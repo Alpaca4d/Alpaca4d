@@ -30,6 +30,8 @@ GeomTransf = openSeesModel[1]
 openSeesBeam = openSeesModel[2]
 openSeesSupport = openSeesModel[3]
 openSeesNodeLoad = openSeesModel[4]
+openSeesNodalMass = openSeesModel[5]
+openSeesBeamLoad = openSeesModel[6]
 openSeesShell = openSeesModel[8]
 openSeesSolid = openSeesModel[10]
 
@@ -321,7 +323,7 @@ def meshLoft3( point, color ):
         for i in range(0,len(pointSection1)):
             for j in range(0, len(pointSection1[0])):
                 vertix = pointSection1[i][j]
-                print( type(vertix) )
+                #print( type(vertix) )
                 meshEle.Vertices.Add( vertix ) 
                 #meshEle.VertexColors.Add( color[0],color[1],color[2] );
         k = len(pointSection1[0])
@@ -359,29 +361,29 @@ for ele in openSeesBeam :
     beamModel = Beam( ele, pointWrapperDict )
     line.append( beamModel[0] )
     posEleTag.append( beamModel[0].PointAtNormalizedLength(0.5) )
-    model.append( beamModel[0] )
     colorLine.append( beamModel[2] )
-    extrudedModel.append( beamModel[1] )
-
+    model.append([ ele[1], beamModel[0] ])
+    extrudedModel.append([ ele[1], beamModel[1] ])
 
 for ele in openSeesShell :
     nNode = len( ele[2] )
     eleTag.append( ele[1] )
     if nNode == 4 :
         shellModel = ShellQuad( ele, pointWrapperDict )
-        model.append( shellModel[0] )
-        extrudedModel.append( shellModel[1] )
         calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
         centroid = calcPropSection.Centroid
         posEleTag.append( centroid )
     elif nNode == 3:
         #print( nNode )
         shellModel = ShellTriangle( ele, pointWrapperDict )
-        model.append( shellModel[0] )
-        extrudedModel.append( shellModel[1] )
         calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
         centroid = calcPropSection.Centroid
         posEleTag.append( centroid )
+
+    model.append([ ele[1] ,shellModel[0] ])
+    extrudedModel.append([ ele[1],shellModel[1] ])
+
+
 
 
 for ele in openSeesSolid :
@@ -390,28 +392,36 @@ for ele in openSeesSolid :
     eleType = ele[0] 
     if nNode == 8:
         solidModel = Solid( ele, pointWrapperDict )
-        model.append( solidModel )
-        extrudedModel.append( solidModel )
         calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
         centroid = calcPropSection.Centroid
         posEleTag.append( centroid )
     elif  eleType == 'FourNodeTetrahedron' :
         #print(ele)
         solidModel = TetraSolid( ele, pointWrapperDict )
-        model.append( solidModel )
-        extrudedModel.append( solidModel )
         calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
         centroid = calcPropSection.Centroid
         posEleTag.append( centroid )
 
+    model.append([ ele[1], solidModel ])
+    extrudedModel.append([ ele[1], solidModel ])
 
+
+# --------------------------------#
+modelDict = dict( model )
+modelExstrudedDict = dict( extrudedModel )
+ModelView = []
+ModelViewExtruded = []
+for i in range(0,len(modelDict)):
+    ModelView.append( modelDict.get( i  , "never" ))
+    ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
+#--------------------------------#
 if elementTag == True:
     tagEle = th.list_to_tree( [ posEleTag, eleTag ]  )
 
 if modelExstrud == True:
-    modelView = extrudedModel
+    modelView = ModelViewExtruded
 else:
-    modelView = model
+    modelView = ModelView
     lineModel = th.list_to_tree( [ line, colorLine ]  )
 
 #------------------ Local Axis ----------------------#
@@ -420,24 +430,31 @@ v3Display = []
 v2Display = []
 v1Display = []
 eleTag = []
+versorLine = []
+
+for ele in openSeesBeam :
+    tag = ele[1]
+    indexStart = ele[2][0]
+    indexEnd = ele[2][1]
+    propSection = ele[13]
+    ## creo la linea ##
+    line = rg.LineCurve( pointWrapperDict.get( indexStart  , "never"), pointWrapperDict.get( indexEnd  , "never"))
+    MidPoint =  line.PointAtNormalizedLength(0.5)
+    ## creo i versori  ##
+    axis3 = pointWrapperDict.get( indexEnd  , "never") - pointWrapperDict.get( indexStart  , "never")
+    axis3.Unitize()
+    axis1 =  rg.Vector3d( propSection[0], propSection[1], propSection[2]  )
+    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    versorLine.append( [ tag ,[ axis1, axis2, axis3 ] ]  )
+    midPoint.append( MidPoint )
+    v3Display.append( axis3*0.5 )
+    v2Display.append( axis2*0.5  )
+    v1Display.append( axis1*0.5  )
+
+VersorLine = dict( versorLine )
+
 if LocalAxes == True:
-    for ele in openSeesBeam :
-        indexStart = ele[2][0]
-        indexEnd = ele[2][1]
-        propSection = ele[13]
-        ## creo la linea ##
-        line = rg.LineCurve( pointWrapperDict.get( indexStart  , "never"), pointWrapperDict.get( indexEnd  , "never"))
-        MidPoint =  line.PointAtNormalizedLength(0.5)
-        ## creo i versori  ##
-        axis3 = pointWrapperDict.get( indexEnd  , "never") - pointWrapperDict.get( indexStart  , "never")
-        axis3.Unitize()
-        axis1 =  rg.Vector3d( propSection[0], propSection[1], propSection[2]  )
-        axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
-        midPoint.append( MidPoint )
-        v3Display.append( axis3*0.5 )
-        v2Display.append( axis2*0.5  )
-        v1Display.append( axis1*0.5  )
-localAxis = th.list_to_tree( [ midPoint, v1Display, v2Display, v3Display ] )
+    localAxis = th.list_to_tree( [ midPoint, v1Display, v2Display, v3Display ] )
 
 #--------------------------------------------------------------#
 
@@ -448,10 +465,22 @@ for force in openSeesNodeLoad :
     fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
     fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
     forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
-forceMax = max( forceMax )
+
+
+for linearLoad in openSeesBeamLoad :
+    forceVector =  rg.Vector3d( linearLoad[1][0], linearLoad[1][1] , linearLoad[1][2]  )
+    fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
+    fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
+    forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
+
+forceMin = min( forceMax )
+
 
 #scale = forceMax*0.1/coordMax 
-scale = 1/forceMax 
+if forceMin > 0 :
+    scale = 1/forceMin 
+else :
+    scale = 0.2
 
 forceDisplay = []
 ancorPoint = []
@@ -462,7 +491,45 @@ if Load == True:
         forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
         ancorPoint.append( pos )
         forceDisplay.append(  forceVector*scale  )
+
+
+
+for linearLoad in openSeesBeamLoad :
+    tag =  linearLoad[0]
+    geomTransf = VersorLine.get( tag  , "never" )
+    force1 = rg.Vector3d.Multiply( linearLoad[1][0], geomTransf[0] )
+    force2 = rg.Vector3d.Multiply( linearLoad[1][1], geomTransf[1] )
+    force3 = rg.Vector3d.Multiply( linearLoad[1][2], geomTransf[2] )
+    forceVector =  rg.Vector3d.Multiply( force1 + force2 + force3, scale )
+    lineBeam =  modelDict.get( tag  , "never" )
+    Length = rg.Curve.GetLength( lineBeam )
+    divideDistance = 0.5
+    DivCurve = lineBeam.DivideByLength( divideDistance, True )
+    if DivCurve == None:
+        DivCurve = [ 0, Length]
+
+    for index, x in enumerate(DivCurve):
+        beamPoint = lineBeam.PointAt(DivCurve[index]) 
+        ancorPoint.append( beamPoint )
+        forceDisplay.append(  forceVector*scale  )
+
 forceDisplay = th.list_to_tree( [ ancorPoint, forceDisplay ] )
+
+scaleMass  = max([row[1][0] for row in openSeesNodalMass ])
+if scaleMass > 0 :
+    scaleMass = scaleMass
+else :
+    scaleMass = 1
+
+massPos = []
+massValue = []
+for mass in openSeesNodalMass  :
+    index  = mass[0]
+    massPos.append(pointWrapperDict.get( index  , "never"))
+    massValue.append(mass[1][0]/scaleMass)
+
+if nodalMass == True:
+    Mass = th.list_to_tree( [ massPos , massValue ] )
 
 
 
