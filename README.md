@@ -4,6 +4,5 @@
 
  ```
  pip install openseespy
-
  ```
  
