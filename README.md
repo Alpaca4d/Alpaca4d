@@ -5,6 +5,7 @@
 <img src="image/openSees_logo.jpg" width="380" height="256">
 
 
+
  ```
  pip install openseespy
  ```
