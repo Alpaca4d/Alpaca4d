@@ -1,7 +1,7 @@
 # openSeesGh
  Experimenting with wrapping [OpenseesPy](https://openseespydoc.readthedocs.io/en/latest/index.html) inside Grasshopper.
 
-testing Git on vs
+
 <img src="image/openSees_logo.jpg" width="380" height="256">
 
 
