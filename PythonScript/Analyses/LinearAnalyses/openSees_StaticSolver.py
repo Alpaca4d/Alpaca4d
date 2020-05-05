@@ -1,4 +1,5 @@
 import sys
+import openseespy.opensees as ops
 
 
 filename = sys.argv[1]
@@ -25,15 +26,13 @@ gT = GeomTransf
 openSeesBeam = openSeesBeam
 oSupport = openSeesSupport
 oNodeLoad = openSeesNodeLoad
-#oMass = openSeesNodalMass          TO DOUBLE CHECK
+#oMass = openSeesNodalMass          NOT NECESSARY FOR STATIC ANALYSES
 oBeamLoad = openSeesBeamLoad
 MatTag = openSeesMatTag
 openSeesShell = openSeesShell
 openSeesSecTag = openSeesSecTag
 
 
-
-import openseespy.opensees as ops
 
 
 ops.wipe()
@@ -82,6 +81,8 @@ for item in openSeesSecTag:
         ops.section(typeSection, secTag, E_mod, nu, h, rho)
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
         print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
+
+
 ## CREATE ELEMENT IN OPENSEES ##
 
 # Define geometric transformation:

@@ -215,7 +215,7 @@ openSeesBeamLoad = openSeesBeamLoad
 # find Total mass convering in each node
 
 cumulativeWeigth = []
-'''
+
 for point in oPoints:
     cumulativeWeigthTemp = []
     for element in Element:
@@ -226,9 +226,9 @@ for point in oPoints:
             massDens = element[5] / 10
             cumulativeWeigthTemp.append( length * massDens)
     cumulativeWeigth.append(cumulativeWeigthTemp)
-'''
+
 totalMassPerPoint = []
-'''
+
 for weigthElements in cumulativeWeigth:
     mass = 0
     for item in weigthElements:
@@ -236,35 +236,22 @@ for weigthElements in cumulativeWeigth:
     totalMassPerPoint.append(mass)
 
 totalMassPerPoint = totalMassPerPoint
-'''
+
 massWrapper = []
-'''
+
 for i,j in zip(oPoints, totalMassPerPoint):
     massWrapper.append( [i,j] )
-'''
+
 
 openSeesNodalMass = []
-'''
+
 for mass in massWrapper:
     massNodeTag = cloudPoints.ClosestPoint(mass[0])
     massValues = [ mass[1], mass[1], mass[1], 0, 0, 0 ]
     openSeesNodalMass.append( [massNodeTag, massValues] )
 
 openSeesNodalMass = openSeesNodalMass
-'''
 
-"""
-## MASS ##
-
-openSeesNodalMass = []
-
-for mass in Mass:
-    massNodeTag = cloudPoints.ClosestPoint(mass[0])
-    massValues = [ mass[1].X, mass[1].Y, mass[1].Z, mass[2].X, mass[2].Y, mass[2].Z ]
-    openSeesNodalMass.append( [massNodeTag, massValues] )
-    
-openSeesNodalMass = openSeesNodalMass
-"""
 
 ## ASSEMBLE ##
 

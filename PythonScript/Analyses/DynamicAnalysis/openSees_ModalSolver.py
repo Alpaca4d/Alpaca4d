@@ -14,12 +14,12 @@ with open(filename, 'r') as f:
     openSeesNodeLoad = eval( lines[4].strip() )
     openSeesNodalMass = eval( lines[5].strip() )
     openSeesBeamLoad = eval( lines[6].strip() )
+    openSeesMatTag = eval( lines[7].strip() )
+    openSeesShell = eval(lines[8].strip() )
+    openSeesSecTag = eval(lines[9].strip() )
 
 
 numEigenvalues = int(sys.argv[2])
-#print(numEigenvalues)
-#numEigenvalues = 6
-
 
 
 oNodes = openSeesNode
