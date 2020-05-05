@@ -1,8 +1,9 @@
 import math as mt
 import sys
-
+import openseespy.opensees as ops
 
 filename = sys.argv[1]
+numEigenvalues = int(sys.argv[2])
 inputName = filename.split("\\")[-1]
 
 with open(filename, 'r') as f:
@@ -19,18 +20,17 @@ with open(filename, 'r') as f:
     openSeesSecTag = eval(lines[9].strip() )
 
 
-numEigenvalues = int(sys.argv[2])
-
 
 oNodes = openSeesNode
 gT = GeomTransf
-oElement = openSeesBeam
+openSeesBeam = openSeesBeam
 oSupport = openSeesSupport
 oNodeLoad = openSeesNodeLoad
-oMass = openSeesNodalMass          #TO DOUBLE CHECK
+oMass = openSeesNodalMass         
 oBeamLoad = openSeesBeamLoad
-
-import openseespy.opensees as ops
+MatTag = openSeesMatTag
+openSeesShell = openSeesShell
+openSeesSecTag = openSeesSecTag
 
 
 ops.wipe()
@@ -38,10 +38,9 @@ ops.wipe()
 # MODEL
 # ------------------------------
 
-# Create ModelBuilder (with three-dimensions and 6 DOF/node):
-
-ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
 #model('basic', '-ndm', ndm, '-ndf', ndf=ndm*(ndm+1)/2)
+ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
+
 
 ##INPUT VARIABLE IS NODES CORDINATES OF STRUCTUR IN GRASSHOPER ##
 
@@ -50,6 +49,33 @@ ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
 for i in range(0,len(oNodes)):
     nodeTag = oNodes[i][0] + 1
     ops.node( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) 
+
+## CREATE MATERIAL IN OPENSEES ##
+
+#print(MatTag) # to adjust
+
+for item in MatTag:
+    materialDimension = item[0].split("_")[1]
+    materialType = item[0].split("_")[2]
+    matTag = item[1][0]
+    E = item[1][1][0]
+    if materialDimension == 'uniaxialMaterial':
+        ops.uniaxialMaterial(materialType, matTag , E)
+    elif materialDimension == 'nDMaterial':
+        ops.nDMaterial('ElasticIsotropic', matTag, E, 0.3)
+
+
+for item in openSeesSecTag:
+    typeSection = item[0].split("_")[1]
+    secTag = int(item[1][0])
+    E_mod = float( item[1][1][1][1] )
+    nu = float( item[1][1][1][3] )
+    h = float( item[1][1][0] )
+    rho = float( item[1][1][1][4] )
+    if typeSection == 'ElasticMembranePlateSection':
+        ops.section(typeSection, secTag, E_mod, nu, h, rho)
+        #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
+        print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
 
 
 ## CREATE ELEMENT IN OPENSEES ##
@@ -63,38 +89,61 @@ for i in range(0, len(gT)):
 
 elementProperties = []
 
-for n in range(0, len(oElement)):
+for n in range(0, len(openSeesBeam)):
 
-    eleTag = oElement[n][1] + 1
-    eleType = oElement[n][0]
-    indexStart = oElement[n][2][0] + 1
-    indexEnd = oElement[n][2][1] + 1
+    eleTag = openSeesBeam[n][1] + 1
+    eleType = openSeesBeam[n][0]
+    indexStart = openSeesBeam[n][2][0] + 1
+    indexEnd = openSeesBeam[n][2][1] + 1
     eleNodes = [ indexStart, indexEnd]
     
-    A = oElement[n][3]
-    E = oElement[n][4]
-    G = oElement[n][5]
-    Jxx = oElement[n][6] 
-    Iy = oElement[n][7] 
-    Iz = oElement[n][8]
-    Avz = oElement[n][11]
-    Avy = oElement[n][12]
-    geomTag = int(oElement[n][9])
-    massDens = 0
-    #massDens = oElement[n][10]
-    orientVector = oElement[n][13]
-    sectionGeomProperties = oElement[n][14]     # it is a list with [shape, base, height]
-    
-    elementProperties.append([ eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties ])
+    A = openSeesBeam[n][3]
+    E = openSeesBeam[n][4]
+    G = openSeesBeam[n][5]
+    Jxx = openSeesBeam[n][6] 
+    Iy = openSeesBeam[n][7] 
+    Iz = openSeesBeam[n][8]
+    Avz = openSeesBeam[n][11]
+    Avy = openSeesBeam[n][12]
+    geomTag = int(openSeesBeam[n][9])
+    massDens = openSeesBeam[n][10]
+    orientVector = openSeesBeam[n][13]
+    sectionGeomProperties = openSeesBeam[n][14]     # it is a list with [shape, base, height]
+    matTag = openSeesBeam[n][15]
 
-    if eleType is 'Truss' :
+    elementProperties.append([ eleTag, [eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties, matTag] ])
 
-        ops.element( eleType , eleTag , indexStart, indexEnd, float(A), float(E), 1)
-    
-    elif eleType is 'ElasticTimoshenkoBeam' :
 
-        ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag)
-        #ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens, '-lMass')
+    if eleType is 'Truss':
+
+        ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag ) # TO CONTROL!!!
+        
+
+    elif eleType is 'ElasticTimoshenkoBeam':
+
+        ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
+
+# transform elementproperties to  Dict to call the object by tag
+elementPropertiesDict = dict(elementProperties)
+
+
+for item in openSeesShell:
+
+    eleType = item[0]
+    #print('eleType = ' + str(eleType))
+    eleTag = item[1] + 1
+    #print('eleTag = ' + str(eleTag))
+    eleNodes = item[2]
+    #print('eleNodes = ' + str(eleNodes))
+    secTag = item[3]
+    #print('secTag = ' + str(secTag))
+    thick = item[4]
+    #print('thick = ' + str(thick))
+
+    if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
+
+        print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
+        ops.element( eleType , eleTag, *eleNodes, secTag)
 
 
 # SUPPORT #
@@ -129,8 +178,7 @@ for i in range(len(oMass)):
 #solver = '-symmBandLapack'
 solver = '-fullGenLapack'
 eigenValues =  ops.eigen(solver, numEigenvalues)
-#print(2*mt.asin(1))
-#print(mt.pi)
+
 
 ## PERIOD ##
 

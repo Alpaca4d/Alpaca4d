@@ -33,17 +33,14 @@ openSeesShell = openSeesShell
 openSeesSecTag = openSeesSecTag
 
 
-
-
 ops.wipe()
 
 # MODEL
 # ------------------------------
 
-# Create ModelBuilder (with three-dimensions and 6 DOF/node):
-
-ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
 #model('basic', '-ndm', ndm, '-ndf', ndf=ndm*(ndm+1)/2)
+ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
+
 
 ##INPUT VARIABLE IS NODES CORDINATES OF STRUCTUR IN GRASSHOPER ##
 
@@ -256,6 +253,7 @@ for elementTag in elementTagList:
 			disp.append(ops.nodeDisp(nodeIndex))
 
 		shellOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), disp])
+
 	elif numberOfNodes == 2:
 		disp = []
 		for nodeIndex in ops.eleNodes(elementTag):
