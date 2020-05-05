@@ -3,8 +3,6 @@ import sys
 
 
 filename = sys.argv[1]
-print(filename)
-#filename = r"C:\Users\FORMAT\Desktop\Alpaca_rev02\assembleData\openSeesModel.txt"
 inputName = filename.split("\\")[-1]
 
 with open(filename, 'r') as f:

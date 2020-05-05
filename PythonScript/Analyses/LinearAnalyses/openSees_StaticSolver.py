@@ -1,8 +1,7 @@
 import sys
 
 
-#filename = sys.argv[1]
-filename = r"C:\Users\FORMAT\Desktop\Alpaca_Rev5_WIP\assembleData\openSeesModel.txt"
+filename = sys.argv[1]
 inputName = filename.split("\\")[-1]
 
 
