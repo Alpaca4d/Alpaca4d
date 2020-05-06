@@ -30,7 +30,6 @@ for element in Element:
         secTagWrapper.append([element[2][0], element[2][1:] ])
     elif (element[1] == "bbarBrick") or (element[1] == "FourNodeTetrahedron"):
         mesh = element[0]
-        print(element)
         vertices = mesh.Vertices
         for i in range(vertices.Count):
             #points.append( rg.Point3d.FromPoint3f(vertices[i]) )
@@ -94,11 +93,7 @@ GeomTransf = GeomTransf
 
 
 
-points = points
-print( points )
-
 oPoints = rg.Point3d.CullDuplicates(points, 0.01)       # Collection of all the points of our geometry
-
 cloudPoints = rg.PointCloud(oPoints)        # Convert to PointCloud to use ClosestPoint Method
 
 
@@ -169,8 +164,7 @@ for eleTag, element in enumerate(Element):
         matTag = matNameDict.setdefault(element[2][0])[0]
         color = [ element[3][0], element[3][1], element[3][2] ]
         # sectionProperties = we need to bring some information later probably 
-        openSeesSolid.append( [ typeElement, eleTag, SolidNodes, matTag, [0,0,0],color] )
-
+        openSeesSolid.append( [ typeElement, eleTag, SolidNodes, matTag, [0,0,0], color] )
 
 
 openSeesShell = openSeesShell
@@ -191,7 +185,6 @@ for support in Support:
     openSeesSupport.append( [supportNodeTag, dof_1, dof_2, dof_3, dof_4, dof_5, dof_6 ] )
 
 openSeesSupport = openSeesSupport
-
 
 ## FORCE ##
 
@@ -222,7 +215,7 @@ openSeesBeamLoad = openSeesBeamLoad
 # find Total mass convering in each node
 
 cumulativeWeigth = []
-'''
+
 for point in oPoints:
     cumulativeWeigthTemp = []
     for element in Element:
@@ -233,9 +226,9 @@ for point in oPoints:
             massDens = element[5] / 10
             cumulativeWeigthTemp.append( length * massDens)
     cumulativeWeigth.append(cumulativeWeigthTemp)
-'''
+
 totalMassPerPoint = []
-'''
+
 for weigthElements in cumulativeWeigth:
     mass = 0
     for item in weigthElements:
@@ -243,35 +236,22 @@ for weigthElements in cumulativeWeigth:
     totalMassPerPoint.append(mass)
 
 totalMassPerPoint = totalMassPerPoint
-'''
+
 massWrapper = []
-'''
+
 for i,j in zip(oPoints, totalMassPerPoint):
     massWrapper.append( [i,j] )
-'''
+
 
 openSeesNodalMass = []
-'''
+
 for mass in massWrapper:
     massNodeTag = cloudPoints.ClosestPoint(mass[0])
     massValues = [ mass[1], mass[1], mass[1], 0, 0, 0 ]
     openSeesNodalMass.append( [massNodeTag, massValues] )
 
 openSeesNodalMass = openSeesNodalMass
-'''
 
-"""
-## MASS ##
-
-openSeesNodalMass = []
-
-for mass in Mass:
-    massNodeTag = cloudPoints.ClosestPoint(mass[0])
-    massValues = [ mass[1].X, mass[1].Y, mass[1].Z, mass[2].X, mass[2].Y, mass[2].Z ]
-    openSeesNodalMass.append( [massNodeTag, massValues] )
-    
-openSeesNodalMass = openSeesNodalMass
-"""
 
 ## ASSEMBLE ##
 
