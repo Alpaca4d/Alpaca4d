@@ -30,6 +30,7 @@ for element in Element:
         secTagWrapper.append([element[2][0], element[2][1:] ])
     elif (element[1] == "bbarBrick") or (element[1] == "FourNodeTetrahedron"):
         mesh = element[0]
+        print(element)
         vertices = mesh.Vertices
         for i in range(vertices.Count):
             #points.append( rg.Point3d.FromPoint3f(vertices[i]) )
@@ -94,9 +95,10 @@ GeomTransf = GeomTransf
 
 
 points = points
-
+print( points )
 
 oPoints = rg.Point3d.CullDuplicates(points, 0.01)       # Collection of all the points of our geometry
+
 cloudPoints = rg.PointCloud(oPoints)        # Convert to PointCloud to use ClosestPoint Method
 
 
@@ -138,12 +140,15 @@ for eleTag, element in enumerate(Element):
         orientVector = [ element[3].X, element[3].Y, element[3].Z ]
         massDens = element[5]
         sectionGeomProperties = element[2][7]
+        color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
         matTag = matNameDict.setdefault(element[2][6][0])[0]
-        openSeesBeam.append( [typeElement, eleTag, eleNodes, Area, E_mod, G_mod, Jxx, Iy, Iz, transfTag, massDens, Avy, Avz, orientVector, sectionGeomProperties, matTag] )
+        openSeesBeam.append( [typeElement, eleTag, eleNodes, Area, E_mod, G_mod, Jxx, Iy, Iz, transfTag, massDens, Avy, Avz, orientVector, sectionGeomProperties, matTag, color] )
+        
     elif (element[1] == "ShellDKGQ") or (element[1] == "ShellDKGT"):
         typeElement = element[1]
         eleTag = eleTag
         shellNodesRhino = element[0].Vertices
+        color = [element[3][0],element[3][1],element[3][2],element[3][3]] 
         indexNode = []
         for node in shellNodesRhino:
             indexNode.append(cloudPoints.ClosestPoint(node) + 1)
@@ -151,7 +156,8 @@ for eleTag, element in enumerate(Element):
         thick = element[2][1]
         secTag = secTagDict.setdefault(element[2][0])[0]
         # sectionProperties = we need to bring some information later probably 
-        openSeesShell.append( [ typeElement, eleTag, shellNodes, secTag, thick] )
+        openSeesShell.append( [ typeElement, eleTag, shellNodes, secTag, thick, color] )
+        
     elif (element[1] == 'bbarBrick') or (element[1] == "FourNodeTetrahedron"):
         typeElement = element[1]
         eleTag = eleTag
@@ -161,8 +167,9 @@ for eleTag, element in enumerate(Element):
             indexNode.append(cloudPoints.ClosestPoint(node) + 1)
         SolidNodes = indexNode
         matTag = matNameDict.setdefault(element[2][0])[0]
+        color = [ element[3][0], element[3][1], element[3][2] ]
         # sectionProperties = we need to bring some information later probably 
-        openSeesSolid.append( [ typeElement, eleTag, SolidNodes, matTag, [0,0,0]] )
+        openSeesSolid.append( [ typeElement, eleTag, SolidNodes, matTag, [0,0,0],color] )
 
 
 
@@ -215,7 +222,7 @@ openSeesBeamLoad = openSeesBeamLoad
 # find Total mass convering in each node
 
 cumulativeWeigth = []
-
+'''
 for point in oPoints:
     cumulativeWeigthTemp = []
     for element in Element:
@@ -226,9 +233,9 @@ for point in oPoints:
             massDens = element[5] / 10
             cumulativeWeigthTemp.append( length * massDens)
     cumulativeWeigth.append(cumulativeWeigthTemp)
-
+'''
 totalMassPerPoint = []
-
+'''
 for weigthElements in cumulativeWeigth:
     mass = 0
     for item in weigthElements:
@@ -236,22 +243,35 @@ for weigthElements in cumulativeWeigth:
     totalMassPerPoint.append(mass)
 
 totalMassPerPoint = totalMassPerPoint
-
+'''
 massWrapper = []
-
+'''
 for i,j in zip(oPoints, totalMassPerPoint):
     massWrapper.append( [i,j] )
-
+'''
 
 openSeesNodalMass = []
-
+'''
 for mass in massWrapper:
     massNodeTag = cloudPoints.ClosestPoint(mass[0])
     massValues = [ mass[1], mass[1], mass[1], 0, 0, 0 ]
     openSeesNodalMass.append( [massNodeTag, massValues] )
 
 openSeesNodalMass = openSeesNodalMass
+'''
 
+"""
+## MASS ##
+
+openSeesNodalMass = []
+
+for mass in Mass:
+    massNodeTag = cloudPoints.ClosestPoint(mass[0])
+    massValues = [ mass[1].X, mass[1].Y, mass[1].Z, mass[2].X, mass[2].Y, mass[2].Z ]
+    openSeesNodalMass.append( [massNodeTag, massValues] )
+    
+openSeesNodalMass = openSeesNodalMass
+"""
 
 ## ASSEMBLE ##
 
