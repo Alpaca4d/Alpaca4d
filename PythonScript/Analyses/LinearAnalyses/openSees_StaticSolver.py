@@ -1,5 +1,4 @@
 import sys
-import openseespy.opensees as ops
 
 
 filename = sys.argv[1]
@@ -18,6 +17,7 @@ with open(filename, 'r') as f:
     openSeesMatTag = eval( lines[7].strip() )
     openSeesShell = eval(lines[8].strip() )
     openSeesSecTag = eval(lines[9].strip() )
+    openSeesSolid = eval(lines[10].strip() )
 
 
 
@@ -26,21 +26,27 @@ gT = GeomTransf
 openSeesBeam = openSeesBeam
 oSupport = openSeesSupport
 oNodeLoad = openSeesNodeLoad
-#oMass = openSeesNodalMass          NOT NECESSARY FOR STATIC ANALYSES
+#oMass = openSeesNodalMass          TO DOUBLE CHECK
 oBeamLoad = openSeesBeamLoad
 MatTag = openSeesMatTag
 openSeesShell = openSeesShell
 openSeesSecTag = openSeesSecTag
+openSeesSolid = openSeesSolid
 
+
+import openseespy.opensees as ops
+# import OpenSeesPy rendering module
+#from openseespy.postprocessing.Get_Rendering import *
 
 ops.wipe()
 
 # MODEL
 # ------------------------------
 
-#model('basic', '-ndm', ndm, '-ndf', ndf=ndm*(ndm+1)/2)
-ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
+# Create ModelBuilder (with three-dimensions and 6 DOF/node):
 
+ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
+#model('basic', '-ndm', ndm, '-ndf', ndf=ndm*(ndm+1)/2)
 
 ##INPUT VARIABLE IS NODES CORDINATES OF STRUCTUR IN GRASSHOPER ##
 
@@ -78,8 +84,6 @@ for item in openSeesSecTag:
         ops.section(typeSection, secTag, E_mod, nu, h, rho)
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
         print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
-
-
 ## CREATE ELEMENT IN OPENSEES ##
 
 # Define geometric transformation:
@@ -112,8 +116,9 @@ for n in range(0, len(openSeesBeam)):
     orientVector = openSeesBeam[n][13]
     sectionGeomProperties = openSeesBeam[n][14]     # it is a list with [shape, base, height]
     matTag = openSeesBeam[n][15]
+    color = openSeesBeam[n][16]   
 
-    elementProperties.append([ eleTag, [eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties, matTag] ])
+    elementProperties.append([ eleTag, [eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties, matTag, color] ])
 
 
     if eleType is 'Truss':
@@ -125,13 +130,10 @@ for n in range(0, len(openSeesBeam)):
 
         ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
 
-# transform elementproperties to  Dict to call the object by tag
-elementPropertiesDict = dict(elementProperties)
-
-
 for item in openSeesShell:
 
     eleType = item[0]
+
     #print('eleType = ' + str(eleType))
     eleTag = item[1] + 1
     #print('eleTag = ' + str(eleTag))
@@ -141,12 +143,37 @@ for item in openSeesShell:
     #print('secTag = ' + str(secTag))
     thick = item[4]
     #print('thick = ' + str(thick))
+    color = item[5]
+
+    elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
     if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
 
         print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
+for item in openSeesSolid:
+
+    eleType = item[0]
+    #print('eleType = ' + str(eleType))
+    eleTag = item[1] + 1
+    #print('eleTag = ' + str(eleTag))
+    eleNodes = item[2]
+    #print('eleNodes = ' + str(eleNodes))
+    matTag = item[3]
+    #print('secTag = ' + str(secTag))
+    force = item[4]
+    #print( force)
+    color = item[5]
+
+    elementProperties.append([ eleTag, [eleType,color] ])
+
+    if (eleType == 'bbarBrick') or (eleType == 'FourNodeTetrahedron'):
+
+        print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
+        ops.element( eleType , eleTag, *eleNodes, matTag, *force)                           
+# transform elementproperties to  Dict to call the object by tag
+elementPropertiesDict = dict(elementProperties)
 
 # SUPPORT #
 
@@ -190,14 +217,13 @@ ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele'
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
-
+#plot_model()
 # create SOE
 ops.system("BandSPD")
 
 ops.numberer('Plain')
 
 # create constraint handler
-
 #ops.constraints("Plain")
 ops.constraints("Transformation") # to allow Diaphgram constrain
 
@@ -245,21 +271,12 @@ shellOutputWrapper = []
 
 
 elementTagList = ops.getEleTags()
+
 for elementTag in elementTagList:
-	numberOfNodes = len( ops.eleNodes(elementTag) )
-	if numberOfNodes >= 3:
-		disp = []
-		for nodeIndex in ops.eleNodes(elementTag):
-			disp.append(ops.nodeDisp(nodeIndex))
-
-		shellOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), disp])
-
-	elif numberOfNodes == 2:
-		disp = []
-		for nodeIndex in ops.eleNodes(elementTag):
-			disp.append(ops.nodeDisp(nodeIndex))
-		elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), disp[0], disp[1], elementPropertiesDict.setdefault(elementTag) ]) # need to find a new way to add elementProperties
-
+    numberOfNodes = len( ops.eleNodes(elementTag) )
+    #print( numberOfNodes )
+    elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
+ # need to find a new way to add elementProperties
 
 
 openSeesOutputWrapper = ([nodeDisplacementWrapper,

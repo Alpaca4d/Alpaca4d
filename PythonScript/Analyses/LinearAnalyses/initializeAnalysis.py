@@ -31,12 +31,10 @@ with open(outputFile, 'r') as f:
     reactionWrapper = eval( lines[1].strip() )
     elementOutputWrapper = eval( lines[2].strip() )
     elementLoadWrapper = eval( lines[3].strip() )
-    shellOutputWrapper = eval( lines[4].strip() )
 
 
 
 openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         reactionWrapper,
                         elementOutputWrapper,
-                        elementLoadWrapper,
-                        shellOutputWrapper])
+                        elementLoadWrapper])
