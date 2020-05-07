@@ -1,3 +1,4 @@
+import math as mt
 
 def linspace(a, b, n=100):
     if n < 2:

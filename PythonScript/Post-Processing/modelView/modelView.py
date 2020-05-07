@@ -18,10 +18,10 @@ wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
 userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
 fileName = userObjectFolder + 'Alpaca'
 '''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript'
-sys.path.append(fileName)
+folderName = r'C:\GitHub\Alpaca4d\PythonScript\function'
+sys.path.append(folderName)
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import function.DomeFunc as dg 
+import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
 
