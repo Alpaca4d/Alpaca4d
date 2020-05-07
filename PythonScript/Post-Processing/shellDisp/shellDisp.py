@@ -1,4 +1,5 @@
 ﻿import Rhino.Geometry as rg
+import ghpythonlib.treehelpers as th # per data tree
 #---------------------------------------------------------------------------------------#
 
 diplacementWrapper = openSeesOutputWrapper[0]
@@ -22,9 +23,9 @@ for index,item in enumerate(diplacementWrapper):
     displacementValue.append( item[1] )
     pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
     if len(item[1]) == 3:
-        dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
+        dispWrapper.append( [index, rg.Vector3d( item[1][0], item[1][1], item[1][2] ) ] )
     elif len(item[1]) == 6:
-        dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
+        dispWrapper.append( [index, [rg.Vector3d(item[1][0],item[1][1],item[1][2] ), rg.Vector3d(item[1][3],item[1][4],item[1][5]) ] ] )
 
 ## Dict. for point ##
 pointWrapperDict = dict( pointWrapper )
@@ -96,6 +97,6 @@ for ele in EleOut :
         tag.append( tagEle )
         
 tagElement = tag
-Trans = trans
-Rot = rot
+Trans = th.list_to_tree( trans )
+Rot = th.list_to_tree( rot )
 
