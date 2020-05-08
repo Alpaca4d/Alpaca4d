@@ -7,6 +7,7 @@
 * [ ] Update Deformed Dynamic Model
 * [ ] Create Cluster when necessary
 * [ ] Diagram Cds
+* [ ] Add 3df Solver
 
 ### Marco Pellegrino
 
