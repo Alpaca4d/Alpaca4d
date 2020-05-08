@@ -230,18 +230,7 @@ for item in ForceOut:
         Fj = rg.Point3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
         Mj = rg.Point3d( item[1][9], item[1][10], item[1][11] )
         forceWrapper.append( [index, [ Fi, Mi, Fj, Mj ]] )
-'''
-    elif len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
-        Fi = rg.Point3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-        Mi = rg.Point3d( item[1][3], item[1][4], item[1][5] )
-        Fj = rg.Point3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-        Mj = rg.Point3d( item[1][9], item[1][10], item[1][11] )
-        Fk = rg.Point3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-        Mk = rg.Point3d( item[1][15], item[1][16], item[1][17] )
-        Fw = rg.Point3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
-        Mw = rg.Point3d( item[1][21], item[1][22], item[1][23] )
-        forceWrapper.append( [index, [ Fi, Mi, Fj, Mj, Fk, Mk, Fw, Mw ] ])
-'''
+
 ## Dict. for force ##
 forceWrapperDict = dict( forceWrapper )
 ####
