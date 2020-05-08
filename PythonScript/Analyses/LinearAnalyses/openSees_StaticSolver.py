@@ -266,7 +266,7 @@ reactionWrapper = reactionWrapper
 
 #-----------------------------------------------------
 elementOutputWrapper = []
-shellOutputWrapper = []
+eleForceOutputWrapper = []
 
 
 
@@ -276,6 +276,7 @@ for elementTag in elementTagList:
     numberOfNodes = len( ops.eleNodes(elementTag) )
     #print( numberOfNodes )
     elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
+    eleForceOutputWrapper.append([ elementTag, ops.eleForce(elementTag) ])
  # need to find a new way to add elementProperties
 
 
@@ -283,7 +284,7 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         reactionWrapper,
                         elementOutputWrapper,
                         elementLoad,
-                        shellOutputWrapper])
+                        eleForceOutputWrapper])
 
 
 length = len(filename)-len(inputName)
