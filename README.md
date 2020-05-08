@@ -15,3 +15,6 @@
 * [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
 * [ ] CMD starts when we run the analyses. Do we like it?
 * [ ] Add Warning to the components
+* [ ] Color Palette for components
+* [ ] Documentation
+* [ ] Icon
