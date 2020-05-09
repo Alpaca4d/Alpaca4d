@@ -99,7 +99,7 @@ def forceTimoshenkoBeam( ele, node, force, loadDict ):
         Nx = F3I - q3*x
         N.append( Nx )
         ## Taglio in direzione 1 ##
-        V1x = F1I - q1*x
+        V1x = F1I + q1*x
         V1.append( V1x )
         ## Taglio in direzione 2 ##
         V2x = F2I - q2*x
@@ -111,7 +111,7 @@ def forceTimoshenkoBeam( ele, node, force, loadDict ):
         M1x = M1I + F2I*x - q2*x**2/2
         M1.append( M1x )
         ## Taglio in direzione 2 ##
-        M2x = M2I + F1I*x - q1*x**2/2
+        M2x = M2I - F1I*x - q1*x**2/2
         M2.append( M2x )
         
     eleForceValue = [ N, V1, V2, Mt, M1, M2, versor, pointLine ]
@@ -259,7 +259,7 @@ for ele in EleOut :
         M2.append(valueTBeam[5])
         versorLine.append(valueTBeam[6])
         linePoint.append(valueTBeam[7])
-'''
+
     elif eleType == 'Truss' :
         valueTruss = forceTrussValue( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict)
         N.append(valueTruss[0])
@@ -270,9 +270,8 @@ for ele in EleOut :
         M2.append(valueTruss[5])
         versorLine.append(valueTruss[6])
         linePoint.append(valueTruss[7])
-'''
-#--------------------------------------------------------------#
 
+#--------------------------------------------------------------#
 Nmax = max(max(N))
 Nmin = min(min(N))
 
@@ -286,28 +285,32 @@ M2max = max(max(M2))
 M2min = min(min(M2))
 
 V1max = max(max(V1))
-v1min = min(min(V1))
+V1min = min(min(V1))
 
 Mtmax = max(max(Mt))
 Mtmin = min(min(Mt))
 
 
-def scaleAutomatic(lengthMax, valueMax, valueMin):
-    if valueMax < 0.01 :
+def scaleAutomatic( valueMax, valueMin):
+    if max( valueMax,mt.fabs(valueMin)) < 0.000000001 :
         return 0
     else :
-        return lengthMax*0.2/(max( valueMax,mt.fabs(valueMin)))
+        return 2/(max( valueMax,mt.fabs(valueMin)))
 
 if scale == None:
-    scaleN = scaleAutomatic( lengthMax, Nmax, Nmin )
-    scaleM = scaleAutomatic( lengthMax, max(M1max, M2max), min(M1min, M2min) )
-    scaleT = scaleAutomatic( lengthMax, max(T1max, T2max), min(T1min, T2min) )
-    scaleMt = scaleAutomatic( lengthMax, Mtmax, Mtmin )
+    scaleN = scaleAutomatic( Nmax, Nmin )
+    scaleM1 = scaleAutomatic( M1max, M1min )
+    scaleM2 = scaleAutomatic( M2max, M2min )
+    scaleV1 = scaleAutomatic( V1max ,V1min )
+    scaleV2 = scaleAutomatic( V2max ,V2min )
+    scaleMt = scaleAutomatic( Mtmax, Mtmin )
 
 else :
     scaleN = scale
-    scaleT = scale
-    scaleM = scale
+    scaleM1 = scale
+    scaleM2 = scale
+    scaleV1 = scale
+    scaleV2 = scale
     scaleMt = scale
 
 
@@ -364,17 +367,19 @@ def cdsMesh( strucPoint , cdsValue, cdsPoint, color1, color2):
         Mesh.Append( mesh)
     return Mesh
 
-for force,vector,pointDiv in zip( [N, V1, V2, Mt, M1, M2], versorLine, linePoint ):
+
+for f3,f1,f2,m3,m1,m2,vector,pointDiv in zip( N, V1, V2, Mt, M1, M2 , versorLine, linePoint ):
     versor1 = vector[0]
     versor2 = vector[1]
     versor3 = vector[2]
     PointsDivLength = pointDiv
-    Nval = force[0]
-    V1val = force[1]
-    V2val = force[2]
-    Mtval = force[3]
-    M1val = force[4]
-    M2val = force[5]
+    #print( force )
+    Nval = f3
+    V1val = f1
+    V2val = f2
+    Mtval = m3
+    M1val = m1
+    M2val = m2
     
     NPoint = []
     M1Point = []
@@ -386,18 +391,18 @@ for force,vector,pointDiv in zip( [N, V1, V2, Mt, M1, M2], versorLine, linePoint
     for value in range( 0, len(Nval) ):
         
         NPoint.append(scaleN*versor1*Nval[value])
-        M1Point.append(scaleM*versor2*M1val[value])
-        V2Point.append(scaleT*versor2*V2val[value])
-        M2Point.append(scaleM*versor1*M2val[value])
-        V1Point.append(scaleT*versor1*V1val[value])
+        M1Point.append(scaleM1*versor2*M1val[value])
+        V2Point.append(scaleV2*versor2*V2val[value])
+        M2Point.append(scaleM2*versor1*M2val[value])
+        V1Point.append(scaleV1*versor1*V1val[value])
         MtPoint.append(scaleMt*versor1*Mtval[value])
-    Nmesh = cdsMesh( PointsDivLength , Nval, NPoint, rosa, blu)
+    Nmesh = cdsMesh( PointsDivLength , Nval, NPoint, blu, rosa)
     
-    M2mesh = cdsMesh( PointsDivLength , M2val, M2Point, blu, rosso)
+    M2mesh = cdsMesh( PointsDivLength , M2val, M2Point, rosso, blu)
     
     T1mesh = cdsMesh( PointsDivLength , V1val, V1Point, rosso, rosso)
     
-    M1mesh = cdsMesh( PointsDivLength , M1val, M1Point, celeste, rosa)
+    M1mesh = cdsMesh( PointsDivLength , M1val, M1Point, rosa, celeste)
     
     T2mesh = cdsMesh( PointsDivLength , V2val, V2Point, giallo, giallo)
     
