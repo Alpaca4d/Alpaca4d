@@ -12,7 +12,7 @@ outputPath = ghFolderPath + 'assembleData'
 wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
 
 #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\DynamicAnalyses\openSees_ModalSolver.py'
+fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\DynamicAnalysis\openSees_ModalSolver.py'
 
 
 modalAnalyses = System.Diagnostics.ProcessStartInfo(fileName)

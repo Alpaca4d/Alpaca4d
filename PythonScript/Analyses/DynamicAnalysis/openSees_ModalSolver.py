@@ -1,6 +1,6 @@
-import math as mt
 import sys
 import openseespy.opensees as ops
+import math
 
 filename = sys.argv[1]
 numEigenvalues = int(sys.argv[2])
@@ -18,7 +18,7 @@ with open(filename, 'r') as f:
     openSeesMatTag = eval( lines[7].strip() )
     openSeesShell = eval(lines[8].strip() )
     openSeesSecTag = eval(lines[9].strip() )
-
+    openSeesSolid = eval(lines[10].strip() )
 
 
 oNodes = openSeesNode
@@ -26,11 +26,14 @@ gT = GeomTransf
 openSeesBeam = openSeesBeam
 oSupport = openSeesSupport
 oNodeLoad = openSeesNodeLoad
-oMass = openSeesNodalMass         
 oBeamLoad = openSeesBeamLoad
 MatTag = openSeesMatTag
 openSeesShell = openSeesShell
 openSeesSecTag = openSeesSecTag
+openSeesSolid = openSeesSolid
+oMass = openSeesNodalMass
+
+
 
 
 ops.wipe()
@@ -38,17 +41,20 @@ ops.wipe()
 # MODEL
 # ------------------------------
 
-#model('basic', '-ndm', ndm, '-ndf', ndf=ndm*(ndm+1)/2)
-ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
+# Create ModelBuilder (with three-dimensions and 6 DOF/node):
 
+ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
+#model('basic', '-ndm', ndm, '-ndf', ndf=ndm*(ndm+1)/2)
 
 ##INPUT VARIABLE IS NODES CORDINATES OF STRUCTUR IN GRASSHOPER ##
 
 ## CREATE NODES IN OPENSEES ##
 
+
 for i in range(0,len(oNodes)):
     nodeTag = oNodes[i][0] + 1
-    ops.node( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) 
+    ops.node( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] )
+    print('ops.node( {0}, {1}, {2}, {3})'.format( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) )
 
 ## CREATE MATERIAL IN OPENSEES ##
 
@@ -76,15 +82,13 @@ for item in openSeesSecTag:
         ops.section(typeSection, secTag, E_mod, nu, h, rho)
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
         print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
-
-
 ## CREATE ELEMENT IN OPENSEES ##
 
 # Define geometric transformation:
 for i in range(0, len(gT)):
     tag = gT[i][0]
     vec = gT[i][1]
-    ops.geomTransf('Linear', tag , *vec) 
+    ops.geomTransf('Linear', tag , *vec)
 
 
 elementProperties = []
@@ -110,8 +114,9 @@ for n in range(0, len(openSeesBeam)):
     orientVector = openSeesBeam[n][13]
     sectionGeomProperties = openSeesBeam[n][14]     # it is a list with [shape, base, height]
     matTag = openSeesBeam[n][15]
+    color = openSeesBeam[n][16]   
 
-    elementProperties.append([ eleTag, [eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties, matTag] ])
+    elementProperties.append([ eleTag, [eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties, matTag, color] ])
 
 
     if eleType is 'Truss':
@@ -123,13 +128,10 @@ for n in range(0, len(openSeesBeam)):
 
         ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
 
-# transform elementproperties to  Dict to call the object by tag
-elementPropertiesDict = dict(elementProperties)
-
-
 for item in openSeesShell:
 
     eleType = item[0]
+
     #print('eleType = ' + str(eleType))
     eleTag = item[1] + 1
     #print('eleTag = ' + str(eleTag))
@@ -139,19 +141,44 @@ for item in openSeesShell:
     #print('secTag = ' + str(secTag))
     thick = item[4]
     #print('thick = ' + str(thick))
+    color = item[5]
+
+    elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
     if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
 
         print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
+for item in openSeesSolid:
+
+    eleType = item[0]
+    #print('eleType = ' + str(eleType))
+    eleTag = item[1] + 1
+    #print('eleTag = ' + str(eleTag))
+    eleNodes = item[2]
+    #print('eleNodes = ' + str(eleNodes))
+    matTag = item[3]
+    #print('secTag = ' + str(secTag))
+    force = item[4]
+    #print( force)
+    color = item[5]
+
+    elementProperties.append([ eleTag, [eleType,color] ])
+
+    if (eleType == 'bbarBrick') or (eleType == 'FourNodeTetrahedron'):
+
+        print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
+        ops.element( eleType , eleTag, *eleNodes, matTag, *force)                           
+# transform elementproperties to  Dict to call the object by tag
+elementPropertiesDict = dict(elementProperties)
 
 # SUPPORT #
 
 for i in range(0, len(oSupport)):
     indexSupport = oSupport[i][0] + 1
+    print('ops.fix( {0}, {1}, {2}, {3}, {4}, {5}, {6})'.format( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3], oSupport[i][4], oSupport[i][5], oSupport[i][6]) )
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3], oSupport[i][4], oSupport[i][5], oSupport[i][6] )
-
 
 ## LOAD ##
 
@@ -174,61 +201,49 @@ for i in range(len(oMass)):
 # Start of analysis generation
 # ------------------------------
 # calculate eigenvalues & print results
-#solver = '-genBandArpack'
-#solver = '-symmBandLapack'
 solver = '-fullGenLapack'
 eigenValues =  ops.eigen(solver, numEigenvalues)
 
 
 ## PERIOD ##
-
 period = []
 frequency = []
 
 
 for i in range(numEigenvalues):
     lambd = eigenValues[i]
-    omega = mt.sqrt(lambd)
-    freq = omega / (2*mt.pi)
-    period.append( (2*mt.pi) / (omega) )
+    omega = math.sqrt(lambd)
+    freq = omega / (2*math.pi)
+    period.append( (2*math.pi) / (omega) )
     frequency.append(freq)
 
 period = period
-## SPOSTAMENTI NODALI ##
 
-## we should find a way to plot for all numberModal. In that case we don't
-## have to run the analyses to see every Modes
+## SPOSTAMENTI NODALI ##
 
 nodeModalDispWrapper = []
 
 for eigenMode in range(1, numEigenvalues + 1):
     nodeModalDispWrapperTemp = []
-    for i in range(0,len(ops.getNodeTags())):
+    for i in range(1,len(ops.getNodeTags())+1):
 
-        nodeTag = oNodes[i][0] + 1
-        
-        oNodeModalDisp = ops.nodeEigenvector( nodeTag ,eigenMode) # spostamenti e rotazioni del nodo 
-
+        nodeTag = i
         Node = ops.nodeCoord( nodeTag ) # cordinate nodo
-        nodeModalDispWrapperTemp.append( [Node, oNodeModalDisp] )
+        NodeModalDisp = ops.nodeEigenvector( nodeTag ,eigenMode) # spostamenti e rotazioni del nodo 
+        nodeModalDispWrapperTemp.append( [Node, NodeModalDisp] )
+
     nodeModalDispWrapper.append( nodeModalDispWrapperTemp )
 
-####################################################
-numberElement = ops.getEleTags()
+#-----------------------------------------------------
+
 elementOutputWrapper = []
 
-for eigenMode in range(1, numEigenvalues + 1):
+elementTagList = ops.getEleTags()
 
-    eleModalOutputTemp = []
-    for i in range(len(ops.getEleTags())):
-        tagElement = numberElement[i]
-        indexStart = ops.eleNodes(tagElement)[0]
-        indexEnd = ops.eleNodes(tagElement)[1]
-        dispStart = ops.nodeEigenvector( indexStart, eigenMode )
-        dispEnd = ops.nodeEigenvector( indexEnd, eigenMode )
-        eleModalOutputTemp.append([ tagElement, ops.eleNodes(tagElement), dispStart, dispEnd, elementProperties[i] ])
-    elementOutputWrapper.append( eleModalOutputTemp )
-#######################################################################
+for elementTag in elementTagList:
+    elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
+
+#-----------------------------------------------------
 
 nodeModalDispWrapper = nodeModalDispWrapper
 elementOutputWrapper = elementOutputWrapper

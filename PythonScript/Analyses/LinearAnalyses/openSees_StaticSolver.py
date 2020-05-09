@@ -1,4 +1,5 @@
 import sys
+import openseespy.opensees as ops
 
 
 filename = sys.argv[1]
@@ -26,7 +27,6 @@ gT = GeomTransf
 openSeesBeam = openSeesBeam
 oSupport = openSeesSupport
 oNodeLoad = openSeesNodeLoad
-#oMass = openSeesNodalMass          TO DOUBLE CHECK
 oBeamLoad = openSeesBeamLoad
 MatTag = openSeesMatTag
 openSeesShell = openSeesShell
@@ -34,9 +34,6 @@ openSeesSecTag = openSeesSecTag
 openSeesSolid = openSeesSolid
 
 
-import openseespy.opensees as ops
-# import OpenSeesPy rendering module
-#from openseespy.postprocessing.Get_Rendering import *
 
 ops.wipe()
 
@@ -212,19 +209,17 @@ for item in openSeesBeamLoad:
 
 
 
-ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele', 1,'stresses')
+#ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele', 1,'stresses')
 
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
-#plot_model()
-# create SOE
+
 ops.system("BandSPD")
 
 ops.numberer('Plain')
 
 # create constraint handler
-#ops.constraints("Plain")
 ops.constraints("Transformation") # to allow Diaphgram constrain
 
 # create integrator
@@ -248,9 +243,9 @@ nodeDisplacementWrapper = []
 for i in range(1,len(ops.getNodeTags())+1):
 
     nodeTag = i
-    oNode = ops.nodeCoord( nodeTag ) # cordinate nodo
-    oNodeDisp = ops.nodeDisp( nodeTag ) # spostamenti e rotazioni del nodo 
-    nodeDisplacementWrapper.append([oNode, oNodeDisp])
+    Node = ops.nodeCoord( nodeTag ) # cordinate nodo
+    NodeDisp = ops.nodeDisp( nodeTag ) # spostamenti e rotazioni del nodo 
+    nodeDisplacementWrapper.append([Node, NodeDisp])
 
 #-----------------------------------------------------
 
@@ -273,8 +268,6 @@ eleForceOutputWrapper = []
 elementTagList = ops.getEleTags()
 
 for elementTag in elementTagList:
-    numberOfNodes = len( ops.eleNodes(elementTag) )
-    #print( numberOfNodes )
     elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
     eleForceOutputWrapper.append([ elementTag, ops.eleForce(elementTag) ])
  # need to find a new way to add elementProperties

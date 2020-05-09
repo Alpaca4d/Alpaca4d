@@ -1,9 +1,21 @@
 # openSeesGh
- Experimenting with wrapping [OpenseesPy](https://openseespydoc.readthedocs.io/en/latest/index.html) inside Grasshopper.
+## To Do List
 
-<img src="image/openSees_logo.jpg">
+### Domenico Gaudioso
 
+* [ ] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
+* [ ] Update Deformed Dynamic Model
+* [ ] Create Cluster when necessary
+* [ ] Diagram Cds
+* [ ] Add 3df Solver
 
- ```
- pip install openseespy
- ```
+### Marco Pellegrino
+
+* [ ] Update Modal Analyses
+* [ ] EarthQuake Analyses
+* [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
+* [ ] CMD starts when we run the analyses. Do we like it?
+* [ ] Add Warning to the components
+* [ ] Color Palette for components
+* [ ] Documentation
+* [ ] Icon
