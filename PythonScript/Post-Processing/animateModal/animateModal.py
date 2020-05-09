@@ -1,7 +1,7 @@
 ﻿import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import Grasshopper
+import Grasshopper as gh
 #import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
@@ -26,55 +26,6 @@ sys.path.append(fileName)
 import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
-
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
-nodeValue = []
-displacementValue = []
-#ShellOut = openSeesOutputWrapper[4]
-
-pointWrapper = []
-dispWrapper = []
-
-for index,item in enumerate(diplacementWrapper):
-    nodeValue.append( item[0] )
-    displacementValue.append( item[1] )
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-    if len(item[1]) == 3:
-        dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
-    elif len(item[1]) == 6:
-        dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
-
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-pointDispWrapperDict = dict( dispWrapper )
-####
-
-## FOR scala automatica ##
-## nodeValue è la lista delle cordinate
-rowX = [row[0] for row in nodeValue ]
-rowY = [row[1] for row in nodeValue ]
-rowZ = [row[2] for row in nodeValue ]
-
-scaleMax = max( max(rowX), max(rowY), max(rowZ) )
-scaleMin = min( min(rowX), min(rowY), min(rowZ) )
-coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
-
-## displacementValue è la lista degli spostamenti
-
-rowDefX = [row[0] for row in displacementValue ]
-rowDefY = [row[1] for row in displacementValue ]
-rowDefZ = [row[2] for row in displacementValue ]
-
-defMax = max( max(rowDefX), max(rowDefY), max(rowDefZ) )
-defMin = min( min(rowDefX), min(rowDefY), min(rowDefZ) )
-DefMax = max( mt.fabs(defMax),mt.fabs(defMin))
-
-if scale == None:
-    scaleDef = dg.scaleAutomatic( coordMax , DefMax )
-
-else :
-    scaleDef = scale
 
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
@@ -564,6 +515,89 @@ def meshLoft3( point, color ):
     return meshEle
 
 
+
+diplacementWrapper = openSeesOutputWrapper[0][numberMode-1]
+EleOut = openSeesOutputWrapper[1]
+Period = openSeesOutputWrapper[3]
+
+def updateComponent(interval):
+    
+    ## Updates this component, similar to using a grasshopper timer 
+    
+    # Define callback action
+    def callBack(e):
+        ghenv.Component.ExpireSolution(False)
+        
+    # Get grasshopper document
+    ghDoc = ghenv.Component.OnPingDocument()
+    
+    # Schedule this component to expire
+    ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
+
+# Instantiate/reset persisent starting counter variable
+if "myCounter" not in globals() or Reset :
+    myCounter = 0
+
+# Update the variable and component
+if Animate and not Reset:
+    myCounter += 1/ ( (speed) * 10 )
+    updateComponent(1)
+
+# Output counter
+
+T = Period[numberMode]
+w = 2 * mt.pi/T
+#At = math.sin(myCounter)
+
+At = mt.sin(myCounter * w + mt.pi/2)
+
+nodeValue = []
+displacementValue = []
+#ShellOut = openSeesOutputWrapper[4]
+
+pointWrapper = []
+dispWrapper = []
+
+for index,item in enumerate(diplacementWrapper):
+    nodeValue.append( item[0] )
+    displacementValue.append( item[1] )
+    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+    if len(item[1]) == 3:
+        dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
+    elif len(item[1]) == 6:
+        dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
+
+## Dict. for point ##
+pointWrapperDict = dict( pointWrapper )
+pointDispWrapperDict = dict( dispWrapper )
+####
+
+## FOR scala automatica ##
+## nodeValue è la lista delle cordinate
+rowX = [row[0] for row in nodeValue ]
+rowY = [row[1] for row in nodeValue ]
+rowZ = [row[2] for row in nodeValue ]
+
+scaleMax = max( max(rowX), max(rowY), max(rowZ) )
+scaleMin = min( min(rowX), min(rowY), min(rowZ) )
+coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
+
+## displacementValue è la lista degli spostamenti
+
+rowDefX = [row[0] for row in displacementValue ]
+rowDefY = [row[1] for row in displacementValue ]
+rowDefZ = [row[2] for row in displacementValue ]
+
+defMax = max( max(rowDefX), max(rowDefY), max(rowDefZ) )
+defMin = min( min(rowDefX), min(rowDefY), min(rowDefZ) )
+DefMax = max( mt.fabs(defMax),mt.fabs(defMin))
+
+if scale == None:
+    scaleDef = dg.scaleAutomatic( coordMax , DefMax )
+
+else :
+    scaleDef = scale
+
 modelCurve = []
 ShellDefModel = []
 ExtrudedView = rg.Mesh()
@@ -588,7 +622,7 @@ for ele in EleOut :
         
         dimSection = ele[2][10]
         color = ele[2][12]
-        valueTBeam = defValueTimoshenkoBeam( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+        valueTBeam = defValueTimoshenkoBeam( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
         defpolyline = valueTBeam[0]
         meshdef = valueTBeam[1]
         globalTrans = valueTBeam[2]
@@ -604,7 +638,7 @@ for ele in EleOut :
         dimSection = ele[2][10]
         color = ele[2][12]
         #print( color )
-        valueTruss = defTruss( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+        valueTruss = defTruss( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
         defpolyline = valueTruss[0]
         meshdef = valueTruss[1]
         globalTrans = valueTruss[2]
@@ -615,7 +649,7 @@ for ele in EleOut :
         #doc.Objects.AddMesh( meshdef )
 
     elif nNode == 4 and eleType != 'FourNodeTetrahedron':
-        shellDefModel = defShellQuad( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+        shellDefModel = defShellQuad( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
         ShellDefModel.append( shellDefModel[0] )
         traslShellValue.append( shellDefModel[1] )
         rotShellValue.append( shellDefModel[2] )
@@ -625,7 +659,7 @@ for ele in EleOut :
         
     elif nNode == 3:
         #print( nNode )
-        shellDefModel = dg.defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+        shellDefModel = dg.defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
         ShellDefModel.append( shellDefModel[0] )
         traslShellValue.append( shellDefModel[1] )
         rotShellValue.append( shellDefModel[2] )
@@ -634,7 +668,7 @@ for ele in EleOut :
         doc.Objects.AddMesh( extrudeShell)
         
     elif nNode == 8:
-        solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef)
+        solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
         SolidDefModel.append( solidDefModel[0] )
         doc.Objects.AddMesh( solidDefModel[0] )
         traslSolidValue.append( solidDefModel[1] )
@@ -642,7 +676,7 @@ for ele in EleOut :
         
     elif  eleType == 'FourNodeTetrahedron' :
         #print(ele)
-        solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+        solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
         SolidDefModel.append( solidDefModel[0] )
         traslSolidValue.append( solidDefModel[1] )
         ExtrudedView.Append( solidDefModel[0] )
@@ -736,9 +770,6 @@ def meshLoft4( point, value, valueMax, valueMin ):
             meshEle.Faces.AddFace(index1, index2, index3, index4)
     return meshEle
 
-
-
-
 colorValor = []
 numberDivide = []
 for value in traslBeamValue :
@@ -776,3 +807,4 @@ if modelExstrud == False :
 else  :
     ModelDisp = ExtrudedView
 
+########################################################################
