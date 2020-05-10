@@ -32,6 +32,7 @@ with open(outputFile, 'r') as f:
     elementOutputWrapper = eval( lines[2].strip() )
     elementLoadWrapper = eval( lines[3].strip() )
     eleForceWrapper = eval( lines[4].strip() )
+    #nodalForceWrapper = eval( lines[5].strip() )
 
 
 openSeesOutputWrapper = ([nodeDisplacementWrapper,

@@ -257,7 +257,13 @@ for i in range(0, len(oSupport)):
     reactionWrapper.append([ghTag, ops.nodeReaction(indexSupport)])
 
 reactionWrapper = reactionWrapper
-
+# nodal Force #
+'''
+nodalForce = []
+for value in ops.getNodeTags():
+    indexNode = value 
+    nodalForce.append([indexNode, ops.nodeReaction(indexNode)])
+'''
 
 #-----------------------------------------------------
 elementOutputWrapper = []

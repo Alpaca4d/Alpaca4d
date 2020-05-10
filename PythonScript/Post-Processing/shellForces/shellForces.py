@@ -49,7 +49,14 @@ for item in ForceOut:
         Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
         Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
         Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
-        forceWrapper.append( [index, [[ Fi, Fj, Fk, Fw],[Mi, Mj,  Mk,  Mw ] ]])
+        forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
+                    [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
+                    [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
+                    [ Mi.X, Mj.X,  Mk.X, Mw.X ],
+                    [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
+                    [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
+        forceWrapper .append( [index, forceOut ])
+
     if len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
         Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
         Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
@@ -57,13 +64,19 @@ for item in ForceOut:
         Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
         Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
         Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-        forceWrapper.append( [index, [[ Fi, Fj, Fk ],[Mi, Mj,  Mk] ]])
+        forceOut = [[ Fi.X, Fj.X, Fk.X ],
+                    [ Fi.Y, Fj.Y, Fk.Y ],
+                    [ Fi.Z, Fj.Z, Fk.Z ],
+                    [ Mi.X, Mj.X,  Mk.X ],
+                    [ Mi.Y, Mj.Y, Mk.Y ],
+                    [ Mi.Z, Mj.Z, Mk.Z ]]
+        forceWrapper .append( [index, forceOut ])
 
 ## Dict. for force ##
 forceWrapperDict = dict( forceWrapper )
 ####
 
-F, M = [],[]
+Fx, Fy, Fz, Mx, My, Mz = [],[],[],[],[],[]
 tag = []
 
 for ele in EleOut :
@@ -72,16 +85,29 @@ for ele in EleOut :
     if eleType == "ShellDKGQ" :
         tag.append( eleTag )
         outputForce = forceWrapperDict.get( eleTag )
-        F.append( outputForce[0] )
-        M.append( outputForce[1] )
+        Fx.append( outputForce[0] )
+        Fy.append( outputForce[1] )
+        Fz.append( outputForce[2] )
+        Mx.append( outputForce[3] )
+        My.append( outputForce[4] )
+        Mz.append( outputForce[5] )
     elif eleType == "ShellDKGT" :
         tag.append( eleTag )
         outputForce = forceWrapperDict.get( eleTag )
-        F.append( outputForce[0] )
-        M.append( outputForce[1] )
+        Fx.append( outputForce[0] )
+        Fy.append( outputForce[1] )
+        Fz.append( outputForce[2] )
+        Mx.append( outputForce[3] )
+        My.append( outputForce[4] )
+        Mz.append( outputForce[5] )
         
 tagElement = th.list_to_tree( tag )
-nodalForce = th.list_to_tree( F )
-nodalMoment = th.list_to_tree( M )
+Fx = th.list_to_tree( Fx )
+Fy = th.list_to_tree( Fy )
+Fz = th.list_to_tree( Fz )
+Mx = th.list_to_tree( Mx )
+My = th.list_to_tree( My )
+Mz = th.list_to_tree( Mz )
+
 
 
