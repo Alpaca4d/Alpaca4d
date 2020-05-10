@@ -116,6 +116,9 @@ def gradientJet(value, valueMax, valueMin):
 diplacementWrapper = openSeesOutputWrapper[0]
 EleOut = openSeesOutputWrapper[2]
 ForceOut = openSeesOutputWrapper[4]
+nodalForce = openSeesOutputWrapper[5]
+
+nodalForcerDict = dict( nodalForce )
 
 pointWrapper = []
 for index,item in enumerate(diplacementWrapper):
@@ -125,6 +128,61 @@ pointWrapperDict = dict( pointWrapper )
 
 
 forceWrapper = []
+'''
+for ele in EleOut :
+    eleTag = ele[0]
+    eleType = ele[2][0]
+    if eleType == "ShellDKGQ" :
+            eleNodeTag = ele[1]
+            index1 = eleNodeTag[0] 
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+
+            force1 = nodalForcerDict.get( index1  , "never")
+            force2 = nodalForcerDict.get( index2  , "never")
+            force3 = nodalForcerDict.get( index3  , "never")
+            force4 = nodalForcerDict.get( index4  , "never")
+            #print( force1, force2, force3, force4 )
+            Fi = rg.Vector3d( force1[0], force1[1], force1[2] ) # risultante nodo i
+            Mi = rg.Vector3d( force1[3], force1[4], force1[5] )
+            Fj = rg.Vector3d( force2[0], force2[1], force2[3] ) # risultante nodo j
+            Mj = rg.Vector3d( force2[3], force2[4], force2[5] )
+            Fk = rg.Vector3d( force3[0], force3[1], force3[2] ) # risultante nodo k
+            Mk = rg.Vector3d( force3[3], force3[4], force3[5] )
+            Fw = rg.Vector3d( force4[0], force4[1], force4[2] ) # risultante nodo w
+            Mw = rg.Vector3d( force4[3], force4[4], force4[5] )
+            forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
+                        [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
+                        [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
+                        [ Mi.X, Mj.X,  Mk.X, Mw.X ],
+                        [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
+                        [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
+
+    elif eleType == "ShellDKGT" :
+            eleNodeTag = ele[1]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+
+            force1 = nodalForcerDict.get( index1 , "never")
+            force2 = nodalForcerDict.get( index2 , "never")
+            force3 = nodalForcerDict.get( index3 , "never")
+            Fi = rg.Vector3d( force1[0], force1[1], force1[2] ) # risultante nodo i
+            Mi = rg.Vector3d( force1[3], force1[4], force1[5] )
+            Fj = rg.Vector3d( force2[0], force2[1], force2[3] ) # risultante nodo j
+            Mj = rg.Vector3d( force2[3], force2[4], force2[5] )
+            Fk = rg.Vector3d( force3[0], force3[1], force3[2] ) # risultante nodo k
+            Mk = rg.Vector3d( force3[3], force3[4], force3[5] )
+            forceOut = [[ Fi.X, Fj.X, Fk.X ],
+                        [ Fi.Y, Fj.Y, Fk.Y ],
+                        [ Fi.Z, Fj.Z, Fk.Z ],
+                        [ Mi.X, Mj.X,  Mk.X ],
+                        [ Mi.Y, Mj.Y, Mk.Y ],
+                        [ Mi.Z, Mj.Z, Mk.Z ]]
+
+    forceWrapper .append( [eleTag, forceOut ])
+'''
 for item in ForceOut:
     index = item[0]
     if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
@@ -142,7 +200,7 @@ for item in ForceOut:
                     [ Mi.X, Mj.X,  Mk.X, Mw.X ],
                     [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
                     [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
-        forceWrapper .append( [index, forceOut ])
+
 
     if len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
         Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
@@ -157,7 +215,7 @@ for item in ForceOut:
                     [ Mi.X, Mj.X,  Mk.X ],
                     [ Mi.Y, Mj.Y, Mk.Y ],
                     [ Mi.Z, Mj.Z, Mk.Z ]]
-        forceWrapper .append( [index, forceOut ])
+    forceWrapper .append( [index, forceOut ])
 
 ## Dict. for force ##
 forceWrapperDict = dict( forceWrapper )
@@ -172,6 +230,7 @@ for ele in EleOut :
     if eleType == "ShellDKGQ" :
         tag.append( eleTag )
         outputForce = forceWrapperDict.get( eleTag )
+        #print( outputForce )
         Fx.append( outputForce[0] )
         Fy.append( outputForce[1] )
         Fz.append( outputForce[2] )
