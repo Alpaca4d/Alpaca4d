@@ -24,7 +24,94 @@ sys.path.append(fileName)
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
 import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
+def ShellQuad( ele, node):
+    eleTag = ele[0]
+    eleNodeTag = ele[1]
+    color = ele[2][2]
+    index1 = eleNodeTag[0]
+    index2 = eleNodeTag[1]
+    index3 = eleNodeTag[2]
+    index4 = eleNodeTag[3]
+    
+    ## CREO IL MODELLO  ##
+    point1 = node.get( index1 -1 , "never")
+    point2 = node.get( index2 -1 , "never")
+    point3 = node.get( index3 -1 , "never")
+    point4 =  node.get( index4 -1 , "never")
+    
+    shellModel = rg.Mesh()
+    shellModel.Vertices.Add( point1 ) #0
+    shellModel.Vertices.Add( point2 ) #1
+    shellModel.Vertices.Add( point3 ) #2
+    shellModel.Vertices.Add( point4 ) #3
+    
+    
+    shellModel.Faces.AddFace(0, 1, 2, 3)
+    colour = rs.CreateColor( color[0], color[1], color[2] )
+    shellModel.VertexColors.CreateMonotoneMesh( colour )
+    return  shellModel 
 
+def ShellTriangle( ele, node ):
+    
+    eleTag = ele[0]
+    eleNodeTag = ele[1]
+    color = ele[2][2]
+    index1 = eleNodeTag[0]
+    index2 = eleNodeTag[1]
+    index3 = eleNodeTag[2]
+    
+    
+    ## CREO IL MODELLO DEFORMATO  ##
+    point1 =  node.get( index1 -1 , "never")
+    point2 =  node.get( index2 -1 , "never")
+    point3 =  node.get( index3 -1 , "never")
+    
+    shellModel = rg.Mesh()
+    shellModel.Vertices.Add( point1 ) #0
+    shellModel.Vertices.Add( point2 ) #1
+    shellModel.Vertices.Add( point3 ) #2
+    
+    shellModel.Faces.AddFace(0, 1, 2)
+    colour = rs.CreateColor( color[0], color[1], color[2] )
+    shellModel.VertexColors.CreateMonotoneMesh( colour )
+    
+    return  shellModel
+
+def gradientJet(value, valueMax, valueMin):
+
+    listcolo = [[0, 0, 102 ],
+                [0, 0, 255],
+                [0, 64, 255],
+                [0, 128, 255],
+                [0, 191, 255],
+                [0, 255, 255],
+                [0, 255, 191],
+                [0, 255, 128],
+                [0, 255, 64],
+                [0, 255, 0],
+                [64, 255, 0],
+                [128, 255, 0],
+                [191, 255, 0],
+                [255, 255, 0],
+                [255, 191, 0],
+                [255, 128, 0],
+                [255, 64, 0],
+                [255, 0, 0],
+                [230, 0, 0],
+                [204, 0, 0]]
+
+    #domain = linspace( valueMin,  valueMax, len( listcolo ) )
+    n = len( listcolo )
+    domain = dg.linspace( valueMin, valueMax, n)
+    
+    for i in range(1,n):
+        if  domain[i-1] <= value <= domain[i]:
+            return listcolo[ i-1 ]
+        elif  valueMax <= value <= valueMax + 0.00001 :
+            return listcolo[ -1 ]
+        elif  valueMin - 0.00000000001 <= value <= valueMin  :
+            print( value, valueMin)
+            return listcolo[ 0 ]
 #--------------------------------------------------------------------------
 diplacementWrapper = openSeesOutputWrapper[0]
 EleOut = openSeesOutputWrapper[2]
@@ -78,7 +165,7 @@ forceWrapperDict = dict( forceWrapper )
 
 Fx, Fy, Fz, Mx, My, Mz = [],[],[],[],[],[]
 tag = []
-
+shell = []
 for ele in EleOut :
     eleTag = ele[0]
     eleType = ele[2][0]
@@ -91,6 +178,8 @@ for ele in EleOut :
         Mx.append( outputForce[3] )
         My.append( outputForce[4] )
         Mz.append( outputForce[5] )
+        shellModel = ShellQuad( ele, pointWrapperDict )
+        shell.append( shellModel )
     elif eleType == "ShellDKGT" :
         tag.append( eleTag )
         outputForce = forceWrapperDict.get( eleTag )
@@ -100,14 +189,51 @@ for ele in EleOut :
         Mx.append( outputForce[3] )
         My.append( outputForce[4] )
         Mz.append( outputForce[5] )
+        shellModel = ShellTriangle( ele, pointWrapperDict )
+        shell.append( shellModel )
         
 tagElement = th.list_to_tree( tag )
-Fx = th.list_to_tree( Fx )
-Fy = th.list_to_tree( Fy )
-Fz = th.list_to_tree( Fz )
-Mx = th.list_to_tree( Mx )
-My = th.list_to_tree( My )
-Mz = th.list_to_tree( Mz )
 
+fx = th.list_to_tree( Fx )
+fy = th.list_to_tree( Fy )
+fz = th.list_to_tree( Fz )
+mx = th.list_to_tree( Mx )
+my = th.list_to_tree( My )
+mz = th.list_to_tree( Mz )
 
+if viewForce == 0:
+    shellForceValue = Fx
+    ForceValue = fx
+elif viewForce == 1:
+    shellForceValue = Fy
+    ForceValue = fy
+elif viewForce == 2:
+    shellForceValue = Fz
+    ForceValue = fz
+elif viewForce == 3:
+    shellForceValue = Mx
+    ForceValue = mx
+elif viewForce == 4:
+    shellForceValue = My
+    ForceValue = mx
+elif viewForce == 5:
+    ForceValue = mx
+    shellForceValue = Mz
 
+maxValue = []
+minValue = []
+for value in shellForceValue:
+    maxValue.append( max( value ))
+    minValue.append( min( value ))
+maxValue = max( maxValue )
+minValue = min( minValue )
+
+modelForce = []
+for shellEle, value in zip(shell,shellForceValue) :
+    shellColor = shellEle.DuplicateMesh()
+    shellColor.VertexColors.Clear()
+    for j in range(0,shellEle.Vertices.Count):
+        #print( value[j] )
+        jetColor = gradientJet(value[j], maxValue, minValue)
+        shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
+    modelForce.append( shellColor)
