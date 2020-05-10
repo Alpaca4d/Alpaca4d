@@ -1,9 +1,12 @@
 import sys
 import openseespy.opensees as ops
+import math
+import time
+import matplotlib.pyplot as plt
 
 
-#filename = sys.argv[1]
-filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
+filename = sys.argv[1]
+#filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
 inputName = filename.split("\\")[-1]
 
 
@@ -131,7 +134,6 @@ for n in range(0, len(openSeesBeam)):
 for item in openSeesShell:
 
     eleType = item[0]
-
     #print('eleType = ' + str(eleType))
     eleTag = item[1] + 1
     #print('eleTag = ' + str(eleTag))
@@ -179,6 +181,7 @@ for i in range(0, len(oSupport)):
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3], oSupport[i][4], oSupport[i][5], oSupport[i][6] )
 
 ## LOAD ##
+## LOAD ##
 
 # create TimeSeries
 ops.timeSeries('Constant', 1)
@@ -205,139 +208,113 @@ for item in openSeesBeamLoad:
     ops.eleLoad('-ele', eleTags,'-type', '-beamUniform', Wz, Wy, Wx)
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
+
+
 for i in range(len(oMass)):
     nodeTag = oMass[i][0] + 1
     massValues = oMass[i][1]
     ops.mass(nodeTag, *massValues)
-
 
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
 
 ops.system("BandSPD")
-
 ops.numberer('Plain')
-
 # create constraint handler
 ops.constraints("Transformation") # to allow Diaphgram constrain
-
 # create integrator
-ops.integrator("LoadControl",  0.1 )
-
+ops.integrator("LoadControl",  1.0 )
 # create algorithm
 ops.algorithm("Newton")
-
 # create analysis object
 ops.analysis("Static")
-
 # perform the analysis
-ops.analyze(10)
+ops.analyze(1)
 
-print("Static Analyses Complete")
-print(ops.nodeDisp(3,2))
-
-## OUTPUT FILE ##
+ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to zero
 
 
-import ReadRecord
+#applying Dynamic Ground motion analysis
+GMdirection = 1 				# it will be an arguments
+GMfile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\BM68elc.acc'
 
+GMfact = 1.0
+dt = 0.01			# time step for input ground motion
 
-# Set the gravity loads to be constant & reset the time in the domain
-ops.loadConst('-time', 0.0)
-
-
-# Set some parameters
-record = 'elCentro'
-
-# Permform the conversion from SMD record to OpenSees record
-dt, nPts = ReadRecord.ReadRecord(record+'.at2', record+'.dat')
-
-# Set time series to be passed to uniform excitation
-ops.timeSeries('Trig', 2, 0, 5, 0.5, '-factor', 0.000000000001)
-
-#ops.timeSeries('Path', 2, '-filePath', record+'.dat', '-dt', dt, '-factor', 0.000000000001)
-
-# Create UniformExcitation load pattern
-#                               tag    dir          tag timeSeries
-ops.pattern('UniformExcitation',  2,   1,  '-accel', 2)
-
-# set the rayleigh damping factors for nodes & elements
-ops.rayleigh(0.0, 0.0, 0.0, 0.625)
+ops.timeSeries('Path', 2, '-dt', dt, '-filePath', GMfile, '-factor', GMfact, '-prependZero')
+ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
 
 
 
-# Delete the old analysis and all it's component objects
+Lambda = ops.eigen('-fullGenLapack', 1)[0] # eigenvalue mode 1
+Omega = math.pow(Lambda, 0.5)
+betaKcomm = 2 * (0.02/Omega)
+
+xDamp = 0.02				# 2% damping ratio
+alphaM = 0.0				# M-prop. damping; D = alphaM*M	
+betaKcurr = 0.0		# K-proportional damping;      +beatKcurr*KCurrent
+betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
+
+ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
+
+
+
 ops.wipeAnalysis()
-
-# Create the system of equation, a banded general storage scheme
+ops.constraints('Transformation')
+ops.numberer('Plain')
 ops.system('BandGeneral')
-
-# Create the constraint handler, a plain handler as homogeneous boundary
-ops.constraints('Plain')
-
-# Create the convergence test, the norm of the residual with a tolerance of 
-# 1e-12 and a max number of iterations of 10
-ops.test('NormDispIncr', 1.0e-15,  100 )
-#ops.test('FixedNumIter', 500)
-
-# Create the solution algorithm, a Newton-Raphson algorithm
+ops.test('EnergyIncr', 1e-10, 10)
 ops.algorithm('Newton')
 
-# Create the DOF numberer, the reverse Cuthill-McKee algorithm
-ops.numberer('RCM')
-
-# Create the integration scheme, the Newmark with alpha =0.5 and beta =.25
-ops.integrator('Newmark',  0.5,  0.25 )
-
-# Create the analysis object
+NewmarkGamma = 0.5
+NewmarkBeta = 0.25
+ops.integrator('Newmark', NewmarkGamma, NewmarkBeta)
 ops.analysis('Transient')
 
-# is it necessary to perform an Eigen?
-
-# Perform an eigenvalue analysis
-numEigen = 5
-eigenValues = ops.eigen(numEigen)
-print("eigen values at start of transient:",eigenValues)
-
-# set some variables
-
-
-tFinal = 3                # value from components
-#tFinal = nPts*dt                # value from components
-tCurrent = ops.getTime()
-ok = 0
-
-time = [tCurrent]
-u3 = [0.0]
-
 # Perform the transient analysis
-while ok == 0 and tCurrent < tFinal:
-    print(ops.nodeDisp(3,2))
-    
-    ok = ops.analyze(1, .005)
+ok = 0
+tCurrent = ops.getTime()
+tAnalyses = 100 			# End of the analyses
+timeStep = dt * 0.1				# Increment 10% of the time series step?
+print("starting Analyse")
 
-# if the analysis fails try initial tangent iteration
+timer = []
+disp = []
+
+while ok == 0 and tCurrent < tAnalyses:
+    
+    ok = ops.analyze(1, timeStep)
+    
+    # if the analysis fails try initial tangent iteration
     if ok != 0:
-        print("regular newton failed .. lets try an initial stiffness for this step")
-        ops.test('NormDispIncr', 1.0e-12,  1000, 0)
+        print("regular newton failed .. lets try an initail stiffness for this step")
+        ops.test('NormDispIncr', 1.0e-12,  10)
         ops.algorithm('ModifiedNewton', '-initial')
-        ok = ops.analyze( 1, .01)
+        ok =analyze( 1, timeStep)
         if ok == 0:
             print("that worked .. back to regular newton")
-        ops.test('NormDispIncr', 1.0e-12,  1000 )
+        ops.test('NormDispIncr', 1.0e-12,  10 )
         ops.algorithm('Newton')
 
     tCurrent = ops.getTime()
-    print(f"current time is {tCurrent}")
+    u2 = ops.nodeDisp(2,1)
+
+    timer.append(tCurrent)
+    disp.append(u2)
 
 
 
-print("I finished")
+print("Ground Motion Analyses Finished")
+ops.wipe()
 
+plt.plot(timer, disp)
+plt.ylabel('Horizontal Displacement of node 3 (in)')
+plt.xlabel('Time (s)')
 
+plt.show()
 
-
+time.sleep(2)
 
 '''
 
@@ -351,37 +328,14 @@ for i in range(1,len(ops.getNodeTags())+1):
     NodeDisp = ops.nodeDisp( nodeTag ) # spostamenti e rotazioni del nodo 
     nodeDisplacementWrapper.append([Node, NodeDisp])
 
-#-----------------------------------------------------
-
-reactionWrapper = []
-ops.reactions()
-for i in range(0, len(oSupport)):
-    indexSupport = oSupport[i][0] + 1
-    ghTag = oSupport[i][0]
-    reactionWrapper.append([ghTag, ops.nodeReaction(indexSupport)])
-
-reactionWrapper = reactionWrapper
-
-
-#-----------------------------------------------------
-elementOutputWrapper = []
-eleForceOutputWrapper = []
 
 
 
-elementTagList = ops.getEleTags()
-
-for elementTag in elementTagList:
-    elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
-    eleForceOutputWrapper.append([ elementTag, ops.eleForce(elementTag) ])
- # need to find a new way to add elementProperties
-
-
-openSeesOutputWrapper = ([nodeDisplacementWrapper,
+openSeesOutputWrapper = [nodeDisplacementWrapper,
                         reactionWrapper,
                         elementOutputWrapper,
                         elementLoad,
-                        eleForceOutputWrapper])
+                        eleForceOutputWrapper]
 
 
 length = len(filename)-len(inputName)
