@@ -258,11 +258,12 @@ for i in range(0, len(oSupport)):
 
 reactionWrapper = reactionWrapper
 # nodal Force #
+'''
 nodalForce = []
 for value in ops.getNodeTags():
     indexNode = value 
     nodalForce.append([indexNode, ops.nodeReaction(indexNode)])
-
+'''
 
 #-----------------------------------------------------
 elementOutputWrapper = []
@@ -282,8 +283,7 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         reactionWrapper,
                         elementOutputWrapper,
                         elementLoad,
-                        eleForceOutputWrapper,
-                        nodalForce])
+                        eleForceOutputWrapper])
 
 
 length = len(filename)-len(inputName)
