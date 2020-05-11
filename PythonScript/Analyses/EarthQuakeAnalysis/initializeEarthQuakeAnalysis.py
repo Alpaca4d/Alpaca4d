@@ -34,7 +34,8 @@ with open(outputFile, 'r') as f:
     lines = f.readlines()
     nodeDispFilePath = lines[0]
     elementModalWrapper = eval( lines[1].strip() )
+    nodeWrapper = eval( lines[2].strip() )
 
 
 
-openSeesOutputWrapper = [nodeDispFilePath, elementModalWrapper]
+openSeesOutputWrapper = [nodeDispFilePath, elementModalWrapper, nodeWrapper ]

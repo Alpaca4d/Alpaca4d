@@ -333,12 +333,17 @@ for elementTag in elementTagList:
     elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
 
 elementOutputWrapper = elementOutputWrapper
-
+## nodal coord
+nodeWrapper = []
+for nodeTag in ops.getNodeTags():
+    Node = ops.nodeCoord( nodeTag )
+    nodeWrapper.append([ nodeTag, Node ]) # cordinate nodo
 #-----------------------------------------------------
 
 
 openSeesModalOutputWrapper = ([nodeDispFilePath,
-                               elementOutputWrapper])
+                               elementOutputWrapper,
+                               nodeWrapper])
 
 
 length = len(filename)-len(inputName)
