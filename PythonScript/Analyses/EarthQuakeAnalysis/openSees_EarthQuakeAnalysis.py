@@ -264,7 +264,7 @@ ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
 
 
 nodeDispFilePath = os.path.join(workingDirectory, "DFree.out")
-ops.recorder('Node', '-file', nodeDispFilePath ,'-time', '-node', '-dof', 1, 2, 3, 'disp')
+ops.recorder('Node', '-file', nodeDispFilePath ,'-time', '-node', '-dof', 1, 2, 3, 4, 5, 6, 'disp')
 
 ops.wipeAnalysis()
 ops.constraints('Transformation')
@@ -306,12 +306,12 @@ while ok == 0 and tCurrent < tAnalyses:
     tCurrent = ops.getTime()
 
 
-    #u2 = ops.nodeDisp(2,1)
-    #timer.append(tCurrent)
-    #disp.append(u2)
+    u2 = ops.nodeDisp(2,1)
+    timer.append(tCurrent)
+    disp.append(u2)
 
 
-'''
+
 print("Ground Motion Analyses Finished")
 ops.wipe()
 
@@ -320,7 +320,7 @@ plt.ylabel('Horizontal Displacement of node 3 (in)')
 plt.xlabel('Time (s)')
 
 plt.show()
-'''
+
 
 time.sleep(2)
 
