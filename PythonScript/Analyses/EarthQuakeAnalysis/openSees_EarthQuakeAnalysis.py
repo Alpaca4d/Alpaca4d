@@ -1,13 +1,16 @@
 import sys
+import os
 import openseespy.opensees as ops
 import math
 import time
 import matplotlib.pyplot as plt
 
 
-filename = sys.argv[1]
-#filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
-inputName = filename.split("\\")[-1]
+#filename = sys.argv[1]
+filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
+workingDirectory = os.path.split(filename)[0]
+inputName = os.path.split(filename)[1]
+
 
 
 with open(filename, 'r') as f:
@@ -236,11 +239,11 @@ ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to z
 
 
 #applying Dynamic Ground motion analysis
-GMdirection = 1 				# it will be an arguments
-GMfile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\BM68elc.acc'
+GMdirection = int(sys.argv[2])
+GMfile = str(sys.argv[3])
 
-GMfact = 1.0
-dt = 0.01			# time step for input ground motion
+GMfact = float(sys.argv[5])
+dt = float(sys.argv[4])			# time step for input ground motion
 
 ops.timeSeries('Path', 2, '-dt', dt, '-filePath', GMfile, '-factor', GMfact, '-prependZero')
 ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
@@ -249,9 +252,10 @@ ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2)
 
 Lambda = ops.eigen('-fullGenLapack', 1)[0] # eigenvalue mode 1
 Omega = math.pow(Lambda, 0.5)
-betaKcomm = 2 * (0.02/Omega)
 
-xDamp = 0.02				# 2% damping ratio
+
+xDamp = float(sys.argv[6])				# 2% damping ratio
+betaKcomm = 2 * (xDamp/Omega)
 alphaM = 0.0				# M-prop. damping; D = alphaM*M	
 betaKcurr = 0.0		# K-proportional damping;      +beatKcurr*KCurrent
 betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
@@ -259,23 +263,25 @@ betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
 ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
 
 
+path = os.path.join(workingDirectory, "DFree.out")
+ops.recorder('Node', '-file', path ,'-time', '-node', '-dof',1, 'disp')
 
 ops.wipeAnalysis()
 ops.constraints('Transformation')
 ops.numberer('Plain')
 ops.system('BandGeneral')
-ops.test('EnergyIncr', 1e-10, 10)
+ops.test('EnergyIncr', 1e-12, 10)
 ops.algorithm('Newton')
 
-NewmarkGamma = 0.5
-NewmarkBeta = 0.25
+NewmarkGamma = float(sys.argv[7])	
+NewmarkBeta = float(sys.argv[8])	
 ops.integrator('Newmark', NewmarkGamma, NewmarkBeta)
 ops.analysis('Transient')
 
 # Perform the transient analysis
 ok = 0
 tCurrent = ops.getTime()
-tAnalyses = 100 			# End of the analyses
+tAnalyses = 10 			# End of the analyses
 timeStep = dt * 0.1				# Increment 10% of the time series step?
 print("starting Analyse")
 
