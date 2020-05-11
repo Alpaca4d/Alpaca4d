@@ -11,7 +11,7 @@
 
 ### Marco Pellegrino
 
-* [ ] Update Modal Analyses
+* [x] Update Modal Analyses
 * [ ] EarthQuake Analyses
 * [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
 * [ ] CMD starts when we run the analyses. Do we like it?
