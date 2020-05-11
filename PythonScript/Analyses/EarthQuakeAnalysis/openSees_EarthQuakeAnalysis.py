@@ -6,8 +6,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-#filename = sys.argv[1]
-filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
+filename = sys.argv[1]
+#filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
 workingDirectory = os.path.split(filename)[0]
 inputName = os.path.split(filename)[1]
 
@@ -263,8 +263,8 @@ betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
 ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
 
 
-path = os.path.join(workingDirectory, "DFree.out")
-ops.recorder('Node', '-file', path ,'-time', '-node', '-dof',1, 'disp')
+nodeDispFilePath = os.path.join(workingDirectory, "DFree.out")
+ops.recorder('Node', '-file', nodeDispFilePath ,'-time', '-node', '-dof', 1, 2, 3, 'disp')
 
 ops.wipeAnalysis()
 ops.constraints('Transformation')
@@ -281,7 +281,7 @@ ops.analysis('Transient')
 # Perform the transient analysis
 ok = 0
 tCurrent = ops.getTime()
-tAnalyses = 10 			# End of the analyses
+tAnalyses = float(sys.argv[9])			# End of the analyses
 timeStep = dt * 0.1				# Increment 10% of the time series step?
 print("starting Analyse")
 
@@ -304,13 +304,14 @@ while ok == 0 and tCurrent < tAnalyses:
         ops.algorithm('Newton')
 
     tCurrent = ops.getTime()
-    u2 = ops.nodeDisp(2,1)
-
-    timer.append(tCurrent)
-    disp.append(u2)
 
 
+    #u2 = ops.nodeDisp(2,1)
+    #timer.append(tCurrent)
+    #disp.append(u2)
 
+
+'''
 print("Ground Motion Analyses Finished")
 ops.wipe()
 
@@ -319,37 +320,32 @@ plt.ylabel('Horizontal Displacement of node 3 (in)')
 plt.xlabel('Time (s)')
 
 plt.show()
+'''
 
 time.sleep(2)
 
-'''
 
-## DISPLACEMENT
-nodeDisplacementWrapper = []
+elementOutputWrapper = []
 
-for i in range(1,len(ops.getNodeTags())+1):
+elementTagList = ops.getEleTags()
 
-    nodeTag = i
-    Node = ops.nodeCoord( nodeTag ) # cordinate nodo
-    NodeDisp = ops.nodeDisp( nodeTag ) # spostamenti e rotazioni del nodo 
-    nodeDisplacementWrapper.append([Node, NodeDisp])
+for elementTag in elementTagList:
+    elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
 
+elementOutputWrapper = elementOutputWrapper
 
+#-----------------------------------------------------
 
 
-openSeesOutputWrapper = [nodeDisplacementWrapper,
-                        reactionWrapper,
-                        elementOutputWrapper,
-                        elementLoad,
-                        eleForceOutputWrapper]
+openSeesModalOutputWrapper = ([nodeDispFilePath,
+                               elementOutputWrapper])
 
 
 length = len(filename)-len(inputName)
 filefolder = filename[0:length]
-outputFileName = filefolder+'openSeesOutputWrapper.txt'
+outputFileName = filefolder + 'openSeesEarthQuakeAnalysisOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
-    for item in openSeesOutputWrapper:
+    for item in openSeesModalOutputWrapper:
         f.write("%s\n" % item)
 
-'''

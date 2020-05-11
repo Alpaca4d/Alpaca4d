@@ -16,28 +16,25 @@ fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSee
 
 
 EarthQuakeAnalysis = System.Diagnostics.ProcessStartInfo(fileName)
-EarthQuakeAnalysis.Arguments = wrapperFile + " " + str(GMdirection) + " " + str(GMfile) + " " + str(GMtimeStep) + " " + str(GMfact) + " " + str(Damping) + " " + str(NewmarkGamma) + " " + str(NewmarkBeta)
+EarthQuakeAnalysis.Arguments = wrapperFile + " " + str(GroundMotionDirection) + " " + str(GroundMotionFile) + " " + str(GroundMotionTimeStep) + " " + str(GroundMotionTimeStep) + " " + str(Damping) + " " + str(NewmarkGamma) + " " + str(NewmarkBeta)+ " " + str(TmaxAnalyses)
 process = System.Diagnostics.Process.Start(EarthQuakeAnalysis)
 System.Diagnostics.Process.WaitForExit(process)
 
 
 
 print("I have fineshed")
+
 ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
 ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
 
 
-"""
 outputFile = outputPath + '\\openSeesEarthQuakeAnalysisOutputWrapper.txt'
 
 with open(outputFile, 'r') as f:
     lines = f.readlines()
-    nodeModalDispWrapper = eval( lines[0].strip() )
+    nodeDispFilePath = lines[0]
     elementModalWrapper = eval( lines[1].strip() )
-    period = eval( lines[2].strip() )
-    frequency = eval( lines[3].strip() )
 
 
 
-openSeesOutputWrapper = [nodeModalDispWrapper]
-"""
+openSeesOutputWrapper = [nodeDispFilePath, elementModalWrapper]
