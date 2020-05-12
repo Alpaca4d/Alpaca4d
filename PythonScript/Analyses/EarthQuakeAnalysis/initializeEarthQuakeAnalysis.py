@@ -37,5 +37,4 @@ with open(outputFile, 'r') as f:
     nodeWrapper = eval( lines[2].strip() )
 
 
-
 openSeesOutputWrapper = [nodeDispFilePath, elementModalWrapper, nodeWrapper ]
