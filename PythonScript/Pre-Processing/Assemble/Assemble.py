@@ -240,14 +240,27 @@ totalMassPerPoint = totalMassPerPoint
 massWrapper = []
 
 for i,j in zip(oPoints, totalMassPerPoint):
-    massWrapper.append( [i,j] )
+    massWrapper.append( [cloudPoints.ClosestPoint(i),j] )
 
+# ---------------------------------------------------
+# apply external Load on top of the Dead Load
+
+externalMass = []
+
+for item in Mass:
+    externalMass.append([ cloudPoints.ClosestPoint(item[0]), item[1] ])
+
+externalMassDict = dict(externalMass)
 
 openSeesNodalMass = []
 
 for mass in massWrapper:
-    massNodeTag = cloudPoints.ClosestPoint(mass[0])
-    massValues = [ mass[1], mass[1], mass[1], 0, 0, 0 ]
+    massNodeTag = mass[0]
+    if externalMassDict.get(massNodeTag) == None:
+        massValues = [ mass[1], mass[1], mass[1], 0, 0, 0 ]
+    else:
+        additionMass = externalMassDict.get(massNodeTag)
+        massValues = [mass[1] + additionMass.X , mass[1] + additionMass.Y, mass[1] + additionMass.Z, 0, 0, 0]
     openSeesNodalMass.append( [massNodeTag, massValues] )
 
 openSeesNodalMass = openSeesNodalMass
