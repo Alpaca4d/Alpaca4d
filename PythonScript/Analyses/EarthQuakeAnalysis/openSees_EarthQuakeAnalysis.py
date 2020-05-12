@@ -311,7 +311,7 @@ while ok == 0 and tCurrent < tAnalyses:
     disp.append(u2)
 
 
-
+'''
 print("Ground Motion Analyses Finished")
 ops.wipe()
 
@@ -320,7 +320,7 @@ plt.ylabel('Horizontal Displacement of node 3 (in)')
 plt.xlabel('Time (s)')
 
 plt.show()
-
+'''
 
 time.sleep(2)
 
