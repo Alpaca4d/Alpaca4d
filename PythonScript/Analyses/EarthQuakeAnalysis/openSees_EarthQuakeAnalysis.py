@@ -240,12 +240,20 @@ ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to z
 
 #applying Dynamic Ground motion analysis
 GMdirection = int(sys.argv[2])
+print(f"GMdirection = {GMdirection}")
+
 GMfile = str(sys.argv[3])
+print(f"GMfile = {GMfile}")
+
+GroundMotionTimeStep = float(sys.argv[4])           # time step for input ground motion
+print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
 
 GMfact = float(sys.argv[5])
-dt = float(sys.argv[4])			# time step for input ground motion
+print(f'GMfact = {GMfact}')
 
-ops.timeSeries('Path', 2, '-dt', dt, '-filePath', GMfile, '-factor', GMfact, '-prependZero')
+
+
+ops.timeSeries('Path', 2, '-filePath', GMfile, '-dt', GroundMotionTimeStep, '-factor', GMfact, '-prependZero')
 ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
 
 
@@ -273,16 +281,18 @@ ops.system('BandGeneral')
 ops.test('EnergyIncr', 1e-12, 10)
 ops.algorithm('Newton')
 
-NewmarkGamma = float(sys.argv[7])	
-NewmarkBeta = float(sys.argv[8])	
+NewmarkGamma = float(sys.argv[7])   
+NewmarkBeta = float(sys.argv[8])    
 ops.integrator('Newmark', NewmarkGamma, NewmarkBeta)
+
 ops.analysis('Transient')
+
 
 # Perform the transient analysis
 ok = 0
 tCurrent = ops.getTime()
 tAnalyses = float(sys.argv[9])			# End of the analyses
-timeStep = dt * 0.1				# Increment 10% of the time series step?
+timeStep = GroundMotionTimeStep * 0.1				# Increment 10% of the time series step?
 print("starting Analyse")
 
 timer = []
@@ -310,19 +320,49 @@ while ok == 0 and tCurrent < tAnalyses:
     timer.append(tCurrent)
     disp.append(u2)
 
+#print( "maximum displacement is" + str(disp.sort()[-1]) )
 
-'''
 print("Ground Motion Analyses Finished")
-ops.wipe()
+
 
 plt.plot(timer, disp)
-plt.ylabel('Horizontal Displacement of node 3 (in)')
+plt.ylabel('Horizontal Displacement of node 2 (in)')
 plt.xlabel('Time (s)')
 
 plt.show()
-'''
 
-time.sleep(2)
+time.sleep(1)
+
+#----------------------------------------------
+# THIS PART HAS TO BE DECIDE WITH DOMENICO
+# SOME USEFULL OUTPUT FOR FUTURE OPTIMISATION
+
+
+dt = []
+displacement = []
+
+with open(nodeDispFilePath, 'r') as f:
+    lines = f.readlines()
+    for n, line in enumerate(lines):
+        if (n % 10) == 0:
+            line = line.strip().split(" ")
+            dt.append( line[0] )
+            displacementTemp = line[1:]
+            n = 6
+            displacementTime = [displacementTemp[i:i + n] for i in range(0, len(displacementTemp), n)]
+            displacement.append(displacementTime)
+
+# TAKING THE VALUE IN A SINGLE DIRECTION BUT WE SHOULD DO IT FOR VECTOR
+
+maximum = []
+for values in displacement:
+    for value in values:
+        maximum.append(float(value[GMdirection-1]))
+
+maximum.sort()
+maxDisplacement = maximum[-1]
+minDisplacement = maximum[0]
+
 
 
 elementOutputWrapper = []
@@ -343,7 +383,9 @@ for nodeTag in ops.getNodeTags():
 
 openSeesModalOutputWrapper = ([nodeDispFilePath,
                                elementOutputWrapper,
-                               nodeWrapper])
+                               nodeWrapper,
+                               maxDisplacement,
+                               minDisplacement])
 
 
 length = len(filename)-len(inputName)
@@ -353,4 +395,7 @@ outputFileName = filefolder + 'openSeesEarthQuakeAnalysisOutputWrapper.txt'
 with open(outputFileName, 'w') as f:
     for item in openSeesModalOutputWrapper:
         f.write("%s\n" % item)
+
+
+ops.wipe()
 
