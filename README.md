@@ -12,6 +12,7 @@
 ### Marco Pellegrino
 
 * [x] Update Modal Analyses
+* [ ] Non Linear Material for Brick
 * [ ] EarthQuake Analyses
 * [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
 * [ ] CMD starts when we run the analyses. Do we like it?
