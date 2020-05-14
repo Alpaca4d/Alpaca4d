@@ -2,7 +2,6 @@
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper as gh
-#import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
 import Rhino.Display as rd
@@ -40,7 +39,7 @@ def AddCircleFromCenter( plane, radius):
     #circle = rg.PolylineCurve( a )
     circle  = a 
     return circle
-    
+
 def defShellQuad( ele, node, nodeDisp, scaleDef ):
     
     eleTag = ele[0]
@@ -536,6 +535,7 @@ path = openSeesOutputWrapper[0].strip()
 EleOut = openSeesOutputWrapper[1]
 point = openSeesOutputWrapper[2]
 
+
 timeStep = []
 displacement = []
 
@@ -553,9 +553,8 @@ with open(path, 'r') as f:
             displacementTime = [displacementTemp[i:i + n] for i in range(0, len(displacementTemp), n)]
             displacement.append(displacementTime)
 
-#print(time.clock() - start)
 
-disp = []
+#print(time.clock() - start)
 
 if "myCounter" not in globals() or Reset:
     myCounter = 0
@@ -612,12 +611,11 @@ for indexPoint, value in enumerate(stepValue):
     rotY = float(value[4])
     rotZ = float(value[5])
     pointDef.append([ tagPoint, [ rg.Point3d( traslX, traslY, traslZ ), rg.Point3d( rotX, rotY, rotZ ) ]])
-    
 timePointDef = dict( pointDef )
 
-if myCounter > (len(timePointDef) +1) :
+if myCounter > (len(displacement)) :
     myCounter = 1
-
+print(myCounter)
 
 nodeValue = []
 #ShellOut = openSeesOutputWrapper[4]
