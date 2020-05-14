@@ -4,10 +4,10 @@
 ### Domenico Gaudioso
 
 * [ ] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
-* [ ] Update Deformed Dynamic Model
+* [x] Update Deformed Dynamic Model
 * [ ] Create Cluster when necessary
-* [ ] Diagram Cds
-* [ ] Add 3df Solver
+* [x] Diagram Cds
+* [x] Add 3df Solver
 
 ### Marco Pellegrino
 
@@ -20,3 +20,5 @@
 * [ ] Color Palette for components
 * [ ] Documentation
 * [ ] Icon
+* [ ] look to eleForce in shell ( component name is 'shellForceView'... i thinks )
+* [ ] trombare
