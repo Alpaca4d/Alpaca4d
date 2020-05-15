@@ -4,19 +4,21 @@
 ### Domenico Gaudioso
 
 * [ ] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
-* [ ] Update Deformed Dynamic Model
+* [x] Update Deformed Dynamic Model
 * [ ] Create Cluster when necessary
-* [ ] Diagram Cds
-* [ ] Add 3df Solver
+* [x] Diagram Cds
+* [x] Add 3df Solver
 
 ### Marco Pellegrino
 
 * [x] Update Modal Analyses
 * [ ] Non Linear Material for Brick
-* [ ] EarthQuake Analyses
+* [ ] EarthQuake Analyses - update for different way to make analyses
 * [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
 * [ ] CMD starts when we run the analyses. Do we like it?
 * [ ] Add Warning to the components
 * [ ] Color Palette for components
 * [ ] Documentation
 * [ ] Icon
+* [ ] look to eleForce in shell ( component name is 'shellForceView'... i thinks )
+* [ ] trombare

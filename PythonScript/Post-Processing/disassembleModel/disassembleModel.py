@@ -287,7 +287,7 @@ for ele in openSeesBeam :
 
 for ele in openSeesShell :
     nNode = len( ele[2] )
-    eleTag.append( ele[1] )
+    eleTag =  ele[1] 
     if nNode == 4 :
         shellModel = ShellQuad( ele, pointWrapperDict )
         model.append([ eleTag,shellModel[0] ])
@@ -299,7 +299,7 @@ for ele in openSeesShell :
 
 for ele in openSeesSolid :
     nNode = len( ele[2] )
-    eleTag.append( ele[1] )
+    eleTag =  ele[1]
     eleType = ele[0] 
     if nNode == 8:
         solidModel = Solid( ele, pointWrapperDict )

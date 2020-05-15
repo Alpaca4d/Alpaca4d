@@ -35,7 +35,7 @@ displacementValue = []
 
 pointWrapper = []
 dispWrapper = []
-
+print( diplacementWrapper )
 for index,item in enumerate(diplacementWrapper):
     nodeValue.append( item[0] )
     displacementValue.append( item[1] )
@@ -217,7 +217,7 @@ def defSolid( ele, node, nodeDisp, scaleDef ):
     trasl6 = nodeDisp.get( index6 -1 , "never")
     trasl7 = nodeDisp.get( index7 -1 , "never")
     trasl8 = nodeDisp.get( index8 -1 , "never")
-    
+    print( trasl1 )
     ## CREO IL MODELLO DEFORMATO  ##
     pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
     pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )

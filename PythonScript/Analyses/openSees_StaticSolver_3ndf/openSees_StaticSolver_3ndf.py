@@ -1,10 +1,15 @@
 import sys
+import openseespy.opensees as ops
+from openseespy.postprocessing.Get_Rendering import *
 
 
-#filename = sys.argv[1]
+filename = sys.argv[1]
+inputName = filename.split("\\")[-1]
+print( inputName )
+"""
 filename = r'C:\Users\domy7\Desktop\Magistrale\Grass_OPS\Revisone3\assembleData\openSeesModel.txt'
 inputName = filename.split("\\")[-1]
-
+"""
 
 with open(filename, 'r') as f:
     lines = f.readlines()
@@ -35,9 +40,8 @@ openSeesSecTag = openSeesSecTag
 openSeesSolid = openSeesSolid
 
 
-import openseespy.opensees as ops
-# import OpenSeesPy rendering module
-from openseespy.postprocessing.Get_Rendering import *
+
+
 
 ops.wipe()
 
@@ -215,7 +219,7 @@ for item in openSeesBeamLoad:
 
 
 
-ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele', 1,'stresses')
+#ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele', 1,'stresses')
 
 # ------------------------------
 # Start of analysis generation
@@ -248,10 +252,9 @@ ops.analyze(1)
 nodeDisplacementWrapper = []
 
 for i in range(1,len(ops.getNodeTags())+1):
-
     nodeTag = i
     oNode = ops.nodeCoord( nodeTag ) # cordinate nodo
-    oNodeDisp = ops.nodeDisp( nodeTag ) # spostamenti e rotazioni del nodo 
+    oNodeDisp = ops.nodeDisp( nodeTag ) # spostamenti del nodo 
     nodeDisplacementWrapper.append([oNode, oNodeDisp])
 
 #-----------------------------------------------------

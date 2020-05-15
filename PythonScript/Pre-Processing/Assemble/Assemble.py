@@ -210,7 +210,7 @@ for loadWrapper in Load:
 
 openSeesNodeLoad = openSeesNodeLoad
 openSeesBeamLoad = openSeesBeamLoad
-
+"""
 ## MASS ##
 # find Total mass convering in each node
 
@@ -251,9 +251,9 @@ for item in Mass:
     externalMass.append([ cloudPoints.ClosestPoint(item[0]), item[1] ])
 
 externalMassDict = dict(externalMass)
-
+"""
 openSeesNodalMass = []
-
+"""
 for mass in massWrapper:
     massNodeTag = mass[0]
     if externalMassDict.get(massNodeTag) == None:
@@ -264,7 +264,7 @@ for mass in massWrapper:
     openSeesNodalMass.append( [massNodeTag, massValues] )
 
 openSeesNodalMass = openSeesNodalMass
-
+"""
 
 ## ASSEMBLE ##
 

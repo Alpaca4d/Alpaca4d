@@ -42,7 +42,7 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         elementOutputWrapper,
                         elementLoadWrapper ])
 
-
+print( nodeDisplacementWrapper )
 """
 with open(outputFile, 'r') as f:
     lines = f.readlines()
