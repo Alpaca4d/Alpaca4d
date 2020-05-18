@@ -5,8 +5,23 @@ import Grasshopper
 
 ghFilePath = ghenv.LocalScope.ghdoc.Path
 ghFileName = ghenv.LocalScope.ghdoc.Name
+
+# delete file if already there
+workingDirectory = os.path.dirname(ghFilePath) 
+outputFileName = 'openSeesOutputWrapper.txt'
+
+for dirpath, dirnames, filenames in os.walk(workingDirectory):
+    for filename in filenames:
+        print(filename)
+        if filename == outputFileName:
+            file = os.path.join(dirpath,outputFileName)
+            os.remove(file)
+
+
 folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
 ghFolderPath = ghFilePath[0:folderNameLength]
+
+
 
 outputPath = ghFolderPath + 'assembleData'
 wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
