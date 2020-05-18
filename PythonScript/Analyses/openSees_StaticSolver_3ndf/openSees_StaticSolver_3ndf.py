@@ -1,15 +1,14 @@
 import sys
 import openseespy.opensees as ops
-from openseespy.postprocessing.Get_Rendering import *
 
 
 filename = sys.argv[1]
 inputName = filename.split("\\")[-1]
-print( inputName )
-"""
-filename = r'C:\Users\domy7\Desktop\Magistrale\Grass_OPS\Revisone3\assembleData\openSeesModel.txt'
-inputName = filename.split("\\")[-1]
-"""
+
+
+#filename = r'C:\Users\FORMAT\Desktop\testNDF\assembleData\openSeesModel.txt'
+#inputName = filename.split("\\")[-1]
+
 
 with open(filename, 'r') as f:
     lines = f.readlines()
@@ -186,16 +185,13 @@ for i in range(0, len(oSupport)):
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3] )
 
 ## LOAD ##
-'''
+
 # create TimeSeries
 ops.timeSeries('Constant', 1)
 
 # create a plain load pattern
 ops.pattern('Plain', 1, 1)
-'''
-timeSeries("Linear", 1)
-# create a Plain load pattern
-pattern("Plain", 1, 1, "-fact", 1.0)
+
 ## assemble load ##
 for i in range(0, len(oNodeLoad)):
 
@@ -292,10 +288,12 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
 
 length = len(filename)-len(inputName)
 filefolder = filename[0:length]
+
 outputFileName = filefolder+'openSeesOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
         f.write("%s\n" % item)
-#plot_model()
-#print( nodeDisp(6))
+
+
+
