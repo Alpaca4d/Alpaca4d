@@ -8,6 +8,8 @@
 * [ ] Create Cluster when necessary
 * [x] Diagram Cds
 * [x] Add 3df Solver
+* [ ] fare l'amore
+* [ ] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
 
 ### Marco Pellegrino
 
@@ -21,4 +23,3 @@
 * [ ] Documentation
 * [ ] Icon
 * [ ] look to eleForce in shell ( component name is 'shellForceView'... i thinks )
-* [ ] trombare
