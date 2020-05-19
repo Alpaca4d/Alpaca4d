@@ -576,41 +576,7 @@ if Animate and not Reset:
     myCounter += 1
     updateComponent(1)
 
-#print(myCounter)
-"""
-for vector in displacement[myCounter]:
-    disp.append( rg.Vector3d(float(vector[0]), float(vector[1]), float(vector[2]) ) )
-"""
-#print(displacement[0])
 
-
-"""
-list2 = []
-
-for i in range( 0, len(lines)):
-    list2.append(lines[i].split())
-    list2[i].pop(0) # elemina il primo elemento della lista
-
-#print( (list2[0]) )
-
-timePointDef = []
-
-
-for stepValue in list2:
-    pointDef = []
-    for indexPoint,j in enumerate(range(0,len(stepValue),6)):
-        tagPoint = indexPoint + 1
-        traslX = float(stepValue[ j ]) 
-        traslY = float(stepValue[ j + 1 ])
-        traslZ = float(stepValue[ j + 2 ])
-        rotX = float(stepValue[ j + 3 ]) 
-        rotY = float(stepValue[ j + 4 ])
-        rotZ = float(stepValue[ j + 5 ])
-        pointDef.append([ tagPoint, [ rg.Point3d( traslX, traslY, traslZ ), rg.Point3d( rotX, rotY, rotZ ) ]])
-    pointDefDict = dict( pointDef )
-    timePointDef.append( pointDefDict )
-
-"""
 
 
 stepValue = displacement[myCounter]

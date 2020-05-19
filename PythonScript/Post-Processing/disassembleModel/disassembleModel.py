@@ -1,23 +1,10 @@
-﻿import Rhino.Geometry as rg
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import rhinoscriptsyntax as rs
-#import Grasshopper
-#import System as sy #DV
 import sys
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
 
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
 folderName = r'C:\GitHub\Alpaca4d\PythonScript\function'
 sys.path.append(folderName)
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
@@ -30,7 +17,9 @@ GeomTransf = openSeesModel[1]
 openSeesBeam = openSeesModel[2]
 openSeesSupport = openSeesModel[3]
 openSeesNodeLoad = openSeesModel[4]
+openSeesMatTag = openSeesModel[7]
 openSeesShell = openSeesModel[8]
+openSeesSecTag = openSeesModel[9]
 openSeesSolid = openSeesModel[10]
 
 pointWrapper = []
@@ -324,13 +313,47 @@ for i in range(0,len(modelDict)):
 
 
 forceDisplay = []
-for force in openSeesNodeLoad :
-    forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
-    forceDisplay.append(  forceVector  )
+for item in openSeesNodeLoad:
+    loadWrapper = "{3}; Pos=[{4}]; F={1}; M={2}".format(item[0],item[1][:3],item[1][3:], item[2], pointWrapperDict.get(item[0]))
+    forceDisplay.append(loadWrapper)
 Load = forceDisplay
 
+
+
 Support = []
+
 for support in openSeesSupport :
     index = support[0]
-    pos = pointWrapperDict.get( index  , "never")
-    Support.append( pos )
+    pos = pointWrapperDict.get(index)
+    supportType = support[1:]
+    supportTypeTemp = []
+    for number in supportType:
+        if number == 1:
+            dof = True
+        else:
+            dof = False
+        supportTypeTemp.append(dof)
+    supportWrapper = "Support; Pos=[{0}]; DOF={1}".format(pos,supportTypeTemp)
+    Support.append( supportWrapper )
+
+
+Material = []
+
+for item in openSeesMatTag:
+    Grade= item[0].split("_")[0]
+    dimensionType = item[0].split("_")[1]
+    typeMat = item[0].split("_")[2]
+    E = item[1][1][0]
+    G = item[1][1][1]
+    v = item[1][1][2]
+    gamma = item[1][1][3]
+    fy = item[1][1][4]
+    Material.append( "grade={}; type={}; E={}; G={}; v={}; gamma={}; fy={}".format(Grade,typeMat,E,G,v,gamma,fy))
+
+
+Section = []
+
+for item in openSeesSecTag:
+    name = item[0].split("_")[0]
+    typeSec = item[0].split("_")[1]
+    Section.append("name={}; type={}".format(name, typeSec))
