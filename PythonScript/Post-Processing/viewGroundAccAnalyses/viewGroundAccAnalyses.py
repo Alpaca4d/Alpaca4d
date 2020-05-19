@@ -8,18 +8,6 @@ import Rhino.Display as rd
 from scriptcontext import doc
 import time
 
-"""
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-"""
 
 
 fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
@@ -552,6 +540,31 @@ with open(path, 'r') as f:
             n = 6
             displacementTime = [displacementTemp[i:i + n] for i in range(0, len(displacementTemp), n)]
             displacement.append(displacementTime)
+
+
+
+# I change the List Structure to have an ouput
+# this change will not affect the work done before
+
+newDisplacement = [[row[i] for row in displacement] for i in range(len(displacement[0]))]
+
+trans = []
+rot = []
+for nodeDispCollection in newDisplacement:
+    transTemp = []
+    rotTemp = []
+    for nodeDisp in nodeDispCollection:
+        transTemp.append(rg.Vector3d(float(nodeDisp[0]),float(nodeDisp[1]),float(nodeDisp[2])))
+        rotTemp.append(rg.Vector3d(float(nodeDisp[3]),float(nodeDisp[4]),float(nodeDisp[5])))
+    trans.append(transTemp)
+    rot.append(rotTemp)
+
+#for item in newDisplacement
+
+trans = th.list_to_tree(trans)
+rot = th.list_to_tree(rot)
+
+
 
 
 #print(time.clock() - start)
