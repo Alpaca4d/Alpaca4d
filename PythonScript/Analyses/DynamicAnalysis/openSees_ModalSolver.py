@@ -124,7 +124,7 @@ for n in range(0, len(openSeesBeam)):
 
     if eleType is 'Truss':
 
-        ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag ) # TO CONTROL!!!
+        ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag , '-rho', massDens/9.81) # TO CONTROL!!!
         
 
     elif eleType is 'ElasticTimoshenkoBeam':
