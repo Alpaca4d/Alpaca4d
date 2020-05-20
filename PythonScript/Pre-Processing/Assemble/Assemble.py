@@ -281,17 +281,16 @@ openSeesModel = ([ openSeesNode,
                    openSeesSecTag,
                    openSeesSolid])
 
+
 ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
+ghFolderPath = os.path.dirname(ghFilePath)
 
-outputPath = ghFolderPath + 'assembleData'
 
+outputPath = os.path.join(ghFolderPath,'assembleData')
 if not os.path.exists(outputPath):
     os.makedirs(outputPath)
 
-wrapperFile = outputPath + '\\openSeesModel.txt'
+wrapperFile = os.path.join(outputPath,'openSeesModel.txt')
 with open(wrapperFile, 'w') as f:
     for item in openSeesModel:
         f.write("%s\n" % item)

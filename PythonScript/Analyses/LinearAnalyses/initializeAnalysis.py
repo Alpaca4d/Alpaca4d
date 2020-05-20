@@ -4,7 +4,6 @@ import Grasshopper
 
 
 ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
 
 # delete file if already there
 workingDirectory = os.path.dirname(ghFilePath) 
@@ -12,19 +11,17 @@ outputFileName = 'openSeesOutputWrapper.txt'
 
 for dirpath, dirnames, filenames in os.walk(workingDirectory):
     for filename in filenames:
-        print(filename)
         if filename == outputFileName:
             file = os.path.join(dirpath,outputFileName)
             os.remove(file)
+            #print("I removed the file")
+
+ghFilePath = ghenv.LocalScope.ghdoc.Path
+ghFolderPath = os.path.dirname(ghFilePath)
+outputFolder = os.path.join(ghFolderPath,'assembleData')
+wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
 
 #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
 fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\openSees_StaticSolver.py'
@@ -38,7 +35,7 @@ System.Diagnostics.Process.WaitForExit(process)
 ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
 ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
 
-outputFile = outputPath + '\\openSeesOutputWrapper.txt'
+outputFile = os.path.join(outputFolder, outputFileName)
 
 with open(outputFile, 'r') as f:
     lines = f.readlines()
@@ -47,7 +44,6 @@ with open(outputFile, 'r') as f:
     elementOutputWrapper = eval( lines[2].strip() )
     elementLoadWrapper = eval( lines[3].strip() )
     eleForceWrapper = eval( lines[4].strip() )
-    #nodalForceWrapper = eval( lines[5].strip() )
 
 
 openSeesOutputWrapper = ([nodeDisplacementWrapper,
@@ -55,3 +51,4 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         elementOutputWrapper,
                         elementLoadWrapper,
                         eleForceWrapper])
+
