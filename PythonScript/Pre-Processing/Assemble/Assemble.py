@@ -7,7 +7,6 @@ import Rhino.Geometry as rg
 points = []
 startPointList = []
 endPointList = []
-
 geomTransf = []
 matWrapper = []
 secTagWrapper = []
@@ -210,61 +209,19 @@ for loadWrapper in Load:
 
 openSeesNodeLoad = openSeesNodeLoad
 openSeesBeamLoad = openSeesBeamLoad
-"""
+
+
 ## MASS ##
 # find Total mass convering in each node
 
-cumulativeWeigth = []
-
-for point in oPoints:
-    cumulativeWeigthTemp = []
-    for element in Element:
-        test = element[0].ClosestPoint(point, 0.01)[0]
-        if test == True:
-            print( element[0])
-            length = element[0].GetLength()/2
-            massDens = element[5] / 10
-            cumulativeWeigthTemp.append( length * massDens)
-    cumulativeWeigth.append(cumulativeWeigthTemp)
-
-totalMassPerPoint = []
-
-for weigthElements in cumulativeWeigth:
-    mass = 0
-    for item in weigthElements:
-        mass += item
-    totalMassPerPoint.append(mass)
-
-totalMassPerPoint = totalMassPerPoint
-
-massWrapper = []
-
-for i,j in zip(oPoints, totalMassPerPoint):
-    massWrapper.append( [cloudPoints.ClosestPoint(i),j] )
-
-# ---------------------------------------------------
-# apply external Load on top of the Dead Load
-
-externalMass = []
+openSeesNodalMass = []
 
 for item in Mass:
-    externalMass.append([ cloudPoints.ClosestPoint(item[0]), item[1] ])
-
-externalMassDict = dict(externalMass)
-"""
-openSeesNodalMass = []
-"""
-for mass in massWrapper:
-    massNodeTag = mass[0]
-    if externalMassDict.get(massNodeTag) == None:
-        massValues = [ mass[1], mass[1], mass[1], 0, 0, 0 ]
-    else:
-        additionMass = externalMassDict.get(massNodeTag)
-        massValues = [mass[1] + additionMass.X , mass[1] + additionMass.Y, mass[1] + additionMass.Z, 0, 0, 0]
-    openSeesNodalMass.append( [massNodeTag, massValues] )
+    massNodeTag = cloudPoints.ClosestPoint(item[0])
+    massValues = [item[1].X, item[1].Y, item[1].Z]
+    openSeesNodalMass.append([ massNodeTag, massValues ])
 
 openSeesNodalMass = openSeesNodalMass
-"""
 
 ## ASSEMBLE ##
 

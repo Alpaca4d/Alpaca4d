@@ -1,10 +1,14 @@
 import sys
 import openseespy.opensees as ops
 import math
+import time
 
 filename = sys.argv[1]
 numEigenvalues = int(sys.argv[2])
 inputName = filename.split("\\")[-1]
+
+
+
 
 with open(filename, 'r') as f:
     lines = f.readlines()
@@ -32,7 +36,6 @@ openSeesShell = openSeesShell
 openSeesSecTag = openSeesSecTag
 openSeesSolid = openSeesSolid
 oMass = openSeesNodalMass
-
 
 
 
@@ -126,7 +129,8 @@ for n in range(0, len(openSeesBeam)):
 
     elif eleType is 'ElasticTimoshenkoBeam':
 
-        ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
+        ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens/9.81,'-lMass')
+
 
 for item in openSeesShell:
 
@@ -191,9 +195,11 @@ ops.pattern('Plain', 1, 1)
 
 ## assemble MASS ##
 
-for i in range(len(oMass)):
-    nodeTag = oMass[i][0] + 1
-    massValues = oMass[i][1]
+for item in oMass:
+    nodeTag = item[0] + 1
+    print(nodeTag)
+    massValues = item[1]
+    print(massValues)
     ops.mass(nodeTag, *massValues)
 
 
@@ -252,6 +258,7 @@ openSeesModalOutputWrapper = ([nodeModalDispWrapper,
                                elementOutputWrapper,
                                period,
                                frequency])
+
 
 
 length = len(filename)-len(inputName)
