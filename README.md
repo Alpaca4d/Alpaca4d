@@ -13,6 +13,7 @@
 * [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
 * [ ] add "IPE" section
 * [ ] add box section
+* [ ] circular Cross-Section less dense for visualisation
 
 
 ### Marco Pellegrino
