@@ -7,8 +7,7 @@
     else:
     	G = E / (2 * (1 + v))
 
-    rho = rho                                  # Input value kN/m3
-    
+    rho = rho / 9.81                           # Force Density to mass Density
     fy = fy                                    # Input value in N/mm2
     materialDimension = "nDMaterial"
     materialType = "ElasticIsotropic"

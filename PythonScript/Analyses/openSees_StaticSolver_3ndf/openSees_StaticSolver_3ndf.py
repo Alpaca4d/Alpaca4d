@@ -6,10 +6,6 @@ filename = sys.argv[1]
 inputName = filename.split("\\")[-1]
 
 
-#filename = r'C:\Users\FORMAT\Desktop\testNDF\assembleData\openSeesModel.txt'
-#inputName = filename.split("\\")[-1]
-
-
 with open(filename, 'r') as f:
     lines = f.readlines()
     openSeesNode = eval( lines[0].strip() )
