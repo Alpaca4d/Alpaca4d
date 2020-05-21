@@ -6,11 +6,10 @@
 * [x] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
 * [x] Update Deformed Dynamic Model
 * [ ] Create Cluster when necessary
-* [ ] Circular CrossSection has some visualisation problem
+* [ ] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
 * [ ] modal analyses doesn't start from mode 1
 * [x] Diagram Cds
 * [x] Add 3df Solver
-* [ ] fare l'amore
 * [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
 
 ### Marco Pellegrino
