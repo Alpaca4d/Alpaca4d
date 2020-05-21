@@ -16,7 +16,7 @@
 
 * [x] Update Modal Analyses
 * [ ] Non Linear Material for Brick
-* [ ] Update Circular Cross-Section for Hollow Cross Section
+* [x] Update Circular Cross-Section for Hollow Cross Section
 * [x] creationFolder name is wrong. 
 * [ ] EarthQuake Analyses - update for different way to make analyses
 * [x] Automatically delete existing Folder to avoid to read previous file when the analyses fail
