@@ -11,6 +11,9 @@
 * [x] Diagram Cds
 * [x] Add 3df Solver
 * [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
+* [ ] add "IPE" section
+* [ ] add box section
+
 
 ### Marco Pellegrino
 
