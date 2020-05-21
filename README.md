@@ -17,7 +17,7 @@
 
 * [x] Update Modal Analyses
 * [ ] Non Linear Material for Brick
-* [ ] creationFolder name is wrong. 
+* [x] creationFolder name is wrong. 
 * [ ] EarthQuake Analyses - update for different way to make analyses
 * [x] Automatically delete existing Folder to avoid to read previous file when the analyses fail
 * [ ] CMD starts when we run the analyses. Do we like it?
