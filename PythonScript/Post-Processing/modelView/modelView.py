@@ -48,7 +48,7 @@ if nodeTag == True:
 
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 2*mt.pi, 20 )
+    t = dg.linspace( 0 , 2*mt.pi, 15 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)
@@ -240,12 +240,14 @@ def Beam( ele, node):
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
             section = dg.AddRectangleFromCenter( sectionPlane, width, height )
-            
+            sectionForm.append( section )
         if dimSection[0] == 'circular' :
-            radius  = dimSection[2]
-            section = AddCircleFromCenter( sectionPlane, radius )
+            radius1  = dimSection[1]/2
+            radius2  = dimSection[1]/2 - dimSection[2]
+            section1 = AddCircleFromCenter( sectionPlane, radius1 )
+            section2 = AddCircleFromCenter( sectionPlane, radius2 )
+            sectionForm.append( [ section1, section2 ] )
             
-        sectionForm.append( section )
         
         
     meshExtr = meshLoft3( sectionForm,  color )
@@ -254,30 +256,36 @@ def Beam( ele, node):
 
 ## Mesh from close section eith gradient color ##
 def meshLoft3( point, color ):
-    meshEle = rg.Mesh()
-    for i in range(0,len(point)):
-        for j in range(0, len(point[0])):
-            vertix = point[i][j]
-            meshEle.Vertices.Add( vertix ) 
-            #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-    k = len(point[0])
-    for i in range(0,len(point)-1):
-        for j in range(0, len(point[0])):
-            if j < k-1:
-                index1 = i*k + j
-                index2 = (i+1)*k + j
-                index3 = index2 + 1
-                index4 = index1 + 1
-            elif j == k-1:
-                index1 = i*k + j
-                index2 = (i+1)*k + j
-                index3 = (i+1)*k
-                index4 = i*k
-            meshEle.Faces.AddFace(index1, index2, index3, index4)
-            #rs.ObjectColor(scyl,(255,0,0))
-    colour = rs.CreateColor( color[0], color[1], color[2] )
-    meshEle.VertexColors.CreateMonotoneMesh( colour )
-    return meshEle
+    nLength = ( len(point[0]) )
+    meshElement = rg.Mesh()
+    for item in range( nLength ):
+        meshEle = rg.Mesh()
+        pointSection1 = [row[item] for row in point ]
+        for i in range(0,len(pointSection1)):
+            for j in range(0, len(pointSection1[0])):
+                vertix = pointSection1[i][j]
+                meshEle.Vertices.Add( vertix ) 
+                #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+        k = len(pointSection1[0])
+        for i in range(0,len(pointSection1)-1):
+            for j in range(0, len(pointSection1[0])):
+                if j < k-1:
+                    index1 = i*k + j
+                    index2 = (i+1)*k + j
+                    index3 = index2 + 1
+                    index4 = index1 + 1
+                elif j == k-1:
+                    index1 = i*k + j
+                    index2 = (i+1)*k + j
+                    index3 = (i+1)*k
+                    index4 = i*k
+                meshEle.Faces.AddFace(index1, index2, index3, index4)
+                #rs.ObjectColor(scyl,(255,0,0))
+        colour = rs.CreateColor( color[0], color[1], color[2] )
+        meshEle.VertexColors.CreateMonotoneMesh( colour )
+        meshElement.Append( meshEle )
+    
+    return meshElement
 
 
 model = []
