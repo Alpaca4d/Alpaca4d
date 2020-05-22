@@ -80,7 +80,7 @@ for item in openSeesSecTag:
     E_mod = float( item[1][1][1][1] )
     nu = float( item[1][1][1][3] )
     h = float( item[1][1][0] )
-    rho = float( item[1][1][1][4] )
+    rho = float( item[1][1][1][4] ) / 9.81
     if typeSection == 'ElasticMembranePlateSection':
         ops.section(typeSection, secTag, E_mod, nu, h, rho)
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )

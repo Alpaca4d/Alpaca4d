@@ -110,6 +110,7 @@ openSeesNode = openSeesNode
 openSeesBeam = []
 openSeesShell = []
 openSeesSolid = []
+MassOfStructure = 0
 
 for eleTag, element in enumerate(Element):
     if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
@@ -133,10 +134,13 @@ for eleTag, element in enumerate(Element):
         transfTag = geomTransfDict.setdefault(element[3])
         orientVector = [ element[3].X, element[3].Y, element[3].Z ]
         massDens = element[5]
+        print(massDens)
         sectionGeomProperties = element[2][7]
         color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
         matTag = matNameDict.setdefault(element[2][6][0])[0]
         openSeesBeam.append( [typeElement, eleTag, eleNodes, Area, E_mod, G_mod, Jxx, Iy, Iz, transfTag, massDens, Avy, Avz, orientVector, sectionGeomProperties, matTag, color] )
+        
+        MassOfStructure += element[0].GetLength() * massDens * 100    # kN to kg
         
     elif (element[1] == "ShellDKGQ") or (element[1] == "ShellDKGT"):
         typeElement = element[1]
@@ -151,6 +155,12 @@ for eleTag, element in enumerate(Element):
         secTag = secTagDict.setdefault(element[2][0])[0]
         # sectionProperties = we need to bring some information later probably 
         openSeesShell.append( [ typeElement, eleTag, shellNodes, secTag, thick, color] )
+        
+        areaMesh = rg.AreaMassProperties.Compute(element[0]).Area
+        
+        density = element[2][2][4]
+        MassOfStructure +=  (areaMesh * thick * density) * 100         # kN to kg
+        
         
     elif (element[1] == 'bbarBrick') or (element[1] == "FourNodeTetrahedron"):
         typeElement = element[1]

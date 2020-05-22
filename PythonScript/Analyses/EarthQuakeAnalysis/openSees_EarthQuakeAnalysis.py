@@ -152,7 +152,8 @@ for item in openSeesShell:
 
     if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
 
-        ops.element( eleType , eleTag, *eleNodes, secTag)
+        ops.element( 'ShellMITC4' , eleTag, *eleNodes, secTag)
+        #ops.element( eleType , eleTag, *eleNodes, secTag)
 
 for item in openSeesSolid:
 
@@ -278,8 +279,9 @@ ops.wipeAnalysis()
 ops.constraints('Transformation')
 ops.numberer('Plain')
 ops.system('BandGeneral')
-ops.test('EnergyIncr', 1e-12, 10)
+
 ops.algorithm('Newton')
+ops.test('NormDispIncr', 1e-8, 1000)
 
 NewmarkGamma = float(sys.argv[7])   
 NewmarkBeta = float(sys.argv[8])    
@@ -316,27 +318,17 @@ while ok == 0 and tCurrent < tAnalyses:
     tCurrent = ops.getTime()
 
 
-    u2 = ops.nodeDisp(2,1)
-    timer.append(tCurrent)
-    disp.append(u2)
-
 #print( "maximum displacement is" + str(disp.sort()[-1]) )
 
 print("Ground Motion Analyses Finished")
 
 
-plt.plot(timer, disp)
-plt.ylabel('Horizontal Displacement of node 2 (in)')
-plt.xlabel('Time (s)')
-
-plt.show()
-
-time.sleep(1)
-
 #----------------------------------------------
 # THIS PART HAS TO BE DECIDE WITH DOMENICO
 # SOME USEFULL OUTPUT FOR FUTURE OPTIMISATION
 
+
+## some problem happening here
 
 dt = []
 displacement = []
@@ -351,8 +343,12 @@ with open(nodeDispFilePath, 'r') as f:
             n = 6
             displacementTime = [displacementTemp[i:i + n] for i in range(0, len(displacementTemp), n)]
             displacement.append(displacementTime)
+        else:
+            break
 
 # TAKING THE VALUE IN A SINGLE DIRECTION BUT WE SHOULD DO IT FOR VECTOR
+
+
 
 maximum = []
 for values in displacement:
@@ -395,6 +391,8 @@ outputFileName = filefolder + 'openSeesEarthQuakeAnalysisOutputWrapper.txt'
 with open(outputFileName, 'w') as f:
     for item in openSeesModalOutputWrapper:
         f.write("%s\n" % item)
+
+
 
 
 ops.wipe()
