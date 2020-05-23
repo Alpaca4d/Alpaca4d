@@ -58,6 +58,22 @@ def AddCircleFromCenter( plane, radius):
     circle  = a 
     return circle
 
+def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+    p1 = plane.PointAt(ta/2, -(yg - tinf) )
+    p2 = plane.PointAt( Binf/2,  -(yg - tinf) )
+    p3 = plane.PointAt( Binf/2,  -yg )
+    p4 = plane.PointAt( -Binf/2,  -yg )
+    p5 = plane.PointAt( -Binf/2, -(yg - tinf) ) 
+    p6 = plane.PointAt( -ta/2,  -(yg - tinf) )
+    p7 = plane.PointAt( -ta/2,  (H - yg - tsup))
+    p8 = plane.PointAt( -Bsup/2,  (H - yg - tsup) )
+    p9 = plane.PointAt( -Bsup/2,  (H - yg ) )
+    p10 = plane.PointAt( Bsup/2,  (H - yg ) )
+    p11 = plane.PointAt( Bsup/2,  (H - yg - tsup) )
+    p12 = plane.PointAt( ta/2,  (H - yg - tsup) )
+    wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
+    return wirframe
+
 def ShellQuad( ele, node):
     eleTag = ele[1]
     eleNodeTag = ele[2]
@@ -241,12 +257,26 @@ def Beam( ele, node):
             width, height = dimSection[1], dimSection[2]
             section = dg.AddRectangleFromCenter( sectionPlane, width, height )
             sectionForm.append( section )
-        if dimSection[0] == 'circular' :
+        elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
             radius2  = dimSection[1]/2 - dimSection[2]
             section1 = AddCircleFromCenter( sectionPlane, radius1 )
             section2 = AddCircleFromCenter( sectionPlane, radius2 )
             sectionForm.append( [ section1, section2 ] )
+        elif dimSection[0] == 'doubleT' :
+            Bsup = dimSection[1]
+            tsup = dimSection[2]
+            Binf = dimSection[3]
+            tinf = dimSection[4]
+            H =  dimSection[5]
+            ta =  dimSection[6]
+            yg =  dimSection[7]
+            section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
+            sectionForm.append( section )
+        elif dimSection[0] == 'Generic' :
+            radius  = dimSection[1]
+            section = AddCircleFromCenter( sectionPlane, radius )
+            sectionForm.append( section )
             
         
         
@@ -256,14 +286,42 @@ def Beam( ele, node):
 
 ## Mesh from close section eith gradient color ##
 def meshLoft3( point, color ):
-    nLength = ( len(point[0]) )
     meshElement = rg.Mesh()
-    for item in range( nLength ):
+    if len(point[0]) < 11 : # perchè in questo caso piùsezioni
+        nLength =  len(point[0]) 
+        for item in range( nLength ):
+            meshEle = rg.Mesh()
+            pointSection1 = [row[item] for row in point ]
+            for i in range(0,len(pointSection1)):
+                for j in range(0, len(pointSection1[0])):
+                    vertix = pointSection1[i][j]
+                    meshEle.Vertices.Add( vertix ) 
+                    #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+            k = len(pointSection1[0])
+            for i in range(0,len(pointSection1)-1):
+                for j in range(0, len(pointSection1[0])):
+                    if j < k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = index2 + 1
+                        index4 = index1 + 1
+                    elif j == k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = (i+1)*k
+                        index4 = i*k
+                    meshEle.Faces.AddFace(index1, index2, index3, index4)
+                    #rs.ObjectColor(scyl,(255,0,0))
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            meshEle.VertexColors.CreateMonotoneMesh( colour )
+            meshElement.Append( meshEle )
+    else :
         meshEle = rg.Mesh()
-        pointSection1 = [row[item] for row in point ]
+        pointSection1 = point
         for i in range(0,len(pointSection1)):
             for j in range(0, len(pointSection1[0])):
                 vertix = pointSection1[i][j]
+                print( type(vertix) )
                 meshEle.Vertices.Add( vertix ) 
                 #meshEle.VertexColors.Add( color[0],color[1],color[2] );
         k = len(pointSection1[0])
@@ -283,7 +341,7 @@ def meshLoft3( point, color ):
                 #rs.ObjectColor(scyl,(255,0,0))
         colour = rs.CreateColor( color[0], color[1], color[2] )
         meshEle.VertexColors.CreateMonotoneMesh( colour )
-        meshElement.Append( meshEle )
+        meshElement = meshEle
     
     return meshElement
 
