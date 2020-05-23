@@ -9,11 +9,13 @@
 * [x] Add 3df Solver
 * [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
 * [ ] Create Cluster when necessary
-* [ ] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
-* [ ] modal analyses doesn't start from mode 1
-* [ ] add "IPE" section
+* [x] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
+* [x] modal analyses doesn't start from mode 1
+* [x] add "IPE" section
 * [ ] add box section
-* [ ] circular Cross-Section less dense for visualisation
+* [x] circular Cross-Section less dense for visualisation
+* [ ] add view distribuited load in model view
+* [ ] add view concentrated mass load in model view ( create a sphere in node )
 
 
 ### Marco Pellegrino
