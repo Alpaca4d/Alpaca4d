@@ -28,8 +28,11 @@ wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
 fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py'
 
 
+GroundMotionFile = str(GroundMotionFile)
+GroundMotionTimeStep = str(GroundMotionTimeStep)
+
 EarthQuakeAnalysis = System.Diagnostics.ProcessStartInfo(fileName)
-EarthQuakeAnalysis.Arguments = wrapperFile + " " + str(GroundMotionDirection) + " " + str(GroundMotionFile) + " " + str(GroundMotionTimeStep) + " " + str(GroundMotionfactor) + " " + str(Damping) + " " + str(NewmarkGamma) + " " + str(NewmarkBeta)+ " " + str(TmaxAnalyses)
+EarthQuakeAnalysis.Arguments = wrapperFile + " " + str(GroundMotionDirection) + " " + str(GroundMotionFile) + " " + GroundMotionTimeStep + " " + str(GroundMotionfactor) + " " + str(Damping) + " " + str(NewmarkGamma) + " " + str(NewmarkBeta)+ " " + str(TmaxAnalyses)
 process = System.Diagnostics.Process.Start(EarthQuakeAnalysis)
 System.Diagnostics.Process.WaitForExit(process)
 

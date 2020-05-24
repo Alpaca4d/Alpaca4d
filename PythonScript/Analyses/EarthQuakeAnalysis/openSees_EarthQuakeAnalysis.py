@@ -150,7 +150,7 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
+    if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'): # to modify becaue shell will be ShellMITC4
 
         ops.element( 'ShellMITC4' , eleTag, *eleNodes, secTag)
         #ops.element( eleType , eleTag, *eleNodes, secTag)
@@ -243,10 +243,11 @@ ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to z
 GMdirection = int(sys.argv[2])
 print(f"GMdirection = {GMdirection}")
 
-GMfile = str(sys.argv[3])
-print(f"GMfile = {GMfile}")
+GroundMotionValues = eval(sys.argv[3])
+print(f"GroundMotionValues = {GroundMotionValues}")
 
-GroundMotionTimeStep = float(sys.argv[4])           # time step for input ground motion
+
+GroundMotionTimeStep = eval(sys.argv[4])           # time step for input ground motion. It is a list of Values
 print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
 
 GMfact = float(sys.argv[5])
@@ -254,9 +255,24 @@ print(f'GMfact = {GMfact}')
 
 
 
-ops.timeSeries('Path', 2, '-filePath', GMfile, '-dt', GroundMotionTimeStep, '-factor', GMfact, '-prependZero')
-ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
+# ops.timeSeries('Path', tag, '-dt', dt=0.0, '-values', *values, '-time', *time, '-filepath', filepath='', '-fileTime', fileTime='', '-factor', factor=1.0, '-startTime', startTime=0.0, '-useLast', '-prependZero')
 
+# time series with text file
+# any text file has a dot. 
+# i.e. .txt, .dat, .out
+# if the file has a dot, it is a text file that the user is inputting
+
+
+# to make it more reliable
+if len(GroundMotionValues) == 1:
+    ops.timeSeries('Path', 2, '-filePath', GroundMotionValues[0], '-dt', float(GroundMotionTimeStep[0]), '-factor', GMfact, '-prependZero')
+
+else:
+# time series with values for time and force
+    ops.timeSeries('Path', 2, '-values', *GroundMotionValues, '-time', *GroundMotionTimeStep, '-factor', GMfact, '-prependZero')
+
+
+ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
 
 
 Lambda = ops.eigen('-fullGenLapack', 1)[0] # eigenvalue mode 1
@@ -294,8 +310,9 @@ ops.analysis('Transient')
 ok = 0
 tCurrent = ops.getTime()
 tAnalyses = float(sys.argv[9])			# End of the analyses
-timeStep = GroundMotionTimeStep * 0.1				# Increment 10% of the time series step?
-print("starting Analyse")
+timeStep = GroundMotionTimeStep[0] * 0.1				# Increment 10% of the time series step?
+
+print("starting Analyses")
 
 timer = []
 disp = []
@@ -316,6 +333,7 @@ while ok == 0 and tCurrent < tAnalyses:
         ops.algorithm('Newton')
 
     tCurrent = ops.getTime()
+    print(f"Analyses step: {tCurrent}")
 
 
 #print( "maximum displacement is" + str(disp.sort()[-1]) )
@@ -391,8 +409,6 @@ outputFileName = filefolder + 'openSeesEarthQuakeAnalysisOutputWrapper.txt'
 with open(outputFileName, 'w') as f:
     for item in openSeesModalOutputWrapper:
         f.write("%s\n" % item)
-
-
 
 
 ops.wipe()
