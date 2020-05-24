@@ -16,6 +16,9 @@
 * [x] circular Cross-Section less dense for visualisation
 * [ ] add view distribuited load in model view
 * [ ] add view concentrated mass load in model view ( create a sphere in node )
+* [ ] add inetia zz in ipe section
+* [ ] add coding (in panel or path script ) and view post processing
+
 
 
 ### Marco Pellegrino
