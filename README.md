@@ -19,6 +19,7 @@
 * [ ] add inetia zz in ipe section
 * [ ] add coding (in panel or path script ) and view post processing
 * [ ] modify loft mesh for brich ( problem con tetra )
+* [ ] make it work DomeFunction
 
 
 ### Marco Pellegrino
