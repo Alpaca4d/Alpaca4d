@@ -1,4 +1,4 @@
-﻿import Rhino.Geometry as rg
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -620,7 +620,7 @@ def meshLoft3( point, color ):
         for i in range(0,len(pointSection1)):
             for j in range(0, len(pointSection1[0])):
                 vertix = pointSection1[i][j]
-                print( type(vertix) )
+                #print( type(vertix) )
                 meshEle.Vertices.Add( vertix ) 
                 #meshEle.VertexColors.Add( color[0],color[1],color[2] );
         k = len(pointSection1[0])
