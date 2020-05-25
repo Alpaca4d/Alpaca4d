@@ -12,13 +12,14 @@
 * [x] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
 * [x] modal analyses doesn't start from mode 1
 * [x] add "IPE" section
+* [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
+* [ ] add inetia zz in ipe section
 * [ ] add box section
 * [x] circular Cross-Section less dense for visualisation
 * [ ] add view distribuited load in model view
 * [ ] add view concentrated mass load in model view ( create a sphere in node )
-* [ ] add inetia zz in ipe section
 * [ ] add coding (in panel or path script ) and view post processing
-* [ ] modify loft mesh for brich ( problem con tetra )
+* [ ] modify loft mesh for brick ( problem con tetra )
 * [ ] make it work DomeFunction
 
 
