@@ -16,11 +16,10 @@ for dirpath, dirnames, filenames in os.walk(workingDirectory):
             os.remove(file)
             #print("I removed the file")
 
-ghFilePath = ghenv.LocalScope.ghdoc.Path
+
 ghFolderPath = os.path.dirname(ghFilePath)
 outputFolder = os.path.join(ghFolderPath,'assembleData')
 wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
-
 
 
 #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder

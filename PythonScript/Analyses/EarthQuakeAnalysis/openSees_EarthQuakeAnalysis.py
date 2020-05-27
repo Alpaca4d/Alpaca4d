@@ -243,7 +243,7 @@ ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to z
 GMdirection = int(sys.argv[2])
 print(f"GMdirection = {GMdirection}")
 
-GroundMotionValues = eval(sys.argv[3])
+GroundMotionValues = eval(sys.argv[3])         # it is an list string input from Grasshopper
 print(f"GroundMotionValues = {GroundMotionValues}")
 
 
@@ -311,6 +311,9 @@ ok = 0
 tCurrent = ops.getTime()
 tAnalyses = float(sys.argv[9])			# End of the analyses
 timeStep = GroundMotionTimeStep[0] * 0.1				# Increment 10% of the time series step?
+
+time.sleep(10)
+
 
 print("starting Analyses")
 
