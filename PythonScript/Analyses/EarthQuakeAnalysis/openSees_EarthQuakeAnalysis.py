@@ -7,7 +7,12 @@ import matplotlib.pyplot as plt
 
 
 filename = sys.argv[1]
-#filename = r'C:\Users\FORMAT\Desktop\EarthQuakeTest\assembleData\openSeesModel.txt'
+earthQuakeSettingsFile = sys.argv[2]
+
+#filename = r'C:\Users\FORMAT\Desktop\testAlpaca\assembleData\openSeesModel.txt'
+#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\testAlpaca\assembleData\earthQuakeSettingsFile.txt'
+
+
 workingDirectory = os.path.split(filename)[0]
 inputName = os.path.split(filename)[1]
 
@@ -26,7 +31,6 @@ with open(filename, 'r') as f:
     openSeesShell = eval(lines[8].strip() )
     openSeesSecTag = eval(lines[9].strip() )
     openSeesSolid = eval(lines[10].strip() )
-
 
 
 
@@ -239,28 +243,48 @@ ops.analyze(1)
 ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to zero
 
 
-#applying Dynamic Ground motion analysis
-GMdirection = int(sys.argv[2])
-print(f"GMdirection = {GMdirection}")
+with open(earthQuakeSettingsFile, 'r') as f:
+    earthQuakeSettingLines = f.readlines()
 
-GroundMotionValues = eval(sys.argv[3])         # it is an list string input from Grasshopper
+GroundMotionValues = []
+GroundMotionTimeStep = []
+
+for line in earthQuakeSettingLines:
+    l = line.split()
+
+    if l[0] == "GROUNDMOTIONVALUES":
+        GroundMotionValues.append( float(l[1]) )
+
+    elif l[0] == "GROUNDMOTIONTIMESTEP":
+        GroundMotionTimeStep.append( float(l[1]) )
+
+    elif l[0] == "GROUNDMOTIONDIRECTION":
+        GMdirection = int(l[1])
+
+    elif l[0] == "GROUNDMOTIONFACTOR":
+        GMfact = float(l[1])
+
+    elif l[0] == "DAMPING":
+        damping = float(l[1])
+
+    elif l[0] == "NEWMARKGAMMA":
+        NewmarkGamma = float(l[1])
+
+    elif l[0] == "NEWMARKBETA":
+        NewmarkBeta = float(l[1])
+
+    elif l[0] == "TMAXANALYSES":
+        tAnalyses = float(l[1])
+
+    elif l[0] == "TIMESTEP":
+        timeStep = float(l[1])
+
+
+
 print(f"GroundMotionValues = {GroundMotionValues}")
-
-
-GroundMotionTimeStep = eval(sys.argv[4])           # time step for input ground motion. It is a list of Values
 print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
-
-GMfact = float(sys.argv[5])
 print(f'GMfact = {GMfact}')
-
-
-
-# ops.timeSeries('Path', tag, '-dt', dt=0.0, '-values', *values, '-time', *time, '-filepath', filepath='', '-fileTime', fileTime='', '-factor', factor=1.0, '-startTime', startTime=0.0, '-useLast', '-prependZero')
-
-# time series with text file
-# any text file has a dot. 
-# i.e. .txt, .dat, .out
-# if the file has a dot, it is a text file that the user is inputting
+print(f"GMdirection = {GMdirection}")
 
 
 # to make it more reliable
@@ -269,18 +293,16 @@ if len(GroundMotionValues) == 1:
 
 else:
 # time series with values for time and force
-    ops.timeSeries('Path', 2, '-values', *GroundMotionValues, '-time', *GroundMotionTimeStep, '-factor', GMfact, '-prependZero')
+    ops.timeSeries('Path', 2, '-values', *GroundMotionValues, '-time', *GroundMotionTimeStep, '-factor', GMfact)
+
 
 
 ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
-
-
 Lambda = ops.eigen('-fullGenLapack', 1)[0] # eigenvalue mode 1
 Omega = math.pow(Lambda, 0.5)
 
 
-xDamp = float(sys.argv[6])				# 2% damping ratio
-betaKcomm = 2 * (xDamp/Omega)
+betaKcomm = 2 * (damping/Omega)
 alphaM = 0.0				# M-prop. damping; D = alphaM*M	
 betaKcurr = 0.0		# K-proportional damping;      +beatKcurr*KCurrent
 betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
@@ -299,8 +321,7 @@ ops.system('BandGeneral')
 ops.algorithm('Newton')
 ops.test('NormDispIncr', 1e-8, 1000)
 
-NewmarkGamma = float(sys.argv[7])   
-NewmarkBeta = float(sys.argv[8])    
+ 
 ops.integrator('Newmark', NewmarkGamma, NewmarkBeta)
 
 ops.analysis('Transient')
@@ -309,13 +330,10 @@ ops.analysis('Transient')
 # Perform the transient analysis
 ok = 0
 tCurrent = ops.getTime()
-tAnalyses = float(sys.argv[9])			# End of the analyses
-timeStep = GroundMotionTimeStep[0] * 0.1				# Increment 10% of the time series step?
-
-time.sleep(10)
-
 
 print("starting Analyses")
+
+
 
 timer = []
 disp = []
@@ -342,7 +360,6 @@ while ok == 0 and tCurrent < tAnalyses:
 #print( "maximum displacement is" + str(disp.sort()[-1]) )
 
 print("Ground Motion Analyses Finished")
-
 
 #----------------------------------------------
 # THIS PART HAS TO BE DECIDE WITH DOMENICO

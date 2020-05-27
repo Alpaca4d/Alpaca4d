@@ -28,19 +28,21 @@ fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSee
 
 earthQuakeSettings = []
 
-earthQuakeSettings.append( "GROUNDMOTIONDIRECTION {}".format(GroundMotionDirection) )
-
 for item in GroundMotionFile:
-    earthQuakeSettings.append( "GROUNDMOTIONFILE {}".format(item) )
+    earthQuakeSettings.append( "GROUNDMOTIONVALUES {}".format(item) )
 
 for item in GroundMotionTimeStep:
     earthQuakeSettings.append( "GROUNDMOTIONTIMESTEP {}".format(item) )
 
+earthQuakeSettings.append( "GROUNDMOTIONDIRECTION {}".format(GroundMotionDirection) )
 earthQuakeSettings.append( "GROUNDMOTIONFACTOR {}".format(GroundMotionfactor) )
 earthQuakeSettings.append( "DAMPING {}".format(Damping) )
 earthQuakeSettings.append( "NEWMARKGAMMA {}".format(NewmarkGamma) )
 earthQuakeSettings.append( "NEWMARKBETA {}".format(NewmarkBeta) )
 earthQuakeSettings.append( "TMAXANALYSES {}".format(TmaxAnalyses) )
+earthQuakeSettings.append( "TIMESTEP {}".format(TimeStepIncrement) )
+
+
 
 earthQuakeSettingsFile = os.path.join( outputFolder,'earthQuakeSettingsFile.txt')
 
@@ -49,10 +51,9 @@ with open(earthQuakeSettingsFile, 'w') as f:
         f.write("%s\n" % item)
 
 
-"""
 
 EarthQuakeAnalysis = System.Diagnostics.ProcessStartInfo(fileName)
-EarthQuakeAnalysis.Arguments = wrapperFile + " " + eartQuakeSettings
+EarthQuakeAnalysis.Arguments = wrapperFile + " " + earthQuakeSettingsFile
 process = System.Diagnostics.Process.Start(EarthQuakeAnalysis)
 System.Diagnostics.Process.WaitForExit(process)
 
@@ -75,6 +76,3 @@ with open(outputFile, 'r') as f:
 
 
 openSeesOutputWrapper = [nodeDispFilePath, elementModalWrapper, nodeWrapper]
-
-
-"""
