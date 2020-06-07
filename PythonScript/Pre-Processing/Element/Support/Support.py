@@ -1,4 +1,6 @@
-﻿import Grasshopper as gh
+import Grasshopper as gh
+
+
 
 def SupportWrapper(Pos, Tx, Ty, Tz, Rx, Ry, Rz):
 
