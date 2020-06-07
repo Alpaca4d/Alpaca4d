@@ -12,8 +12,8 @@ def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material):
     Area = A1 + A2 + A3
     Ay = Area*0.2 # da cambiare
     Az = Area*0.2 # da cambiare
-    Iyy = Bsup*tsup**3 + ( Bsup*tsup )*( H - yg - tsup/2 )**2 + ( H -tsup - ta )**3*ta + ( H - tsup - ta )*ta*( (H - tsup - ta)/2 - yg ) + Binf*tinf**3 + Binf*tinf*( yg - tinf )**2
-    Izz = Iyy # da cambiare
+    Iyy = Bsup*tsup**3 + ( Bsup*tsup )*( H - yg - tsup/2 )**2 + ( H -tsup - tinf )**3*ta + ( H - tsup - tinf )*ta*( (H - tsup - tinf)/2 - yg ) + Binf*tinf**3 + Binf*tinf*( yg - tinf )**2
+    Izz = tsup*Bsup**3 + tinf*Binf**3 + ( H -tsup - tinf )*ta**3
     J = Iyy + Izz
 
     material = material
