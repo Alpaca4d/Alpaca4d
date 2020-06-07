@@ -491,27 +491,25 @@ if Load == True:
         forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
         ancorPoint.append( pos )
         forceDisplay.append(  forceVector*scale  )
+        
+    for linearLoad in openSeesBeamLoad :
+        tag =  linearLoad[0]
+        geomTransf = VersorLine.get( tag  , "never" )
+        force1 = rg.Vector3d.Multiply( linearLoad[1][0], geomTransf[0] )
+        force2 = rg.Vector3d.Multiply( linearLoad[1][1], geomTransf[1] )
+        force3 = rg.Vector3d.Multiply( linearLoad[1][2], geomTransf[2] )
+        forceVector =  rg.Vector3d.Multiply( force1 + force2 + force3, scale )
+        lineBeam =  modelDict.get( tag  , "never" )
+        Length = rg.Curve.GetLength( lineBeam )
+        divideDistance = 0.5
+        DivCurve = lineBeam.DivideByLength( divideDistance, True )
+        if DivCurve == None:
+            DivCurve = [ 0, Length]
 
-
-
-for linearLoad in openSeesBeamLoad :
-    tag =  linearLoad[0]
-    geomTransf = VersorLine.get( tag  , "never" )
-    force1 = rg.Vector3d.Multiply( linearLoad[1][0], geomTransf[0] )
-    force2 = rg.Vector3d.Multiply( linearLoad[1][1], geomTransf[1] )
-    force3 = rg.Vector3d.Multiply( linearLoad[1][2], geomTransf[2] )
-    forceVector =  rg.Vector3d.Multiply( force1 + force2 + force3, scale )
-    lineBeam =  modelDict.get( tag  , "never" )
-    Length = rg.Curve.GetLength( lineBeam )
-    divideDistance = 0.5
-    DivCurve = lineBeam.DivideByLength( divideDistance, True )
-    if DivCurve == None:
-        DivCurve = [ 0, Length]
-
-    for index, x in enumerate(DivCurve):
-        beamPoint = lineBeam.PointAt(DivCurve[index]) 
-        ancorPoint.append( beamPoint )
-        forceDisplay.append(  forceVector*scale  )
+        for index, x in enumerate(DivCurve):
+            beamPoint = lineBeam.PointAt(DivCurve[index]) 
+            ancorPoint.append( beamPoint )
+            forceDisplay.append(  forceVector*scale  )
 
 forceDisplay = th.list_to_tree( [ ancorPoint, forceDisplay ] )
 

@@ -44,10 +44,14 @@ def forceTimoshenkoBeam( ele, node, force, loadDict ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    piano = ghcomp.PerpFrame( line, 1 )
+    axis1 = piano[1]
+    axis2 = piano[2]
+    axis3 = piano[3]
+    #axis3 = pointEnd - pointStart
+    #axis3.Unitize()
+    #axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
+    #axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
     versor = [ axis1, axis2, axis3 ]
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
@@ -136,10 +140,14 @@ def forceTrussValue(  ele, node, force, loadDict ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    piano = ghcomp.PerpFrame( line, 1 )
+    axis1 = piano[1]
+    axis2 = piano[2]
+    axis3 = piano[3]
+    #axis3 = pointEnd - pointStart
+    #axis3.Unitize()
+    #axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
+    #axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
     versor = [ axis1, axis2, axis3 ]
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
