@@ -16,8 +16,8 @@
 * [ ] add inetia zz in ipe section
 * [ ] add box section
 * [x] circular Cross-Section less dense for visualisation
-* [ ] add view distribuited load in model view
-* [ ] add view concentrated mass load in model view ( create a sphere in node )
+* [x] add view distribuited load in model view
+* [x] add view concentrated mass load in model view ( create a sphere in node )
 * [ ] add coding (in panel or path script ) and view post processing
 * [ ] modify loft mesh for brick ( problem con tetra )
 * [ ] make it work DomeFunction
