@@ -116,9 +116,9 @@ def gradientJet(value, valueMax, valueMin):
 diplacementWrapper = openSeesOutputWrapper[0]
 EleOut = openSeesOutputWrapper[2]
 ForceOut = openSeesOutputWrapper[4]
-nodalForce = openSeesOutputWrapper[5]
+#nodalForce = openSeesOutputWrapper[5]
 
-nodalForcerDict = dict( nodalForce )
+#nodalForcerDict = dict( nodalForce )
 
 pointWrapper = []
 for index,item in enumerate(diplacementWrapper):
@@ -183,6 +183,7 @@ for ele in EleOut :
 
     forceWrapper .append( [eleTag, forceOut ])
 '''
+print( ForceOut[0] )
 for item in ForceOut:
     index = item[0]
     if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
