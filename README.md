@@ -1,7 +1,7 @@
 # openSeesGh
 
 ## To Do List
-##![Screenshot](AlpacaLogo.png)
+![Screenshot](AlpacaLogo.png)
 
 ### Domenico Gaudioso
 
