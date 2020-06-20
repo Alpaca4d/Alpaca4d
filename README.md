@@ -1,4 +1,3 @@
-### Alpaca4d
 ![Screenshot](AlpacaLogo.PNG)
 # openSeesGh
 ## To Do List
