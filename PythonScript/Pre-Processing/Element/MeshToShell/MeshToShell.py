@@ -6,7 +6,7 @@ def MeshToShell(Mesh, Colour, CrossSection):
     
     elementType = []
     if Mesh.Vertices.Count == 4:
-        elementType = "ShellDKGQ"
+        elementType = "ShellMITC4"
     else:
         elementType = "ShellDKGT"
     newMesh = Mesh
