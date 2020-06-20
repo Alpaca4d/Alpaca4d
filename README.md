@@ -1,3 +1,4 @@
+![Screenshot](AlpacaLogo.PNG)
 # openSeesGh
 ## To Do List
 

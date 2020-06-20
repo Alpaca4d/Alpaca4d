@@ -144,7 +144,7 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
+    if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'):
 
         print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)

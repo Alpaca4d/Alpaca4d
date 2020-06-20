@@ -154,7 +154,7 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'): # to modify becaue shell will be ShellMITC4
+    if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'): # to modify becaue shell will be ShellMITC4
 
         ops.element( 'ShellMITC4' , eleTag, *eleNodes, secTag)
         #ops.element( eleType , eleTag, *eleNodes, secTag)
