@@ -1,7 +1,7 @@
 # openSeesGh
 
 ## To Do List
-##![Screenshot](LogoCherubino.png)
+##![Screenshot](AlpacaLogo.png)
 
 ### Domenico Gaudioso
 
