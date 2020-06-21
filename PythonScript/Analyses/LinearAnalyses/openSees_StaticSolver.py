@@ -1,5 +1,6 @@
 import sys
 import openseespy.opensees as ops
+import os
 
 
 filename = sys.argv[1]
@@ -207,9 +208,9 @@ for item in openSeesBeamLoad:
     ops.eleLoad('-ele', eleTags,'-type', '-beamUniform', Wz, Wy, Wx)
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
-
-
-#ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele', 1,'stresses')
+TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\tension.out'
+#TensionFilePath = os.path.join(workingDirectory, "tension.out")
+ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',1,2,3,4,5,6,'stresses')
 
 # ------------------------------
 # Start of analysis generation
@@ -235,8 +236,6 @@ ops.analysis("Static")
 ops.analyze(1)
 
 ## OUTPUT FILE ##
-TensionFilePath = os.path.join(workingDirectory, "tension.out")
-ops.recorder('Node', '-file', TensionFilePath ,'-time', '-node', '-dof', 1, 2, 3, 4, 5, 6, 'disp')
 
 ## DISPLACEMENT
 nodeDisplacementWrapper = []
