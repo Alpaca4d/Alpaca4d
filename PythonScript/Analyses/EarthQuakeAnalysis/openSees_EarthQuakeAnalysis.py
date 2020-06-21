@@ -243,20 +243,25 @@ ops.analyze(1)
 ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to zero
 
 
+
 with open(earthQuakeSettingsFile, 'r') as f:
     earthQuakeSettingLines = f.readlines()
 
+
+
 GroundMotionValues = []
 GroundMotionTimeStep = []
+
+
 
 for line in earthQuakeSettingLines:
     l = line.split()
 
     if l[0] == "GROUNDMOTIONVALUES":
-        GroundMotionValues.append( float(l[1]) )
+        GroundMotionValues.append( l[1] )
 
     elif l[0] == "GROUNDMOTIONTIMESTEP":
-        GroundMotionTimeStep.append( float(l[1]) )
+        GroundMotionTimeStep.append( l[1] )
 
     elif l[0] == "GROUNDMOTIONDIRECTION":
         GMdirection = int(l[1])
@@ -313,6 +318,8 @@ ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
 nodeDispFilePath = os.path.join(workingDirectory, "DFree.out")
 ops.recorder('Node', '-file', nodeDispFilePath ,'-time', '-node', '-dof', 1, 2, 3, 4, 5, 6, 'disp')
 
+
+
 ops.wipeAnalysis()
 ops.constraints('Transformation')
 ops.numberer('Plain')
@@ -333,7 +340,7 @@ tCurrent = ops.getTime()
 
 print("starting Analyses")
 
-
+time.sleep(5)
 
 timer = []
 disp = []
