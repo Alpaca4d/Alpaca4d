@@ -106,19 +106,20 @@ def gradientJet(value, valueMax, valueMin):
     
     for i in range(1,n):
         if  domain[i-1] <= value <= domain[i]:
-            return listcolo[ i-1 ]
+            return listcolo[ i ]
         elif  valueMax <= value <= valueMax + 0.00001 :
             return listcolo[ -1 ]
         elif  valueMin - 0.00000000001 <= value <= valueMin  :
-            print( value, valueMin)
             return listcolo[ 0 ]
 #--------------------------------------------------------------------------
 diplacementWrapper = openSeesOutputWrapper[0]
 EleOut = openSeesOutputWrapper[2]
 ForceOut = openSeesOutputWrapper[4]
-nodalForce = openSeesOutputWrapper[5]
+#print( ForceOut[0] )
+#print( ForceOut[1] )
+#nodalForce = openSeesOutputWrapper[5]
 
-nodalForcerDict = dict( nodalForce )
+#nodalForcerDict = dict( nodalForce )
 
 pointWrapper = []
 for index,item in enumerate(diplacementWrapper):
@@ -183,6 +184,7 @@ for ele in EleOut :
 
     forceWrapper .append( [eleTag, forceOut ])
 '''
+
 for item in ForceOut:
     index = item[0]
     if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
@@ -200,9 +202,7 @@ for item in ForceOut:
                     [ Mi.X, Mj.X,  Mk.X, Mw.X ],
                     [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
                     [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
-
-
-    if len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
+    elif len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
         Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
         Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
         Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
@@ -227,10 +227,9 @@ shell = []
 for ele in EleOut :
     eleTag = ele[0]
     eleType = ele[2][0]
-    if eleType == "ShellDKGQ" :
+    if eleType == "ShellMITC4" :
         tag.append( eleTag )
         outputForce = forceWrapperDict.get( eleTag )
-        #print( outputForce )
         Fx.append( outputForce[0] )
         Fy.append( outputForce[1] )
         Fz.append( outputForce[2] )
@@ -252,7 +251,6 @@ for ele in EleOut :
         shell.append( shellModel )
         
 tagElement = th.list_to_tree( tag )
-
 fx = th.list_to_tree( Fx )
 fy = th.list_to_tree( Fy )
 fz = th.list_to_tree( Fz )
@@ -274,9 +272,9 @@ elif viewForce == 3:
     ForceValue = mx
 elif viewForce == 4:
     shellForceValue = My
-    ForceValue = mx
+    ForceValue = my
 elif viewForce == 5:
-    ForceValue = mx
+    ForceValue = mz
     shellForceValue = Mz
 
 maxValue = []
@@ -284,9 +282,10 @@ minValue = []
 for value in shellForceValue:
     maxValue.append( max( value ))
     minValue.append( min( value ))
+
 maxValue = max( maxValue )
 minValue = min( minValue )
-
+print( maxValue, minValue )
 modelForce = []
 for shellEle, value in zip(shell,shellForceValue) :
     shellColor = shellEle.DuplicateMesh()

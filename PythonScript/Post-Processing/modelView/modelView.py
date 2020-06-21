@@ -522,8 +522,10 @@ if Load == True:
             forceDisplay.append(  forceVector*scale  )
 
 forceDisplay = th.list_to_tree( [ ancorPoint, forceDisplay ] )
-
-scaleMass  = max([row[1][0] for row in openSeesNodalMass ])
+if len(openSeesNodalMass)>0:
+    scaleMass  = max([row[1][0] for row in openSeesNodalMass ])
+else:
+    scaleMass = 0
 if scaleMass > 0 :
     scaleMass = scaleMass
 else :
