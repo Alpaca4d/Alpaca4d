@@ -252,14 +252,16 @@ with open(earthQuakeSettingsFile, 'r') as f:
 GroundMotionValues = []
 GroundMotionTimeStep = []
 
+
+
 for line in earthQuakeSettingLines:
     l = line.split()
 
     if l[0] == "GROUNDMOTIONVALUES":
-        GroundMotionValues.append( float(l[1]) )
+        GroundMotionValues.append( l[1] )
 
     elif l[0] == "GROUNDMOTIONTIMESTEP":
-        GroundMotionTimeStep.append( float(l[1]) )
+        GroundMotionTimeStep.append( l[1] )
 
     elif l[0] == "GROUNDMOTIONDIRECTION":
         GMdirection = int(l[1])
@@ -281,7 +283,6 @@ for line in earthQuakeSettingLines:
 
     elif l[0] == "TIMESTEP":
         timeStep = float(l[1])
-
 
 
 
