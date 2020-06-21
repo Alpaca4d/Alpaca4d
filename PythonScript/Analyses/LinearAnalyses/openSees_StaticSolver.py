@@ -235,7 +235,8 @@ ops.analysis("Static")
 ops.analyze(1)
 
 ## OUTPUT FILE ##
-
+TensionFilePath = os.path.join(workingDirectory, "tension.out")
+ops.recorder('Node', '-file', TensionFilePath ,'-time', '-node', '-dof', 1, 2, 3, 4, 5, 6, 'disp')
 
 ## DISPLACEMENT
 nodeDisplacementWrapper = []
