@@ -135,7 +135,6 @@ for item in openSeesShell:
     eleType = item[0]
 
     #print('eleType = ' + str(eleType))
-    shellTag.append( item[1] )
     eleTag = item[1] + 1
     #print('eleTag = ' + str(eleTag))
     eleNodes = item[2]
@@ -149,7 +148,7 @@ for item in openSeesShell:
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
     if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'):
-
+        shellTag.append( item[1] )
         print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
@@ -223,7 +222,8 @@ for item in openSeesBeamLoad:
 TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
 TensionFilePathTag = TensionFilePath + '/tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
-ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
+print( shellTag ) # ho problemi con shellTag
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*ops.getEleTags(),'stresses')
 
 TensionFilePathTag = TensionFilePath + '/eleForceGlobal.out' 
 ops.recorder('Element','-file', TensionFilePathTag , '-closeOnWrite', '-ele', *beamTag, 'globalForce')
