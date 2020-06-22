@@ -92,7 +92,8 @@ for i in range(0, len(gT)):
 
 
 elementProperties = []
-
+beamTag = []
+trussTag = []
 for n in range(0, len(openSeesBeam)):
 
     eleTag = openSeesBeam[n][1] + 1
@@ -120,19 +121,21 @@ for n in range(0, len(openSeesBeam)):
 
 
     if eleType is 'Truss':
-
+        trussTag.append( eleTag - 1 )
         ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag ) # TO CONTROL!!!
         
 
     elif eleType is 'ElasticTimoshenkoBeam':
-
+        beamTag.append( eleTag - 1 )
         ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
 
+shellTag = []
 for item in openSeesShell:
 
     eleType = item[0]
 
     #print('eleType = ' + str(eleType))
+    shellTag.append( item[1] )
     eleTag = item[1] + 1
     #print('eleTag = ' + str(eleTag))
     eleNodes = item[2]
@@ -208,9 +211,24 @@ for item in openSeesBeamLoad:
     ops.eleLoad('-ele', eleTags,'-type', '-beamUniform', Wz, Wy, Wx)
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
-TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\tension.out'
+
+
+#for elementTag in elementTagList: 
+    #TensionFilePath = r'C:\Users\domy7\Desktop\Magistrale\CorsoOpenSees\scripts\Mesh'
+    #TensionFilePathTag = TensionFilePath + '/tension_' + str(elementTag) + '.out'
+    #TensionFilePath = os.path.join(workingDirectory, "tension.out")
+    #ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',elementTag,'stresses')
+
+ 
+TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
+TensionFilePathTag = TensionFilePath + '/tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
-ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',1,2,3,4,5,6,'stresses')
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
+
+TensionFilePathTag = TensionFilePath + '/eleForceGlobal.out' 
+ops.recorder('Element','-file', TensionFilePathTag , '-closeOnWrite', '-ele', *beamTag, 'globalForce')
+TensionFilePathTag = TensionFilePath + '/eleForceLocal.out' 
+ops.recorder('Element','-file', TensionFilePathTag, '-closeOnWrite', '-ele', *beamTag, 'localForce')
 
 # ------------------------------
 # Start of analysis generation
@@ -236,7 +254,7 @@ ops.analysis("Static")
 ops.analyze(1)
 
 ## OUTPUT FILE ##
-
+elementTagList = ops.getEleTags()
 ## DISPLACEMENT
 nodeDisplacementWrapper = []
 
@@ -271,7 +289,7 @@ eleForceOutputWrapper = []
 
 
 
-elementTagList = ops.getEleTags()
+
 
 for elementTag in elementTagList:
     elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
