@@ -6,25 +6,12 @@ import Grasshopper
 import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
-
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
 fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
 sys.path.append(fileName)
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
 import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
-def ShellQuad( ele, node):
+def ShellStressQuad( ele, node, eleValue, valueMax, valueMin):
     eleTag = ele[0]
     eleNodeTag = ele[1]
     color = ele[2][2]
@@ -45,10 +32,20 @@ def ShellQuad( ele, node):
     shellModel.Vertices.Add( point3 ) #2
     shellModel.Vertices.Add( point4 ) #3
     
+    nodeELeValue = eleValue.get(eleTag )
+    color = gradientJet( nodeELeValue[0], valueMax, valueMin )
+    shellModel.VertexColors.Add(color[0],color[1],color[2]);
+    
+    color = gradientJet( nodeELeValue[1], valueMax, valueMin )
+    shellModel.VertexColors.Add(color[0],color[1],color[2]);
+
+    color = gradientJet( nodeELeValue[2], valueMax, valueMin )
+    shellModel.VertexColors.Add(color[0],color[1],color[2]);
+    
+    color = gradientJet( nodeELeValue[3], valueMax, valueMin )
+    shellModel.VertexColors.Add(color[0],color[1],color[2]);
     
     shellModel.Faces.AddFace(0, 1, 2, 3)
-    colour = rs.CreateColor( color[0], color[1], color[2] )
-    shellModel.VertexColors.CreateMonotoneMesh( colour )
     return  shellModel 
 
 def ShellTriangle( ele, node ):
@@ -127,81 +124,60 @@ for index,item in enumerate(diplacementWrapper):
 ## Dict. for point ##
 pointWrapperDict = dict( pointWrapper )
 
-
-forceWrapper = []
-
-for item in ForceOut:
-    index = item[0]
-    if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
-        Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-        Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
-        Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-        Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
-        Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-        Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-        Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
-        Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
-        forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
-                    [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
-                    [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
-                    [ Mi.X, Mj.X,  Mk.X, Mw.X ],
-                    [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
-                    [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
-    elif len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
-        Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-        Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
-        Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-        Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
-        Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-        Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-        forceOut = [[ Fi.X, Fj.X, Fk.X ],
-                    [ Fi.Y, Fj.Y, Fk.Y ],
-                    [ Fi.Z, Fj.Z, Fk.Z ],
-                    [ Mi.X, Mj.X,  Mk.X ],
-                    [ Mi.Y, Mj.Y, Mk.Y ],
-                    [ Mi.Z, Mj.Z, Mk.Z ]]
-    forceWrapper .append( [index, forceOut ])
+shellTag = []
+for item in EleOut:
+    if  len(item[1])  == 4:
+         shellTag.append(item[0])
 
 ## Dict. for force ##
-forceWrapperDict = dict( forceWrapper )
+#forceWrapperDict = dict( forceWrapper )
 ####
-ForceView = []
-tag = []
+#---------------------------------------------------#
+outputFile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\tension.out'
+
+with open(outputFile, 'r') as f:
+    lines = f.readlines()
+    tensionList = lines[0].split()
+    
+print(len(tensionList)/len(shellTag))
+
+w = stressView
+#print(w + 24)
+tensionDic = []
+for n,eleTag in enumerate(shellTag) :
+    tensionShell = []
+    for i in range( (n)*32, ( n + 1 )*32  ):
+        tensionShell.append( float(tensionList[i]) )
+    tensionView = [ tensionShell[ w ], tensionShell[ w + 8 ], tensionShell[ w + 16 ], tensionShell[ w + 24 ] ]
+    tensionDic.append([ eleTag, tensionView ])
+
+stressDict = dict( tensionDic )
+#print( stressDict.get(2))
+#print( stressDict )
+#print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+#print( tensionDic[0] )
+
+maxValue = []
+minValue = []
+for value in stressDict.values():
+    maxValue.append( max( value ))
+    minValue.append( min( value ))
+    
+maxValue = max( maxValue )
+minValue = min( minValue )
+print( maxValue, minValue )
+
 shell = []
 for ele in EleOut :
     eleTag = ele[0]
     eleType = ele[2][0]
     if eleType == "ShellMITC4" :
-        tag.append( eleTag )
-        outputForce = forceWrapperDict.get( eleTag )
-        ForceView.append( outputForce[viewForce] )
-        shellModel = ShellQuad( ele, pointWrapperDict )
+        shellModel = ShellStressQuad( ele, pointWrapperDict, stressDict, maxValue, minValue )
         shell.append( shellModel )
     elif eleType == "ShellDKGT" :
-        tag.append( eleTag )
         outputForce = forceWrapperDict.get( eleTag )
-        ForceView.append( outputForce[viewForce] )
         shellModel = ShellTriangle( ele, pointWrapperDict )
         shell.append( shellModel )
-        
-tagElement = th.list_to_tree( tag )
-ForceValue = th.list_to_tree( ForceView )
 
-maxValue = []
-minValue = []
-for value in ForceView:
-    maxValue.append( max( value ))
-    minValue.append( min( value ))
-
-maxValue = max( maxValue )
-minValue = min( minValue )
-print( maxValue, minValue )
-modelForce = []
-for shellEle, value in zip(shell,ForceView) :
-    shellColor = shellEle.DuplicateMesh()
-    shellColor.VertexColors.Clear()
-    for j in range(0,shellEle.Vertices.Count):
-        #print( value[j] )
-        jetColor = gradientJet(value[j], maxValue, minValue)
-        shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
-    modelForce.append( shellColor)
+stressValue = th.list_to_tree( stressDict.values() )
+ 
