@@ -2,7 +2,7 @@
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
-import ghpythonlib.components as ghcomp
+#import ghpythonlib.components as ghcomp
 #import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
@@ -54,10 +54,9 @@ def defValueTimoshenkoBeamValue( ele, node, nodeDisp, numberResults ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    piano = ghcomp.PerpFrame( line, 1 )
-    axis1 = piano[1]
-    axis2 = piano[2]
-    axis3 = piano[3]
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     versor = [ axis1, axis2, axis3 ] 
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
@@ -157,10 +156,9 @@ def defTrussValue( ele, node, nodeDisp, numberResults ):
     #print( traslStart[1] )
     line = rg.LineCurve( pointStart,  pointEnd )
 
-    piano = ghcomp.PerpFrame( line, 1 )
-    axis1 = piano[1]
-    axis2 = piano[2]
-    axis3 = piano[3]
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     versor = [ axis1, axis2, axis3 ] 
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )

@@ -2,6 +2,7 @@
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
+import ghpythonlib.components as ghcomp
 #import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
@@ -43,10 +44,9 @@ def forceTimoshenkoBeam( ele, node, force, loadDict, numberResults ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
     WorldPlane.Transform( traslPlane )
@@ -131,10 +131,9 @@ def forceTrussValue(  ele, node, force, loadDict, numberResults ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
     WorldPlane.Transform( traslPlane )

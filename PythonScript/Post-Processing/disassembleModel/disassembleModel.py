@@ -224,10 +224,9 @@ def Beam( ele, node):
     pointStart = node.get( indexStart  , "never")
     pointEnd = node.get( indexEnd  , "never")
     line = rg.LineCurve( pointStart, pointEnd )
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( ele[13][0], ele[13][1], ele[13][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( ele[13][0][0], ele[13][0][1], ele[13][0][2]  )
+    axis2 =  rg.Vector3d( ele[13][1][0], ele[13][1][1], ele[13][1][2]  )
+    axis3 =  rg.Vector3d( ele[13][2][0], ele[13][2][1], ele[13][2][2]  )
     versor = [ axis1, axis2, axis3 ] 
     
     planeStart = rg.Plane(pointStart, axis1, axis2)

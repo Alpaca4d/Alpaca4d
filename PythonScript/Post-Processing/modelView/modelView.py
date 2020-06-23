@@ -1,7 +1,7 @@
 ﻿import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import ghpythonlib.components as ghcomp
+#import ghpythonlib.components as ghcomp
 import rhinoscriptsyntax as rs
 #import Grasshopper
 #import System as sy #DV
@@ -242,14 +242,9 @@ def Beam( ele, node):
     pointStart = node.get( indexStart  , "never")
     pointEnd = node.get( indexEnd  , "never")
     line = rg.LineCurve( pointStart, pointEnd )
-    piano = ghcomp.PerpFrame( line, 1 )
-    axis1 = piano[1]
-    axis2 = piano[2]
-    axis3 = piano[3]
-    #axis3 = pointEnd - pointStart
-    #axis3.Unitize()
-    #axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    #axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( ele[13][0][0], ele[13][0][1], ele[13][0][2]  )
+    axis2 =  rg.Vector3d( ele[13][1][0], ele[13][1][1], ele[13][1][2]  )
+    axis3 =  rg.Vector3d( ele[13][2][0], ele[13][2][1], ele[13][2][2]  )
     versor = [ axis1, axis2, axis3 ] 
     
     planeStart = rg.Plane(pointStart, axis1, axis2)

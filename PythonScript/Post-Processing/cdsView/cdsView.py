@@ -1,7 +1,7 @@
 ﻿import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import ghpythonlib.components as ghcomp
+#import ghpythonlib.components as ghcomp
 import Grasshopper
 #import System as sy #DV
 import sys
@@ -44,14 +44,9 @@ def forceTimoshenkoBeam( ele, node, force, loadDict ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    piano = ghcomp.PerpFrame( line, 1 )
-    axis1 = piano[1]
-    axis2 = piano[2]
-    axis3 = piano[3]
-    #axis3 = pointEnd - pointStart
-    #axis3.Unitize()
-    #axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    #axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     versor = [ axis1, axis2, axis3 ]
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
@@ -140,14 +135,9 @@ def forceTrussValue(  ele, node, force, loadDict ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    piano = ghcomp.PerpFrame( line, 1 )
-    axis1 = piano[1]
-    axis2 = piano[2]
-    axis3 = piano[3]
-    #axis3 = pointEnd - pointStart
-    #axis3.Unitize()
-    #axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    #axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     versor = [ axis1, axis2, axis3 ]
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )

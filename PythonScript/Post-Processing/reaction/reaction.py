@@ -38,14 +38,15 @@ pointWrapperDict = dict( pointWrapper )
 
 ## per scalare le reazioni #
 rowReaction = [row[1] for row in reactionOut ]
+
 valorReaction = []
 for valor in rowReaction:
     rx = mt.fabs( valor[0] )
     ry = mt.fabs( valor[1] )
     rz = mt.fabs( valor[2] )
-    mx = mt.fabs( valor[0] )
-    my = mt.fabs( valor[1] )
-    mz = mt.fabs( valor[2] )
+    mx = mt.fabs( valor[3] )
+    my = mt.fabs( valor[4] )
+    mz = mt.fabs( valor[5] )
     valorReaction.append( [ rx, ry, rz, mx, my, mz ] )
 
 rx = max([row[0] for row in valorReaction ])
@@ -72,7 +73,7 @@ for value in reactionOut:
     Mz = rg.Vector3d( 0,0, value[1][5] )
     Rxyz = Rx + Ry + Rz
     Mxyz = Mx + My + Mz
-    viewElement.append( [ point, Rx/rx, Ry/ry, Rz/rz, Mx/mx, My/my, Mz/mz ] )
+    viewElement.append( [ point, Rx/rx*scale, Ry/ry*scale, Rz/rz*scale, Mx/mx*scale, My/my*scale, Mz/mz*scale ] )
     ReactionForce.append( Rxyz )
     ReactionMoment.append( Mxyz )
 
@@ -84,8 +85,10 @@ Mx = [row[4] for row in viewElement ]
 My = [row[5] for row in viewElement ]
 Mz = [row[6] for row in viewElement ]
 
-if reactionForcesView == True:
-    view = th.list_to_tree( [ point, Rx, Ry, Rz ]  )
-
-if reactionMomentsView == True:
-    view = th.list_to_tree( [ point, Mx, My, Mz ]  )
+null = [rg.Vector3d( 0, 0, 0 )]*len(Rx)
+if reactionForcesView == True and reactionMomentsView == False :
+    view = th.list_to_tree( [ point, Rx, Ry, Rz, null, null, null ]  )
+elif reactionForcesView == False and reactionMomentsView == True :
+    view = th.list_to_tree( [ point, null, null, null, Mx, My, Mz ]   )
+elif reactionForcesView == True and reactionMomentsView == True :
+    view = th.list_to_tree( [ point, Rx, Ry, Rz,Mx, My, Mz ]  )

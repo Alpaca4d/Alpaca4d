@@ -77,7 +77,7 @@ secTagDict = dict(openSeesSecTag)
 #print(secTagDict)
 
 # create GeomTransf
-
+geomTransf = [row[0] for row in geomTransf ]
 geomTransfList = list(dict.fromkeys(geomTransf))
 geomTransfDict = { geomTransfList[i] : i+1 for i in range(len(geomTransfList) ) }
 
@@ -131,10 +131,14 @@ for eleTag, element in enumerate(Element):
         Jxx = element[2][5]
         Iy = element[2][3]
         Iz = element[2][4]
-        transfTag = geomTransfDict.setdefault(element[3])
-        orientVector = [ element[3].X, element[3].Y, element[3].Z ]
+        transfTag = geomTransfDict.setdefault(element[3][0])
+        axis1 = [ element[3][0].X, element[3][0].Y, element[3][0].Z ]
+        axis2 = [ element[3][1].X, element[3][1].Y, element[3][1].Z ]
+        axis3 = [ element[3][2].X, element[3][2].Y, element[3][2].Z ]
+        orientVector = [ axis1, axis2, axis3 ]
+
         massDens = element[5]
-        print(massDens)
+        #print(massDens)
         sectionGeomProperties = element[2][7]
         color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
         matTag = matNameDict.setdefault(element[2][6][0])[0]
