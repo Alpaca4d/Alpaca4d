@@ -1,4 +1,4 @@
-﻿import Rhino.Geometry as rg
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -11,7 +11,7 @@ sys.path.append(fileName)
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
 import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
-def ShellStressQuad( ele, node, eleValue, valueMax, valueMin):
+def ShellStressQuad( ele, node ):
     eleTag = ele[0]
     eleNodeTag = ele[1]
     color = ele[2][2]
@@ -32,20 +32,9 @@ def ShellStressQuad( ele, node, eleValue, valueMax, valueMin):
     shellModel.Vertices.Add( point3 ) #2
     shellModel.Vertices.Add( point4 ) #3
     
-    nodeELeValue = eleValue.get(eleTag )
-    color = gradientJet( nodeELeValue[0], valueMax, valueMin )
-    shellModel.VertexColors.Add(color[0],color[1],color[2]);
-    
-    color = gradientJet( nodeELeValue[1], valueMax, valueMin )
-    shellModel.VertexColors.Add(color[0],color[1],color[2]);
-
-    color = gradientJet( nodeELeValue[2], valueMax, valueMin )
-    shellModel.VertexColors.Add(color[0],color[1],color[2]);
-    
-    color = gradientJet( nodeELeValue[3], valueMax, valueMin )
-    shellModel.VertexColors.Add(color[0],color[1],color[2]);
-    
     shellModel.Faces.AddFace(0, 1, 2, 3)
+    colour = rs.CreateColor( color[0], color[1], color[2] )
+    shellModel.VertexColors.CreateMonotoneMesh( colour )
     return  shellModel 
 
 def ShellTriangle( ele, node ):
@@ -74,40 +63,6 @@ def ShellTriangle( ele, node ):
     
     return  shellModel
 
-def gradientJet(value, valueMax, valueMin):
-
-    listcolo = [[0, 0, 102 ],
-                [0, 0, 255],
-                [0, 64, 255],
-                [0, 128, 255],
-                [0, 191, 255],
-                [0, 255, 255],
-                [0, 255, 191],
-                [0, 255, 128],
-                [0, 255, 64],
-                [0, 255, 0],
-                [64, 255, 0],
-                [128, 255, 0],
-                [191, 255, 0],
-                [255, 255, 0],
-                [255, 191, 0],
-                [255, 128, 0],
-                [255, 64, 0],
-                [255, 0, 0],
-                [230, 0, 0],
-                [204, 0, 0]]
-
-    #domain = linspace( valueMin,  valueMax, len( listcolo ) )
-    n = len( listcolo )
-    domain = dg.linspace( valueMin, valueMax, n)
-    
-    for i in range(1,n):
-        if  domain[i-1] <= value <= domain[i]:
-            return listcolo[ i ]
-        elif  valueMax <= value <= valueMax + 0.00001 :
-            return listcolo[ -1 ]
-        elif  valueMin - 0.00000000001 <= value <= valueMin  :
-            return listcolo[ 0 ]
 #--------------------------------------------------------------------------
 diplacementWrapper = openSeesOutputWrapper[0]
 EleOut = openSeesOutputWrapper[2]
@@ -139,24 +94,26 @@ with open(outputFile, 'r') as f:
     lines = f.readlines()
     tensionList = lines[0].split()
     
-print(len(tensionList)/len(shellTag))
+#print(len(tensionList)/len(shellTag))
 
 w = stressView
 #print(w + 24)
 tensionDic = []
 for n,eleTag in enumerate(shellTag) :
     tensionShell = []
+    print(  )
     for i in range( (n)*32, ( n + 1 )*32  ):
         tensionShell.append( float(tensionList[i]) )
     tensionView = [ tensionShell[ w ], tensionShell[ w + 8 ], tensionShell[ w + 16 ], tensionShell[ w + 24 ] ]
     tensionDic.append([ eleTag, tensionView ])
 
 stressDict = dict( tensionDic )
+stressValue = th.list_to_tree( stressDict.values() )
 #print( stressDict.get(2))
 #print( stressDict )
 #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
 #print( tensionDic[0] )
-
+'''
 maxValue = []
 minValue = []
 for value in stressDict.values():
@@ -166,18 +123,15 @@ for value in stressDict.values():
 maxValue = max( maxValue )
 minValue = min( minValue )
 print( maxValue, minValue )
-
+'''
 shell = []
 for ele in EleOut :
     eleTag = ele[0]
     eleType = ele[2][0]
     if eleType == "ShellMITC4" :
-        shellModel = ShellStressQuad( ele, pointWrapperDict, stressDict, maxValue, minValue )
+        shellModel = ShellStressQuad( ele, pointWrapperDict )
         shell.append( shellModel )
     elif eleType == "ShellDKGT" :
         outputForce = forceWrapperDict.get( eleTag )
         shellModel = ShellTriangle( ele, pointWrapperDict )
         shell.append( shellModel )
-
-stressValue = th.list_to_tree( stressDict.values() )
- 

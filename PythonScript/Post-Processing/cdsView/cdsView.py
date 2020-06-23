@@ -346,9 +346,9 @@ def cdsMesh( strucPoint , cdsValue, cdsPoint, color1, color2):
         
         corner1 = strucPoint[value-1]
         corner4 = strucPoint[value]
-        corner2 = ghcomp.Move( corner1, cdsPoint[ value-1 ])[0]
-        corner3 = ghcomp.Move( corner4, cdsPoint[ value ])[0]
-
+        #modo elegante per spostare un punto
+        corner2 = rg.Point3d.Add( corner1, cdsPoint[ value-1 ] )
+        corner3 = rg.Point3d.Add( corner4, cdsPoint[ value ] ) 
         mesh.Vertices.Add( corner1 )
         mesh.Vertices.Add( corner2 )
         mesh.Vertices.Add( corner3 )

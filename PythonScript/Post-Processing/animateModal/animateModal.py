@@ -306,10 +306,9 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
     pointEnd = node.get( indexEnd -1 , "never")
     line = rg.LineCurve( pointStart, pointEnd )
     #-------------------------versor ---------------------------#
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     versor = [ axis1, axis2, axis3 ] 
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
@@ -447,10 +446,9 @@ def defTruss( ele, node, nodeDisp, scale ):
     #print( traslStart[1] )
     line = rg.LineCurve( pointStart,  pointEnd )
 
-    axis3 = pointEnd - pointStart
-    axis3.Unitize()
-    axis1 =  rg.Vector3d( propSection[9][0], propSection[9][1], propSection[9][2]  )
-    axis2 = rg.Vector3d.CrossProduct(axis3, axis1)
+    axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+    axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+    axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
     versor = [ axis1, axis2, axis3 ] 
     #---------- WORLD PLANE on point start of line ---------------#
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )

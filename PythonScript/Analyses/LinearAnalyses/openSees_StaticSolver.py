@@ -224,12 +224,12 @@ TensionFilePathTag = TensionFilePath + '/tension.out'
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
 print( shellTag ) # ho problemi con shellTag
 ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*ops.getEleTags(),'stresses')
-
+'''
 TensionFilePathTag = TensionFilePath + '/eleForceGlobal.out' 
 ops.recorder('Element','-file', TensionFilePathTag , '-closeOnWrite', '-ele', *beamTag, 'globalForce')
 TensionFilePathTag = TensionFilePath + '/eleForceLocal.out' 
 ops.recorder('Element','-file', TensionFilePathTag, '-closeOnWrite', '-ele', *beamTag, 'localForce')
-
+'''
 # ------------------------------
 # Start of analysis generation
 # ------------------------------

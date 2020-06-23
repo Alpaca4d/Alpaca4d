@@ -211,19 +211,26 @@ for item in openSeesBeamLoad:
 
 
 
-#ops.recorder('Element','-file','shellElementRecorder.out','-closeOnWrite','-ele', 1,'stresses')
-
+TensionFilePath = r'PythonScript\Analyses\openSees_StaticSolver_3ndf'
+TensionFilePathTag = TensionFilePath + '/tension.out' 
+#TensionFilePath = os.path.join(workingDirectory, "tension.out")
+print( shellTag ) # ho problemi con shellTag
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*ops.getEleTags(),'stresses')
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
 
 # create SOE
+# create constraint handler
+#ops.constraints("Plain")
+#ops.constraints("Transformation") # to allow Diaphgram constrain
+
 ops.system("BandSPD")
 
 ops.numberer('Plain')
+
 # create constraint handler
-ops.constraints("Plain")
-#ops.constraints("Transformation") # to allow Diaphgram constrain
+ops.constraints("Plain") # to allow Diaphgram constrain
 
 # create integrator
 ops.integrator("LoadControl",  1.0 )
@@ -236,7 +243,6 @@ ops.analysis("Static")
 
 # perform the analysis
 ops.analyze(1)
-
 ## OUTPUT FILE ##
 
 
