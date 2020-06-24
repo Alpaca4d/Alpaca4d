@@ -595,7 +595,7 @@ def meshLoft3( point, color ):
 
 
 
-diplacementWrapper = openSeesOutputWrapper[0][numberMode]
+diplacementWrapper = openSeesOutputWrapper[0][numberMode-1] # number of mode will start from 1. First, Second, Third ect ect
 EleOut = openSeesOutputWrapper[1]
 Period = openSeesOutputWrapper[3]
 
@@ -624,7 +624,7 @@ if Animate and not Reset:
 
 # Output counter
 
-T = Period[numberMode]
+T = Period[numberMode-1]
 w = 2 * mt.pi/T
 #At = math.sin(myCounter)
 
@@ -883,7 +883,7 @@ if modelExstrud == False :
     ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
     max_min = th.list_to_tree([ tMax[i], tMin[i] ])
     
-else  :
+else:
     ModelDisp = ExtrudedView
 
 ########################################################################
