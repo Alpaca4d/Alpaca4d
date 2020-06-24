@@ -3,6 +3,7 @@ import clr
 import os
 
 import Rhino.Geometry as rg
+import Grasshopper as gh
 
 points = []
 startPointList = []

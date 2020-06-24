@@ -29,6 +29,29 @@ def CircleCrossSection(sectionName, diameter, thickness, material):
     return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, diameter, thickness], sectionName ]]
 
 
+checkData = True
 
-CircleCrossSection = CircleCrossSection(sectionName, diameter, thickness, material)
+if sectionName is None:
+    checkData = False
+    msg = "input 'sectionName' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if diameter is None:
+    checkData = False
+    msg = "input 'diameter' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if thickness is None:
+    checkData = False
+    msg = "input 'thickness' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if material is None:
+    checkData = False
+    msg = "input 'material' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    CircleCrossSection = CircleCrossSection(sectionName, diameter, thickness, material)
 

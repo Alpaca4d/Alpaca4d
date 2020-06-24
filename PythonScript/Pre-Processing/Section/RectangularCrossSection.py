@@ -1,4 +1,5 @@
 ﻿import math
+import Grasshopper as gh
 
 def RectangularCrossSection(sectionName, base, height, material):
     
@@ -21,5 +22,27 @@ def RectangularCrossSection(sectionName, base, height, material):
 
     return [[Area, Ay, Az, Iyy, Izz, J, material, [shape, base, height], sectionName ]]
 
+checkData = True
 
-rectangularCrossSection = RectangularCrossSection(sectionName, base, height, material)
+if sectionName is None:
+    checkData = False
+    msg = "input 'sectionName' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if base is None:
+    checkData = False
+    msg = "input 'base' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if height is None:
+    checkData = False
+    msg = "input 'height' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if material is None:
+    checkData = False
+    msg = "input 'material' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    rectangularCrossSection = RectangularCrossSection(sectionName, base, height, material)

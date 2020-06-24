@@ -1,6 +1,6 @@
 ﻿import Rhino.Geometry as rg
 
-def pointLoad(Force=rg.Vector3d(0, 0, 0), Moment=rg.Vector3d(0, 0, 0), Pos = None):
+def pointLoad(Force, Moment, Pos):
 
     Pos = Pos
     Force = Force                   # Input value in kN ---> Output kN
@@ -9,5 +9,23 @@ def pointLoad(Force=rg.Vector3d(0, 0, 0), Moment=rg.Vector3d(0, 0, 0), Pos = Non
 
     return [[Pos, Force, Moment, loadType]]
 
+checkData = True
 
-LoadWrapper = pointLoad(Force, Moment, Pos)
+if Force is None:
+    checkData = False
+    msg = "input 'Force' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if Moment is None:
+    checkData = False
+    msg = "input 'Moment' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if Pos is None:
+    checkData = False
+    msg = "input 'Pos' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+	LoadWrapper = pointLoad(Force, Moment, Pos)

@@ -20,7 +20,48 @@ def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material):
 
     return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, Bsup, tsup, Binf, tinf, H, ta, yg], sectionName ]]
 
+checkData = True
 
+if sectionName is None:
+    checkData = False
+    msg = "input 'sectionName' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-doubleTCrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material)
+if Bsup is None:
+    checkData = False
+    msg = "input 'Bsup' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if tsup is None:
+    checkData = False
+    msg = "input 'tsup' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if Binf is None:
+    checkData = False
+    msg = "input 'Binf' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if tinf is None:
+    checkData = False
+    msg = "input 'tinf' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if H is None:
+    checkData = False
+    msg = "input 'H' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if ta is None:
+    checkData = False
+    msg = "input 'ta' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if material is None:
+    checkData = False
+    msg = "input 'material' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    doubleTCrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material)
 

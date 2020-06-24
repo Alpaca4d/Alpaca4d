@@ -1,5 +1,6 @@
 ﻿import Rhino.Geometry as rg
 import ghpythonlib.components as ghcomp
+import Grasshopper as gh
 
 
 def uniformLoad(Force = rg.Vector3d(0,0,0), Element = None, Orientation = 0):
@@ -19,4 +20,19 @@ def uniformLoad(Force = rg.Vector3d(0,0,0), Element = None, Orientation = 0):
 
     return [[elementLoad, localForce,  "leaveEmpty", loadType, perpFrame]]
 
-beamUniformLoad = uniformLoad(Force, Element, Orientation)
+
+checkData = True
+
+if Force is None:
+    checkData = False
+    msg = "input 'Force' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if Element is None:
+    checkData = False
+    msg = "input 'Element' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    beamUniformLoad = uniformLoad(Force, Element, Orientation)

@@ -15,5 +15,28 @@
 
     return [[matName, E, G, v, rho, fy, materialType]]
 
+checkData = True
 
-elasticMaterialWrapper = ElasticMaterial(matName, E, G, v, rho, fy)
+if matName is None:
+    checkData = False
+    msg = "input 'matName' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if E is None:
+    checkData = False
+    msg = "input 'E' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if G or v is None:
+    checkData = False
+    msg = "input 'G' or 'v' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if rho is None:
+    checkData = False
+    msg = "input 'rho' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    elasticMaterialWrapper = ElasticMaterial(matName, E, G, v, rho, fy)
