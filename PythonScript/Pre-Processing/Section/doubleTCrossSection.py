@@ -63,5 +63,5 @@ if material is None:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    doubleTCrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material)
+    CrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material)
 

@@ -59,4 +59,4 @@ if material is None:
 
 
 if checkData != False:
-    genericCrossSection = GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, material)
+    CrossSection = GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, material)

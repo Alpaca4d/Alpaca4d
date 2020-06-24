@@ -45,4 +45,4 @@ if material is None:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    rectangularCrossSection = RectangularCrossSection(sectionName, base, height, material)
+    CrossSection = RectangularCrossSection(sectionName, base, height, material)

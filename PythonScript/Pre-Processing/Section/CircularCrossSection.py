@@ -53,5 +53,5 @@ if material is None:
 
 
 if checkData != False:
-    CircleCrossSection = CircleCrossSection(sectionName, diameter, thickness, material)
+    CrossSection = CircleCrossSection(sectionName, diameter, thickness, material)
 
