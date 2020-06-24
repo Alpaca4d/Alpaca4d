@@ -5,7 +5,7 @@ import Grasshopper
 
 ghFilePath = ghenv.LocalScope.ghdoc.Path
 
-# delete file if already there
+
 workingDirectory = os.path.dirname(ghFilePath) 
 outputFileName = 'openSeesOutputWrapper.txt'
 
@@ -14,7 +14,7 @@ for dirpath, dirnames, filenames in os.walk(workingDirectory):
         if filename == outputFileName:
             file = os.path.join(dirpath,outputFileName)
             os.remove(file)
-            #print("I removed the file")
+
 
 
 ghFolderPath = os.path.dirname(ghFilePath)

@@ -2,6 +2,7 @@
 from Rhino.RhinoMath import *
 from System.Drawing import Color
 import ghpythonlib.components as ghcomp
+import Grasshopper as gh
 
 def LineToBeam(Line, CrossSection, Colour):
 
@@ -10,7 +11,7 @@ def LineToBeam(Line, CrossSection, Colour):
         elementType = "ElasticTimoshenkoBeam"
     else:
         elementType = "Truss"
-        #print( elementType )
+
     CrossSection = CrossSection
     
     midPoint =  line.PointAtNormalizedLength(0.5)
@@ -39,7 +40,20 @@ def LineToBeam(Line, CrossSection, Colour):
 
     return [[line, elementType, CrossSection, vecGeomTransf, colour, massDens,perpFrame]]
 
-beamWrapper = LineToBeam(Line, CrossSection, Colour )
+
+if Line is None:
+    checkData = False
+    msg = "input 'Line' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if CrossSection is None:
+    checkData = False
+    msg = "input 'CrossSection' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    beamWrapper = LineToBeam(Line, CrossSection, Colour )
 
 
 

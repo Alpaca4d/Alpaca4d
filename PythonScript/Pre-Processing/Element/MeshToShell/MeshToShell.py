@@ -1,4 +1,5 @@
 ﻿import Rhino.Geometry as rg
+import Grasshopper as gh
 
 def MeshToShell(Mesh, Colour, CrossSection):
     
@@ -15,5 +16,23 @@ def MeshToShell(Mesh, Colour, CrossSection):
     colour = Colour
     return[ [ newMesh , elementType, CrossSection, colour] ]
 
-shellWrapper = MeshToShell(Mesh, Colour, CrossSection)
+checkData = True
+
+if Mesh is None:
+    checkData = False
+    msg = "input 'Mesh' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if CrossSection is None:
+    checkData = False
+    msg = "input 'CrossSection' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    shellWrapper = MeshToShell(Mesh, Colour, CrossSection)
+
+
+
+
 
