@@ -37,12 +37,12 @@
 
 * [ ] EarthQuake Analyses - update for different way to make analyses
 * [x] update "ShellMITC" element type instead of "ShellNTGQ"
-* [ ] Add Warning to the components
+* [x] Add Warning to the components
 * [ ] look to eleForce in shell ( component name is 'shellForceView'... I thinks )
 
 * [x] Color Palette for components
 * [ ] Documentation
 * [ ] Icons
 
-
-* [ ] Non Linear Material for Brick
+* [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
+* [ ] Compile and Test
