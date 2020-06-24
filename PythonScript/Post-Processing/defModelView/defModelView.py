@@ -234,7 +234,7 @@ def defSolid( ele, node, nodeDisp, scaleDef ):
     trasl6 = nodeDisp.get( index6 -1 , "never")
     trasl7 = nodeDisp.get( index7 -1 , "never")
     trasl8 = nodeDisp.get( index8 -1 , "never")
-    print( trasl1 )
+    #print( trasl1 )
     ## CREO IL MODELLO DEFORMATO  ##
     pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
     pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
@@ -787,7 +787,7 @@ def gradientJet(value, valueMax, valueMin):
         elif  valueMax <= value <= valueMax + 0.00001 :
             return listcolo[ -1 ]
         elif  valueMin - 0.00000000001 <= value <= valueMin  :
-            print( value, valueMin)
+            #print( value, valueMin)
             return listcolo[ 0 ]
 
 ## Mesh from close section eith gradient color ##
@@ -841,6 +841,8 @@ for solidEle, value in zip(SolidDefModel,traslSolidValue) :
     solidColor = solidEle.DuplicateMesh()
     solidColor.VertexColors.Clear()
     for j in range(0,solidEle.Vertices.Count):
+        print(i)
+        print( value )
         jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
         solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
     modelDisp.append( solidColor)

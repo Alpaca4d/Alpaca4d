@@ -3,8 +3,9 @@ import openseespy.opensees as ops
 #from openseespy.postprocessing.Get_Rendering import *
 
 
-filename = sys.argv[1]
-inputName = filename.split("\\")[-1]
+#filename = sys.argv[1]
+filename = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesModel.txt'
+#inputName = filename.split("\\")[-1]
 
 
 with open(filename, 'r') as f:
@@ -57,7 +58,7 @@ ops.model('BasicBuilder', '-ndm', 3, '-ndf', 3)
 for i in range(0,len(oNodes)):
     nodeTag = oNodes[i][0] + 1
     ops.node( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] )
-    print('ops.node( {0}, {1}, {2}, {3})'.format( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) )
+    #print('ops.node( {0}, {1}, {2}, {3})'.format( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) )
 
 ## CREATE MATERIAL IN OPENSEES ##
 
@@ -84,7 +85,7 @@ for item in openSeesSecTag:
     if typeSection == 'ElasticMembranePlateSection':
         ops.section(typeSection, secTag, E_mod, nu, h, rho)
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
-        print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
+        #print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
 ## CREATE ELEMENT IN OPENSEES ##
 '''
 # Define geometric transformation:
@@ -169,7 +170,7 @@ for item in openSeesSolid:
 
     if (eleType == 'bbarBrick') or (eleType == 'FourNodeTetrahedron'):
 
-        print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
+        #print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
         ops.element( eleType , eleTag, *eleNodes, matTag, *force)                           
 # transform elementproperties to  Dict to call the object by tag
 elementPropertiesDict = dict(elementProperties)
@@ -178,7 +179,7 @@ elementPropertiesDict = dict(elementProperties)
 
 for i in range(0, len(oSupport)):
     indexSupport = oSupport[i][0] + 1
-    print('ops.fix( {0}, {1}, {2}, {3})'.format( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3]) )
+    #print('ops.fix( {0}, {1}, {2}, {3})'.format( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3]) )
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3] )
 
 ## LOAD ##
@@ -196,7 +197,7 @@ for i in range(0, len(oNodeLoad)):
     Force = oNodeLoad[i][1]
     #print(Force[0:3])
     ops.load( nodetag, *Force[0:3] )
-    print( f'ops.load( {nodetag}, *{Force[0:3]} )')
+    #print( f'ops.load( {nodetag}, *{Force[0:3]} )')
 
 elementLoad = []
 
@@ -214,7 +215,8 @@ for item in openSeesBeamLoad:
 TensionFilePathTag = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
 # ho problemi con shellTag
-ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',1,2,'stresses')
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',1,'stresses')
+print(ops.getEleTags())
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
@@ -244,7 +246,6 @@ ops.analysis("Static")
 ops.analyze(1)
 ## OUTPUT FILE ##
 
-
 ## DISPLACEMENT
 nodeDisplacementWrapper = []
 
@@ -253,7 +254,8 @@ for i in range(1,len(ops.getNodeTags())+1):
     oNode = ops.nodeCoord( nodeTag ) # cordinate nodo
     oNodeDisp = ops.nodeDisp( nodeTag ) # spostamenti del nodo 
     nodeDisplacementWrapper.append([oNode, oNodeDisp])
-
+    
+#print( ops.getNodeTags() )
 #-----------------------------------------------------
 
 reactionWrapper = []
@@ -286,11 +288,13 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         elementOutputWrapper,
                         elementLoad])
 
+#length = len(filename)-len(inputName)
+#filefolder = filename[0:length]
 
-length = len(filename)-len(inputName)
-filefolder = filename[0:length]
 
-outputFileName = filefolder + 'openSeesOutputWrapper.txt'
+
+#outputFileName = filefolder + 'openSeesOutputWrapper.txt'
+outputFileName = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
