@@ -434,6 +434,7 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
         sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
         sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
         sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
+        sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
             section = dg.AddRectangleFromCenter( sectionPlane, width, height )
@@ -442,8 +443,11 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             radius1  = dimSection[1]/2
             radius2  = dimSection[1]/2 - dimSection[2]
             section1 = AddCircleFromCenter( sectionPlane, radius1 )
-            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-            defSection.append( [ section1, section2 ] )
+            if (radius1 - radius2 ) == 0 :
+                defSection.append( section1 )
+            else :
+                section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'doubleT' :
             Bsup = dimSection[1]
             tsup = dimSection[2]
@@ -458,21 +462,29 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
             defSection.append( section )
-        
-        globalRot = rg.Point3d( rotResult ) 
-        globalRot.Transform(xform2[1]) 
-        globalRot.Transform(xform)
-        globalRotVector.append( globalRot ) 
+    
         globalTrasl = rg.Point3d( transResult ) 
         globalTrasl.Transform(xform2[1]) 
         globalTrasl.Transform(xform)
         globalTransVector.append( globalTrasl )
-       
-        
-        #defSectionPolyline.append( sectionPolyline )
-        # estrusione della truss #
+
+   
     defpolyline = rg.PolylineCurve( defPoint )
-    meshdef = meshLoft3( defSection,  color )
+
+    if dimSection[0] == 'circular' :
+        radius1  = dimSection[1]/2
+        radius2  = dimSection[1]/2 - dimSection[2]
+        if (radius1 - radius2 ) == 0:
+            meshdef = meshLoft3( defSection,  color )
+        else :
+            defSection1 = [row[0] for row in defSection ]
+            defSection2 = [row[1] for row in defSection ]
+            meshdef = meshLoft3( defSection1,  color )
+            meshdef.Append( meshLoft3( defSection2,  color ) )
+            print( meshdef )
+
+    else  :
+        meshdef = meshLoft3( defSection,  color )
     return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
 
 ## node e nodeDisp son dictionary ##
@@ -556,8 +568,11 @@ def defTruss( ele, node, nodeDisp, scale ):
             radius1  = dimSection[1]/2
             radius2  = dimSection[1]/2 - dimSection[2]
             section1 = AddCircleFromCenter( sectionPlane, radius1 )
-            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-            defSection.append( [ section1, section2 ] )
+            if (radius1 - radius2 ) == 0 :
+                defSection.append( section1 )
+            else :
+                section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'doubleT' :
             Bsup = dimSection[1]
             tsup = dimSection[2]
@@ -572,80 +587,69 @@ def defTruss( ele, node, nodeDisp, scale ):
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
             defSection.append( section )
-        
+    
         globalTrasl = rg.Point3d( transResult ) 
         globalTrasl.Transform(xform2[1]) 
         globalTrasl.Transform(xform)
         globalTransVector.append( globalTrasl )
-        
+
+   
     defpolyline = rg.PolylineCurve( defPoint )
-    meshdef = meshLoft3( defSection,  color )
-    return  [ defpolyline, meshdef, globalTransVector] 
+
+    if dimSection[0] == 'circular' :
+        radius1  = dimSection[1]/2
+        radius2  = dimSection[1]/2 - dimSection[2]
+        if (radius1 - radius2 ) == 0:
+            meshdef = meshLoft3( defSection,  color )
+
+        else :
+            defSection1 = [row[0] for row in defSection ]
+            defSection2 = [row[1] for row in defSection ]
+            meshdef = meshLoft3( defSection1,  color )
+            meshdef.Append( meshLoft3( defSection2,  color ) )
+            print( meshdef )
+
+    else  :
+        meshdef = meshLoft3( defSection,  color )
+
+    return  [ defpolyline, meshdef, globalTransVector]
+
 ## Mesh from close section eith gradient color ##
 def meshLoft3( point, color ):
-    meshElement = rg.Mesh()
-    if len(point[0]) <= 3  : # perchè in questo caso piùsezioni
-        nLength =  len(point[0]) 
-        for item in range( nLength ):
-            meshEle = rg.Mesh()
-            pointSection1 = [row[item] for row in point ]
-            for i in range(0,len(pointSection1)):
-                for j in range(0, len(pointSection1[0])):
-                    vertix = pointSection1[i][j]
-                    meshEle.Vertices.Add( vertix ) 
-                    #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-            k = len(pointSection1[0])
-            for i in range(0,len(pointSection1)-1):
-                for j in range(0, len(pointSection1[0])):
-                    if j < k-1:
-                        index1 = i*k + j
-                        index2 = (i+1)*k + j
-                        index3 = index2 + 1
-                        index4 = index1 + 1
-                    elif j == k-1:
-                        index1 = i*k + j
-                        index2 = (i+1)*k + j
-                        index3 = (i+1)*k
-                        index4 = i*k
-                    meshEle.Faces.AddFace(index1, index2, index3, index4)
-                    #rs.ObjectColor(scyl,(255,0,0))
-            colour = rs.CreateColor( color[0], color[1], color[2] )
-            meshEle.VertexColors.CreateMonotoneMesh( colour )
-            meshElement.Append( meshEle )
-    else :
-        meshEle = rg.Mesh()
-        pointSection1 = point
-        for i in range(0,len(pointSection1)):
-            for j in range(0, len(pointSection1[0])):
-                vertix = pointSection1[i][j]
-                #print( type(vertix) )
-                meshEle.Vertices.Add( vertix ) 
-                #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-        k = len(pointSection1[0])
-        for i in range(0,len(pointSection1)-1):
-            for j in range(0, len(pointSection1[0])):
-                if j < k-1:
-                    index1 = i*k + j
-                    index2 = (i+1)*k + j
-                    index3 = index2 + 1
-                    index4 = index1 + 1
-                elif j == k-1:
-                    index1 = i*k + j
-                    index2 = (i+1)*k + j
-                    index3 = (i+1)*k
-                    index4 = i*k
-                meshEle.Faces.AddFace(index1, index2, index3, index4)
-                #rs.ObjectColor(scyl,(255,0,0))
-        colour = rs.CreateColor( color[0], color[1], color[2] )
-        meshEle.VertexColors.CreateMonotoneMesh( colour )
-        meshElement = meshEle
+    #print( point )
+    meshEle = rg.Mesh()
+    pointSection1 = point
+    for i in range(0,len(pointSection1)):
+        for j in range(0, len(pointSection1[0])):
+            vertix = pointSection1[i][j]
+            #print( type(vertix) )
+            meshEle.Vertices.Add( vertix ) 
+            #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+    k = len(pointSection1[0])
+    for i in range(0,len(pointSection1)-1):
+        for j in range(0, len(pointSection1[0])):
+            if j < k-1:
+                index1 = i*k + j
+                index2 = (i+1)*k + j
+                index3 = index2 + 1
+                index4 = index1 + 1
+            elif j == k-1:
+                index1 = i*k + j
+                index2 = (i+1)*k + j
+                index3 = (i+1)*k
+                index4 = i*k
+            meshEle.Faces.AddFace(index1, index2, index3, index4)
+            #rs.ObjectColor(scyl,(255,0,0))
+    colour = rs.CreateColor( color[0], color[1], color[2] )
+    meshEle.VertexColors.CreateMonotoneMesh( colour )
+    meshElement = meshEle
+    #meshdElement.IsClosed(True)
     
     return meshElement
 
-
 modelCurve = []
 ShellDefModel = []
-ExtrudedView = rg.Mesh()
+ExtrudedView = []
 modelDisp = []
 
 traslBeamValue = []
@@ -677,7 +681,7 @@ for ele in EleOut :
         modelCurve.append( defpolyline )
         modelDisp.append( defpolyline )
         # estrusione della beam #
-        ExtrudedView.Append( meshdef )
+        ExtrudedView.append( meshdef )
         #doc.Objects.AddMesh( meshdef )
     elif eleType == 'Truss' :
         dimSection = ele[2][10]
@@ -690,7 +694,7 @@ for ele in EleOut :
         traslBeamValue.append( globalTrans ) 
         modelCurve.append( defpolyline )
         modelDisp.append( defpolyline )
-        ExtrudedView.Append( meshdef )
+        ExtrudedView.append( meshdef )
         #doc.Objects.AddMesh( meshdef )
 
     elif nNode == 4 and eleType != 'FourNodeTetrahedron':
@@ -699,8 +703,8 @@ for ele in EleOut :
         traslShellValue.append( shellDefModel[1] )
         rotShellValue.append( shellDefModel[2] )
         extrudeShell = shellDefModel[3]
-        ExtrudedView.Append( extrudeShell )
-        doc.Objects.AddMesh( extrudeShell)
+        ExtrudedView.append( extrudeShell )
+        #doc.Objects.AddMesh( extrudeShell)
         
     elif nNode == 3:
         #print( nNode )
@@ -709,22 +713,22 @@ for ele in EleOut :
         traslShellValue.append( shellDefModel[1] )
         rotShellValue.append( shellDefModel[2] )
         extrudeShell = shellDefModel[3]
-        ExtrudedView.Append( extrudeShell )
-        doc.Objects.AddMesh( extrudeShell)
+        ExtrudedView.append( extrudeShell )
+        #doc.Objects.AddMesh( extrudeShell)
         
     elif nNode == 8:
         solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef)
         SolidDefModel.append( solidDefModel[0] )
-        doc.Objects.AddMesh( solidDefModel[0] )
+        #doc.Objects.AddMesh( solidDefModel[0] )
         traslSolidValue.append( solidDefModel[1] )
-        ExtrudedView.Append( solidDefModel[0] )
+        ExtrudedView.append( solidDefModel[0] )
         
     elif  eleType == 'FourNodeTetrahedron' :
         #print(ele)
         solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
         SolidDefModel.append( solidDefModel[0] )
         traslSolidValue.append( solidDefModel[1] )
-        ExtrudedView.Append( solidDefModel[0] )
+        ExtrudedView.append( solidDefModel[0] )
 
 # Max Beam #
 flattenTrasl = []

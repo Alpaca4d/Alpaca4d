@@ -377,12 +377,15 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             width, height = dimSection[1], dimSection[2]
             section = dg.AddRectangleFromCenter( sectionPlane, width, height )
             defSection.append( section )
-        if dimSection[0] == 'circular' :
+        elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
             radius2  = dimSection[1]/2 - dimSection[2]
             section1 = AddCircleFromCenter( sectionPlane, radius1 )
-            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-            defSection.append( [ section1, section2 ] )
+            if (radius1 - radius2 ) == 0 :
+                defSection.append( section1 )
+            else :
+                section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'doubleT' :
             Bsup = dimSection[1]
             tsup = dimSection[2]
@@ -397,21 +400,30 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
             defSection.append( section )
-        
-        globalRot = rg.Point3d( rotResult ) 
-        globalRot.Transform(xform2[1]) 
-        globalRot.Transform(xform)
-        globalRotVector.append( globalRot ) 
+    
         globalTrasl = rg.Point3d( transResult ) 
         globalTrasl.Transform(xform2[1]) 
         globalTrasl.Transform(xform)
         globalTransVector.append( globalTrasl )
-        
-        
-        #defSectionPolyline.append( sectionPolyline )
-        # estrusione della truss #
+
+   
     defpolyline = rg.PolylineCurve( defPoint )
-    meshdef = meshLoft3( defSection,  color )
+
+    if dimSection[0] == 'circular' :
+        radius1  = dimSection[1]/2
+        radius2  = dimSection[1]/2 - dimSection[2]
+        if (radius1 - radius2 ) == 0:
+            meshdef = meshLoft3( defSection,  color )
+
+        else :
+            defSection1 = [row[0] for row in defSection ]
+            defSection2 = [row[1] for row in defSection ]
+            meshdef = meshLoft3( defSection1,  color )
+            meshdef.Append( meshLoft3( defSection2,  color ) )
+            print( meshdef )
+
+    else  :
+        meshdef = meshLoft3( defSection,  color )
     return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
 
 ## node e nodeDisp son dictionary ##
@@ -492,12 +504,15 @@ def defTruss( ele, node, nodeDisp, scale ):
             width, height = dimSection[1], dimSection[2]
             section = dg.AddRectangleFromCenter( sectionPlane, width, height )
             defSection.append( section )
-        if dimSection[0] == 'circular' :
+        elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
             radius2  = dimSection[1]/2 - dimSection[2]
             section1 = AddCircleFromCenter( sectionPlane, radius1 )
-            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-            defSection.append( [ section1, section2 ] )
+            if (radius1 - radius2 ) == 0 :
+                defSection.append( section1 )
+            else :
+                section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'doubleT' :
             Bsup = dimSection[1]
             tsup = dimSection[2]
@@ -512,73 +527,62 @@ def defTruss( ele, node, nodeDisp, scale ):
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
             defSection.append( section )
-        
+    
         globalTrasl = rg.Point3d( transResult ) 
         globalTrasl.Transform(xform2[1]) 
         globalTrasl.Transform(xform)
         globalTransVector.append( globalTrasl )
-        
+
+   
     defpolyline = rg.PolylineCurve( defPoint )
-    meshdef = meshLoft3( defSection,  color )
+
+    if dimSection[0] == 'circular' :
+        radius1  = dimSection[1]/2
+        radius2  = dimSection[1]/2 - dimSection[2]
+        if (radius1 - radius2 ) == 0:
+            meshdef = meshLoft3( defSection,  color )
+
+        else :
+            defSection1 = [row[0] for row in defSection ]
+            defSection2 = [row[1] for row in defSection ]
+            meshdef = meshLoft3( defSection1,  color )
+            meshdef.Append( meshLoft3( defSection2,  color ) )
+            print( meshdef )
+
+    else  :
+        meshdef = meshLoft3( defSection,  color )
     return  [ defpolyline, meshdef, globalTransVector] 
 ## Mesh from close section eith gradient color ##
+
 def meshLoft3( point, color ):
     meshElement = rg.Mesh()
-    if len(point[0]) <= 3  : # perchè in questo caso piùsezioni
-        nLength =  len(point[0]) 
-        for item in range( nLength ):
-            meshEle = rg.Mesh()
-            pointSection1 = [row[item] for row in point ]
-            for i in range(0,len(pointSection1)):
-                for j in range(0, len(pointSection1[0])):
-                    vertix = pointSection1[i][j]
-                    meshEle.Vertices.Add( vertix ) 
-                    #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-            k = len(pointSection1[0])
-            for i in range(0,len(pointSection1)-1):
-                for j in range(0, len(pointSection1[0])):
-                    if j < k-1:
-                        index1 = i*k + j
-                        index2 = (i+1)*k + j
-                        index3 = index2 + 1
-                        index4 = index1 + 1
-                    elif j == k-1:
-                        index1 = i*k + j
-                        index2 = (i+1)*k + j
-                        index3 = (i+1)*k
-                        index4 = i*k
-                    meshEle.Faces.AddFace(index1, index2, index3, index4)
-                    #rs.ObjectColor(scyl,(255,0,0))
-            colour = rs.CreateColor( color[0], color[1], color[2] )
-            meshEle.VertexColors.CreateMonotoneMesh( colour )
-            meshElement.Append( meshEle )
-    else :
-        meshEle = rg.Mesh()
-        pointSection1 = point
-        for i in range(0,len(pointSection1)):
-            for j in range(0, len(pointSection1[0])):
-                vertix = pointSection1[i][j]
-                print( type(vertix) )
-                meshEle.Vertices.Add( vertix ) 
-                #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-        k = len(pointSection1[0])
-        for i in range(0,len(pointSection1)-1):
-            for j in range(0, len(pointSection1[0])):
-                if j < k-1:
-                    index1 = i*k + j
-                    index2 = (i+1)*k + j
-                    index3 = index2 + 1
-                    index4 = index1 + 1
-                elif j == k-1:
-                    index1 = i*k + j
-                    index2 = (i+1)*k + j
-                    index3 = (i+1)*k
-                    index4 = i*k
-                meshEle.Faces.AddFace(index1, index2, index3, index4)
-                #rs.ObjectColor(scyl,(255,0,0))
-        colour = rs.CreateColor( color[0], color[1], color[2] )
-        meshEle.VertexColors.CreateMonotoneMesh( colour )
-        meshElement = meshEle
+    meshEle = rg.Mesh()
+    pointSection1 = point
+    print( point )
+    for i in range(0,len(pointSection1)):
+        for j in range(0, len(pointSection1[0])):
+            vertix = pointSection1[i][j]
+            print( type(vertix) )
+            meshEle.Vertices.Add( vertix ) 
+            #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+    k = len(pointSection1[0])
+    for i in range(0,len(pointSection1)-1):
+        for j in range(0, len(pointSection1[0])):
+            if j < k-1:
+                index1 = i*k + j
+                index2 = (i+1)*k + j
+                index3 = index2 + 1
+                index4 = index1 + 1
+            elif j == k-1:
+                index1 = i*k + j
+                index2 = (i+1)*k + j
+                index3 = (i+1)*k
+                index4 = i*k
+            meshEle.Faces.AddFace(index1, index2, index3, index4)
+            #rs.ObjectColor(scyl,(255,0,0))
+    colour = rs.CreateColor( color[0], color[1], color[2] )
+    meshEle.VertexColors.CreateMonotoneMesh( colour )
+    meshElement = meshEle
     
     return meshElement
 
