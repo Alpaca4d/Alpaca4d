@@ -15,7 +15,8 @@ def LineToBeam(Line, CrossSection, Colour):
     
     midPoint =  line.PointAtNormalizedLength(0.5)
     parameter = line.ClosestPoint(midPoint, 0.01)[1]
-    perpFrame = ghcomp.PerpFrame( line, 1 )
+    print( parameter )
+    perpFrame = ghcomp.PerpFrame( line, parameter )
     #perpFrame = line.PerpendicularFrameAt(parameter)[1]
     perpFrame.Rotate(ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
     #axis1 = piano[1]

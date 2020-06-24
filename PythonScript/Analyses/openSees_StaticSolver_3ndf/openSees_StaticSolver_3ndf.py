@@ -1,5 +1,6 @@
 import sys
 import openseespy.opensees as ops
+#from openseespy.postprocessing.Get_Rendering import *
 
 
 filename = sys.argv[1]
@@ -181,7 +182,7 @@ for i in range(0, len(oSupport)):
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3] )
 
 ## LOAD ##
-
+#plot_model()
 # create TimeSeries
 ops.timeSeries('Constant', 1)
 
@@ -210,12 +211,10 @@ for item in openSeesBeamLoad:
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
 
-
-TensionFilePath = r'PythonScript\Analyses\openSees_StaticSolver_3ndf'
-TensionFilePathTag = TensionFilePath + '/tension.out' 
+TensionFilePathTag = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
-print( shellTag ) # ho problemi con shellTag
-ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*ops.getEleTags(),'stresses')
+# ho problemi con shellTag
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',1,2,'stresses')
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
@@ -291,7 +290,7 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
 length = len(filename)-len(inputName)
 filefolder = filename[0:length]
 
-outputFileName = filefolder+'openSeesOutputWrapper.txt'
+outputFileName = filefolder + 'openSeesOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
