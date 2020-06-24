@@ -46,3 +46,5 @@ if material is None:
 
 if checkData != False:
     CrossSection = RectangularCrossSection(sectionName, base, height, material)
+
+    print( CrossSection )

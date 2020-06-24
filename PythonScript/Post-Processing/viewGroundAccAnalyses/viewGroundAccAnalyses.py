@@ -524,7 +524,7 @@ def defTruss( ele, node, nodeDisp, scale ):
 ## Mesh from close section eith gradient color ##
 def meshLoft3( point, color ):
     meshElement = rg.Mesh()
-    if len(point[0]) < 11 : # perchè in questo caso piùsezioni
+    if len(point[0]) <= 3  : # perchè in questo caso piùsezioni
         nLength =  len(point[0]) 
         for item in range( nLength ):
             meshEle = rg.Mesh()

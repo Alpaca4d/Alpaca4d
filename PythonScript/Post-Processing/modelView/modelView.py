@@ -279,6 +279,9 @@ def Beam( ele, node):
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
             sectionForm.append( section )
+        #print(sectionForm)
+
+
             
         
         
@@ -289,7 +292,9 @@ def Beam( ele, node):
 ## Mesh from close section eith gradient color ##
 def meshLoft3( point, color ):
     meshElement = rg.Mesh()
-    if len(point[0]) < 11 : # perchè in questo caso piùsezioni
+    print( len(point[0]) < 11 )
+    print( len(point[0]) )
+    if len(point[0]) <= 3 : # perchè in questo caso più sezioni
         nLength =  len(point[0]) 
         for item in range( nLength ):
             meshEle = rg.Mesh()
