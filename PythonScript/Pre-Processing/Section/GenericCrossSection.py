@@ -52,9 +52,9 @@ if J is None:
     msg = "input 'J' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if Material is None:
+if material is None:
     checkData = False
-    msg = "input 'Material' failed to collect data"
+    msg = "input 'material' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
