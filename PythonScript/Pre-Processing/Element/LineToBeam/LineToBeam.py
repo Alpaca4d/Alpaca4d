@@ -6,7 +6,7 @@ import Grasshopper as gh
 
 def LineToBeam(Line, CrossSection, Colour):
 
-    line = Line
+    Line = Line
     if beamType == 1:
         elementType = "ElasticTimoshenkoBeam"
     else:
@@ -14,10 +14,10 @@ def LineToBeam(Line, CrossSection, Colour):
 
     CrossSection = CrossSection
     
-    midPoint =  line.PointAtNormalizedLength(0.5)
-    parameter = line.ClosestPoint(midPoint, 0.01)[1]
+    midPoint =  Line.PointAtNormalizedLength(0.5)
+    parameter = Line.ClosestPoint(midPoint, 0.01)[1]
     print( parameter )
-    perpFrame = ghcomp.PerpFrame( line, parameter )
+    perpFrame = ghcomp.PerpFrame( Line, parameter )
     #perpFrame = line.PerpendicularFrameAt(parameter)[1]
     perpFrame.Rotate(ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
     #axis1 = piano[1]
@@ -38,8 +38,9 @@ def LineToBeam(Line, CrossSection, Colour):
     massDens = Area * rho
 
 
-    return [[line, elementType, CrossSection, vecGeomTransf, colour, massDens,perpFrame]]
+    return [[Line, elementType, CrossSection, vecGeomTransf, colour, massDens,perpFrame]]
 
+checkData = True
 
 if Line is None:
     checkData = False

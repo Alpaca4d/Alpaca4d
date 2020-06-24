@@ -1,4 +1,6 @@
-﻿def ElasticMaterial(matName, E, G, v, rho, fy):
+﻿import Grasshopper as gh
+
+def ElasticMaterial(matName, E, G, v, rho, fy):
 
     E = E * 1000                               # Input value in N/mm2 ---> Output kN/m2
     if v == None:
@@ -28,10 +30,12 @@ if E is None:
     msg = "input 'E' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
+"""
 if G or v is None:
     checkData = False
     msg = "input 'G' or 'v' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+"""
 
 if rho is None:
     checkData = False
