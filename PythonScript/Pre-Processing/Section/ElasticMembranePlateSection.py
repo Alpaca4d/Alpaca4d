@@ -1,4 +1,13 @@
-﻿import math
+﻿"""Generate a circular cross section
+    Inputs:
+        sectionName: Name of the section.
+        thickness: Height of the cross section [mm].
+        material: Material element.
+    Output:
+       plateFiberSection: Elastic Membrane Plate Section element.
+       """
+
+import math
 import Grasshopper as gh
 
 def ElasticMembranePlateSection(sectionName, thickness, material):

@@ -1,4 +1,17 @@
-﻿import Grasshopper as gh
+﻿"""Generate a uniaxial Elastic Material
+    Inputs:
+        matName: Name of the material.
+        E: Young's Modulus [MPa].
+        G: Tangential Modulus [MPa].
+        v: Poisson ratio.
+        rho: specific weight [kN/m3].
+        fy: Yield stress value of the material [MPa]
+    Output:
+       elasticMaterialWrapper: Material element.
+       """
+
+
+import Grasshopper as gh
 
 def ElasticMaterial(matName, E, G, v, rho, fy):
 

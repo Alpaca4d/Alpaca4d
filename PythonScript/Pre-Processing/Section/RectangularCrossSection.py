@@ -1,4 +1,15 @@
-﻿import math
+﻿"""Generate a Rectangular cross section
+    Inputs:
+        sectionName: Name of the section.
+        base: Base of cross section [mm].
+        height: Height of cross section [mm].
+        material: Material element.
+    Output:
+       CrossSection: CrossSection element.
+       """
+
+
+import math
 import Grasshopper as gh
 
 def RectangularCrossSection(sectionName, base, height, material):

@@ -1,4 +1,19 @@
-﻿import math
+﻿"""Generate a Generic cross section
+    Inputs:
+        sectionName: Name of the section.
+        Area: Area of cross section [mm2].
+        Ay: Shear area along Y local axis [mm2].
+        Az: Shear area along Z local axis [mm2].
+        Iyy: Moment of Inertia about Y local axis [mm4].
+        Izz: Moment of Inertia about Z local axis [mm4].
+        J: Primary torsional moment of Inertia about X local axis [mm4].
+        material: Material element.
+    Output:
+       CrossSection: CrossSection element.
+       """
+
+
+import math
 import Grasshopper as gh
 
 def GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, Material):

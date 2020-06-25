@@ -1,4 +1,15 @@
-﻿import math
+﻿"""Generate a circular cross section
+    Inputs:
+        sectionName: Name of the section.
+        diameter: Diameter of cross section [mm].
+        thickness: Wall thickness [mm].
+        material: Material element.
+    Output:
+       CrossSection: CrossSection element.
+       """
+
+
+import math
 import Grasshopper as gh
 
 def CircleCrossSection(sectionName, diameter, thickness, material):
