@@ -101,7 +101,6 @@ w = stressView
 tensionDic = []
 for n,eleTag in enumerate(shellTag) :
     tensionShell = []
-    print(  )
     for i in range( (n)*32, ( n + 1 )*32  ):
         tensionShell.append( float(tensionList[i]) )
     tensionView = [ tensionShell[ w ], tensionShell[ w + 8 ], tensionShell[ w + 16 ], tensionShell[ w + 24 ] ]

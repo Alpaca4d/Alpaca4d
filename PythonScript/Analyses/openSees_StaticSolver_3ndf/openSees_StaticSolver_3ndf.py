@@ -151,7 +151,7 @@ for item in openSeesShell:
         print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 '''
-
+solidTag = []
 for item in openSeesSolid:
 
     eleType = item[0]
@@ -169,7 +169,7 @@ for item in openSeesSolid:
     elementProperties.append([ eleTag, [eleType,color] ])
 
     if (eleType == 'bbarBrick') or (eleType == 'FourNodeTetrahedron'):
-
+        solidTag.append( eleTag )
         #print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
         ops.element( eleType , eleTag, *eleNodes, matTag, *force)                           
 # transform elementproperties to  Dict to call the object by tag
@@ -212,10 +212,10 @@ for item in openSeesBeamLoad:
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
 
-TensionFilePathTag = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
+TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
 # ho problemi con shellTag
-ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',1,'stresses')
+ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*solidTag,'stresses')
 print(ops.getEleTags())
 # ------------------------------
 # Start of analysis generation
