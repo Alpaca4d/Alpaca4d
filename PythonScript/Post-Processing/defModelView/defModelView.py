@@ -90,6 +90,8 @@ def AddCircleFromCenter( plane, radius):
     return circle
 
 def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+    #-------------------1---------2 #
+    '''
     p1 = plane.PointAt(ta/2, -(yg - tinf) )
     p2 = plane.PointAt( Binf/2,  -(yg - tinf) )
     p3 = plane.PointAt( Binf/2,  -yg )
@@ -102,6 +104,20 @@ def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
     p10 = plane.PointAt( Bsup/2,  (H - yg ) )
     p11 = plane.PointAt( Bsup/2,  (H - yg - tsup) )
     p12 = plane.PointAt( ta/2,  (H - yg - tsup) )
+    '''
+    p1 = plane.PointAt( -(yg - tinf), ta/2 )
+    p2 = plane.PointAt( -(yg - tinf), Binf/2 )
+    p3 = plane.PointAt( -yg, Binf/2 )
+    p4 = plane.PointAt( -yg, -Binf/2 )
+    p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
+    p6 = plane.PointAt( -(yg - tinf), -ta/2 )
+    p7 = plane.PointAt( (H - yg - tsup), -ta/2)
+    p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
+    p9 = plane.PointAt( (H - yg ), -Bsup/2 )
+    p10 = plane.PointAt( (H - yg ), Bsup/2 )
+    p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
+    p12 = plane.PointAt( (H - yg - tsup), ta/2 )
+
     wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
     return wirframe
 
@@ -364,7 +380,7 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
     traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
     WorldPlane.Transform( traslPlane )
     #-------------------------------------------------------------#
-    planeStart = rg.Plane(pointStart, axis1, axis2 )
+    planeStart = rg.Plane( pointStart, axis1, axis2 )
     #planeStart = rg.Plane(pointStart, axis3 )
     localPlane = planeStart
     xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
@@ -420,8 +436,9 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
         ## RISULTANTE SPOSTAMENTI ##
         transResult = v1Vector + v2Vector + u3Vector
         
-        r2x =  dg.thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+
         r1x =  dg.psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+        r2x =  dg.thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
         r3x = dg.phix(x, Length, rI3, rJ3)
         
         rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
@@ -429,12 +446,11 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
         trasl = rg.Transform.Translation( transResult*scaleDef )
         beamPoint.Transform( trasl )
         defPoint.append( beamPoint )
-        
+        print( scaleDef*r1x , scaleDef*r2x, scaleDef*r3x)
         sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
         sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
         sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
         sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
-        sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
             section = dg.AddRectangleFromCenter( sectionPlane, width, height )

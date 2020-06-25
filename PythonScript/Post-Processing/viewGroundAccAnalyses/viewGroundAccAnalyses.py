@@ -29,6 +29,8 @@ def AddCircleFromCenter( plane, radius):
     return circle
 
 def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+    #-------------------1---------2 #
+    '''
     p1 = plane.PointAt(ta/2, -(yg - tinf) )
     p2 = plane.PointAt( Binf/2,  -(yg - tinf) )
     p3 = plane.PointAt( Binf/2,  -yg )
@@ -41,6 +43,20 @@ def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
     p10 = plane.PointAt( Bsup/2,  (H - yg ) )
     p11 = plane.PointAt( Bsup/2,  (H - yg - tsup) )
     p12 = plane.PointAt( ta/2,  (H - yg - tsup) )
+    '''
+    p1 = plane.PointAt( -(yg - tinf), ta/2 )
+    p2 = plane.PointAt( -(yg - tinf), Binf/2 )
+    p3 = plane.PointAt( -yg, Binf/2 )
+    p4 = plane.PointAt( -yg, -Binf/2 )
+    p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
+    p6 = plane.PointAt( -(yg - tinf), -ta/2 )
+    p7 = plane.PointAt( (H - yg - tsup), -ta/2)
+    p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
+    p9 = plane.PointAt( (H - yg ), -Bsup/2 )
+    p10 = plane.PointAt( (H - yg ), Bsup/2 )
+    p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
+    p12 = plane.PointAt( (H - yg - tsup), ta/2 )
+
     wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
     return wirframe
 
