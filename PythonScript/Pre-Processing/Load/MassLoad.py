@@ -1,3 +1,12 @@
+"""Add a concentrated Mass to a node.
+    Inputs:
+        NodalMass: Mass at point [kg].
+        Pos: Point to apply the nodal Mass.
+    Output:
+       Mass: Mass element.
+       """
+
+
 import Rhino.Geometry as rg
 import Grasshopper as gh
 

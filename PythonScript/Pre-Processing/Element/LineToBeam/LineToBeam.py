@@ -1,4 +1,15 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate a Timoshenko Beam element or a Truss element
+    Inputs:
+        Line: Straight line representing the structural element.
+        CrossSection: Cross section of the element.
+        Colour: Colour of the element.
+        orientSection: Rotation angle in degrees about local X-axis.
+        beamType:  0: Truss  1: Beam. Default is Beam.
+    Output:
+       beamWrapper: Beam with properties.
+       """
+
+import Rhino.Geometry as rg
 from Rhino.RhinoMath import *
 from System.Drawing import Color
 import ghpythonlib.components as ghcomp
@@ -7,7 +18,7 @@ import Grasshopper as gh
 def LineToBeam(Line, CrossSection, Colour):
 
     Line = Line
-    if beamType == 1:
+    if beamType == 1 or None:
         elementType = "ElasticTimoshenkoBeam"
     else:
         elementType = "Truss"

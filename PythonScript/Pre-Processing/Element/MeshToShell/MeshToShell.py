@@ -1,4 +1,14 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate a Shell MITC4 element
+    Inputs:
+        Mesh: QuadMesh representing the structural element.
+        CrossSection: Cross section of the mesh.
+        Colour: Colour of the element.
+    Output:
+       shellWrapper: Shell with properties.
+       """
+
+
+import Rhino.Geometry as rg
 import Grasshopper as gh
 
 def MeshToShell(Mesh, Colour, CrossSection):

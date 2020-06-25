@@ -28,14 +28,14 @@ fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSee
 
 earthQuakeSettings = []
 
-for item in GroundMotionFile:
+for item in GroundMotionValues:
     earthQuakeSettings.append( "GROUNDMOTIONVALUES {}".format(item) )
 
 for item in GroundMotionTimeStep:
     earthQuakeSettings.append( "GROUNDMOTIONTIMESTEP {}".format(item) )
 
 earthQuakeSettings.append( "GROUNDMOTIONDIRECTION {}".format(GroundMotionDirection) )
-earthQuakeSettings.append( "GROUNDMOTIONFACTOR {}".format(GroundMotionfactor) )
+earthQuakeSettings.append( "GROUNDMOTIONFACTOR {}".format(GroundMotionFactor) )
 earthQuakeSettings.append( "DAMPING {}".format(Damping) )
 earthQuakeSettings.append( "NEWMARKGAMMA {}".format(NewmarkGamma) )
 earthQuakeSettings.append( "NEWMARKBETA {}".format(NewmarkBeta) )

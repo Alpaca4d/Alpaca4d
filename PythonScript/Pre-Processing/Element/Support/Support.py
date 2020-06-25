@@ -1,5 +1,17 @@
-import Grasshopper as gh
+"""Generate support for the structure.
+    Inputs:
+        Pos: QuadMesh representing the structural element.
+        Tx: Translation in X. TRUE if it is Fixed.
+        Ty: Translation in Y. TRUE if it is Fixed.
+        Tz: Translation in Z. TRUE if it is Fixed.
+        Rx: Rotation about the X axis. TRUE if it is Fixed.
+        Ry: Rotation about the Y axis. TRUE if it is Fixed.
+        Rz: Rotation about the Z axis. TRUE if it is Fixed.
+    Output:
+       supportWrapper: Point with constraint properties.
+       """
 
+import Grasshopper as gh
 
 
 def SupportWrapper(Pos, Tx, Ty, Tz, Rx, Ry, Rz):

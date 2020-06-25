@@ -1,4 +1,13 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate a point load.
+    Inputs:
+        Force: Input force vector [kN].
+        Moment: Input moment vector [kN].
+        Pos: Point to apply the loads.
+    Output:
+       LoadWrapper: Load element.
+       """
+
+import Rhino.Geometry as rg
 
 def pointLoad(Force, Moment, Pos):
 

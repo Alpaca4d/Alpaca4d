@@ -1,4 +1,14 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate a uniform Distributed Load
+    Inputs:
+        Force: Straight line representing the structural element.
+        Element: Cross section of the element.
+        Orientation:  0: Local axis.  1: Global axis. Default is Global axis.
+    Output:
+       beamUniformLoad: Load element.
+       """
+
+
+import Rhino.Geometry as rg
 import ghpythonlib.components as ghcomp
 import Grasshopper as gh
 

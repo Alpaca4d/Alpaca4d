@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 filename = sys.argv[1]
 earthQuakeSettingsFile = sys.argv[2]
 
-#filename = r'C:\Users\FORMAT\Desktop\testAlpaca\assembleData\openSeesModel.txt'
-#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\testAlpaca\assembleData\earthQuakeSettingsFile.txt'
+#filename = r'C:\Users\FORMAT\Desktop\TestAlpaca\assembleData\openSeesModel.txt'
+#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\TestAlpaca\assembleData\earthQuakeSettingsFile.txt'
 
 
 workingDirectory = os.path.split(filename)[0]
@@ -109,7 +109,7 @@ for n in range(0, len(openSeesBeam)):
     eleType = openSeesBeam[n][0]
     indexStart = openSeesBeam[n][2][0] + 1
     indexEnd = openSeesBeam[n][2][1] + 1
-    eleNodes = [ indexStart, indexEnd]
+    eleNodes = [indexStart, indexEnd]
     
     A = openSeesBeam[n][3]
     E = openSeesBeam[n][4]
@@ -286,10 +286,10 @@ for line in earthQuakeSettingLines:
 
 
 
-print(f"GroundMotionValues = {GroundMotionValues}")
-print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
-print(f'GMfact = {GMfact}')
-print(f"GMdirection = {GMdirection}")
+#print(f"GroundMotionValues = {GroundMotionValues}")
+#print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
+#print(f'GMfact = {GMfact}')
+#print(f"GMdirection = {GMdirection}")
 
 
 # to make it more reliable
@@ -298,6 +298,8 @@ if len(GroundMotionValues) == 1:
 
 else:
 # time series with values for time and force
+    GroundMotionValues = [ float(item) for item in GroundMotionValues ]
+    GroundMotionTimeStep = [ float(item) for item in GroundMotionTimeStep ]
     ops.timeSeries('Path', 2, '-values', *GroundMotionValues, '-time', *GroundMotionTimeStep, '-factor', GMfact)
 
 
@@ -305,6 +307,7 @@ else:
 ops.pattern('UniformExcitation', 2, GMdirection, '-accel', 2) 
 Lambda = ops.eigen('-fullGenLapack', 1)[0] # eigenvalue mode 1
 Omega = math.pow(Lambda, 0.5)
+
 
 
 betaKcomm = 2 * (damping/Omega)
@@ -340,7 +343,6 @@ tCurrent = ops.getTime()
 
 print("starting Analyses")
 
-time.sleep(5)
 
 timer = []
 disp = []
@@ -361,7 +363,7 @@ while ok == 0 and tCurrent < tAnalyses:
         ops.algorithm('Newton')
 
     tCurrent = ops.getTime()
-    print(f"Analyses step: {tCurrent}")
+    #print(f"Analyses step: {tCurrent}")
 
 
 #print( "maximum displacement is" + str(disp.sort()[-1]) )
