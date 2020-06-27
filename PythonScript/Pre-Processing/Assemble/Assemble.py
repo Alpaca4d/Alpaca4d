@@ -292,5 +292,5 @@ if not Load:
 
 
 if checkData != False:
-    openSeesModel = Assemble(Element, Support, Load, Mass)[0]
+    AlpacaModel = Assemble(Element, Support, Load, Mass)[0]
     MassOfStructure= Assemble(Element, Support, Load, Mass)[1]

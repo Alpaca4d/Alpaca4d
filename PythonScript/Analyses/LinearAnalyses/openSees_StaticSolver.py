@@ -55,7 +55,7 @@ ops.model('BasicBuilder', '-ndm', 3, '-ndf', 6)
 for i in range(0,len(oNodes)):
     nodeTag = oNodes[i][0] + 1
     ops.node( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] )
-    print('ops.node( {0}, {1}, {2}, {3})'.format( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) )
+    #print('ops.node( {0}, {1}, {2}, {3})'.format( nodeTag, oNodes[i][1], oNodes[i][2], oNodes[i][3] ) )
 
 ## CREATE MATERIAL IN OPENSEES ##
 
@@ -82,7 +82,7 @@ for item in openSeesSecTag:
     if typeSection == 'ElasticMembranePlateSection':
         ops.section(typeSection, secTag, E_mod, nu, h, rho)
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
-        print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
+        #print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
 ## CREATE ELEMENT IN OPENSEES ##
 
 # Define geometric transformation:
@@ -150,7 +150,7 @@ for item in openSeesShell:
 
     if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'):
         shellTag.append( eleTag )
-        print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
+        #print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
 for item in openSeesSolid:
@@ -171,7 +171,7 @@ for item in openSeesSolid:
 
     if (eleType == 'bbarBrick') or (eleType == 'FourNodeTetrahedron'):
 
-        print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
+        #print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
         ops.element( eleType , eleTag, *eleNodes, matTag, *force)                           
 # transform elementproperties to  Dict to call the object by tag
 elementPropertiesDict = dict(elementProperties)
@@ -180,7 +180,7 @@ elementPropertiesDict = dict(elementProperties)
 
 for i in range(0, len(oSupport)):
     indexSupport = oSupport[i][0] + 1
-    print('ops.fix( {0}, {1}, {2}, {3}, {4}, {5}, {6})'.format( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3], oSupport[i][4], oSupport[i][5], oSupport[i][6]) )
+    #print('ops.fix( {0}, {1}, {2}, {3}, {4}, {5}, {6})'.format( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3], oSupport[i][4], oSupport[i][5], oSupport[i][6]) )
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3], oSupport[i][4], oSupport[i][5], oSupport[i][6] )
 
 ## LOAD ##
@@ -197,7 +197,7 @@ for i in range(0, len(oNodeLoad)):
     nodetag = oNodeLoad[i][0] + 1
     Force = oNodeLoad[i][1]
     ops.load( nodetag, *Force )
-    print( f'ops.load( {nodetag}, *{Force} )')
+    #print( f'ops.load( {nodetag}, *{Force} )')
 
 elementLoad = []
 
@@ -250,6 +250,7 @@ ops.algorithm("Newton")
 # create analysis object
 ops.analysis("Static")
 
+print("starting Analysis")
 # perform the analysis
 ops.analyze(1)
 
