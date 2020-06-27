@@ -35,10 +35,9 @@
 * [x] creationFolder name is wrong. 
 * [x] Automatically delete existing Folder to avoid to read previous file when the analyses fail
 
-* [ ] EarthQuake Analyses - update for different way to make analyses
+* [x] EarthQuake Analyses - update for different way to make analyses
 * [x] update "ShellMITC" element type instead of "ShellNTGQ"
 * [x] Add Warning to the components
-* [ ] look to eleForce in shell ( component name is 'shellForceView'... I thinks )
 
 * [x] Color Palette for components
 * [ ] Documentation
