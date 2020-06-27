@@ -1,4 +1,25 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaModel: Output of Assemble Model.
+        modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model. 
+        Load : if Boolean Toggle is 'True' view forces model  , if  ' False ' you don't see . 
+        Support : if Boolean Toggle is 'True' view constraints  model  , if ' False ' you don't see .
+        LocalAxes : if Boolean Toggle is 'True' view local axis of beam or truss element  , if is ' False ' you don't see .
+        nodeTag : if Boolean Toggle is 'True' view mode tag of model , if ' False ' you don't see .
+        elementTag : if Boolean Toggle is 'True' view tag of element , if  ' False ' you don't see .
+        nodalMass : if Boolean Toggle is 'True' view mass at the nodes of the structure , if ' False ' you don't see .
+    Output:
+       modelView : view the element ( beam, shell, brick ... ).
+       lineModel : view analitic line of the beaom or truss Element .
+       forceDisplay : vector of forces applied to the model .
+       support : brep of constraints view .
+       localAxis : vector of local axis of beam or truss element .
+       tagNode : view nodes tag of Model .
+       tagEle : view tag of element .
+       Mass : mass at the nodes of the structure .
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 #import ghpythonlib.components as ghcomp

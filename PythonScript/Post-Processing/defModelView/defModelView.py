@@ -1,3 +1,25 @@
+"""Generate Model view 
+    Inputs:
+        AlpacaOutputWrapper: Output of solver on static Analyses.
+
+        direction : view relative color of the traslation :
+        if you enter '0' view traslation X ;
+        if you enter '1' view traslation Y ;
+        if you enter '2' view traslation Z .
+
+        scale: number that multiplies the real displacements. 
+
+        modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model. 
+
+    Output:
+       ModelDisp : view deformed model :
+       beam --> polyline;
+       shell --> mesh;
+       brick --> solid .
+       ModelCurve : analitic line ( polyline) of the beaom or truss Element .
+       max_min : max end min of displacement of the structure .
+       """
+
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
