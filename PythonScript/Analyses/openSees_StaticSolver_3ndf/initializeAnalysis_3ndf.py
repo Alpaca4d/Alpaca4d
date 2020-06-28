@@ -48,7 +48,7 @@ with open(outputFile, 'r') as f:
 
 
 
-openSeesOutputWrapper = ([nodeDisplacementWrapper,
+AlpacaStaticOutput = ([nodeDisplacementWrapper,
                         reactionWrapper,
                         elementOutputWrapper,
                         elementLoadWrapper ])

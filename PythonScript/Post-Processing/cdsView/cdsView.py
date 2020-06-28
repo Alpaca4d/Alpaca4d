@@ -1,4 +1,20 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+        Cds : Cds =  caratteristiche delle sollecitazioni ( Italian Name) - Is Stress characteristics .
+        if you enter '0' view N ( forces in direction 3 ) ;
+        if you enter '1' view V1  ( forces in direction 1 ).
+        if you enter '2' view V2  ( forces in direction 2 ).
+        if you enter '3' view M2 ( Moments in direction 2 ) ;
+        if you enter '4' view M1  ( Moments in direction 1 ).
+        if you enter '5' view Mt  ( Moments in direction 3 ).
+        scale: number that multiplies the real forces.
+        If you don't enter anything it will be automatically scaled. 
+    Output:
+       diagram : view mesh outputs which represents the trend of the chosen stress .
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 #import ghpythonlib.components as ghcomp
@@ -208,10 +224,10 @@ def forceTrussValue(  ele, node, force, loadDict ):
     return  eleForceValue
 
 #--------------------------------------------------------------------------
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
-eleLoad = openSeesOutputWrapper[3]
-ForceOut = openSeesOutputWrapper[4]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
+eleLoad = AlpacaStaticOutput[3]
+ForceOut = AlpacaStaticOutput[4]
 pointWrapper = []
 for index,item in enumerate(diplacementWrapper):
     pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )

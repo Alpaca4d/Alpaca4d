@@ -47,15 +47,15 @@ import DomeFunc as dg
 
 #---------------------------------------------------------------------------------------#
 
-nodeWrapper = openSeesModel[0]
-GeomTransf = openSeesModel[1]
-openSeesBeam = openSeesModel[2]
-openSeesSupport = openSeesModel[3]
-openSeesNodeLoad = openSeesModel[4]
-openSeesNodalMass = openSeesModel[5]
-openSeesBeamLoad = openSeesModel[6]
-openSeesShell = openSeesModel[8]
-openSeesSolid = openSeesModel[10]
+nodeWrapper = AlpacaModel[0]
+GeomTransf = AlpacaModel[1]
+openSeesBeam = AlpacaModel[2]
+openSeesSupport = AlpacaModel[3]
+openSeesNodeLoad = AlpacaModel[4]
+openSeesNodalMass = AlpacaModel[5]
+openSeesBeamLoad = AlpacaModel[6]
+openSeesShell = AlpacaModel[8]
+openSeesSolid = AlpacaModel[10]
 
 pointWrapper = []
 for item in nodeWrapper:
@@ -765,6 +765,3 @@ if Support == True:
             supp = AddBoxFromCenter(plane2, length, h) 
             a.append( supp )
 support = th.list_to_tree( a )
-
-
- 

@@ -1,4 +1,17 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+    Output:
+       tagElement : number of the tag of Beam or Truss element .
+       Fx : Forces in direction X  of the Shell nodes .
+       Fy : Forces in direction Y of the Shell nodes .
+       Fz : Forces in direction Z  of the Shell nodes .
+       Mx : Moments in direction X  of the Shell nodes .
+       My : Moments in direction Y  of the Shell nodes .
+       Mz : Moments in direction Z  of the Shell nodes .
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -26,9 +39,9 @@ import DomeFunc as dg
 #---------------------------------------------------------------------------------------#
 
 #--------------------------------------------------------------------------
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
-ForceOut = openSeesOutputWrapper[4]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
+ForceOut = AlpacaStaticOutput[4]
 
 pointWrapper = []
 for index,item in enumerate(diplacementWrapper):

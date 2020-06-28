@@ -1,6 +1,6 @@
 """Generate Model view 
     Inputs:
-        AlpacaOutputWrapper: Output of solver on static Analyses.
+        AlpacaStaticOutput: Output of solver on static Analyses.
 
         direction : view relative color of the traslation :
         if you enter '0' view traslation X ;
@@ -50,8 +50,8 @@ import DomeFunc as dg
 
 #---------------------------------------------------------------------------------------#
 
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 nodeValue = []
 displacementValue = []
 #ShellOut = openSeesOutputWrapper[4]

@@ -1,4 +1,17 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaModel: Output of Assemble Model.
+    Output:
+       ModelView : analitic element ( beam, shell, brick ... ).
+       ModelViewExtruded : extruded model .
+       Points : points of model .
+       Support : info support .
+       Load : info Load .
+       Material : info Material.
+       Section : info Section.
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import rhinoscriptsyntax as rs
@@ -12,15 +25,15 @@ import DomeFunc as dg
 
 #---------------------------------------------------------------------------------------#
 
-nodeWrapper = openSeesModel[0]
-GeomTransf = openSeesModel[1]
-openSeesBeam = openSeesModel[2]
-openSeesSupport = openSeesModel[3]
-openSeesNodeLoad = openSeesModel[4]
-openSeesMatTag = openSeesModel[7]
-openSeesShell = openSeesModel[8]
-openSeesSecTag = openSeesModel[9]
-openSeesSolid = openSeesModel[10]
+nodeWrapper = AlpacaModel[0]
+GeomTransf = AlpacaModel[1]
+openSeesBeam = AlpacaModel[2]
+openSeesSupport = AlpacaModel[3]
+openSeesNodeLoad = AlpacaModel[4]
+openSeesMatTag = AlpacaModel[7]
+openSeesShell = AlpacaModel[8]
+openSeesSecTag = AlpacaModel[9]
+openSeesSolid = AlpacaModel[10]
 
 pointWrapper = []
 for item in nodeWrapper:

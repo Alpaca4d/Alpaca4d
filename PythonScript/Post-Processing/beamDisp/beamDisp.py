@@ -1,4 +1,16 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+        numberResults : number of discretizations for beam.
+    Output:
+       tagElement : number of the tag of Beam or Truss element .
+       localTrans : Displacements related to the local system ( 1- red, 2-green, 3-blue).
+       localRot : Rotation related to the local system ( 1- red, 2-green, 3-blue).
+       globalTrans : Displacements related to the global system ( XYZ ).
+       globalRot : Rotation related to the global system ( XYZ ).
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -212,18 +224,17 @@ def defTrussValue( ele, node, nodeDisp, numberResults ):
     return  [ localTransVector, globalTransVector] 
 
 #--------------------------------------------------------------------------
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 
 pointWrapper = []
 transWrapper = []
 rotWrapper = []
 
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 nodeValue = []
 displacementValue = []
-#ShellOut = openSeesOutputWrapper[4]
 
 pointWrapper = []
 dispWrapper = []

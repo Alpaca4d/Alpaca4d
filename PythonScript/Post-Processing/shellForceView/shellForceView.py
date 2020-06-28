@@ -1,4 +1,19 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+        viewForce :  forces acting on the shell nodes.
+        if you enter '0' view Fx ( forces in direction X ) ;
+        if you enter '1' view Fy  ( forces in direction Y ).
+        if you enter '2' view Fz  ( forces in direction Z ).
+        if you enter '3' view Mx ( Moments in direction X ) ;
+        if you enter '4' view My  ( Moments in direction Y ).
+        if you enter '5' view Mz  ( Moments in direction Z ).
+    Output:
+       modelForce : view color mesh outputs which represents the trend of the chosen stress .
+       ForceValue : values ​​of the chosen forces acting on the shell nodes.
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -112,9 +127,9 @@ def gradientJet(value, valueMax, valueMin):
         elif  valueMin - 0.00000000001 <= value <= valueMin  :
             return listcolo[ 0 ]
 #--------------------------------------------------------------------------
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
-ForceOut = openSeesOutputWrapper[4]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
+ForceOut = AlpacaStaticOutput[4]
 #print( ForceOut[0] )
 #print( ForceOut[1] )
 #nodalForce = openSeesOutputWrapper[5]

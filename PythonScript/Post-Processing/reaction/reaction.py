@@ -1,4 +1,17 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+        reactionForcesView : if Boolean Toggle is 'True' view reaction Forces, if ' False ' you don't see .
+        reactionMomentsView : if Boolean Toggle is 'True' view reaction Moments, if ' False ' you don't see .
+        scale: number that multiplies the reaction.
+    Output:
+       tagPoints :  nodes tag of Model .
+       ReactionForce : Vector of reaction Forces { Rx, Ry, Rz }.
+       ReactionMoment : Vector of reaction Moments { Mx, My, Mz }.
+       view : elemet for forces view .
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -24,8 +37,8 @@ import DomeFunc as dg
 
 #---------------------------------------------------------------------------------------#
 
-diplacementWrapper = openSeesOutputWrapper[0]
-reactionOut = openSeesOutputWrapper[1]
+diplacementWrapper = AlpacaStaticOutput[0]
+reactionOut = AlpacaStaticOutput[1]
 #print( len( reactionOut ) )
 
 pointWrapper = []

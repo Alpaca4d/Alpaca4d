@@ -1,18 +1,26 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+    Output:
+       tagElement : number of the tag of Brick element .
+       Trans : Translation of the nodal briks .
+       """
+
+import Rhino.Geometry as rg
 import ghpythonlib.treehelpers as th # per data tree
 #---------------------------------------------------------------------------------------#
 
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 
 pointWrapper = []
 transWrapper = []
 
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 nodeValue = []
 displacementValue = []
-#ShellOut = openSeesOutputWrapper[4]
+
 
 pointWrapper = []
 dispWrapper = []

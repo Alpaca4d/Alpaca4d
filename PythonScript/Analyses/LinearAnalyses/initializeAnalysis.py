@@ -52,6 +52,7 @@ def InitializeStaticAnalysis(AlpacaModel):
 
     return AlpacaLinearStaticOutput
 
+AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
 checkData = True
 
 if not AlpacaModel:

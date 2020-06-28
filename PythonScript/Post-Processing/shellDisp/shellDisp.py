@@ -1,19 +1,27 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+    Output:
+       tagElement : number of the tag of Shell element .
+       Trans : Translation of the Shell nodes .
+       Rot : Rotation of the Shell nodes  .
+       """
+
+import Rhino.Geometry as rg
 import ghpythonlib.treehelpers as th # per data tree
 #---------------------------------------------------------------------------------------#
 
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 
 pointWrapper = []
 transWrapper = []
 rotWrapper = []
 
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
 nodeValue = []
 displacementValue = []
-#ShellOut = openSeesOutputWrapper[4]
 
 pointWrapper = []
 dispWrapper = []

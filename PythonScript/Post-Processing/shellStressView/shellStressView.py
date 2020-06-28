@@ -1,3 +1,20 @@
+"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+        stressView :  stress acting on the shell nodes.
+        if you enter '0' view sigmaX ( membrane stress X ) ;
+        if you enter '1' view sigmaY  ( membrane stress Y );
+        if you enter '2' view sigmaXY ( membrane stress XY );
+        if you enter '3' view tauX  ( transverse shear forces X );
+        if you enter '4' view tauY ( transverse shear forces Y ).
+        if you enter '5' view mX ( bending moment X ) ;
+        if you enter '6' view my  ( bending moment Y );
+        if you enter '7' view mxy ( bending moment XY  );
+    Output:
+        shell :  mesh that represented the shell ( color later ).
+        stressValue : valor of stress acting on the shell nodes.
+        """
+
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
@@ -64,9 +81,9 @@ def ShellTriangle( ele, node ):
     return  shellModel
 
 #--------------------------------------------------------------------------
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
-ForceOut = openSeesOutputWrapper[4]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
+ForceOut = AlpacaStaticOutput[4]
 #print( ForceOut[0] )
 #print( ForceOut[1] )
 #nodalForce = openSeesOutputWrapper[5]

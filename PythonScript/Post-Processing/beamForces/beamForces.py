@@ -1,4 +1,18 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate Model view 
+    Inputs:
+        AlpacaStaticOutput: Output of solver on static Analyses.
+        numberResults : number of discretizations for beam.
+    Output:
+       tagElement : number of the tag of Beam or Truss element .
+       N : normal force values ( forces in direction 3 )
+       V1 : shear force values ( forces in direction 1 ).
+       V2 : shear force values ( forces in direction 2 ).
+       Mt : torque value ( Moments in direction 3 ).
+       M1 : bending moment ( Moments in direction 1 ).
+       M2 : bending moment ( Moments in direction 2 ).
+       """
+
+import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper
@@ -200,10 +214,10 @@ def forceTrussValue(  ele, node, force, loadDict, numberResults ):
     return  eleForceValue
 
 #--------------------------------------------------------------------------
-diplacementWrapper = openSeesOutputWrapper[0]
-EleOut = openSeesOutputWrapper[2]
-eleLoad = openSeesOutputWrapper[3]
-ForceOut = openSeesOutputWrapper[4]
+diplacementWrapper = AlpacaStaticOutput[0]
+EleOut = AlpacaStaticOutput[2]
+eleLoad = AlpacaStaticOutput[3]
+ForceOut = AlpacaStaticOutput[4]
 
 pointWrapper = []
 for index,item in enumerate(diplacementWrapper):
