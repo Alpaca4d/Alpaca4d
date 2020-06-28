@@ -891,7 +891,7 @@ for solidEle, value in zip(SolidDefModel,traslSolidValue) :
         #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
 
 
-if modelExstrud == False :
+if modelExstrud == False or modelExstrud == None:
     ModelDisp  = modelDisp
     ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
     max_min = th.list_to_tree([ tMax[i], tMin[i] ])

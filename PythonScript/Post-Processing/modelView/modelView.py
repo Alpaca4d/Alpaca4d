@@ -1,15 +1,22 @@
 ﻿"""Generate Model view 
     Inputs:
         AlpacaModel: Output of Assemble Model.
-        modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model. 
-        Load : if Boolean Toggle is 'True' view forces model  , if  ' False ' you don't see . 
+        modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model.
+                       if you don't enter anything then it will be 'True'.
+        Load : if Boolean Toggle is 'True' view forces model  , if  ' False ' you don't see .
+               if you don't enter anything then it will be 'True'. 
         Support : if Boolean Toggle is 'True' view constraints  model  , if ' False ' you don't see .
+                  if you don't enter anything then it will be 'True'.
         LocalAxes : if Boolean Toggle is 'True' view local axis of beam or truss element  , if is ' False ' you don't see .
+                    if you don't enter anything then it will be 'True'.
         nodeTag : if Boolean Toggle is 'True' view mode tag of model , if ' False ' you don't see .
+                  if you don't enter anything then it will be 'True'.
         elementTag : if Boolean Toggle is 'True' view tag of element , if  ' False ' you don't see .
+                     if you don't enter anything then it will be 'True'.
         nodalMass : if Boolean Toggle is 'True' view mass at the nodes of the structure , if ' False ' you don't see .
+                    if you don't enter anything then it will be 'True'.
     Output:
-       modelView : view the element ( beam, shell, brick ... ).
+       modelView : view the element ( beam, shell, brick ... ). 
        lineModel : view analitic line of the beaom or truss Element .
        forceDisplay : vector of forces applied to the model .
        support : brep of constraints view .
@@ -23,10 +30,19 @@ import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 #import ghpythonlib.components as ghcomp
+import Grasshopper as gh
 import rhinoscriptsyntax as rs
 #import Grasshopper
 #import System as sy #DV
 import sys
+
+checkData = True
+
+if AlpacaModel is []:
+    print( AlpacaModel)
+    checkData = False
+    msg = "input 'AlpacaModel' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 '''
 ghFilePath = ghenv.LocalScope.ghdoc.Path
@@ -46,7 +62,6 @@ sys.path.append(folderName)
 import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
-
 nodeWrapper = AlpacaModel[0]
 GeomTransf = AlpacaModel[1]
 openSeesBeam = AlpacaModel[2]
@@ -65,7 +80,7 @@ for item in nodeWrapper:
 pointWrapperDict = dict( pointWrapper )
 ####
 
-if nodeTag == True:
+if nodeTag == True or nodeTag == None :
     posTag = [row[1] for row in pointWrapper ]
     nodeTag = [row[0] for row in pointWrapper ]
     tagNode = th.list_to_tree( [ posTag, nodeTag ]  )
@@ -440,7 +455,7 @@ for i in range(0,len(modelDict)):
     ModelView.append( modelDict.get( i  , "never" ))
     ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
 #--------------------------------#
-if elementTag == True:
+if elementTag == True or elementTag == None :
     tagEle = th.list_to_tree( [ posEleTag, eleTag ]  )
 
 if modelExstrud == True:
@@ -478,7 +493,7 @@ for ele in openSeesBeam :
 
 VersorLine = dict( versorLine )
 
-if LocalAxes == True:
+if LocalAxes == True or LocalAxes == None :
     localAxis = th.list_to_tree( [ midPoint, v1Display, v2Display, v3Display ] )
 
 #--------------------------------------------------------------#
@@ -509,7 +524,7 @@ else :
 
 forceDisplay = []
 ancorPoint = []
-if Load == True:
+if Load == True or Load == None:
     for force in openSeesNodeLoad :
         index = force[0]
         pos = pointWrapperDict.get( index  , "never") 
@@ -553,7 +568,7 @@ for mass in openSeesNodalMass  :
     massPos.append(pointWrapperDict.get( index  , "never"))
     massValue.append(mass[1][0]/scaleMass)
 
-if nodalMass == True:
+if nodalMass == True or nodalMass == None :
     Mass = th.list_to_tree( [ massPos , massValue ] )
 
 
@@ -643,7 +658,7 @@ def AddForm3Center(plane, width, height):
     return  surf 
 
 a = []
-if Support == True:
+if Support == True or Support == None :
     for support in openSeesSupport :
         index = support[0]
         pos = pointWrapperDict.get( index  , "never")

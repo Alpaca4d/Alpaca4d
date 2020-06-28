@@ -902,7 +902,7 @@ for solidEle, value in zip(SolidDefModel,traslSolidValue) :
 
 max_min = th.list_to_tree([ tMax[i], tMin[i] ])
 
-if modelExstrud == False :
+if modelExstrud == False or modelExstrud == None :
     ModelDisp  = modelDisp
     ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
 else  :

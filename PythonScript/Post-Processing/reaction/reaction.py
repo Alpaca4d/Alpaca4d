@@ -99,9 +99,9 @@ My = [row[5] for row in viewElement ]
 Mz = [row[6] for row in viewElement ]
 
 null = [rg.Vector3d( 0, 0, 0 )]*len(Rx)
-if reactionForcesView == True and reactionMomentsView == False :
+if reactionForcesView == True and reactionMomentsView == False or reactionForcesView == None and reactionMomentsView == False :
     view = th.list_to_tree( [ point, Rx, Ry, Rz, null, null, null ]  )
-elif reactionForcesView == False and reactionMomentsView == True :
+elif reactionForcesView == False and reactionMomentsView == True or reactionForcesView == False and reactionMomentsView == None :
     view = th.list_to_tree( [ point, null, null, null, Mx, My, Mz ]   )
-elif reactionForcesView == True and reactionMomentsView == True :
+elif reactionForcesView == True and reactionMomentsView == True or reactionForcesView == None and reactionMomentsView == None :
     view = th.list_to_tree( [ point, Rx, Ry, Rz,Mx, My, Mz ]  )
