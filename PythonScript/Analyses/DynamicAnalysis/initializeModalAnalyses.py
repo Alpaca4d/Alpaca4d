@@ -37,6 +37,7 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
 
 
     modalAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
+    modalAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
     modalAnalyses.Arguments = wrapperFile + " " + str(numVibrationModes)
     process = System.Diagnostics.Process.Start(modalAnalyses)
     System.Diagnostics.Process.WaitForExit(process)

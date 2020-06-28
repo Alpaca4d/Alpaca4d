@@ -35,6 +35,7 @@ def InitializeStaticAnalysis(AlpacaModel):
 
 
     staticAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
+    staticAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
     staticAnalyses.Arguments = wrapperFile
     process = System.Diagnostics.Process.Start(staticAnalyses)
     System.Diagnostics.Process.WaitForExit(process)
