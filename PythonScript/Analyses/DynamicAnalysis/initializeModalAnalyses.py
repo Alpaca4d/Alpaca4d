@@ -1,3 +1,14 @@
+"""Generate a circular cross section
+    Inputs:
+        AlpacaModel: Assemble model to perform Modal Analyses.
+        numEigenvalues: Number of modes to be calculated.
+    Output:
+       AlpacaModalOutput: Analysed Alpaca model.
+       frequency: Frequencies of the corrisponding modes [Hz].
+       period: Periods of the corrisponding modes [s].
+       """
+
+
 import System
 import os
 import Grasshopper as gh
@@ -26,7 +37,7 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
 
 
     modalAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
-    modalAnalyses.Arguments = wrapperFile + " " + str(numEigenvalues)
+    modalAnalyses.Arguments = wrapperFile + " " + str(numVibrationModes)
     process = System.Diagnostics.Process.Start(modalAnalyses)
     System.Diagnostics.Process.WaitForExit(process)
 
@@ -57,14 +68,11 @@ if not AlpacaModel:
     msg = "input 'AlpacaModel' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if numEigenvalues is None:
+if numVibrationModes is None:
     checkData = False
     msg = "input 'numEigenvalues' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
 if checkData != False:
-    AlpacaModalOutputWrapper = InitializeModalAnalysis(AlpacaModel, numEigenvalues)
-    AlpacaModalOutput = AlpacaModalOutputWrapper
-    frequency = AlpacaModalOutputWrapper[2]
-    period = AlpacaModalOutputWrapper[1]
+    AlpacaModalOutput, period, frequency = InitializeModalAnalysis(AlpacaModel, numVibrationModes)

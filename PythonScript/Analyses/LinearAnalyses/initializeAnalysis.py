@@ -1,4 +1,13 @@
-﻿import System
+﻿"""Generate a circular cross section
+    Inputs:
+        AlpacaModel: Assemble model to perform Static Analyses.
+    Output:
+       AlpacaStaticOutput: Analysed Alpaca model.
+       maxDisplacement: Maximum displacement of structure [mm].
+       """
+
+
+import System
 import os
 import Grasshopper as gh
 
@@ -63,3 +72,4 @@ if not AlpacaModel:
 
 if checkData != False:
     AlpacaLinearStaticOutput = InitializeStaticAnalysis(AlpacaModel)
+    maxDisplacement = None

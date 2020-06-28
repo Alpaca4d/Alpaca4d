@@ -1,4 +1,15 @@
-﻿import sys
+﻿"""Generate a circular cross section
+    Inputs:
+        Element: Structural element.
+        Support: Support element.
+        Load: Load element.
+        Mass: Mass point.
+    Output:
+       AlpacaModel: Assembled Alpaca model.
+       MassOfStructure: Total mass of the structure [kg].
+       """
+
+import sys
 import clr
 import os
 
@@ -292,5 +303,4 @@ if not Load:
 
 
 if checkData != False:
-    AlpacaModel = Assemble(Element, Support, Load, Mass)[0]
-    MassOfStructure= Assemble(Element, Support, Load, Mass)[1]
+    AlpacaModel, MassOfStructure = Assemble(Element, Support, Load, Mass)
