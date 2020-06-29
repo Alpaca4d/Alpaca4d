@@ -18,7 +18,7 @@ import DomeFunc as dg
 
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 2*mt.pi, 15 )
+    t = dg.linspace( 0 , 1.80*mt.pi, 15 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)

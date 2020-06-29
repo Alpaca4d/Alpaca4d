@@ -46,7 +46,7 @@ Points = [row[1] for row in pointWrapper ]
 
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 2*mt.pi, 20 )
+    t = dg.linspace( 0 , 1.80*mt.pi, 20 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)

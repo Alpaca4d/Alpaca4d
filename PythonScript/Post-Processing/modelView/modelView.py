@@ -57,7 +57,7 @@ import DomeFunc as dg
 
 #---------------------------------------------------------------------------------------#
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 2*mt.pi, 15 )
+    t = dg.linspace( 0 , 1.80*mt.pi, 15 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)
@@ -318,6 +318,7 @@ def Beam( ele, node):
             sectionForm2 = [row[1] for row in sectionForm ]
             meshExtr = meshLoft3( sectionForm1,  color )
             meshExtr.Append( meshLoft3( sectionForm2,  color ) )
+            #meshExtr.IsClosed()
     else  :
         meshExtr = meshLoft3( sectionForm,  color )
 
@@ -353,7 +354,6 @@ def meshLoft3( point, color ):
     colour = rs.CreateColor( color[0], color[1], color[2] )
     meshEle.VertexColors.CreateMonotoneMesh( colour )
     meshElement = meshEle
-    #meshdElement.IsClosed(True)
     
     return meshElement
 
