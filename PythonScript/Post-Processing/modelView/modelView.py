@@ -1,4 +1,4 @@
-﻿"""Generate Model view 
+"""Generate Model view 
     Inputs:
         AlpacaModel: Output of Assemble Model.
         modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model.
@@ -36,13 +36,6 @@ import rhinoscriptsyntax as rs
 #import System as sy #DV
 import sys
 
-checkData = True
-
-if AlpacaModel is []:
-    print( AlpacaModel)
-    checkData = False
-    msg = "input 'AlpacaModel' failed to collect data"
-    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 '''
 ghFilePath = ghenv.LocalScope.ghdoc.Path
@@ -58,34 +51,11 @@ fileName = userObjectFolder + 'Alpaca'
 '''
 folderName = r'C:\GitHub\Alpaca4d\PythonScript\function'
 sys.path.append(folderName)
+
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
 import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
-nodeWrapper = AlpacaModel[0]
-GeomTransf = AlpacaModel[1]
-openSeesBeam = AlpacaModel[2]
-openSeesSupport = AlpacaModel[3]
-openSeesNodeLoad = AlpacaModel[4]
-openSeesNodalMass = AlpacaModel[5]
-openSeesBeamLoad = AlpacaModel[6]
-openSeesShell = AlpacaModel[8]
-openSeesSolid = AlpacaModel[10]
-
-pointWrapper = []
-for item in nodeWrapper:
-    point = rg.Point3d(item[1],item[2],item[3])
-    pointWrapper.append( [item[0], point ] )
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-####
-
-if nodeTag == True or nodeTag == None :
-    posTag = [row[1] for row in pointWrapper ]
-    nodeTag = [row[0] for row in pointWrapper ]
-    tagNode = th.list_to_tree( [ posTag, nodeTag ]  )
-
-## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
     t = dg.linspace( 0 , 2*mt.pi, 15 )
     a = []
@@ -388,191 +358,6 @@ def meshLoft3( point, color ):
     return meshElement
 
 
-model = []
-extrudedModel = []
-
-line = []
-colorLine = []
-
-eleTag = []
-posEleTag = []
-for ele in openSeesBeam :
-    eleTag.append(ele[1])
-    beamModel = Beam( ele, pointWrapperDict )
-    line.append( beamModel[0] )
-    posEleTag.append( beamModel[0].PointAtNormalizedLength(0.5) )
-    colorLine.append( beamModel[2] )
-    model.append([ ele[1], beamModel[0] ])
-    extrudedModel.append([ ele[1], beamModel[1] ])
-
-for ele in openSeesShell :
-    nNode = len( ele[2] )
-    eleTag.append( ele[1] )
-    if nNode == 4 :
-        shellModel = ShellQuad( ele, pointWrapperDict )
-        calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
-        centroid = calcPropSection.Centroid
-        posEleTag.append( centroid )
-    elif nNode == 3:
-        #print( nNode )
-        shellModel = ShellTriangle( ele, pointWrapperDict )
-        calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
-        centroid = calcPropSection.Centroid
-        posEleTag.append( centroid )
-
-    model.append([ ele[1] ,shellModel[0] ])
-    extrudedModel.append([ ele[1],shellModel[1] ])
-
-
-
-
-for ele in openSeesSolid :
-    nNode = len( ele[2] )
-    eleTag.append( ele[1] )
-    eleType = ele[0] 
-    if nNode == 8:
-        solidModel = Solid( ele, pointWrapperDict )
-        calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
-        centroid = calcPropSection.Centroid
-        posEleTag.append( centroid )
-    elif  eleType == 'FourNodeTetrahedron' :
-        #print(ele)
-        solidModel = TetraSolid( ele, pointWrapperDict )
-        calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
-        centroid = calcPropSection.Centroid
-        posEleTag.append( centroid )
-
-    model.append([ ele[1], solidModel ])
-    extrudedModel.append([ ele[1], solidModel ])
-
-
-# --------------------------------#
-modelDict = dict( model )
-modelExstrudedDict = dict( extrudedModel )
-ModelView = []
-ModelViewExtruded = []
-for i in range(0,len(modelDict)):
-    ModelView.append( modelDict.get( i  , "never" ))
-    ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
-#--------------------------------#
-if elementTag == True or elementTag == None :
-    tagEle = th.list_to_tree( [ posEleTag, eleTag ]  )
-
-if modelExstrud == True:
-    modelView = ModelViewExtruded
-else:
-    modelView = ModelView
-    lineModel = th.list_to_tree( [ line, colorLine ]  )
-
-#------------------ Local Axis ----------------------#
-midPoint = []
-v3Display = []
-v2Display = []
-v1Display = []
-eleTag = []
-versorLine = []
-
-for ele in openSeesBeam :
-    tag = ele[1]
-    indexStart = ele[2][0]
-    indexEnd = ele[2][1]
-    propSection = ele[13]
-    ## creo la linea ##
-    line = rg.LineCurve( pointWrapperDict.get( indexStart  , "never"), pointWrapperDict.get( indexEnd  , "never"))
-    MidPoint =  line.PointAtNormalizedLength(0.5)
-    ## creo i versori  ##
-    axis1 =  rg.Vector3d( ele[13][0][0], ele[13][0][1], ele[13][0][2]  )
-    axis2 =  rg.Vector3d( ele[13][1][0], ele[13][1][1], ele[13][1][2]  )
-    axis3 =  rg.Vector3d( ele[13][2][0], ele[13][2][1], ele[13][2][2]  )
-    versor = [ axis1, axis2, axis3 ] 
-    versorLine.append( [ tag ,versor ]  )
-    midPoint.append( MidPoint )
-    v3Display.append( axis3*0.5 )
-    v2Display.append( axis2*0.5  )
-    v1Display.append( axis1*0.5  )
-
-VersorLine = dict( versorLine )
-
-if LocalAxes == True or LocalAxes == None :
-    localAxis = th.list_to_tree( [ midPoint, v1Display, v2Display, v3Display ] )
-
-#--------------------------------------------------------------#
-
-
-forceMax = []
-for force in openSeesNodeLoad :
-    forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
-    fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
-    fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
-    forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
-
-
-for linearLoad in openSeesBeamLoad :
-    forceVector =  rg.Vector3d( linearLoad[1][0], linearLoad[1][1] , linearLoad[1][2]  )
-    fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
-    fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
-    forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
-
-forceMin = min( forceMax )
-
-
-#scale = forceMax*0.1/coordMax 
-if forceMin > 0 :
-    scale = 1/forceMin 
-else :
-    scale = 0.2
-
-forceDisplay = []
-ancorPoint = []
-if Load == True or Load == None:
-    for force in openSeesNodeLoad :
-        index = force[0]
-        pos = pointWrapperDict.get( index  , "never") 
-        forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
-        ancorPoint.append( pos )
-        forceDisplay.append(  forceVector*scale  )
-        
-    for linearLoad in openSeesBeamLoad :
-        tag =  linearLoad[0]
-        geomTransf = VersorLine.get( tag  , "never" )
-        force1 = rg.Vector3d.Multiply( linearLoad[1][0], geomTransf[0] )
-        force2 = rg.Vector3d.Multiply( linearLoad[1][1], geomTransf[1] )
-        force3 = rg.Vector3d.Multiply( linearLoad[1][2], geomTransf[2] )
-        forceVector =  rg.Vector3d.Multiply( force1 + force2 + force3, scale )
-        lineBeam =  modelDict.get( tag  , "never" )
-        Length = rg.Curve.GetLength( lineBeam )
-        divideDistance = 0.5
-        DivCurve = lineBeam.DivideByLength( divideDistance, True )
-        if DivCurve == None:
-            DivCurve = [ 0, Length]
-
-        for index, x in enumerate(DivCurve):
-            beamPoint = lineBeam.PointAt(DivCurve[index]) 
-            ancorPoint.append( beamPoint )
-            forceDisplay.append(  forceVector*scale  )
-
-forceDisplay = th.list_to_tree( [ ancorPoint, forceDisplay ] )
-if len(openSeesNodalMass)>0:
-    scaleMass  = max([row[1][0] for row in openSeesNodalMass ])
-else:
-    scaleMass = 0
-if scaleMass > 0 :
-    scaleMass = scaleMass
-else :
-    scaleMass = 1
-
-massPos = []
-massValue = []
-for mass in openSeesNodalMass  :
-    index  = mass[0]
-    massPos.append(pointWrapperDict.get( index  , "never"))
-    massValue.append(mass[1][0]/scaleMass)
-
-if nodalMass == True or nodalMass == None :
-    Mass = th.list_to_tree( [ massPos , massValue ] )
-
-
-
 def AddBoxFromCenter(plane, width, height):
     a = plane.PointAt(-width * 0.5, -width * 0.5 )
     b = plane.PointAt(-width * 0.5,  width * 0.5 )
@@ -657,126 +442,368 @@ def AddForm3Center(plane, width, height):
         surf.Append( pyramid )
     return  surf 
 
-a = []
-if Support == True or Support == None :
-    for support in openSeesSupport :
-        index = support[0]
-        pos = pointWrapperDict.get( index  , "never")
-        center_point = rg.Point3d( pos )
-        
-        if support[1] == 1 and support[2] == 0 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo y
-            supp = rg.Brep()
-            plane = rg.Plane.WorldYZ
-            radius = 0.15
-            length = radius*3.50
-            vector = rg.Vector3d( -length/2, 0 , -2.5*radius ) 
-            vectorTrasl = rg.Point3d.Add( center_point, vector )
-            trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-            plane.Transform( trasl )
-            circle = rg.Circle(plane, radius/2)
-            brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True )
-            cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
-            traslc1 = rg.Transform.Translation( 0, -length/4, 0 )
-            cylinder1.Transform( traslc1 )
-            cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
-            supp.Append( cylinder1 )
-            traslc2 = rg.Transform.Translation( 0, length/4, 0 )
-            cylinder2.Transform( traslc2 )
-            supp.Append( cylinder2 )
-            plane2 = rg.Plane.WorldXY
-            vector2 = rg.Vector3d( 0, 0 , 0 ) 
-            vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-            trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-            plane2.Transform( trasl2 )
-            supp.Append( AddForm2Center(plane2, length, radius*2) )
-            a.append( supp )
-        if support[1] == 0 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo x
-            supp = rg.Brep()
-            plane = rg.Plane.WorldZX
-            radius = 0.15
-            length = radius*3.50
-            vector = rg.Vector3d( 0, -length/2 , -2.5*radius ) 
-            vectorTrasl = rg.Point3d.Add( center_point, vector )
-            trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-            plane.Transform( trasl )
-            circle = rg.Circle(plane, radius/2)
-            brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) 
-            cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
-            traslc1 = rg.Transform.Translation( -length/4, 0, 0 )
-            cylinder1.Transform( traslc1 )
-            cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
-            supp.Append( cylinder1 )
-            traslc2 = rg.Transform.Translation( length/4, 0, 0 )
-            cylinder2.Transform( traslc2 )
-            supp.Append( cylinder2 )
-            plane2 = rg.Plane.WorldXY
-            vector2 = rg.Vector3d( 0, 0 , 0 )
-            vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-            trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-            plane2.Transform( trasl2 )
-            supp.Append( AddForm3Center(plane2, length, radius*2) )
-            a.append( supp )
-        if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 1  : # cerniera lungo x
-            supp = rg.Brep()
-            plane = rg.Plane.WorldZX
-            radius = 0.15
-            length = radius*3.50
-            vector = rg.Vector3d( 0, -length/2 , -radius ) 
-            vectorTrasl = rg.Point3d.Add( center_point, vector )
-            trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-            plane.Transform( trasl )
-            circle = rg.Circle(plane, radius)
-            supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
-            plane2 = rg.Plane.WorldXY
-            vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
-            vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-            trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-            plane2.Transform( trasl2 )
-            supp.Append( AddForm3Center(plane2, length, radius*2) )
-            a.append( supp )
-        if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 0  : # cerniera lungo y
-            supp = rg.Brep()
-            plane = rg.Plane.WorldYZ
-            radius = 0.15
-            length = radius*3.50
-            vector = rg.Vector3d( -length/2, 0 , -radius )
-            vectorTrasl = rg.Point3d.Add( center_point, vector )
-            trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-            plane.Transform( trasl )
-            circle = rg.Circle(plane, radius)
-            supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
-            plane2 = rg.Plane.WorldXY
-            vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
-            vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-            trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-            plane2.Transform( trasl2 )
-            supp.Append( AddForm2Center(plane2, length, radius*2) )
-            a.append( supp )
-        if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 0   : # cerniera sferica
-            radius = 0.15
-            length = radius*3.50
-            vector = rg.Vector3d( 0, 0 , -radius ) 
-            center =  rg.Point3d.Add( center_point, vector )
-            supp = rg.Brep()
-            # sfera
-            supp.Append( rg.Brep.CreateFromSphere(rg.Sphere( center, radius)))
-            plane = rg.Plane.WorldXY
-            vectorTrasl = rg.Point3d.Add( center_point, 1.70*vector )
-            trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
-            plane.Transform( trasl )
-            # tronco di piramide
-            supp.Append( AddForm1Center(plane, length, radius*2) )
-            a.append( supp )
-        if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1  and support[6] == 1 : # incastro
-            supp = rg.Brep()
-            plane = rg.Plane.WorldXY
-            length = 0.5
-            h = length/3
-            vector = rg.Vector3d( 0, 0 , 0 )
-            vectorTrasl = rg.Point3d.Add( center_point, vector )
-            trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
-            plane2 = rg.Plane.Clone( plane )
-            plane2.Transform( trasl )
-            supp = AddBoxFromCenter(plane2, length, h) 
-            a.append( supp )
-support = th.list_to_tree( a )
+
+def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False, LocalAxes = False, nodeTag = False, elementTag = False, nodalMass = False):
+
+    # define output
+    modelView = None
+    lineModel = None
+    forceDisplay = None
+    support = None
+    localAxis = None
+    tagNode = None
+    tagEle = None
+    Mass = None
+
+    nodeWrapper = AlpacaModel[0]
+    GeomTransf = AlpacaModel[1]
+    openSeesBeam = AlpacaModel[2]
+    openSeesSupport = AlpacaModel[3]
+    openSeesNodeLoad = AlpacaModel[4]
+    openSeesNodalMass = AlpacaModel[5]
+    openSeesBeamLoad = AlpacaModel[6]
+    openSeesShell = AlpacaModel[8]
+    openSeesSolid = AlpacaModel[10]
+
+    pointWrapper = []
+    for item in nodeWrapper:
+        point = rg.Point3d(item[1],item[2],item[3])
+        pointWrapper.append( [item[0], point ] )
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
+    ####
+
+    if nodeTag == True or nodeTag == None :
+        posTag = [row[1] for row in pointWrapper ]
+        nodeTag = [row[0] for row in pointWrapper ]
+        tagNode = th.list_to_tree( [ posTag, nodeTag ]  )
+
+    ## Funzione cerchio ##
+
+
+    model = []
+    extrudedModel = []
+
+    line = []
+    colorLine = []
+
+    eleTag = []
+    posEleTag = []
+    for ele in openSeesBeam :
+        eleTag.append(ele[1])
+        beamModel = Beam( ele, pointWrapperDict )
+        line.append( beamModel[0] )
+        posEleTag.append( beamModel[0].PointAtNormalizedLength(0.5) )
+        colorLine.append( beamModel[2] )
+        model.append([ ele[1], beamModel[0] ])
+        extrudedModel.append([ ele[1], beamModel[1] ])
+
+    for ele in openSeesShell :
+        nNode = len( ele[2] )
+        eleTag.append( ele[1] )
+        if nNode == 4 :
+            shellModel = ShellQuad( ele, pointWrapperDict )
+            calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
+            centroid = calcPropSection.Centroid
+            posEleTag.append( centroid )
+        elif nNode == 3:
+            #print( nNode )
+            shellModel = ShellTriangle( ele, pointWrapperDict )
+            calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
+            centroid = calcPropSection.Centroid
+            posEleTag.append( centroid )
+
+        model.append([ ele[1] ,shellModel[0] ])
+        extrudedModel.append([ ele[1],shellModel[1] ])
+
+
+
+
+    for ele in openSeesSolid :
+        nNode = len( ele[2] )
+        eleTag.append( ele[1] )
+        eleType = ele[0] 
+        if nNode == 8:
+            solidModel = Solid( ele, pointWrapperDict )
+            calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
+            centroid = calcPropSection.Centroid
+            posEleTag.append( centroid )
+        elif  eleType == 'FourNodeTetrahedron' :
+            #print(ele)
+            solidModel = TetraSolid( ele, pointWrapperDict )
+            calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
+            centroid = calcPropSection.Centroid
+            posEleTag.append( centroid )
+
+        model.append([ ele[1], solidModel ])
+        extrudedModel.append([ ele[1], solidModel ])
+
+
+    # --------------------------------#
+    modelDict = dict( model )
+    modelExstrudedDict = dict( extrudedModel )
+    ModelView = []
+    ModelViewExtruded = []
+    for i in range(0,len(modelDict)):
+        ModelView.append( modelDict.get( i  , "never" ))
+        ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
+    #--------------------------------#
+    if elementTag == True or elementTag == None :
+        tagEle = th.list_to_tree( [ posEleTag, eleTag ]  )
+
+    if modelExstrud == True:
+        modelView = ModelViewExtruded
+    else:
+        modelView = ModelView
+        lineModel = th.list_to_tree( [ line, colorLine ]  )
+
+    #------------------ Local Axis ----------------------#
+    midPoint = []
+    v3Display = []
+    v2Display = []
+    v1Display = []
+    eleTag = []
+    versorLine = []
+
+    for ele in openSeesBeam :
+        tag = ele[1]
+        indexStart = ele[2][0]
+        indexEnd = ele[2][1]
+        propSection = ele[13]
+        ## creo la linea ##
+        line = rg.LineCurve( pointWrapperDict.get( indexStart  , "never"), pointWrapperDict.get( indexEnd  , "never"))
+        MidPoint =  line.PointAtNormalizedLength(0.5)
+        ## creo i versori  ##
+        axis1 =  rg.Vector3d( ele[13][0][0], ele[13][0][1], ele[13][0][2]  )
+        axis2 =  rg.Vector3d( ele[13][1][0], ele[13][1][1], ele[13][1][2]  )
+        axis3 =  rg.Vector3d( ele[13][2][0], ele[13][2][1], ele[13][2][2]  )
+        versor = [ axis1, axis2, axis3 ] 
+        versorLine.append( [ tag ,versor ]  )
+        midPoint.append( MidPoint )
+        v3Display.append( axis3*0.5 )
+        v2Display.append( axis2*0.5  )
+        v1Display.append( axis1*0.5  )
+
+    VersorLine = dict( versorLine )
+
+
+    localAxis = None
+    if LocalAxes == True or LocalAxes == None :
+        localAxis = th.list_to_tree( [ midPoint, v1Display, v2Display, v3Display ] )
+
+    #--------------------------------------------------------------#
+
+
+    forceMax = []
+    for force in openSeesNodeLoad :
+        forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
+        fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
+        fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
+        forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
+
+
+    for linearLoad in openSeesBeamLoad :
+        forceVector =  rg.Vector3d( linearLoad[1][0], linearLoad[1][1] , linearLoad[1][2]  )
+        fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
+        fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
+        forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
+
+    forceMin = min( forceMax )
+
+
+    #scale = forceMax*0.1/coordMax 
+    if forceMin > 0 :
+        scale = 1/forceMin 
+    else :
+        scale = 0.2
+
+    forceDisplay = []
+    ancorPoint = []
+    if Load == True or Load == None:
+        for force in openSeesNodeLoad :
+            index = force[0]
+            pos = pointWrapperDict.get( index  , "never") 
+            forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
+            ancorPoint.append( pos )
+            forceDisplay.append(  forceVector*scale  )
+            
+        for linearLoad in openSeesBeamLoad :
+            tag =  linearLoad[0]
+            geomTransf = VersorLine.get( tag  , "never" )
+            force1 = rg.Vector3d.Multiply( linearLoad[1][0], geomTransf[0] )
+            force2 = rg.Vector3d.Multiply( linearLoad[1][1], geomTransf[1] )
+            force3 = rg.Vector3d.Multiply( linearLoad[1][2], geomTransf[2] )
+            forceVector =  rg.Vector3d.Multiply( force1 + force2 + force3, scale )
+            lineBeam =  modelDict.get( tag  , "never" )
+            Length = rg.Curve.GetLength( lineBeam )
+            divideDistance = 0.5
+            DivCurve = lineBeam.DivideByLength( divideDistance, True )
+            if DivCurve == None:
+                DivCurve = [ 0, Length]
+
+            for index, x in enumerate(DivCurve):
+                beamPoint = lineBeam.PointAt(DivCurve[index]) 
+                ancorPoint.append( beamPoint )
+                forceDisplay.append(  forceVector*scale  )
+
+    forceDisplay = th.list_to_tree( [ ancorPoint, forceDisplay ] )
+    if len(openSeesNodalMass)>0:
+        scaleMass  = max([row[1][0] for row in openSeesNodalMass ])
+    else:
+        scaleMass = 0
+    if scaleMass > 0 :
+        scaleMass = scaleMass
+    else :
+        scaleMass = 1
+
+    massPos = []
+    massValue = []
+    for mass in openSeesNodalMass  :
+        index  = mass[0]
+        massPos.append(pointWrapperDict.get( index  , "never"))
+        massValue.append(mass[1][0]/scaleMass)
+
+    if nodalMass == True or nodalMass == None :
+        Mass = th.list_to_tree( [ massPos , massValue ] )
+
+
+
+
+    a = []
+    if Support == True or Support == None :
+        for support in openSeesSupport :
+            index = support[0]
+            pos = pointWrapperDict.get( index  , "never")
+            center_point = rg.Point3d( pos )
+            
+            if support[1] == 1 and support[2] == 0 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo y
+                supp = rg.Brep()
+                plane = rg.Plane.WorldYZ
+                radius = 0.15
+                length = radius*3.50
+                vector = rg.Vector3d( -length/2, 0 , -2.5*radius ) 
+                vectorTrasl = rg.Point3d.Add( center_point, vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                plane.Transform( trasl )
+                circle = rg.Circle(plane, radius/2)
+                brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True )
+                cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
+                traslc1 = rg.Transform.Translation( 0, -length/4, 0 )
+                cylinder1.Transform( traslc1 )
+                cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
+                supp.Append( cylinder1 )
+                traslc2 = rg.Transform.Translation( 0, length/4, 0 )
+                cylinder2.Transform( traslc2 )
+                supp.Append( cylinder2 )
+                plane2 = rg.Plane.WorldXY
+                vector2 = rg.Vector3d( 0, 0 , 0 ) 
+                vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                plane2.Transform( trasl2 )
+                supp.Append( AddForm2Center(plane2, length, radius*2) )
+                a.append( supp )
+            if support[1] == 0 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo x
+                supp = rg.Brep()
+                plane = rg.Plane.WorldZX
+                radius = 0.15
+                length = radius*3.50
+                vector = rg.Vector3d( 0, -length/2 , -2.5*radius ) 
+                vectorTrasl = rg.Point3d.Add( center_point, vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                plane.Transform( trasl )
+                circle = rg.Circle(plane, radius/2)
+                brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) 
+                cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
+                traslc1 = rg.Transform.Translation( -length/4, 0, 0 )
+                cylinder1.Transform( traslc1 )
+                cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
+                supp.Append( cylinder1 )
+                traslc2 = rg.Transform.Translation( length/4, 0, 0 )
+                cylinder2.Transform( traslc2 )
+                supp.Append( cylinder2 )
+                plane2 = rg.Plane.WorldXY
+                vector2 = rg.Vector3d( 0, 0 , 0 )
+                vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                plane2.Transform( trasl2 )
+                supp.Append( AddForm3Center(plane2, length, radius*2) )
+                a.append( supp )
+            if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 1  : # cerniera lungo x
+                supp = rg.Brep()
+                plane = rg.Plane.WorldZX
+                radius = 0.15
+                length = radius*3.50
+                vector = rg.Vector3d( 0, -length/2 , -radius ) 
+                vectorTrasl = rg.Point3d.Add( center_point, vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                plane.Transform( trasl )
+                circle = rg.Circle(plane, radius)
+                supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
+                plane2 = rg.Plane.WorldXY
+                vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
+                vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                plane2.Transform( trasl2 )
+                supp.Append( AddForm3Center(plane2, length, radius*2) )
+                a.append( supp )
+            if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 0  : # cerniera lungo y
+                supp = rg.Brep()
+                plane = rg.Plane.WorldYZ
+                radius = 0.15
+                length = radius*3.50
+                vector = rg.Vector3d( -length/2, 0 , -radius )
+                vectorTrasl = rg.Point3d.Add( center_point, vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                plane.Transform( trasl )
+                circle = rg.Circle(plane, radius)
+                supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
+                plane2 = rg.Plane.WorldXY
+                vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
+                vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                plane2.Transform( trasl2 )
+                supp.Append( AddForm2Center(plane2, length, radius*2) )
+                a.append( supp )
+            if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 0   : # cerniera sferica
+                radius = 0.15
+                length = radius*3.50
+                vector = rg.Vector3d( 0, 0 , -radius ) 
+                center =  rg.Point3d.Add( center_point, vector )
+                supp = rg.Brep()
+                # sfera
+                supp.Append( rg.Brep.CreateFromSphere(rg.Sphere( center, radius)))
+                plane = rg.Plane.WorldXY
+                vectorTrasl = rg.Point3d.Add( center_point, 1.70*vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
+                plane.Transform( trasl )
+                # tronco di piramide
+                supp.Append( AddForm1Center(plane, length, radius*2) )
+                a.append( supp )
+            if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1  and support[6] == 1 : # incastro
+                supp = rg.Brep()
+                plane = rg.Plane.WorldXY
+                length = 0.5
+                h = length/3
+                vector = rg.Vector3d( 0, 0 , 0 )
+                vectorTrasl = rg.Point3d.Add( center_point, vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
+                plane2 = rg.Plane.Clone( plane )
+                plane2.Transform( trasl )
+                supp = AddBoxFromCenter(plane2, length, h) 
+                a.append( supp )
+
+    support = th.list_to_tree( a )
+
+    return modelView, lineModel, forceDisplay, support, localAxis, tagNode, tagEle, Mass
+
+
+checkData = True
+
+if not AlpacaModel:
+    checkData = False
+    msg = "input 'AlpacaModel' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    modelView, lineModel, forceDisplay, support, localAxis, tagNode, tagEle, Mass = ModelViewer(AlpacaModel, modelExstrud, Load, Support, LocalAxes, nodeTag, elementTag, nodalMass)

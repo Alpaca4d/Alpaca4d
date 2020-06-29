@@ -27,7 +27,6 @@ def LineToBeam(Line, CrossSection, Colour):
     
     midPoint =  Line.PointAtNormalizedLength(0.5)
     parameter = Line.ClosestPoint(midPoint, 0.01)[1]
-    print( parameter )
     perpFrame = ghcomp.PerpFrame( Line, parameter )
     perpFrame.Rotate(ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
     vecGeomTransf = [ perpFrame.XAxis, perpFrame.YAxis, perpFrame.ZAxis ]
