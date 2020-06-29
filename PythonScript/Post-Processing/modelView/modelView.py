@@ -443,17 +443,23 @@ def AddForm3Center(plane, width, height):
     return  surf 
 
 
+
+
 def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False, LocalAxes = False, nodeTag = False, elementTag = False, nodalMass = False):
 
     # define output
-    modelView = None
-    lineModel = None
-    forceDisplay = None
-    support = None
-    localAxis = None
-    tagNode = None
-    tagEle = None
-    Mass = None
+
+    global lineModel
+    global tagNode
+    global tagEle
+    global Mass
+
+    Load = False if Load is None else Load
+    Support = False if Support is None else Support
+    LocalAxes = False if LocalAxes is None else LocalAxes
+    nodeTag = False if nodeTag is None else nodeTag
+    elementTag = False if elementTag is None else elementTag
+    nodalMass = False if nodalMass is None else nodalMass
 
     nodeWrapper = AlpacaModel[0]
     GeomTransf = AlpacaModel[1]
