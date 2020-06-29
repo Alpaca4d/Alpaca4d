@@ -407,7 +407,4 @@ def AddForm3Center(plane, width, height):
     pyramidTrunk = rg.Brep.CreateFromLoft( [ rectangleCurve1, rectangleCurve2 ], rg.Point3d.Unset, rg.Point3d.Unset, rg.LoftType.Straight, False )
     for pyramid in pyramidTrunk:
         surf.Append( pyramid )
-    return  surf 
-
-def saluto():
-	print( 'Have a nice day by Domenico')
+    return  surf
