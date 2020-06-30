@@ -3,7 +3,7 @@
         sectionName: Name of the section.
         diameter: Diameter of cross section [mm].
         thickness: Wall thickness [mm].
-        material: Material element.
+        unixialMaterial: Material element.
     Output:
        CrossSection: CrossSection element.
        """
@@ -12,7 +12,7 @@
 import math
 import Grasshopper as gh
 
-def CircleCrossSection(sectionName, diameter, thickness, material):
+def CircleCrossSection(sectionName, diameter, thickness, unixialMaterial):
     sectionName = sectionName
     shape = "circular"
     diameter = diameter / 1000 			# Input value in mm ---> Output m
@@ -35,7 +35,7 @@ def CircleCrossSection(sectionName, diameter, thickness, material):
         msg = "Incorrect values. Thickness has to be greater than D/2 and greater than 0"
         ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
 
-    material = material
+    material = unixialMaterial
 
     return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, diameter, thickness], sectionName ]]
 
@@ -57,12 +57,12 @@ if thickness is None:
     msg = "input 'thickness' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if material is None:
+if unixialMaterial is None:
     checkData = False
-    msg = "input 'material' failed to collect data"
+    msg = "input 'unixialMaterial' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
 if checkData != False:
-    CrossSection = CircleCrossSection(sectionName, diameter, thickness, material)
+    CrossSection = CircleCrossSection(sectionName, diameter, thickness, unixialMaterial)
 

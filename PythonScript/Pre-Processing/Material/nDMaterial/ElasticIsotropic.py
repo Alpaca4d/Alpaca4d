@@ -56,4 +56,5 @@ if rho is None:
 
 
 if checkData != False:
-    elasticMaterialWrapper = ElasticMaterial(matName, E, G, v, rho, fy)
+    nDMaterial = ElasticMaterial(matName, E, G, v, rho, fy)
+
