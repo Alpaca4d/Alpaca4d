@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 filename = sys.argv[1]
 earthQuakeSettingsFile = sys.argv[2]
 
-#filename = r'C:\Users\FORMAT\Desktop\TestAlpaca\assembleData\openSeesModel.txt'
-#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\TestAlpaca\assembleData\earthQuakeSettingsFile.txt'
+#filename = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesModel.txt'
+#earthQuakeSettingsFile = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\earthQuakeSettingsFile.txt'
 
 
 workingDirectory = os.path.split(filename)[0]
@@ -329,7 +329,7 @@ ops.numberer('Plain')
 ops.system('BandGeneral')
 
 ops.algorithm('Newton')
-ops.test('NormDispIncr', 1e-8, 1000)
+ops.test('NormDispIncr', 1e-8, 1000, 1)
 
  
 ops.integrator('Newmark', NewmarkGamma, NewmarkBeta)
@@ -341,7 +341,14 @@ ops.analysis('Transient')
 ok = 0
 tCurrent = ops.getTime()
 
-print("starting Analyses")
+
+
+print('--------------------------------------------------------')
+print('                       Alpaca4D                         ')
+print('                                                        ')
+print('--------------------------------------------------------')
+print('                  Analyses has started                  ')
+print('--------------------------------------------------------')
 
 
 timer = []
@@ -365,8 +372,6 @@ while ok == 0 and tCurrent < tAnalyses:
     tCurrent = ops.getTime()
     #print(f"Analyses step: {tCurrent}")
 
-
-#print( "maximum displacement is" + str(disp.sort()[-1]) )
 
 print("Ground Motion Analyses Finished")
 
