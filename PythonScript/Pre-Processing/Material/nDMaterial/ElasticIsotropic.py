@@ -7,7 +7,7 @@
         rho: specific weight [kN/m3].
         fy: Yield stress value of the material [MPa]
     Output:
-       elasticMaterialWrapper: Material element.
+       nDMaterial: Material element.
        """
 
 
@@ -42,12 +42,12 @@ if E is None:
     msg = "input 'E' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-"""
-if G or v is None:
+
+if G is None and v is None:
     checkData = False
     msg = "input 'G' or 'v' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-"""
+
 
 if rho is None:
     checkData = False
@@ -56,4 +56,5 @@ if rho is None:
 
 
 if checkData != False:
-    elasticMaterialWrapper = ElasticMaterial(matName, E, G, v, rho, fy)
+    nDMaterial = ElasticMaterial(matName, E, G, v, rho, fy)
+

@@ -1,4 +1,4 @@
-﻿"""Generate a circular cross section
+﻿"""Generate a text file model to be sent to OpenSees
     Inputs:
         Element: Structural element.
         Support: Support element.

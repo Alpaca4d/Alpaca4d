@@ -1,7 +1,7 @@
 ﻿import math
 import Grasshopper as gh
 
-def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material):
+def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, uniaxialMaterial):
     sectionName = sectionName
     shape = "doubleT"
     Bsup, tsup, Binf, tinf, H, ta = Bsup/1000, tsup/1000, Binf/1000, tinf/1000, H/1000, ta/1000     # Input value in mm ---> Output m
@@ -16,7 +16,7 @@ def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material):
     Izz = tsup*Bsup**3 + tinf*Binf**3 + ( H -tsup - tinf )*ta**3
     J = Iyy + Izz
 
-    material = material
+    material = uniaxialMaterial
 
     return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, Bsup, tsup, Binf, tinf, H, ta, yg], sectionName ]]
 
@@ -57,11 +57,11 @@ if ta is None:
     msg = "input 'ta' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if material is None:
+if uniaxialMaterial is None:
     checkData = False
-    msg = "input 'material' failed to collect data"
+    msg = "input 'uniaxialMaterial' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    CrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, material)
+    CrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, uniaxialMaterial)
 

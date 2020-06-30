@@ -1,34 +1,44 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate a Brick Element
+    Inputs:
+        Brick: Closed Mesh representing the structural element.
+        Colour: Colour of the element.
+        nDMaterial: Material element.
+    Output:
+       solidWrapper: Solid with properties.
+       """
+
+
+import Rhino.Geometry as rg
 import Grasshopper as gh
 
-def Solid( Mesh, Colour, material):
+def Solid( Brick, Colour, nDMaterial):
     
-    if Mesh.Vertices.Count == 8:
+    if Brick.Vertices.Count == 8:
         elementType = "bbarBrick"
-    elif Mesh.Vertices.Count == 4:
+    elif Brick.Vertices.Count == 4:
         elementType = "FourNodeTetrahedron"
     else:
     	msg = "Not a valid Mesh"
     	ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
-    newMesh = Mesh
+    newMesh = Brick
     
-    Material = material
+    Material = nDMaterial
     colour = Colour
     return[ [ newMesh , elementType, Material, colour ] ]
 
 
 checkData = True
 
-if Mesh is None:
+if Brick is None:
     checkData = False
-    msg = "input 'Mesh' failed to collect data"
+    msg = "input 'Brick' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if material is None:
+if nDMaterial is None:
     checkData = False
-    msg = "input 'CrossSection' failed to collect data"
+    msg = "input 'nDMaterial' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
 if checkData != False:
-    SolidWrapper = Solid( solid, Colour, material )
+    SolidWrapper = Solid( Brick, Colour, nDMaterial )
