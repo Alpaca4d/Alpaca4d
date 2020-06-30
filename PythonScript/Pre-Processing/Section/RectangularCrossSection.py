@@ -1,9 +1,9 @@
-﻿"""Generate a Rectangular cross section
+"""Generate a Rectangular cross section
     Inputs:
         sectionName: Name of the section.
         base: Base of cross section [mm].
         height: Height of cross section [mm].
-        unixialMaterial: Material element.
+        uniaxialMaterial: Material element.
     Output:
        CrossSection: CrossSection element.
        """
@@ -12,7 +12,7 @@
 import math
 import Grasshopper as gh
 
-def RectangularCrossSection(sectionName, base, height, unixialMaterial):
+def RectangularCrossSection(sectionName, base, height, uniaxialMaterial):
     
     sectionName = sectionName
     shape = "rectangular"
@@ -29,7 +29,7 @@ def RectangularCrossSection(sectionName, base, height, unixialMaterial):
     else:
         k = 1 / (3+4.1*pow((base/height),3/2))
         J = k*height*pow(base,3)
-    material = unixialMaterial
+    material = uniaxialMaterial
 
     return [[Area, Ay, Az, Iyy, Izz, J, material, [shape, base, height], sectionName ]]
 
@@ -50,10 +50,10 @@ if height is None:
     msg = "input 'height' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if unixialMaterial is None:
+if uniaxialMaterial is None:
     checkData = False
-    msg = "input 'unixialMaterial' failed to collect data"
+    msg = "input 'uniaxialMaterial' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    CrossSection = RectangularCrossSection(sectionName, base, height, unixialMaterial)
+    CrossSection = RectangularCrossSection(sectionName, base, height, uniaxialMaterial)

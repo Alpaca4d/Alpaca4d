@@ -41,6 +41,7 @@
 
 * [x] Color Palette for components
 * [ ] Documentation
+* [ ] Big Alpaca with colorful rectangle in the background
 * [ ] Icons
 
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo

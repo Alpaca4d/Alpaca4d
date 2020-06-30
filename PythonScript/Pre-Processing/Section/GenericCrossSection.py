@@ -7,7 +7,7 @@
         Iyy: Moment of Inertia about Y local axis [mm4].
         Izz: Moment of Inertia about Z local axis [mm4].
         J: Primary torsional moment of Inertia about X local axis [mm4].
-        unixialMaterial: Material element.
+        uniaxialMaterial: Material element.
     Output:
        CrossSection: CrossSection element.
        """
@@ -16,7 +16,7 @@
 import math
 import Grasshopper as gh
 
-def GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, unixialMaterial):
+def GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, uniaxialMaterial):
     sectionName = sectionName
     shape = "Generic"
     Area = Area / 10**6		# Input value in mm2 ---> Output m
@@ -26,7 +26,7 @@ def GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, unixialMaterial)
     Izz = Izz / 10*12 		# Input value in mm4 ---> Output m
     J = J / 10**12 			# Input value in mm4 ---> Output m
     radius = math.pow(2*math.pi*Area,0.5)
-    material = unixialMaterial
+    material = uniaxialMaterial
 
     return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, radius ], sectionName ]]
 
@@ -67,11 +67,11 @@ if J is None:
     msg = "input 'J' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if unixialMaterial is None:
+if uniaxialMaterial is None:
     checkData = False
-    msg = "input 'unixialMaterial' failed to collect data"
+    msg = "input 'uniaxialMaterial' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
 if checkData != False:
-    CrossSection = GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, unixialMaterial)
+    CrossSection = GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, uniaxialMaterial)
