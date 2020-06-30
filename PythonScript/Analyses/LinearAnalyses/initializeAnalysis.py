@@ -1,4 +1,4 @@
-﻿"""Generate a circular cross section
+﻿"""Calculate the Static Response of the structure
     Inputs:
         AlpacaModel: Assemble model to perform Static Analyses.
     Output:
@@ -62,7 +62,7 @@ def InitializeStaticAnalysis(AlpacaModel):
 
     return AlpacaLinearStaticOutput
 
-AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
+
 checkData = True
 
 if not AlpacaModel:
@@ -72,5 +72,5 @@ if not AlpacaModel:
 
 
 if checkData != False:
-    AlpacaLinearStaticOutput = InitializeStaticAnalysis(AlpacaModel)
+    AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
     maxDisplacement = None

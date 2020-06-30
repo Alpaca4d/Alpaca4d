@@ -4,6 +4,377 @@ import System
 import Rhino
 import rhinoscriptsyntax as rs
 
+
+
+# 0_Assemble
+
+class Assemble(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Assemble", "Assemble", """Generate a text file model to be sent to OpenSees""", "Alpaca", "0_Model")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("f2c70622-da97-4a8f-a35a-50191848ea9d")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Element", "Element", "Structural element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Support", "Support", "Support element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Load", "Load", "Load element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Mass", "Mass", "Mass point.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaModel", "AlpacaModel", "Assembled Alpaca model.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "MassOfStructure", "MassOfStructure", "Total mass of the structure [kg].")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        p3 = self.marshal.GetInput(DA, 3)
+        result = self.RunScript(p0, p1, p2, p3)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMBSURBVEhLtdRJSFRxHAfw9xxncXR01Fym3G0sRwW1LM1QmNBDJHixQ4sL0kEkzUo0izJEwkEQzYooyDAoD4rhoUuZLSZBiIe6FR0ipEIqwspcfn2/zhgenBm1+sKH997/Lf/1/ZW/jB9scp7+n7SDQB/sYcG/TCR8hAVgJRPwT3MBvkER3AFWkgleYzepmts4hjgv3eYxPHSeKsHACi4tXnlKgKr2jvtZJUrVjrmK3OUJPAAfOA+/XEevSarUhki/IY5je9xZtGLYg2HYCbNwF8zgPVpFdUwYk+S0LnwuUvVlK3XOO3/CIfkEXVALHJ7VL1f0+Wi/IVam/FOkXhu2EKHo4123mG1wC35CHpQBK0iB1cWsahzX9FHyzj9ZsjTGHyjqgXvwAuZgGhqAKQBWsAs4H3ZLsCEGR8/BmNQFqj7zOOXLn4HrnON+BWywlELgMzmwuSwrYq44NWRaryiJvOkuHAauEra2BILAXTgHbEgC+MSZdWOTrTkSGejLSXcbtnQKHMBue8oAvAHt4hXm5WJJwmxtfhQrXXFVaeALvAduZp4SC/ybR816TYdWo3bjfEtbUdxMvT163mhULHxopXACOa7Lf5xsKIblPeoEOWHHgmjJlsJk83dLoK53tC5DcuNN47jHxroNfyIOE5MGbCkr5c7JcKK/wsvBI6my0JUvfRU2GalNl+rdFi4KOx/ylGrgB8OhGWaAexTLuKkNwQcoOLg9XPKtQa9y44OeWcMMLM8Ar2kF7i8cLh6vgwm4LbAX/NHOAsMlGuo8XX3OAT88CfchAFR4Cxwa9iQf1p19wI9QBQtcqYKl8nVXEJDov/F5Z+ZJOZNSKVsD4thqDo+PLiTmsrVhWKyNI6KPtHGl+PKFNcXoazjVklYlQ3kdi25mN4uqqNwiSqNLr85n3BAhW9trUTUazs3aEqw3DTQml0t7+jFxpNdIk61CQnWBParWryXqcLckNT1FDx5JQs2gGCzJXM5rDv/g/VAO3I53gD8we+EQHABu1xvATRTlN6ec2AXsJTwAAAAAAElFTkSuQmCC"
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, Element, Support, Load, Mass):
+        
+        import sys
+        import clr
+        import os
+        
+        import Rhino.Geometry as rg
+        import Grasshopper as gh
+        
+        def Assemble(Element, Support, Load, Mass):
+            points = []
+            startPointList = []
+            endPointList = []
+            geomTransf = []
+            matWrapper = []
+            secTagWrapper = []
+            
+            for element in Element:
+                print(element[1])
+                if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
+                    
+                    startPoint = element[0].PointAt(element[0].Domain[0])
+                    endPoint = element[0].PointAt(element[0].Domain[1])
+                    points.append(startPoint)
+                    points.append(endPoint)
+                    geomTransf.append(element[3])
+                    matWrapper.append([element[2][6][0], element[2][6][1:] ]) # to be careful because we are assigning "unixial" inside the solver. We need to find a clever way to assigning outside
+                elif (element[1] == "ShellMITC4") or (element[1] == "ShellDKGT"):
+                    mesh = element[0]
+                    vertices = mesh.Vertices
+                    for i in range(vertices.Count):
+                        points.append( rg.Point3d.FromPoint3f(vertices[i]) )
+                    matWrapper.append([element[2][2][0], element[2][2][1:] ])
+                    secTagWrapper.append([element[2][0], element[2][1:] ])
+                elif (element[1] == "bbarBrick") or (element[1] == "FourNodeTetrahedron"):
+                    mesh = element[0]
+                    vertices = mesh.Vertices
+                    for i in range(vertices.Count):
+                        #points.append( rg.Point3d.FromPoint3f(vertices[i]) )
+                        points.append( rg.Point3d( vertices[i]) )
+                    matWrapper.append([element[2][0], element[2][1:]])
+            
+            # create MatTag
+            # use dictionary to delete duplicate
+            matNameDict = dict(matWrapper)
+            
+            matNameList = []
+            i = 1
+            
+            for key, value in matNameDict.iteritems():
+                temp = [key,i,value]
+                matNameList.append(temp)
+                i += 1
+            
+            openSeesMatTag = []
+            for item in matNameList:
+                openSeesMatTag.append([ item[0], item[1:] ] )
+            
+            openSeesMatTag = openSeesMatTag
+            matNameDict = dict(openSeesMatTag)
+            
+            
+            # create SecTag
+            # use dictionary to delete duplicate
+            secTagDict = dict(secTagWrapper)
+            secTagList = []
+            i = 1
+            
+            for key, value in secTagDict.iteritems():
+                temp = [key,i,value]
+                secTagList.append(temp)
+                i += 1
+            
+            openSeesSecTag = []
+            for item in secTagList:
+                openSeesSecTag.append([ item[0], item[1:] ] )
+            
+            
+            openSeesSecTag = openSeesSecTag
+            secTagDict = dict(openSeesSecTag)
+            
+            #print(secTagDict)
+            
+            # create GeomTransf
+            geomTransf = [row[0] for row in geomTransf ]
+            geomTransfList = list(dict.fromkeys(geomTransf))
+            geomTransfDict = { geomTransfList[i] : i+1 for i in range(len(geomTransfList) ) }
+            
+            geomTag = geomTransfDict.values() # elemento a dx (tag)
+            geomVec = geomTransfDict.keys() # elemento a sx (vettore)
+            
+            GeomTransf = []
+            for i in range(0, len(geomTag) ) :
+                GeomTransf.append( [ geomTag[i], list(rg.Vector3d(geomVec[i])) ] )
+            
+            GeomTransf = GeomTransf
+            
+            
+            
+            oPoints = rg.Point3d.CullDuplicates(points, 0.01)       # Collection of all the points of our geometry
+            cloudPoints = rg.PointCloud(oPoints)        # Convert to PointCloud to use ClosestPoint Method
+            
+            
+            ## FOR NODE ##
+            openSeesNode = []
+            
+            for nodeTag, node in enumerate(oPoints):
+                openSeesNode.append( [nodeTag, node.X, node.Y, node.Z] )
+            
+            openSeesNode = openSeesNode
+            
+            
+            ## FOR ELEMENT ##
+            
+            openSeesBeam = []
+            openSeesShell = []
+            openSeesSolid = []
+            MassOfStructure = 0
+            
+            for eleTag, element in enumerate(Element):
+                if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
+                    
+                    start = element[0].PointAt(element[0].Domain[0])
+                    end = element[0].PointAt(element[0].Domain[1])
+                    indexStart = cloudPoints.ClosestPoint(start)
+                    indexEnd = cloudPoints.ClosestPoint(end)
+                    
+                    typeElement = element[1]
+                    eleTag = eleTag
+                    eleNodes = [indexStart, indexEnd]
+                    Area = element[2][0]
+                    Avy = element[2][1]
+                    Avz = element[2][2]
+                    E_mod = element[2][6][1]
+                    G_mod = element[2][6][2]
+                    Jxx = element[2][5]
+                    Iy = element[2][3]
+                    Iz = element[2][4]
+                    transfTag = geomTransfDict.setdefault(element[3][0])
+                    axis1 = [ element[3][0].X, element[3][0].Y, element[3][0].Z ]
+                    axis2 = [ element[3][1].X, element[3][1].Y, element[3][1].Z ]
+                    axis3 = [ element[3][2].X, element[3][2].Y, element[3][2].Z ]
+                    orientVector = [ axis1, axis2, axis3 ]
+            
+                    massDens = element[5]
+                    #print(massDens)
+                    sectionGeomProperties = element[2][7]
+                    color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
+                    matTag = matNameDict.setdefault(element[2][6][0])[0]
+                    openSeesBeam.append( [typeElement, eleTag, eleNodes, Area, E_mod, G_mod, Jxx, Iy, Iz, transfTag, massDens, Avy, Avz, orientVector, sectionGeomProperties, matTag, color] )
+                    
+                    MassOfStructure += element[0].GetLength() * massDens * 100    # kN to kg
+                    
+                elif (element[1] == "ShellMITC4") or (element[1] == "ShellDKGT"):
+                    typeElement = element[1]
+                    eleTag = eleTag
+                    shellNodesRhino = element[0].Vertices
+                    color = [element[3][0],element[3][1],element[3][2],element[3][3]] 
+                    indexNode = []
+                    for node in shellNodesRhino:
+                        indexNode.append(cloudPoints.ClosestPoint(node) + 1)
+                    shellNodes = indexNode
+                    thick = element[2][1]
+                    secTag = secTagDict.setdefault(element[2][0])[0]
+                    # sectionProperties = we need to bring some information later probably 
+                    openSeesShell.append( [ typeElement, eleTag, shellNodes, secTag, thick, color] )
+                    
+                    areaMesh = rg.AreaMassProperties.Compute(element[0]).Area
+                    
+                    density = element[2][2][4]
+                    MassOfStructure +=  (areaMesh * thick * density) * 100         # kN to kg
+                    
+                    
+                elif (element[1] == 'bbarBrick') or (element[1] == "FourNodeTetrahedron"):
+                    typeElement = element[1]
+                    eleTag = eleTag
+                    shellNodesRhino = element[0].Vertices
+                    indexNode = []
+                    for node in shellNodesRhino:
+                        indexNode.append(cloudPoints.ClosestPoint(node) + 1)
+                    SolidNodes = indexNode
+                    matTag = matNameDict.setdefault(element[2][0])[0]
+                    color = [ element[3][0], element[3][1], element[3][2] ]
+                    # sectionProperties = we need to bring some information later probably 
+                    openSeesSolid.append( [ typeElement, eleTag, SolidNodes, matTag, [0,0,0], color] )
+            
+            
+            openSeesShell = openSeesShell
+            openSeesBeam = openSeesBeam
+            openSeesSolid = openSeesSolid
+            ## SUPPORT ## 
+            
+            openSeesSupport = []
+            
+            for support in Support:
+                supportNodeTag = cloudPoints.ClosestPoint(support[0])
+                dof_1 = support[1]
+                dof_2 = support[2]
+                dof_3 = support[3]
+                dof_4 = support[4]
+                dof_5 = support[5]
+                dof_6 = support[6]
+                openSeesSupport.append( [supportNodeTag, dof_1, dof_2, dof_3, dof_4, dof_5, dof_6 ] )
+            
+            openSeesSupport = openSeesSupport
+            
+            ## FORCE ##
+            
+            openSeesNodeLoad = []
+            openSeesBeamLoad = []
+            
+            
+            for loadWrapper in Load:
+                if loadWrapper[3] == "pointLoad":
+                    nodeTag = cloudPoints.ClosestPoint(loadWrapper[0])
+                    loadValues = [ loadWrapper[1].X, loadWrapper[1].Y, loadWrapper[1].Z, loadWrapper[2].X, loadWrapper[2].Y, loadWrapper[2].Z ]
+                    loadType = loadWrapper[3]
+                    openSeesNodeLoad.append( [nodeTag, loadValues, loadType] )
+                elif loadWrapper[3] == "beamUniform":
+                    for eleTag, element in enumerate(Element):
+                        equality = rg.GeometryBase.GeometryEquals(loadWrapper[0],element[0])
+                        if equality:
+                            loadValues = [ loadWrapper[1].X, loadWrapper[1].Y, loadWrapper[1].Z ]
+                            loadType = loadWrapper[3]
+                            openSeesBeamLoad.append( [eleTag, loadValues, loadType] )
+                            break
+            
+            
+            openSeesNodeLoad = openSeesNodeLoad
+            openSeesBeamLoad = openSeesBeamLoad
+            
+            
+            ## MASS ##
+            # find Total mass convering in each node
+            
+            openSeesNodalMass = []
+            
+            for item in Mass:
+                massNodeTag = cloudPoints.ClosestPoint(item[0])
+                massValues = [item[1].X, item[1].Y, item[1].Z]
+                openSeesNodalMass.append([ massNodeTag, massValues ])
+            
+            openSeesNodalMass = openSeesNodalMass
+            
+            ## ASSEMBLE ##
+            
+            
+            openSeesModel = ([ openSeesNode,
+                               GeomTransf,
+                               openSeesBeam,
+                               openSeesSupport,
+                               openSeesNodeLoad,
+                               openSeesNodalMass,
+                               openSeesBeamLoad,
+                               openSeesMatTag,
+                               openSeesShell,
+                               openSeesSecTag,
+                               openSeesSolid])
+                               
+                               
+            ghFilePath = ghenv.LocalScope.ghdoc.Path
+            ghFolderPath = os.path.dirname(ghFilePath)
+            
+            
+            outputPath = os.path.join(ghFolderPath,'assembleData')
+            if not os.path.exists(outputPath):
+               os.makedirs(outputPath)
+               
+               
+            wrapperFile = os.path.join(outputPath,'openSeesModel.txt')
+            with open(wrapperFile, 'w') as f:
+             for item in openSeesModel:
+                    f.write("%s\n" % item)
+            
+            
+            return [openSeesModel, MassOfStructure]
+        
+        
+        checkData = True
+        
+        if not Element:
+            checkData = False
+            msg = "input 'Element' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if not Support:
+            checkData = False
+            msg = "input 'Support' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if not Load:
+            msg = "input 'Load' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        
+        if checkData != False:
+            AlpacaModel, MassOfStructure = Assemble(Element, Support, Load, Mass)
+            return (AlpacaModel, MassOfStructure)
+
+
+
 # 1_Define Elements
 
 class MeshToShell(component):
@@ -401,6 +772,7 @@ class Support(component):
             return supportWrapper
 
 
+
 # 2_Define Cross Sections
 
 class RectangularCrossSection(component):
@@ -776,6 +1148,92 @@ class GenericCrossSection(component):
         
         if checkData != False:
             CrossSection = GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, uniaxialMaterial)
+            return CrossSection
+
+class ShellSection(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Shell Section", "Shell Section", """Generate a Plate cross section""", "Alpaca", "2_Cross Section")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("e5559d4b-a93b-461e-a7e4-ff3b48398fbf")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_String()
+        self.SetUpParam(p, "sectionName", "sectionName", "Name of the section.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "thickness", "thickness", "Height of the cross section [mm].")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "nDMaterial", "nDMaterial", "Material element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "CrossSection", "CrossSection", "Elastic Plate Section element.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        result = self.RunScript(p0, p1, p2)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAOwSURBVEhLtZVpbExhFIaL6tBRqqqm0+m0nW66jbZpqqvaq7ZWrQ2x70tFLLV3LKWK1h5CxB9LSBP7ThAS4g/xRyIqRERoBE0R2+s93/TetkMswZs8mTv3zveeb853zrluP1ELEue8/D8qICAvyA6SRv6pTgd6GzA6uQMM7k0lkPCUVJB48leykXcr+gbj65YsfNzUBfvHRCHB0gqeHnqwB6SUdCR/LIeXoRker0hRAYTKCTE4PD4anzdn4fjkWExI9W8Y7B5ZTWRjv5SRPArzbYkqR2f9H0zPNOPdxkw94N6Rkbg0qxPOTbdjbncLvFu6a8FuEwcJID9UPsEx7rI8PxTjU0xYl2vDvlEddfO36zNQmBWATwys3ds2NBy7RkRgYS8r/Lyaa8FyxdBVp+xmIz5UOBdLSnKifTA5zR+bB4cp053DI3B1drxu/nJtGhb0DNS/H50UK+a1xK4cGyiE1Fbkh+k/vkYj2Zlc35ybiEkMlGT1QjVNtd9U8J/eXZikrt+XZyIluLUE2KMcXVRMcGJKrL54FlPxhinRvm8dEobKiTFwsMJmdgnAhRl2LO8TpD8/NC5azGtIlBg2lBxulSzaXRCBsZ1N2JAXqnKrLZZUFDVIhRx+nt0XQxPa4+DYKNSyCKSU6bNNObpokHvTJrjFNGgGsnBqhhnlg0JV7jfxDO7UpUJ4uioFq/qFqOsz0+KQFqJS84aEKkcXnUi3tcEXHqoskJyKoVzfnp/Iujchg89fl6XrAUr6h+DJSmev1DCN0SZPCVDutGusYFLbLdxbpUcWLOptxat19Wbrma6zrPml2UEq9xdndkJZnk1/vn1YuJi/qvP6TsX+rT3U7q4UxqMgyQ+9ItuqepfFz1anwpHjHBuCHHqfKB8MT2yP63MSuC4D0pj0KXPaNZYnqVrEBtEMpEJucOGSbKvarXw+LHZ2tXCnqD59ewoitYOtJhYxdFUO0TtVxoN0rmZ2f2kysrlb6ejzLEm5N7urRU9fdWk6gnxaSIAS5fYDmcklohpkRKIfqyNVD7BmQP1BHuBEzY1zlqV0uNwrHWgTc3lnmMhPlUyOEMT4G7GT3VvFtIiBFkxKVVJ2mUNuTjcLFrMQzG0MEkCG229LOlDeYDB6NFMzRhtqJ6fGNRp683oEivlz4kv+WFYiL5RP7YzNsYzjYBqbTrpVzJ+XpMKvlZqaS+THfyNvIiY18uqUA5aRIQF571nd838iAykkcqBo66leMEXkv2giqSS/2L2b2zecO3vPlGc8WQAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, sectionName, thickness, nDMaterial):
+        import math
+        import Grasshopper as gh
+        
+        def ElasticMembranePlateSection(sectionName, thickness, nDMaterial):
+            
+            sectionName = sectionName
+            thickness = thickness / 1000        # Input value in mm ---> Output m
+            material = nDMaterial
+            sectionType = "ElasticMembranePlateSection"
+            sectionProperties = sectionName + "_" + sectionType
+            return [[sectionProperties, thickness, material]]
+        
+        checkData = True
+        
+        if sectionName is None:
+            checkData = False
+            msg = "input 'sectionName' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if thickness is None:
+            checkData = False
+            msg = "input 'thickness' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if nDMaterial is None:
+            checkData = False
+            msg = "input 'nDMaterial' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            CrossSection = ElasticMembranePlateSection(sectionName, thickness, nDMaterial)
             return CrossSection
 
 
@@ -1284,6 +1742,128 @@ class MassLoad(component):
             return Mass
 
 
+# 5_Analysis
+
+class MyComponent(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Static Analysis", "Static Analysis", """Calculate the Static Response of the structure""", "Alpaca", "5_Analysis")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("cd85b401-cbee-4271-9296-75955256affe")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaModel", "AlpacaModel", "Assemble model to perform Static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Analysed Alpaca model.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "maxDisplacement", "maxDisplacement", "Maximum displacement of structure [mm].")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAKbSURBVEhL7dRfSFNRHAfwe+82d73TnG5LbdqmbolrlcKUiJAgn7IosKCHon9UD2JRgUo9WYH9AcNWyvqDDz1IQYZYkmEtNKGggh586kVKESGhsjRN9+v7u3fGgrtwUVDQFz5w/uycc8/dPUf4G7MM2iBdrf2BnISDMAAF3PA744WjWlHIhyat+ENSwK0VE89eWKEV1bSAUSuq4b6HQODjhkSzB+YH8utpBbNaE4QKq2h4d8zkII9kjqA+DrybhDK/AxNcASdwrEmCONQuu76OW5ZTh+zmHbyG2N3FDT9FOSyF09G6PVqeT+0W4yLiyVmXtsBzrUs/EhyAm/DK7zeQoog8aBiqgXdwHjgbHaLx/UCyJzKkFFHInENbjWn825DWrZ9dTqc0W18vzzU3KxQOp1JfXyo1NiZTIGDgwVMwBi+9knn6rpxHPHmZpHBfGBrBAbqpglt2u0j9/am6urtTKHhRmXqUnK9OzK8laHby5PchiSfRiwHWQAMUZmdLupPHGg541MlHLT4q1Z6+EuJmHxwBG1RkFJbQic5T1PM4V3dyNlibPcMLXNKe/hnIEDd8aMqA75inuTsvU0kbkb/pLVVu9840tJROPAjnzMUu8OReWqTX7vqCP/kDxqyDn0aB23DIWrqN/BdGyF1zZ0LO8c2ircugWKn4+izVdFyjGz3lEV4gGFTIZhM/oZ8P4IKyGcYy1u6mpHTXZ5TfwAuwiZJxclVoUt3VytaP5K/aQRaLOIq+TbDgWKEbRuAwHIcs6DRZs6aLr06Tty5MslPdVS8kfKkVwX7IBL5nFgOn3bG+mjI31JJokAdR56+Fv7qEw1dAPdRBHjdEc9ZSsJpEo4lP8hKt6ddzBs5pxe/hV8dHnz/j//mnIgjfAFbfBYlCcDTMAAAAAElFTkSuQmCC"
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaModel):
+        
+        
+        import System
+        import os
+        import Grasshopper as gh
+        
+        def InitializeStaticAnalysis(AlpacaModel):
+            ghFilePath = ghenv.LocalScope.ghdoc.Path
+        
+            workingDirectory = os.path.dirname(ghFilePath) 
+            outputFileName = 'openSeesOutputWrapper.txt'
+        
+            for dirpath, dirnames, filenames in os.walk(workingDirectory):
+                for filename in filenames:
+                    if filename == outputFileName:
+                        file = os.path.join(dirpath,outputFileName)
+                        os.remove(file)
+        
+        
+        
+            ghFolderPath = os.path.dirname(ghFilePath)
+            outputFolder = os.path.join(ghFolderPath,'assembleData')
+            wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
+        
+        
+            #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
+            fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\openSees_StaticSolver.py'
+        
+        
+            staticAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
+            staticAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+            staticAnalyses.Arguments = wrapperFile
+            process = System.Diagnostics.Process.Start(staticAnalyses)
+            System.Diagnostics.Process.WaitForExit(process)
+        
+            ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+        
+            outputFile = os.path.join(outputFolder, outputFileName)
+        
+            with open(outputFile, 'r') as f:
+                lines = f.readlines()
+                nodeDisplacementWrapper = eval( lines[0].strip() )
+                reactionWrapper = eval( lines[1].strip() )
+                elementOutputWrapper = eval( lines[2].strip() )
+                elementLoadWrapper = eval( lines[3].strip() )
+                eleForceWrapper = eval( lines[4].strip() )
+        
+        
+            AlpacaLinearStaticOutput = ([nodeDisplacementWrapper,
+                                    reactionWrapper,
+                                    elementOutputWrapper,
+                                    elementLoadWrapper,
+                                    eleForceWrapper])
+        
+            return AlpacaLinearStaticOutput
+        
+        
+        checkData = True
+        
+        if not AlpacaModel:
+            checkData = False
+            msg = "input 'AlpacaModel' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        
+        if checkData != False:
+            AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
+            maxDisplacement = None
+            return (AlpacaStaticOutput, maxDisplacement)
+
 
 
 
@@ -1302,4 +1882,3 @@ class AssemblyInfo(GhPython.Assemblies.PythonAssemblyInfo):
     
     def get_Id(self):
         return System.Guid("9bfbb08d-6b4d-446f-b226-cfe680dabf16")
-

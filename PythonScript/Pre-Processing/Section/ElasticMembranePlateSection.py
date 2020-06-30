@@ -1,10 +1,10 @@
-﻿"""Generate a circular cross section
+﻿"""Generate a Plate cross section
     Inputs:
         sectionName: Name of the section.
         thickness: Height of the cross section [mm].
         nDMaterial: Material element.
     Output:
-       plateFiberSection: Elastic Membrane Plate Section element.
+       CrossSection: Elastic Plate Section element.
        """
 
 import math
@@ -37,4 +37,4 @@ if nDMaterial is None:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    plateFiberSection = ElasticMembranePlateSection(sectionName, thickness, nDMaterial)
+    CrossSection = ElasticMembranePlateSection(sectionName, thickness, nDMaterial)
