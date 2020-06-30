@@ -318,11 +318,34 @@ def Beam( ele, node):
             sectionForm2 = [row[1] for row in sectionForm ]
             meshExtr = meshLoft3( sectionForm1,  color )
             meshExtr.Append( meshLoft3( sectionForm2,  color ) )
-            #meshExtr.IsClosed()
-    else  :
-        meshExtr = meshLoft3( sectionForm,  color )
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            sectionStartEnd = [ [sectionForm1[0], sectionForm2[0]], [sectionForm1[-1], sectionForm2[-1]]  ]
+            for iSection in sectionStartEnd :
+                iMesh = rg.Mesh()
+                for iPoint, jPoint in zip(iSection[0],iSection[1])  :
+                    iMesh.Vertices.Add( iPoint )
+                    iMesh.Vertices.Add( jPoint )
+                for i in range(0,len(iSection[0])*2-6): # sistemare
+                    index1 = i*2 # 0
+                    index2 = index1 + 1 #1
+                    index3 = index1 + 2 #2
+                    index4 = index1 + 3 #3
+                    iMesh.Faces.AddFace(index1, index2, index4, index3)
+                iMesh.VertexColors.CreateMonotoneMesh( colour )
+                meshExtr.Append( iMesh )
 
-    colour = rs.CreateColor( color[0], color[1], color[2] )
+            #meshExtr.IsClosed()
+    elif  dimSection[0] == 'rectangular' : 
+        meshExtr = meshLoft3( sectionForm,  color )
+        colour = rs.CreateColor( color[0], color[1], color[2] )
+        sectionStartEnd = [ sectionForm[0], sectionForm[-1] ]
+        for iSection in sectionStartEnd :
+            iMesh = rg.Mesh()
+            for iPoint in iSection :
+                 iMesh.Vertices.Add( iPoint )
+            iMesh.Faces.AddFace(0, 1, 2, 3)
+            iMesh.VertexColors.CreateMonotoneMesh( colour )
+            meshExtr.Append( iMesh )
     return [ line, meshExtr, colour ]
 
 ## Mesh from close section eith gradient color ##
