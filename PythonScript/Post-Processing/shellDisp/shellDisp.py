@@ -10,37 +10,6 @@
 import Rhino.Geometry as rg
 import ghpythonlib.treehelpers as th # per data tree
 #---------------------------------------------------------------------------------------#
-
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-
-pointWrapper = []
-transWrapper = []
-rotWrapper = []
-
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-nodeValue = []
-displacementValue = []
-
-pointWrapper = []
-dispWrapper = []
-
-for index,item in enumerate(diplacementWrapper):
-    nodeValue.append( item[0] )
-    displacementValue.append( item[1] )
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-    if len(item[1]) == 3:
-        dispWrapper.append( [index, rg.Vector3d( item[1][0], item[1][1], item[1][2] ) ] )
-    elif len(item[1]) == 6:
-        dispWrapper.append( [index, [rg.Vector3d(item[1][0],item[1][1],item[1][2] ), rg.Vector3d(item[1][3],item[1][4],item[1][5]) ] ] )
-
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-pointDispWrapperDict = dict( dispWrapper )
-####
-
-    
 def defShellQuadValue( ele, node, nodeDisp ):
     
     eleTag = ele[0]
@@ -84,27 +53,68 @@ def defShellTriangleValue( ele, node, nodeDisp, scaleDef ):
     
     return  [[trasl1, trasl2, trasl3], [rotate1, rotate2, rotate3]]
 
+def shellDisp( AlpacaStaticOutput ):
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
 
-trans = []
-rot = []
-tag = []
-for ele in EleOut :
-    tagEle = ele[0]
-    eleType = ele[2][0]
-    nNode = len( ele[1] )
-    if nNode == 4 and eleType != 'FourNodeTetrahedron':
-        trasl = defShellQuadValue( ele, pointWrapperDict, pointDispWrapperDict )
-        trans.append(trasl[0])
-        rot.append(trasl[1])
-        tag.append( tagEle )
-        
-    elif nNode == 3:
-        trasl = defShellTriangleValue( ele, pointWrapperDict, pointDispWrapperDict )
-        trans.append(trasl[0])
-        rot.append(trasl[1])
-        tag.append( tagEle )
-        
-tagElement = tag
-Trans = th.list_to_tree( trans )
-Rot = th.list_to_tree( rot )
+    pointWrapper = []
+    transWrapper = []
+    rotWrapper = []
 
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    nodeValue = []
+    displacementValue = []
+
+    pointWrapper = []
+    dispWrapper = []
+
+    for index,item in enumerate(diplacementWrapper):
+        nodeValue.append( item[0] )
+        displacementValue.append( item[1] )
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+        if len(item[1]) == 3:
+            dispWrapper.append( [index, rg.Vector3d( item[1][0], item[1][1], item[1][2] ) ] )
+        elif len(item[1]) == 6:
+            dispWrapper.append( [index, [rg.Vector3d(item[1][0],item[1][1],item[1][2] ), rg.Vector3d(item[1][3],item[1][4],item[1][5]) ] ] )
+
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
+    pointDispWrapperDict = dict( dispWrapper )
+    ####
+
+    trans = []
+    rot = []
+    tag = []
+    for ele in EleOut :
+        tagEle = ele[0]
+        eleType = ele[2][0]
+        nNode = len( ele[1] )
+        if nNode == 4 and eleType != 'FourNodeTetrahedron':
+            trasl = defShellQuadValue( ele, pointWrapperDict, pointDispWrapperDict )
+            trans.append(trasl[0])
+            rot.append(trasl[1])
+            tag.append( tagEle )
+            
+        elif nNode == 3:
+            trasl = defShellTriangleValue( ele, pointWrapperDict, pointDispWrapperDict )
+            trans.append(trasl[0])
+            rot.append(trasl[1])
+            tag.append( tagEle )
+            
+    tagElement = tag
+    Trans = th.list_to_tree( trans )
+    Rot = th.list_to_tree( rot )
+
+    return tagElement, Trans, Rot
+
+
+checkData = True
+
+if not AlpacaStaticOutput :
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    Points, Trans, Rot = shellDisp( AlpacaStaticOutput )

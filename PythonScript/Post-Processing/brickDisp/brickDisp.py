@@ -9,33 +9,6 @@
 import Rhino.Geometry as rg
 import ghpythonlib.treehelpers as th # per data tree
 #---------------------------------------------------------------------------------------#
-
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-
-pointWrapper = []
-transWrapper = []
-
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-nodeValue = []
-displacementValue = []
-
-
-pointWrapper = []
-dispWrapper = []
-
-for index,item in enumerate(diplacementWrapper):
-    nodeValue.append( item[0] )
-    displacementValue.append( item[1] )
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-    dispWrapper.append( [index, rg.Vector3d( item[1][0], item[1][1], item[1][2] ) ] )
-
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-pointDispWrapperDict = dict( dispWrapper )
-####
-
 def DefSolidValue( ele, node, nodeDisp ):
     
     eleTag = ele[0]
@@ -78,20 +51,61 @@ def DefTetraSolidValue( ele, node, nodeDisp ):
     trasl4 = nodeDisp.get( index4 -1 , "never")
     return  [trasl1, trasl2, trasl3, trasl4]
 
-trans = []
-tag = []
-for ele in EleOut :
-    tagEle = ele[0]
-    eleType = ele[2][0]
-    nNode = len( ele[1] )
-    if nNode == 8:
-        trasl = DefSolidValue( ele, pointWrapperDict, pointDispWrapperDict )
-        trans.append(trasl)
-        tag.append( tagEle )
-    elif eleType == 'FourNodeTetrahedron' :
-        trasl  = DefTetraSolidValue( ele, pointWrapperDict, pointDispWrapperDict )
-        trans.append(trasl)
-        tag.append( tagEle )
-        
-tagElement = tag
-Trans = th.list_to_tree( trans )
+def brickDisp( AlpacaStaticOutput ):
+
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+
+    pointWrapper = []
+    transWrapper = []
+
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    nodeValue = []
+    displacementValue = []
+
+
+    pointWrapper = []
+    dispWrapper = []
+
+    for index,item in enumerate(diplacementWrapper):
+        nodeValue.append( item[0] )
+        displacementValue.append( item[1] )
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+        dispWrapper.append( [index, rg.Vector3d( item[1][0], item[1][1], item[1][2] ) ] )
+
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
+    pointDispWrapperDict = dict( dispWrapper )
+    ####
+
+    trans = []
+    tag = []
+    for ele in EleOut :
+        tagEle = ele[0]
+        eleType = ele[2][0]
+        nNode = len( ele[1] )
+        if nNode == 8:
+            trasl = DefSolidValue( ele, pointWrapperDict, pointDispWrapperDict )
+            trans.append(trasl)
+            tag.append( tagEle )
+        elif eleType == 'FourNodeTetrahedron' :
+            trasl  = DefTetraSolidValue( ele, pointWrapperDict, pointDispWrapperDict )
+            trans.append(trasl)
+            tag.append( tagEle )
+            
+    tagElement = tag
+    Trans = th.list_to_tree( trans )
+
+    return tagElement, Trans 
+
+
+checkData = True
+
+if not AlpacaStaticOutput :
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    tagElement, Trans = brickDisp( AlpacaStaticOutput )

@@ -224,60 +224,78 @@ def defTrussValue( ele, node, nodeDisp, numberResults ):
     return  [ localTransVector, globalTransVector] 
 
 #--------------------------------------------------------------------------
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
+def beamDisp( AlpacaStaticOutput, numberResults ):
 
-pointWrapper = []
-transWrapper = []
-rotWrapper = []
+    if numberResults is None :
+       numberResults = 2 
 
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-nodeValue = []
-displacementValue = []
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
 
-pointWrapper = []
-dispWrapper = []
+    pointWrapper = []
+    transWrapper = []
+    rotWrapper = []
 
-for index,item in enumerate(diplacementWrapper):
-    nodeValue.append( item[0] )
-    displacementValue.append( item[1] )
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-    if len(item[1]) == 3:
-        dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
-    elif len(item[1]) == 6:
-        dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    nodeValue = []
+    displacementValue = []
 
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-pointDispWrapperDict = dict( dispWrapper )
-####
+    pointWrapper = []
+    dispWrapper = []
 
-transLocal = []
-rotLocal = []
-transGlobal = []
-rotGlobal = []
-tag = []
-for ele in EleOut :
-    eleTag = ele[0]
-    eleType = ele[2][0]
-    if eleType == 'ElasticTimoshenkoBeam' :
-        valueTBeam = defValueTimoshenkoBeamValue( ele, pointWrapperDict, pointDispWrapperDict, numberResults )
-        transLocal.append(valueTBeam[0])
-        rotLocal.append(valueTBeam[1])
-        transGlobal.append(valueTBeam[2])
-        rotGlobal.append(valueTBeam[3])
-        tag.append( eleTag )
-    elif eleType == 'Truss' :
-        valueTruss = defTrussValue( ele, pointWrapperDict, pointDispWrapperDict, numberResults )
-        transLocal.append(valueTruss[0])
-        rotLocal.append([rg.Vector3d(0,0,0)]*len(valueTruss[0]))
-        transGlobal.append(valueTruss[1])
-        rotGlobal.append([rg.Vector3d(0,0,0)]*len(valueTruss[0]))
-        tag.append( eleTag )
+    for index,item in enumerate(diplacementWrapper):
+        nodeValue.append( item[0] )
+        displacementValue.append( item[1] )
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+        if len(item[1]) == 3:
+            dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
+        elif len(item[1]) == 6:
+            dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
 
-localTrans = th.list_to_tree( transLocal )
-localRot = th.list_to_tree( rotLocal )
-globalTrans = th.list_to_tree( transGlobal )
-globalRot = th.list_to_tree( rotGlobal )
-tagElement = tag
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
+    pointDispWrapperDict = dict( dispWrapper )
+    ####
+
+    transLocal = []
+    rotLocal = []
+    transGlobal = []
+    rotGlobal = []
+    tag = []
+    for ele in EleOut :
+        eleTag = ele[0]
+        eleType = ele[2][0]
+        if eleType == 'ElasticTimoshenkoBeam' :
+            valueTBeam = defValueTimoshenkoBeamValue( ele, pointWrapperDict, pointDispWrapperDict, numberResults )
+            transLocal.append(valueTBeam[0])
+            rotLocal.append(valueTBeam[1])
+            transGlobal.append(valueTBeam[2])
+            rotGlobal.append(valueTBeam[3])
+            tag.append( eleTag )
+        elif eleType == 'Truss' :
+            valueTruss = defTrussValue( ele, pointWrapperDict, pointDispWrapperDict, numberResults )
+            transLocal.append(valueTruss[0])
+            rotLocal.append([rg.Vector3d(0,0,0)]*len(valueTruss[0]))
+            transGlobal.append(valueTruss[1])
+            rotGlobal.append([rg.Vector3d(0,0,0)]*len(valueTruss[0]))
+            tag.append( eleTag )
+
+    localTrans = th.list_to_tree( transLocal )
+    localRot = th.list_to_tree( rotLocal )
+    globalTrans = th.list_to_tree( transGlobal )
+    globalRot = th.list_to_tree( rotGlobal )
+    tagElement = tag
+
+    return tagElement, localTrans, localRot, globalTrans, globalRot
+
+
+checkData = True
+
+if not AlpacaStaticOutput :
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    tagElement, localTrans, localRot, globalTrans, globalRot = beamDisp( AlpacaStaticOutput , numberResults )
