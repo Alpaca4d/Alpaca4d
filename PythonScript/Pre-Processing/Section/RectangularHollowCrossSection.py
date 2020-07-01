@@ -20,11 +20,14 @@ def RectangularHollowCrossSection(sectionName, base, height, thickness, uniaxial
     height = height / 1000                  # Input value in mm ---> Output m
     thickness = thickness/1000              # Input value in mm ---> Output m
     Area = base * height - ( base - 2*thickness )*( height - 2*thickness )
-    Ay = Area * 5/6
-    Az = Area * 5/6
+    ky = Area/( base*thickness*2 ) # 
+    kz = Area/( height*thickness*2 )
+    Ay = Area * ky
+    Az = Area * kz
     Iyy = base*(height)**3/12 - ( base - 2*thickness )*( height - 2*thickness )**3/12
     Izz = base**3*height/12 - ( base - 2*thickness )**3*( height - 2*thickness )/12
-    J = Iyy + Izz
+    #J = Iyy + Izz
+    J = ( 4*(( base - thickness)*( height - thickness))**2*thickness )/( 2*( height - thickness) + 2*( base - thickness) )
 
     material = uniaxialMaterial
 
