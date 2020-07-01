@@ -41,4 +41,4 @@ if nDMaterial is None:
 
 
 if checkData != False:
-    SolidWrapper = Solid( Brick, Colour, nDMaterial )
+    solidWrapper = Solid( Brick, Colour, nDMaterial )
