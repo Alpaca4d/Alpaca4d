@@ -15,7 +15,7 @@
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import Grasshopper
+import Grasshopper as gh
 import ghpythonlib.components as ghcomp
 #import System as sy #DV
 import sys
@@ -214,70 +214,98 @@ def forceTrussValue(  ele, node, force, loadDict, numberResults ):
     return  eleForceValue
 
 #--------------------------------------------------------------------------
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-eleLoad = AlpacaStaticOutput[3]
-ForceOut = AlpacaStaticOutput[4]
+def beamForces( AlpacaStaticOutput, numberResults ):
 
-pointWrapper = []
-for index,item in enumerate(diplacementWrapper):
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
+    # define output
+    global tagElement
+    global N
+    global V1
+    global V2
+    global Mt
+    global M1
+    global M2
 
-## Dict. for load ##
-loadWrapperPaired = []
+    if numberResults is None:
+        numberResults = 2
 
-for item in eleLoad:
-    loadWrapperPaired.append( [item[0], item[1:]] )
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    eleLoad = AlpacaStaticOutput[3]
+    ForceOut = AlpacaStaticOutput[4]
 
-loadWrapperDict = dict( loadWrapperPaired )
-####
+    pointWrapper = []
+    for index,item in enumerate(diplacementWrapper):
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
 
-forceWrapper = []
-for item in ForceOut:
-    index = item[0]
-    if len(item[1]) == 12: # 6 nodo start e 6 nodo end
-        Fi = rg.Point3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-        Mi = rg.Point3d( item[1][3], item[1][4], item[1][5] )
-        Fj = rg.Point3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-        Mj = rg.Point3d( item[1][9], item[1][10], item[1][11] )
-        forceWrapper.append( [index, [ Fi, Mi, Fj, Mj ]] )
+    ## Dict. for load ##
+    loadWrapperPaired = []
 
-## Dict. for force ##
-forceWrapperDict = dict( forceWrapper )
-####
+    for item in eleLoad:
+        loadWrapperPaired.append( [item[0], item[1:]] )
 
-N, V1, V2, Mt, M1, M2 = [],[],[],[],[],[]
-tag = []
+    loadWrapperDict = dict( loadWrapperPaired )
+    ####
 
-for ele in EleOut :
-    eleTag = ele[0]
-    eleType = ele[2][0]
-    if eleType == 'ElasticTimoshenkoBeam' :
-        tag.append( eleTag )
-        valueTBeam = forceTimoshenkoBeam( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict, numberResults )
-        N.append(valueTBeam[0])
-        V1.append(valueTBeam[1])
-        V2.append(valueTBeam[2])
-        Mt.append(valueTBeam[3])
-        M1.append(valueTBeam[4])
-        M2.append(valueTBeam[5])
-    elif eleType == 'Truss' :
-        tag.append( eleTag )
-        valueTruss = forceTrussValue( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict, numberResults )
-        N.append(valueTruss[0])
-        V1.append(valueTruss[1])
-        V2.append(valueTruss[2])
-        Mt.append(valueTruss[3])
-        M1.append(valueTruss[4])
-        M2.append(valueTruss[5])
-        
-tagElement = th.list_to_tree( tag )
-N = th.list_to_tree( N )
-V1 = th.list_to_tree( V1 )
-V2 = th.list_to_tree( V2 )
-Mt = th.list_to_tree( Mt )
-M1 = th.list_to_tree( M1 )
-M2 = th.list_to_tree( M2 )
+    forceWrapper = []
+    for item in ForceOut:
+        index = item[0]
+        if len(item[1]) == 12: # 6 nodo start e 6 nodo end
+            Fi = rg.Point3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+            Mi = rg.Point3d( item[1][3], item[1][4], item[1][5] )
+            Fj = rg.Point3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+            Mj = rg.Point3d( item[1][9], item[1][10], item[1][11] )
+            forceWrapper.append( [index, [ Fi, Mi, Fj, Mj ]] )
+
+    ## Dict. for force ##
+    forceWrapperDict = dict( forceWrapper )
+    ####
+
+    N, V1, V2, Mt, M1, M2 = [],[],[],[],[],[]
+    tag = []
+
+    for ele in EleOut :
+        eleTag = ele[0]
+        eleType = ele[2][0]
+        if eleType == 'ElasticTimoshenkoBeam' :
+            tag.append( eleTag )
+            valueTBeam = forceTimoshenkoBeam( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict, numberResults )
+            N.append(valueTBeam[0])
+            V1.append(valueTBeam[1])
+            V2.append(valueTBeam[2])
+            Mt.append(valueTBeam[3])
+            M1.append(valueTBeam[4])
+            M2.append(valueTBeam[5])
+        elif eleType == 'Truss' :
+            tag.append( eleTag )
+            valueTruss = forceTrussValue( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict, numberResults )
+            N.append(valueTruss[0])
+            V1.append(valueTruss[1])
+            V2.append(valueTruss[2])
+            Mt.append(valueTruss[3])
+            M1.append(valueTruss[4])
+            M2.append(valueTruss[5])
+            
+    tagElement = th.list_to_tree( tag )
+    N = th.list_to_tree( N )
+    V1 = th.list_to_tree( V1 )
+    V2 = th.list_to_tree( V2 )
+    Mt = th.list_to_tree( Mt )
+    M1 = th.list_to_tree( M1 )
+    M2 = th.list_to_tree( M2 )
+
+    return tagElement, N, V1, V2, Mt, M1, M2
+
+
+checkData = True
+
+if not AlpacaStaticOutput:
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    tagElement, N, V1, V2, Mt, M1, M2 = beamForces( AlpacaStaticOutput, numberResults )
 

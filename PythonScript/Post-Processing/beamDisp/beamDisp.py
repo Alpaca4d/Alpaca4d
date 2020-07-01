@@ -13,7 +13,7 @@
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import Grasshopper
+import Grasshopper as gh
 #import ghpythonlib.components as ghcomp
 #import System as sy #DV
 import sys
@@ -158,13 +158,14 @@ def defTrussValue( ele, node, nodeDisp, numberResults ):
     E = propSection[1]
     A = propSection[3]
     
-    traslStart = pointDispWrapperDict.get( indexStart -1 , "never")
-    traslEnd = pointDispWrapperDict.get( indexEnd -1 , "never")
+    traslStart = nodeDisp.get( indexStart -1 , "never")
+    traslEnd = nodeDisp.get( indexEnd -1 , "never")
     if len( traslStart ) == 2:
-        traslStart = pointDispWrapperDict.get( indexStart -1 , "never")[0]
-        traslEnd = pointDispWrapperDict.get( indexEnd -1 , "never")[0]
-    pointStart = pointWrapperDict.get( indexStart -1 , "never")
-    pointEnd = pointWrapperDict.get( indexEnd -1 , "never")
+        traslStart = nodeDisp.get( indexStart -1 , "never")[0]
+        traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
+
+    pointStart = node.get( indexStart -1 , "never")
+    pointEnd = node.get( indexEnd -1 , "never")
     #print( traslStart[1] )
     line = rg.LineCurve( pointStart,  pointEnd )
 

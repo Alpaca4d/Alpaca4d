@@ -14,7 +14,7 @@
 * [x] add "IPE" section
 
 * [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
-* [ ] add inetia zz in ipe section
+* [x] add inetia zz in ipe section
 * [ ] add box section
 
 * [x] circular Cross-Section less dense for visualisation
@@ -23,7 +23,7 @@
 * [ ] add coding (in panel or path script ) and view post processing. Let's make a new component for import and visualize a text file
 * [ ] modify loft mesh for brick ( problem con tetra )
 * [ ] make it work DomeFunction
-* [ ] Add Warning to the components. Ask Marco for some reference script
+* [x] Add Warning to the components. Ask Marco for some reference script
 * [ ] Create Cluster when necessary
 
 

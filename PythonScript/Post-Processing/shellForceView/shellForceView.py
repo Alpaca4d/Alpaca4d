@@ -16,7 +16,7 @@
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import Grasshopper
+import Grasshopper as gh
 #import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
@@ -127,96 +127,119 @@ def gradientJet(value, valueMax, valueMin):
         elif  valueMin - 0.00000000001 <= value <= valueMin  :
             return listcolo[ 0 ]
 #--------------------------------------------------------------------------
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-ForceOut = AlpacaStaticOutput[4]
-#print( ForceOut[0] )
-#print( ForceOut[1] )
-#nodalForce = openSeesOutputWrapper[5]
+def shellForceView( AlpacaStaticOutput, viewForce ):
 
-#nodalForcerDict = dict( nodalForce )
+    global modelForce
+    global ForceValue
 
-pointWrapper = []
-for index,item in enumerate(diplacementWrapper):
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    ForceOut = AlpacaStaticOutput[4]
+    #print( ForceOut[0] )
+    #print( ForceOut[1] )
+    #nodalForce = openSeesOutputWrapper[5]
+
+    #nodalForcerDict = dict( nodalForce )
+
+    pointWrapper = []
+    for index,item in enumerate(diplacementWrapper):
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
 
 
-forceWrapper = []
+    forceWrapper = []
 
-for item in ForceOut:
-    index = item[0]
-    if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
-        Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-        Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
-        Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-        Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
-        Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-        Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-        Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
-        Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
-        forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
-                    [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
-                    [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
-                    [ Mi.X, Mj.X,  Mk.X, Mw.X ],
-                    [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
-                    [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
-    elif len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
-        Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-        Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
-        Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-        Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
-        Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-        Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-        forceOut = [[ Fi.X, Fj.X, Fk.X ],
-                    [ Fi.Y, Fj.Y, Fk.Y ],
-                    [ Fi.Z, Fj.Z, Fk.Z ],
-                    [ Mi.X, Mj.X,  Mk.X ],
-                    [ Mi.Y, Mj.Y, Mk.Y ],
-                    [ Mi.Z, Mj.Z, Mk.Z ]]
-    forceWrapper .append( [index, forceOut ])
+    for item in ForceOut:
+        index = item[0]
+        if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
+            Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+            Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
+            Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+            Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
+            Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
+            Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
+            Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
+            Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
+            forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
+                        [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
+                        [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
+                        [ Mi.X, Mj.X,  Mk.X, Mw.X ],
+                        [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
+                        [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
+        elif len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
+            Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+            Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
+            Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+            Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
+            Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
+            Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
+            forceOut = [[ Fi.X, Fj.X, Fk.X ],
+                        [ Fi.Y, Fj.Y, Fk.Y ],
+                        [ Fi.Z, Fj.Z, Fk.Z ],
+                        [ Mi.X, Mj.X,  Mk.X ],
+                        [ Mi.Y, Mj.Y, Mk.Y ],
+                        [ Mi.Z, Mj.Z, Mk.Z ]]
+        forceWrapper .append( [index, forceOut ])
 
-## Dict. for force ##
-forceWrapperDict = dict( forceWrapper )
-####
-ForceView = []
-tag = []
-shell = []
-for ele in EleOut :
-    eleTag = ele[0]
-    eleType = ele[2][0]
-    if eleType == "ShellMITC4" :
-        tag.append( eleTag )
-        outputForce = forceWrapperDict.get( eleTag )
-        ForceView.append( outputForce[viewForce] )
-        shellModel = ShellQuad( ele, pointWrapperDict )
-        shell.append( shellModel )
-    elif eleType == "ShellDKGT" :
-        tag.append( eleTag )
-        outputForce = forceWrapperDict.get( eleTag )
-        ForceView.append( outputForce[viewForce] )
-        shellModel = ShellTriangle( ele, pointWrapperDict )
-        shell.append( shellModel )
-        
-tagElement = th.list_to_tree( tag )
-ForceValue = th.list_to_tree( ForceView )
+    ## Dict. for force ##
+    forceWrapperDict = dict( forceWrapper )
+    ####
+    ForceView = []
+    tag = []
+    shell = []
+    for ele in EleOut :
+        eleTag = ele[0]
+        eleType = ele[2][0]
+        if eleType == "ShellMITC4" :
+            tag.append( eleTag )
+            outputForce = forceWrapperDict.get( eleTag )
+            ForceView.append( outputForce[viewForce] )
+            shellModel = ShellQuad( ele, pointWrapperDict )
+            shell.append( shellModel )
+        elif eleType == "ShellDKGT" :
+            tag.append( eleTag )
+            outputForce = forceWrapperDict.get( eleTag )
+            ForceView.append( outputForce[viewForce] )
+            shellModel = ShellTriangle( ele, pointWrapperDict )
+            shell.append( shellModel )
+            
+    tagElement = th.list_to_tree( tag )
+    ForceValue = th.list_to_tree( ForceView )
 
-maxValue = []
-minValue = []
-for value in ForceView:
-    maxValue.append( max( value ))
-    minValue.append( min( value ))
+    maxValue = []
+    minValue = []
+    for value in ForceView:
+        maxValue.append( max( value ))
+        minValue.append( min( value ))
 
-maxValue = max( maxValue )
-minValue = min( minValue )
-print( maxValue, minValue )
-modelForce = []
-for shellEle, value in zip(shell,ForceView) :
-    shellColor = shellEle.DuplicateMesh()
-    shellColor.VertexColors.Clear()
-    for j in range(0,shellEle.Vertices.Count):
-        #print( value[j] )
-        jetColor = gradientJet(value[j], maxValue, minValue)
-        shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
-    modelForce.append( shellColor)
+    maxValue = max( maxValue )
+    minValue = min( minValue )
+    print( maxValue, minValue )
+    modelForce = []
+    for shellEle, value in zip(shell,ForceView) :
+        shellColor = shellEle.DuplicateMesh()
+        shellColor.VertexColors.Clear()
+        for j in range(0,shellEle.Vertices.Count):
+            #print( value[j] )
+            jetColor = gradientJet(value[j], maxValue, minValue)
+            shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
+        modelForce.append( shellColor)
+
+    return modelForce, ForceValue
+
+checkData = True
+
+if not AlpacaStaticOutput:
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if viewForce is None :
+    checkData = False
+    msg = " input 'viewForce' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    diagram = shellForceView( AlpacaStaticOutput, viewForce  )

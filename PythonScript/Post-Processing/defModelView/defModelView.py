@@ -24,7 +24,7 @@ import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 #import ghpythonlib.components as ghcomp
-import Grasshopper
+import Grasshopper as gh
 #import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
@@ -49,56 +49,6 @@ sys.path.append(fileName)
 import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
-
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-nodeValue = []
-displacementValue = []
-#ShellOut = openSeesOutputWrapper[4]
-
-pointWrapper = []
-dispWrapper = []
-#print( diplacementWrapper )
-for index,item in enumerate(diplacementWrapper):
-    nodeValue.append( item[0] )
-    displacementValue.append( item[1] )
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-    if len(item[1]) == 3:
-        dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
-    elif len(item[1]) == 6:
-        dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
-
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-pointDispWrapperDict = dict( dispWrapper )
-####
-
-## FOR scala automatica ##
-## nodeValue è la lista delle cordinate
-rowX = [row[0] for row in nodeValue ]
-rowY = [row[1] for row in nodeValue ]
-rowZ = [row[2] for row in nodeValue ]
-
-scaleMax = max( max(rowX), max(rowY), max(rowZ) )
-scaleMin = min( min(rowX), min(rowY), min(rowZ) )
-coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
-
-## displacementValue è la lista degli spostamenti
-
-rowDefX = [row[0] for row in displacementValue ]
-rowDefY = [row[1] for row in displacementValue ]
-rowDefZ = [row[2] for row in displacementValue ]
-
-defMax = max( max(rowDefX), max(rowDefY), max(rowDefZ) )
-defMin = min( min(rowDefX), min(rowDefY), min(rowDefZ) )
-DefMax = max( mt.fabs(defMax),mt.fabs(defMin))
-
-if scale == None:
-    scaleDef = dg.scaleAutomatic( coordMax , DefMax )
-
-else :
-    scaleDef = scale
-
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
     t = dg.linspace( 0 , 1.80*mt.pi, 16 )
@@ -468,7 +418,6 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
         trasl = rg.Transform.Translation( transResult*scaleDef )
         beamPoint.Transform( trasl )
         defPoint.append( beamPoint )
-        print( scaleDef*r1x , scaleDef*r2x, scaleDef*r3x)
         sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
         sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
         sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
@@ -519,7 +468,6 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             defSection2 = [row[1] for row in defSection ]
             meshdef = meshLoft3( defSection1,  color )
             meshdef.Append( meshLoft3( defSection2,  color ) )
-            print( meshdef )
 
     else  :
         meshdef = meshLoft3( defSection,  color )
@@ -536,13 +484,13 @@ def defTruss( ele, node, nodeDisp, scale ):
     E = propSection[1]
     A = propSection[3]
     
-    traslStart = pointDispWrapperDict.get( indexStart -1 , "never")
-    traslEnd = pointDispWrapperDict.get( indexEnd -1 , "never")
+    traslStart = nodeDisp.get( indexStart -1 , "never")
+    traslEnd = nodeDisp.get( indexEnd -1 , "never")
     if len( traslStart ) == 2:
-        traslStart = pointDispWrapperDict.get( indexStart -1 , "never")[0]
-        traslEnd = pointDispWrapperDict.get( indexEnd -1 , "never")[0]
-    pointStart = pointWrapperDict.get( indexStart -1 , "never")
-    pointEnd = pointWrapperDict.get( indexEnd -1 , "never")
+        traslStart = nodeDisp.get( indexStart -1 , "never")[0]
+        traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
+    pointStart = node.get( indexStart -1 , "never")
+    pointEnd = node.get( indexEnd -1 , "never")
     #print( traslStart[1] )
     line = rg.LineCurve( pointStart,  pointEnd )
     axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
@@ -645,7 +593,6 @@ def defTruss( ele, node, nodeDisp, scale ):
             defSection2 = [row[1] for row in defSection ]
             meshdef = meshLoft3( defSection1,  color )
             meshdef.Append( meshLoft3( defSection2,  color ) )
-            print( meshdef )
 
     else  :
         meshdef = meshLoft3( defSection,  color )
@@ -684,117 +631,6 @@ def meshLoft3( point, color ):
     #meshdElement.IsClosed(True)
     
     return meshElement
-
-modelCurve = []
-ShellDefModel = []
-ExtrudedView = []
-modelDisp = []
-
-traslBeamValue = []
-rotBeamValue = []
-
-traslShellValue = []
-rotShellValue = []
-ExtrudedShell = []
-
-SolidDefModel = []
-traslSolidValue = []
-
-
-for ele in EleOut :
-    eleType = ele[2][0]
-    nNode = len( ele[1] )
-    
-    if eleType == 'ElasticTimoshenkoBeam' :
-        
-        dimSection = ele[2][10]
-        color = ele[2][12]
-        valueTBeam = defValueTimoshenkoBeam( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
-        defpolyline = valueTBeam[0]
-        meshdef = valueTBeam[1]
-        globalTrans = valueTBeam[2]
-        globalRot = valueTBeam[3]
-        traslBeamValue.append( globalTrans ) 
-        rotBeamValue.append( globalRot )
-        modelCurve.append( defpolyline )
-        modelDisp.append( defpolyline )
-        # estrusione della beam #
-        ExtrudedView.append( meshdef )
-        #doc.Objects.AddMesh( meshdef )
-    elif eleType == 'Truss' :
-        dimSection = ele[2][10]
-        color = ele[2][12]
-        #print( color )
-        valueTruss = defTruss( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
-        defpolyline = valueTruss[0]
-        meshdef = valueTruss[1]
-        globalTrans = valueTruss[2]
-        traslBeamValue.append( globalTrans ) 
-        modelCurve.append( defpolyline )
-        modelDisp.append( defpolyline )
-        ExtrudedView.append( meshdef )
-        #doc.Objects.AddMesh( meshdef )
-
-    elif nNode == 4 and eleType != 'FourNodeTetrahedron':
-        shellDefModel = defShellQuad( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
-        ShellDefModel.append( shellDefModel[0] )
-        traslShellValue.append( shellDefModel[1] )
-        rotShellValue.append( shellDefModel[2] )
-        extrudeShell = shellDefModel[3]
-        ExtrudedView.append( extrudeShell )
-        #doc.Objects.AddMesh( extrudeShell)
-        
-    elif nNode == 3:
-        #print( nNode )
-        shellDefModel = dg.defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
-        ShellDefModel.append( shellDefModel[0] )
-        traslShellValue.append( shellDefModel[1] )
-        rotShellValue.append( shellDefModel[2] )
-        extrudeShell = shellDefModel[3]
-        ExtrudedView.append( extrudeShell )
-        #doc.Objects.AddMesh( extrudeShell)
-        
-    elif nNode == 8:
-        solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef)
-        SolidDefModel.append( solidDefModel[0] )
-        #doc.Objects.AddMesh( solidDefModel[0] )
-        traslSolidValue.append( solidDefModel[1] )
-        ExtrudedView.append( solidDefModel[0] )
-        
-    elif  eleType == 'FourNodeTetrahedron' :
-        #print(ele)
-        solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
-        SolidDefModel.append( solidDefModel[0] )
-        traslSolidValue.append( solidDefModel[1] )
-        ExtrudedView.append( solidDefModel[0] )
-
-# Max Beam #
-flattenTrasl = []
-for valuetrasl in traslBeamValue:
-    for value in valuetrasl:
-        flattenTrasl.append( value )
-
-TraslX = [row[0] for row in flattenTrasl ]
-TraslY = [row[1] for row in flattenTrasl ]
-TraslZ = [row[2] for row in flattenTrasl ]
-
-if len(TraslX) > 0:
-    #              txMax          tyMax         tzMax
-    tMax = [ max( max(rowDefX),max(TraslX)  ), max( max(rowDefY), max(TraslY) ), max( max(rowDefZ), max(TraslZ) ) ]
-    #              txMin          tyMin         tzMin
-    tMin = [ min( min(rowDefX), min(TraslX) ), min( min(rowDefY), min(TraslY) ), min( min(rowDefZ), min(TraslZ) ) ]
-else:
-    #              txMax          tyMax         tzMax
-    tMax = [  max(rowDefX)  , max(rowDefY), max(rowDefZ) ]
-    #              txMin          tyMin         tzMin
-    tMin = [  min(rowDefX), min(rowDefY),  min(rowDefZ)  ]
-
-if direction == 0:
-    i = 0
-elif direction == 1:
-    i = 1
-elif direction == 2:
-    i = 2
 
 def gradientJet(value, valueMax, valueMin):
 
@@ -857,45 +693,225 @@ def meshLoft4( point, value, valueMax, valueMin ):
             meshEle.Faces.AddFace(index1, index2, index3, index4)
     return meshEle
 
+#----------------------------------------------------------------------#
+def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
+
+    global ModelDisp
+    global ModelCurve
+    global max_min
+    global dimSection
+
+    #modelExstrud = False if modelExstrud is None else modelExstrud
+
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    nodeValue = []
+    displacementValue = []
+    #ShellOut = openSeesOutputWrapper[4]
+
+    pointWrapper = []
+    dispWrapper = []
+    #print( diplacementWrapper )
+    for index,item in enumerate(diplacementWrapper):
+        nodeValue.append( item[0] )
+        displacementValue.append( item[1] )
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+        if len(item[1]) == 3:
+            dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
+        elif len(item[1]) == 6:
+            dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
+
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
+    pointDispWrapperDict = dict( dispWrapper )
+    ####
+
+    ## FOR scala automatica ##
+    ## nodeValue è la lista delle cordinate
+    rowX = [row[0] for row in nodeValue ]
+    rowY = [row[1] for row in nodeValue ]
+    rowZ = [row[2] for row in nodeValue ]
+
+    scaleMax = max( max(rowX), max(rowY), max(rowZ) )
+    scaleMin = min( min(rowX), min(rowY), min(rowZ) )
+    coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
+
+    ## displacementValue è la lista degli spostamenti
+
+    rowDefX = [row[0] for row in displacementValue ]
+    rowDefY = [row[1] for row in displacementValue ]
+    rowDefZ = [row[2] for row in displacementValue ]
+
+    defMax = max( max(rowDefX), max(rowDefY), max(rowDefZ) )
+    defMin = min( min(rowDefX), min(rowDefY), min(rowDefZ) )
+    DefMax = max( mt.fabs(defMax),mt.fabs(defMin))
+
+    if scale == None:
+        scaleDef = dg.scaleAutomatic( coordMax , DefMax )
+
+    else :
+        scaleDef = scale
+
+    modelCurve = []
+    ShellDefModel = []
+    ExtrudedView = []
+    modelDisp = []
+
+    traslBeamValue = []
+    rotBeamValue = []
+
+    traslShellValue = []
+    rotShellValue = []
+    ExtrudedShell = []
+
+    SolidDefModel = []
+    traslSolidValue = []
 
 
+    for ele in EleOut :
+        eleType = ele[2][0]
+        nNode = len( ele[1] )
+        
+        if eleType == 'ElasticTimoshenkoBeam' :
+            
+            dimSection = ele[2][10]
+            color = ele[2][12]
+            valueTBeam = defValueTimoshenkoBeam( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+            defpolyline = valueTBeam[0]
+            meshdef = valueTBeam[1]
+            globalTrans = valueTBeam[2]
+            globalRot = valueTBeam[3]
+            traslBeamValue.append( globalTrans ) 
+            rotBeamValue.append( globalRot )
+            modelCurve.append( defpolyline )
+            modelDisp.append( defpolyline )
+            # estrusione della beam #
+            ExtrudedView.append( meshdef )
+            #doc.Objects.AddMesh( meshdef )
+        elif eleType == 'Truss' :
+            dimSection = ele[2][10]
+            color = ele[2][12]
+            #print( color )
+            valueTruss = defTruss( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+            defpolyline = valueTruss[0]
+            meshdef = valueTruss[1]
+            globalTrans = valueTruss[2]
+            traslBeamValue.append( globalTrans ) 
+            modelCurve.append( defpolyline )
+            modelDisp.append( defpolyline )
+            ExtrudedView.append( meshdef )
+            #doc.Objects.AddMesh( meshdef )
 
-colorValor = []
-numberDivide = []
-for value in traslBeamValue :
-    row = [row[i] for row in value ]
-    numberDivide.append( len(row)  )
-    for valor in row:
-        color = gradientJet( valor, tMax[i], tMin[i] )
-        colour = rs.CreateColor( color[0], color[1], color[2] )
-        colorValor.append( colour )
+        elif nNode == 4 and eleType != 'FourNodeTetrahedron':
+            shellDefModel = defShellQuad( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+            ShellDefModel.append( shellDefModel[0] )
+            traslShellValue.append( shellDefModel[1] )
+            rotShellValue.append( shellDefModel[2] )
+            extrudeShell = shellDefModel[3]
+            ExtrudedView.append( extrudeShell )
+            #doc.Objects.AddMesh( extrudeShell)
+            
+        elif nNode == 3:
+            #print( nNode )
+            shellDefModel = dg.defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+            ShellDefModel.append( shellDefModel[0] )
+            traslShellValue.append( shellDefModel[1] )
+            rotShellValue.append( shellDefModel[2] )
+            extrudeShell = shellDefModel[3]
+            ExtrudedView.append( extrudeShell )
+            #doc.Objects.AddMesh( extrudeShell)
+            
+        elif nNode == 8:
+            solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef)
+            SolidDefModel.append( solidDefModel[0] )
+            #doc.Objects.AddMesh( solidDefModel[0] )
+            traslSolidValue.append( solidDefModel[1] )
+            ExtrudedView.append( solidDefModel[0] )
+            
+        elif  eleType == 'FourNodeTetrahedron' :
+            #print(ele)
+            solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+            SolidDefModel.append( solidDefModel[0] )
+            traslSolidValue.append( solidDefModel[1] )
+            ExtrudedView.append( solidDefModel[0] )
 
-for shellEle, value in zip(ShellDefModel,traslShellValue) :
-    shellColor = shellEle.DuplicateMesh()
-    shellColor.VertexColors.Clear()
-    for j in range(0,shellEle.Vertices.Count):
-        jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
-        shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
-    modelDisp.append( shellColor)
-#dup.VertexColors.CreateMonotoneMesh(Color.Red)
-#doc.Objects.AddMesh(dup)
-for solidEle, value in zip(SolidDefModel,traslSolidValue) :
-    solidColor = solidEle.DuplicateMesh()
-    solidColor.VertexColors.Clear()
-    for j in range(0,solidEle.Vertices.Count):
-        print(i)
-        print( value )
-        jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
-        solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
-    modelDisp.append( solidColor)
-        #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
+    # Max Beam #
+    flattenTrasl = []
+    for valuetrasl in traslBeamValue:
+        for value in valuetrasl:
+            flattenTrasl.append( value )
+
+    TraslX = [row[0] for row in flattenTrasl ]
+    TraslY = [row[1] for row in flattenTrasl ]
+    TraslZ = [row[2] for row in flattenTrasl ]
+
+    if len(TraslX) > 0:
+        #              txMax          tyMax         tzMax
+        tMax = [ max( max(rowDefX),max(TraslX)  ), max( max(rowDefY), max(TraslY) ), max( max(rowDefZ), max(TraslZ) ) ]
+        #              txMin          tyMin         tzMin
+        tMin = [ min( min(rowDefX), min(TraslX) ), min( min(rowDefY), min(TraslY) ), min( min(rowDefZ), min(TraslZ) ) ]
+    else:
+        #              txMax          tyMax         tzMax
+        tMax = [  max(rowDefX)  , max(rowDefY), max(rowDefZ) ]
+        #              txMin          tyMin         tzMin
+        tMin = [  min(rowDefX), min(rowDefY),  min(rowDefZ)  ]
+
+    i = direction 
+
+    colorValor = []
+    numberDivide = []
+    for value in traslBeamValue :
+        row = [row[i] for row in value ]
+        numberDivide.append( len(row)  )
+        for valor in row:
+            color = gradientJet( valor, tMax[i], tMin[i] )
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            colorValor.append( colour )
+
+    for shellEle, value in zip(ShellDefModel,traslShellValue) :
+        shellColor = shellEle.DuplicateMesh()
+        shellColor.VertexColors.Clear()
+        for j in range(0,shellEle.Vertices.Count):
+            jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
+            shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
+        modelDisp.append( shellColor)
+    #dup.VertexColors.CreateMonotoneMesh(Color.Red)
+    #doc.Objects.AddMesh(dup)
+    for solidEle, value in zip(SolidDefModel,traslSolidValue) :
+        solidColor = solidEle.DuplicateMesh()
+        solidColor.VertexColors.Clear()
+        for j in range(0,solidEle.Vertices.Count):
+            jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
+            solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
+        modelDisp.append( solidColor)
+            #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
 
 
-if modelExstrud == False or modelExstrud == None:
-    ModelDisp  = modelDisp
-    ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
-    max_min = th.list_to_tree([ tMax[i], tMin[i] ])
-    
-else  :
-    ModelDisp = ExtrudedView
+    if modelExstrud == False or modelExstrud == None:
+        ModelDisp  = modelDisp
+        ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
+        max_min = th.list_to_tree([ tMax[i], tMin[i] ])
+        
+    else  :
+        ModelDisp = ExtrudedView
+        ModelCurve = None
+        max_min = None
+
+        return ModelDisp, ModelCurve, max_min
+
+checkData = True
+
+if not AlpacaStaticOutput:
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if direction is None:
+    checkData = False
+    msg = "input 'direction' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
+    ModelDisp, ModelCurve, max_min = defModelView( AlpacaStaticOutput, direction , scale, modelExstrud  )
 

@@ -16,7 +16,7 @@
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
-import Grasshopper
+import Grasshopper as gh
 #import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
@@ -108,77 +108,97 @@ def TetraSolid( ele, node ):
     return  shellDefModel
 
 #--------------------------------------------------------------------------
-diplacementWrapper = AlpacaStaticOutput[0]
-EleOut = AlpacaStaticOutput[2]
-#print( ForceOut[0] )
-#print( ForceOut[1] )
-#nodalForce = AlpacaStaticOutput[5]
+def brickStressView( AlpacaStaticOutput, stressView ):
 
-#nodalForcerDict = dict( nodalForce )
+    diplacementWrapper = AlpacaStaticOutput[0]
+    EleOut = AlpacaStaticOutput[2]
+    #print( ForceOut[0] )
+    #print( ForceOut[1] )
+    #nodalForce = AlpacaStaticOutput[5]
 
-pointWrapper = []
-for index,item in enumerate(diplacementWrapper):
-    pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
+    #nodalForcerDict = dict( nodalForce )
 
-EleTag = []
-for item in EleOut:
-    if  len(item[1])  == 8:
-         EleTag.append([item[0], 48])
-    elif  len(item[0])  == 'FourNodeTetrahedron':
-         EleTag.append([item[0], 24])
+    pointWrapper = []
+    for index,item in enumerate(diplacementWrapper):
+        pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
 
-## Dict. for force ##
-#forceWrapperDict = dict( forceWrapper )
-####
-#---------------------------------------------------#
-outputFile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out'
+    EleTag = []
+    for item in EleOut:
+        if  len(item[1])  == 8:
+             EleTag.append([item[0], 48])
+        elif  len(item[0])  == 'FourNodeTetrahedron':
+             EleTag.append([item[0], 24])
 
-with open(outputFile, 'r') as f:
-    lines = f.readlines()
-    tensionList = lines[0].split()
+    ## Dict. for force ##
+    #forceWrapperDict = dict( forceWrapper )
+    ####
+    #---------------------------------------------------#
+    outputFile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out'
 
-#print(len(tensionList)/len(shellTag))
+    with open(outputFile, 'r') as f:
+        lines = f.readlines()
+        tensionList = lines[0].split()
 
-w = stressView
-#print(w + 24)
-tensionDic = []
-for n,eleTag in enumerate(EleTag) :
-    tensionShell = []
-    for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
-        tensionShell.append( float(tensionList[i]) )
-    if eleTag[1] == 48:
-        tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ], tensionShell[ w + 24 ], tensionShell[ w + 30 ], tensionShell[ w + 36 ], tensionShell[ w + 42 ] ]
-    elif eleTag[1] == 24:
-        tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ]]
-    tensionDic.append([ eleTag[0], tensionView ])
+    #print(len(tensionList)/len(shellTag))
 
-stressDict = dict( tensionDic )
-stressValue = th.list_to_tree( stressDict.values() )
-#print( stressDict.get(2))
-#print( stressDict )
-#print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
-#print( tensionDic[0] )
-'''
-maxValue = []
-minValue = []
-for value in stressDict.values():
-    maxValue.append( max( value ))
-    minValue.append( min( value ))
-    
-maxValue = max( maxValue )
-minValue = min( minValue )
-print( maxValue, minValue )
-'''
-brick = []
-for ele in EleOut :
-    eleTag = ele[0]
-    eleType = ele[2][0]
-    if eleType == "bbarBrick" :
-        brickModel = Solid( ele, pointWrapperDict )
-        brick.append( brickModel )
-    elif eleType == "ShellDKGT" :
-        outputForce = forceWrapperDict.get( eleTag )
-        tetraModel = ShellTriangle( ele, pointWrapperDict )
-        brick.append( tetraModel )
+    w = stressView
+    #print(w + 24)
+    tensionDic = []
+    for n,eleTag in enumerate(EleTag) :
+        tensionShell = []
+        for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
+            tensionShell.append( float(tensionList[i]) )
+        if eleTag[1] == 48:
+            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ], tensionShell[ w + 24 ], tensionShell[ w + 30 ], tensionShell[ w + 36 ], tensionShell[ w + 42 ] ]
+        elif eleTag[1] == 24:
+            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ]]
+        tensionDic.append([ eleTag[0], tensionView ])
+
+    stressDict = dict( tensionDic )
+    stressValue = th.list_to_tree( stressDict.values() )
+    #print( stressDict.get(2))
+    #print( stressDict )
+    #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+    #print( tensionDic[0] )
+    '''
+    maxValue = []
+    minValue = []
+    for value in stressDict.values():
+        maxValue.append( max( value ))
+        minValue.append( min( value ))
+        
+    maxValue = max( maxValue )
+    minValue = min( minValue )
+    print( maxValue, minValue )
+    '''
+    brick = []
+    for ele in EleOut :
+        eleTag = ele[0]
+        eleType = ele[2][0]
+        if eleType == "bbarBrick" :
+            brickModel = Solid( ele, pointWrapperDict )
+            brick.append( brickModel )
+        elif eleType == "ShellDKGT" :
+            outputForce = forceWrapperDict.get( eleTag )
+            tetraModel = ShellTriangle( ele, pointWrapperDict )
+            brick.append( tetraModel )
+
+    return brick, stressValue
+
+checkData = True
+
+if not AlpacaStaticOutput:
+    checkData = False
+    msg = "input 'AlpacaStaticOutput' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if stressView is None :
+    checkData = False
+    msg = " input 'stressView' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+
+if checkData != False:
+    brick, stressValue = brickStressView( AlpacaStaticOutput, stressView )

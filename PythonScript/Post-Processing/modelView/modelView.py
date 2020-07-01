@@ -525,7 +525,6 @@ def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False
 
     model = []
     extrudedModel = []
-
     line = []
     colorLine = []
 
@@ -843,7 +842,7 @@ checkData = True
 
 if not AlpacaModel:
     checkData = False
-    msg = "input 'AlpacaModel' failed to collect data"
+    msg = "input 'AlpacaModel' failed to collect data"  
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
