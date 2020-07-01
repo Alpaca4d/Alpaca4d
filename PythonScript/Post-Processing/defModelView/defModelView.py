@@ -445,6 +445,11 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             yg =  dimSection[7]
             section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
             defSection.append( section )
+        elif dimSection[0] == 'rectangularHollow' :
+            width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
+            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
@@ -468,7 +473,11 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             defSection2 = [row[1] for row in defSection ]
             meshdef = meshLoft3( defSection1,  color )
             meshdef.Append( meshLoft3( defSection2,  color ) )
-
+    elif dimSection[0] == 'rectangularHollow' :
+            defSection1 = [row[0] for row in defSection ]
+            defSection2 = [row[1] for row in defSection ]
+            meshdef = meshLoft3( defSection1,  color )
+            meshdef.Append( meshLoft3( defSection2,  color ) )
     else  :
         meshdef = meshLoft3( defSection,  color )
     return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
@@ -569,6 +578,11 @@ def defTruss( ele, node, nodeDisp, scale ):
             yg =  dimSection[7]
             section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
             defSection.append( section )
+        elif dimSection[0] == 'rectangularHollow' :
+            width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
+            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
@@ -587,13 +601,16 @@ def defTruss( ele, node, nodeDisp, scale ):
         radius2  = dimSection[1]/2 - dimSection[2]
         if (radius1 - radius2 ) == 0:
             meshdef = meshLoft3( defSection,  color )
-
         else :
             defSection1 = [row[0] for row in defSection ]
             defSection2 = [row[1] for row in defSection ]
             meshdef = meshLoft3( defSection1,  color )
             meshdef.Append( meshLoft3( defSection2,  color ) )
-
+    elif dimSection[0] == 'rectangularHollow' :
+            defSection1 = [row[0] for row in defSection ]
+            defSection2 = [row[1] for row in defSection ]
+            meshdef = meshLoft3( defSection1,  color )
+            meshdef.Append( meshLoft3( defSection2,  color ) )
     else  :
         meshdef = meshLoft3( defSection,  color )
 

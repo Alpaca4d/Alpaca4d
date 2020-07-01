@@ -255,12 +255,8 @@ def Beam( ele, node):
             radius1  = dimSection[1]/2
             radius2  = dimSection[1]/2 - dimSection[2]
             section1 = AddCircleFromCenter( sectionPlane, radius1 )
-            if (radius1 - radius2 ) == 0 :
-                sectionForm.append( section1 )
-            else :
-                section2 = AddCircleFromCenter( sectionPlane, radius2 )
-                sectionForm.append( [ section1, section2 ] )
-
+            section2 = AddCircleFromCenter( sectionPlane, radius2 )
+            sectionForm.append( [ section1, section2 ] )
         elif dimSection[0] == 'doubleT' :
             Bsup = dimSection[1]
             tsup = dimSection[2]
@@ -271,27 +267,90 @@ def Beam( ele, node):
             yg =  dimSection[7]
             section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
             sectionForm.append( section )
+        elif dimSection[0] == 'rectangularHollow' :
+            width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
+            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            sectionForm.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]
             section = AddCircleFromCenter( sectionPlane, radius )
             sectionForm.append( section )
         #print(sectionForm)
-        
-    if dimSection[0] == 'circular' :
-        radius1  = dimSection[1]/2
-        radius2  = dimSection[1]/2 - dimSection[2]
-        if (radius1 - radius2 ) == 0:
-            meshExtr = meshLoft3( defSection,  color )
-
-        else :
-            sectionForm1 = [row[0] for row in sectionForm ]
-            sectionForm2 = [row[1] for row in sectionForm ]
-            meshExtr = meshLoft3( sectionForm1,  color )
-            meshExtr.Append( meshLoft3( sectionForm2,  color ) )
-    else  :
-        meshExtr = meshLoft3( sectionForm,  color )
 
     colour = rs.CreateColor( color[0], color[1], color[2] )
+
+    if dimSection[0] == 'circular' :
+        sectionForm1 = [row[0] for row in sectionForm ]
+        sectionForm2 = [row[1] for row in sectionForm ]
+        meshExtr = meshLoft3( sectionForm1,  color )
+        meshExtr.Append( meshLoft3( sectionForm2,  color ) )
+        sectionStartEnd = [ [sectionForm1[0], sectionForm2[0]], [sectionForm1[-1], sectionForm2[-1]]  ]
+        for iSection in sectionStartEnd :
+            iMesh = rg.Mesh()
+            for iPoint, jPoint in zip(iSection[0],iSection[1])  :
+                iMesh.Vertices.Add( iPoint )
+                iMesh.Vertices.Add( jPoint )
+            for i in range(0,len(iSection[0]) - 1): # sistemare
+                index1 = i*2 # 0
+                index2 = index1 + 1 #1
+                index3 = index1 + 3 #2
+                index4 = index1 + 2 #3
+                iMesh.Faces.AddFace(index1, index2, index3, index4)
+            iMesh.Faces.AddFace(index4, index3, 1, 0)
+            iMesh.VertexColors.CreateMonotoneMesh( colour )
+            meshExtr.Append( iMesh )
+            #meshExtr.IsClosed()
+    elif  dimSection[0] == 'rectangular' : 
+        meshExtr = meshLoft3( sectionForm,  color )
+        sectionStartEnd = [ sectionForm[0], sectionForm[-1] ]
+        for iSection in sectionStartEnd :
+            iMesh = rg.Mesh()
+            for iPoint in iSection :
+                 iMesh.Vertices.Add( iPoint )
+            iMesh.Faces.AddFace(0, 1, 2, 3)
+            iMesh.VertexColors.CreateMonotoneMesh( colour )
+            meshExtr.Append( iMesh )
+    elif  dimSection[0] == 'doubleT' : 
+        meshExtr = meshLoft3( sectionForm,  color )
+        sectionStartEnd = [ sectionForm[0], sectionForm[-1] ]
+        for iSection in sectionStartEnd :
+            iMesh = rg.Mesh()
+            for iPoint in iSection :
+                 iMesh.Vertices.Add( iPoint )
+            iMesh.Faces.AddFace( 0, 1, 2 )
+            iMesh.Faces.AddFace(2, 3, 5, 0 )
+            iMesh.Faces.AddFace( 3, 4, 5 )
+            iMesh.Faces.AddFace( 5, 6, 11, 0 )
+            iMesh.Faces.AddFace( 6, 7, 8 )
+            iMesh.Faces.AddFace( 8, 9, 11, 6 )
+            iMesh.Faces.AddFace( 9, 10, 11 )
+            #iMesh.Faces.AddFace(3, 2, 1, 4)
+            #iMesh.Faces.AddFace( 5, 6, 11, 0 )
+            #iMesh.Faces.AddFace(7, 8, 9, 10)
+            iMesh.VertexColors.CreateMonotoneMesh( colour )
+            meshExtr.Append( iMesh ) 
+    elif  dimSection[0] == 'rectangularHollow' : 
+        sectionForm1 = [row[0] for row in sectionForm ]
+        sectionForm2 = [row[1] for row in sectionForm ]
+        meshExtr = meshLoft3( sectionForm1,  color )
+        meshExtr.Append( meshLoft3( sectionForm2,  color ) )
+        sectionStartEnd = [ [sectionForm1[0], sectionForm2[0]], [sectionForm1[-1], sectionForm2[-1]]  ]
+        for iSection in sectionStartEnd :
+            iMesh = rg.Mesh()
+            for iPoint, jPoint in zip(iSection[0],iSection[1])  :
+                iMesh.Vertices.Add( iPoint )
+                iMesh.Vertices.Add( jPoint )
+            iMesh.Faces.AddFace(0, 1, 3, 2)
+            iMesh.Faces.AddFace(2, 3, 5, 4)
+            iMesh.Faces.AddFace(4, 5, 7, 6)
+            iMesh.Faces.AddFace(6, 7, 1, 0)
+            iMesh.VertexColors.CreateMonotoneMesh( colour )
+            meshExtr.Append( iMesh )
+            #meshExtr.IsClosed()
+
+    elif dimSection[0] == 'Generic' :
+        meshExtr = meshLoft3( sectionForm,  color )
 
     return [ line, meshExtr, colour ]
 
