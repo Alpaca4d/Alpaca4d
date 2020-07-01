@@ -14,6 +14,7 @@
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
+import Grasshopper as gh
 import rhinoscriptsyntax as rs
 import sys
 
@@ -24,26 +25,6 @@ sys.path.append(folderName)
 import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
-
-nodeWrapper = AlpacaModel[0]
-GeomTransf = AlpacaModel[1]
-openSeesBeam = AlpacaModel[2]
-openSeesSupport = AlpacaModel[3]
-openSeesNodeLoad = AlpacaModel[4]
-openSeesMatTag = AlpacaModel[7]
-openSeesShell = AlpacaModel[8]
-openSeesSecTag = AlpacaModel[9]
-openSeesSolid = AlpacaModel[10]
-
-pointWrapper = []
-for item in nodeWrapper:
-    point = rg.Point3d(item[1],item[2],item[3])
-    pointWrapper.append( [item[0], point ] )
-## Dict. for point ##
-pointWrapperDict = dict( pointWrapper )
-####
-Points = [row[1] for row in pointWrapper ]
-
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
     t = dg.linspace( 0 , 1.80*mt.pi, 20 )
@@ -346,97 +327,129 @@ def meshLoft3( point, color ):
     #meshdElement.IsClosed(True)
     
     return meshElement
+# ------------------------------------------------------------------------------- #
+def diassembleModel(AlpacaModel ):
+
+    nodeWrapper = AlpacaModel[0]
+    GeomTransf = AlpacaModel[1]
+    openSeesBeam = AlpacaModel[2]
+    openSeesSupport = AlpacaModel[3]
+    openSeesNodeLoad = AlpacaModel[4]
+    openSeesMatTag = AlpacaModel[7]
+    openSeesShell = AlpacaModel[8]
+    openSeesSecTag = AlpacaModel[9]
+    openSeesSolid = AlpacaModel[10]
+
+    pointWrapper = []
+    for item in nodeWrapper:
+        point = rg.Point3d(item[1],item[2],item[3])
+        pointWrapper.append( [item[0], point ] )
+    ## Dict. for point ##
+    pointWrapperDict = dict( pointWrapper )
+    ####
+    Points = [row[1] for row in pointWrapper ]
+
+    model = []
+    extrudedModel = []
+
+    for ele in openSeesBeam :
+        eleTag = ele[1]
+        beamModel = Beam( ele, pointWrapperDict )
+        model.append([ eleTag, beamModel[0] ])
+        extrudedModel.append([ eleTag, beamModel[1] ])
+
+    for ele in openSeesShell :
+        nNode = len( ele[2] )
+        eleTag =  ele[1] 
+        if nNode == 4 :
+            shellModel = ShellQuad( ele, pointWrapperDict )
+            model.append([ eleTag,shellModel[0] ])
+            extrudedModel.append([ eleTag,shellModel[1] ])
+        elif nNode == 3:
+            shellModel = ShellTriangle( ele, pointWrapperDict )
+            model.append([ eleTag,shellModel[0] ])
+            extrudedModel.append([ eleTag,shellModel[1] ])
+
+    for ele in openSeesSolid :
+        nNode = len( ele[2] )
+        eleTag =  ele[1]
+        eleType = ele[0] 
+        if nNode == 8:
+            solidModel = Solid( ele, pointWrapperDict )
+            model.append([ eleTag, solidModel ])
+            extrudedModel.append([ eleTag, solidModel ])
+        elif  eleType == 'FourNodeTetrahedron' :
+            #print(ele)
+            solidModel = TetraSolid( ele, pointWrapperDict )
+            model.append([ eleTag, solidModel ])
+            extrudedModel.append([ eleTag, solidModel ])
+
+    modelDict = dict( model )
+    modelExstrudedDict = dict( extrudedModel )
+    ModelView = []
+    ModelViewExtruded = []
+    for i in range(0,len(modelDict)):
+        ModelView.append( modelDict.get( i  , "never" ))
+        ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
+
+    #--------------------------------------------------------------#
 
 
-model = []
-extrudedModel = []
 
-for ele in openSeesBeam :
-    eleTag = ele[1]
-    beamModel = Beam( ele, pointWrapperDict )
-    model.append([ eleTag, beamModel[0] ])
-    extrudedModel.append([ eleTag, beamModel[1] ])
-
-for ele in openSeesShell :
-    nNode = len( ele[2] )
-    eleTag =  ele[1] 
-    if nNode == 4 :
-        shellModel = ShellQuad( ele, pointWrapperDict )
-        model.append([ eleTag,shellModel[0] ])
-        extrudedModel.append([ eleTag,shellModel[1] ])
-    elif nNode == 3:
-        shellModel = ShellTriangle( ele, pointWrapperDict )
-        model.append([ eleTag,shellModel[0] ])
-        extrudedModel.append([ eleTag,shellModel[1] ])
-
-for ele in openSeesSolid :
-    nNode = len( ele[2] )
-    eleTag =  ele[1]
-    eleType = ele[0] 
-    if nNode == 8:
-        solidModel = Solid( ele, pointWrapperDict )
-        model.append([ eleTag, solidModel ])
-        extrudedModel.append([ eleTag, solidModel ])
-    elif  eleType == 'FourNodeTetrahedron' :
-        #print(ele)
-        solidModel = TetraSolid( ele, pointWrapperDict )
-        model.append([ eleTag, solidModel ])
-        extrudedModel.append([ eleTag, solidModel ])
-
-modelDict = dict( model )
-modelExstrudedDict = dict( extrudedModel )
-ModelView = []
-ModelViewExtruded = []
-for i in range(0,len(modelDict)):
-    ModelView.append( modelDict.get( i  , "never" ))
-    ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
-
-#--------------------------------------------------------------#
+    forceDisplay = []
+    for item in openSeesNodeLoad:
+        loadWrapper = "{3}; Pos=[{4}]; F={1}; M={2}".format(item[0],item[1][:3],item[1][3:], item[2], pointWrapperDict.get(item[0]))
+        forceDisplay.append(loadWrapper)
+    Load = forceDisplay
 
 
 
-forceDisplay = []
-for item in openSeesNodeLoad:
-    loadWrapper = "{3}; Pos=[{4}]; F={1}; M={2}".format(item[0],item[1][:3],item[1][3:], item[2], pointWrapperDict.get(item[0]))
-    forceDisplay.append(loadWrapper)
-Load = forceDisplay
+    Support = []
+
+    for support in openSeesSupport :
+        index = support[0]
+        pos = pointWrapperDict.get(index)
+        supportType = support[1:]
+        supportTypeTemp = []
+        for number in supportType:
+            if number == 1:
+                dof = True
+            else:
+                dof = False
+            supportTypeTemp.append(dof)
+        supportWrapper = "Support; Pos=[{0}]; DOF={1}".format(pos,supportTypeTemp)
+        Support.append( supportWrapper )
 
 
+    Material = []
 
-Support = []
-
-for support in openSeesSupport :
-    index = support[0]
-    pos = pointWrapperDict.get(index)
-    supportType = support[1:]
-    supportTypeTemp = []
-    for number in supportType:
-        if number == 1:
-            dof = True
-        else:
-            dof = False
-        supportTypeTemp.append(dof)
-    supportWrapper = "Support; Pos=[{0}]; DOF={1}".format(pos,supportTypeTemp)
-    Support.append( supportWrapper )
+    for item in openSeesMatTag:
+        Grade= item[0].split("_")[0]
+        dimensionType = item[0].split("_")[1]
+        typeMat = item[0].split("_")[2]
+        E = item[1][1][0]
+        G = item[1][1][1]
+        v = item[1][1][2]
+        gamma = item[1][1][3]
+        fy = item[1][1][4]
+        Material.append( "grade={}; type={}; E={}; G={}; v={}; gamma={}; fy={}".format(Grade,typeMat,E,G,v,gamma,fy))
 
 
-Material = []
+    Section = []
 
-for item in openSeesMatTag:
-    Grade= item[0].split("_")[0]
-    dimensionType = item[0].split("_")[1]
-    typeMat = item[0].split("_")[2]
-    E = item[1][1][0]
-    G = item[1][1][1]
-    v = item[1][1][2]
-    gamma = item[1][1][3]
-    fy = item[1][1][4]
-    Material.append( "grade={}; type={}; E={}; G={}; v={}; gamma={}; fy={}".format(Grade,typeMat,E,G,v,gamma,fy))
+    for item in openSeesSecTag:
+        name = item[0].split("_")[0]
+        typeSec = item[0].split("_")[1]
+        Section.append("name={}; type={}".format(name, typeSec))
 
+    return ModelView, ModelViewExtruded, Points, Support, Load, Material, Section
 
-Section = []
+checkData = True
 
-for item in openSeesSecTag:
-    name = item[0].split("_")[0]
-    typeSec = item[0].split("_")[1]
-    Section.append("name={}; type={}".format(name, typeSec))
+if not AlpacaModel:
+    checkData = False
+    msg = "input 'AlpacaModel' failed to collect data"  
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+if checkData != False:
+    ModelView, ModelViewExtruded, Points, Support, Load, Material, Section = diassembleModel( AlpacaModel )

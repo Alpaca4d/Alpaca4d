@@ -8,6 +8,7 @@
 
 import Rhino.Geometry as rg
 import ghpythonlib.treehelpers as th # per data tree
+import Grasshopper as gh
 #---------------------------------------------------------------------------------------#
 def DefSolidValue( ele, node, nodeDisp ):
     
@@ -52,6 +53,9 @@ def DefTetraSolidValue( ele, node, nodeDisp ):
     return  [trasl1, trasl2, trasl3, trasl4]
 
 def brickDisp( AlpacaStaticOutput ):
+
+    global tagElement
+    global Trans
 
     diplacementWrapper = AlpacaStaticOutput[0]
     EleOut = AlpacaStaticOutput[2]

@@ -9,6 +9,7 @@
 
 import Rhino.Geometry as rg
 import ghpythonlib.treehelpers as th # per data tree
+import Grasshopper as gh
 #---------------------------------------------------------------------------------------#
 def defShellQuadValue( ele, node, nodeDisp ):
     
