@@ -39,13 +39,6 @@ import DomeFunc as dg
 #---------------------------------------------------------------------------------------#
 def shellForces( AlpacaStaticOutput ):
 
-    global tagElement
-    global Fx
-    global Fy
-    global Fz
-    global Mx
-    global My
-    global Mz
 
     diplacementWrapper = AlpacaStaticOutput[0]
     EleOut = AlpacaStaticOutput[2]
@@ -101,7 +94,7 @@ def shellForces( AlpacaStaticOutput ):
     for ele in EleOut :
         eleTag = ele[0]
         eleType = ele[2][0]
-        if eleType == "ShellDKGQ" :
+        if eleType == "ShellMITC4" :
             tag.append( eleTag )
             outputForce = forceWrapperDict.get( eleTag )
             Fx.append( outputForce[0] )
