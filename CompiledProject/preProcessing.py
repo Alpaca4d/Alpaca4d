@@ -662,7 +662,7 @@ class BrickElement(component):
         
         
         if checkData != False:
-            SolidWrapper = Solid( Brick, Colour, nDMaterial )
+            solidWrapper = Solid( Brick, Colour, nDMaterial )
             return solidWrapper
 
 class Support(component):
