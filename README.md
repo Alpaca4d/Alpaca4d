@@ -15,7 +15,7 @@
 
 * [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
 * [x] add inetia zz in ipe section
-* [ ] add box section
+* [x] add box section
 
 * [x] circular Cross-Section less dense for visualisation
 * [x] add view distribuited load in model view
@@ -24,7 +24,11 @@
 * [ ] modify loft mesh for brick ( problem con tetra )
 * [ ] make it work DomeFunction
 * [x] Add Warning to the components. Ask Marco for some reference script
-* [ ] Create Cluster when necessary
+* [x] Create Cluster when necessary
+* [ ] password - Salvatore439505Merda506682!
+* [ ] WIP Components BrickComponents
+
+
 
 
 
@@ -40,9 +44,11 @@
 * [x] Add Warning to the components
 
 * [x] Color Palette for components
-* [ ] Documentation
+* [ ] Documentation - example
 * [ ] Big Alpaca with colorful rectangle in the background
-* [ ] Icons
+* [x] Icons
+
 
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
 * [ ] Compile and Test
+* [ ] make it working with external python
