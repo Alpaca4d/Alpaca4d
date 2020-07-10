@@ -914,7 +914,7 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
         ModelCurve = None
         max_min = None
 
-        return ModelDisp, ModelCurve, max_min
+    return ModelDisp, ModelCurve, max_min
 
 checkData = True
 
