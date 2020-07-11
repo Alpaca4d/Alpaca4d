@@ -10,6 +10,7 @@
 
 import Rhino.Geometry as rg
 import Grasshopper as gh
+from System.Drawing import Color
 
 def Solid( Brick, Colour, nDMaterial):
     
@@ -23,7 +24,10 @@ def Solid( Brick, Colour, nDMaterial):
     newMesh = Brick
     
     Material = nDMaterial
-    colour = Colour
+    if Colour is None:
+        colour = Color.FromArgb(254, 146, 63)
+    else:
+        colour = Colour
     return[ [ newMesh , elementType, Material, colour ] ]
 
 

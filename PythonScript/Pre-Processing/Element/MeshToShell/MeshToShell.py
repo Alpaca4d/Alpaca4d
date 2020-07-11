@@ -10,6 +10,7 @@
 
 import Rhino.Geometry as rg
 import Grasshopper as gh
+from System.Drawing import Color 
 
 def MeshToShell(Mesh, Colour, CrossSection):
     
@@ -18,12 +19,15 @@ def MeshToShell(Mesh, Colour, CrossSection):
     elementType = []
     if Mesh.Vertices.Count == 4:
         elementType = "ShellMITC4"
+        if Colour is None:
+            colour = Color.FromArgb(49, 159, 255)
+        else:
+            colour = Colour
     else:
         elementType = "ShellDKGT"
     newMesh = Mesh
     
     CrossSection = CrossSection
-    colour = Colour
     return[ [ newMesh , elementType, CrossSection, colour] ]
 
 checkData = True
@@ -41,8 +45,3 @@ if CrossSection is None:
 
 if checkData != False:
     shellWrapper = MeshToShell(Mesh, Colour, CrossSection)
-
-
-
-
-

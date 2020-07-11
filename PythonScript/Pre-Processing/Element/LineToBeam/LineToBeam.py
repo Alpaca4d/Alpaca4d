@@ -15,23 +15,39 @@ from System.Drawing import Color
 import ghpythonlib.components as ghcomp
 import Grasshopper as gh
 
-def LineToBeam(Line, CrossSection, Colour):
+def LineToBeam(Line, CrossSection, Colour, orientSection, beamType):
+
+    if orientSection is None:
+        orientSection = 0
+
+    if beamType is None:
+        beamType = 1
+
+
 
     Line = Line
     if beamType == 1 or None:
         elementType = "ElasticTimoshenkoBeam"
-    else:
+        if Colour is None:
+            colour = Color.FromArgb(195, 195, 13)
+        else:
+            colour = Colour
+    elif beamType == 0:
         elementType = "Truss"
+        if Colour is None:
+            colour = Color.FromArgb(179, 62, 143)
+        else:
+            colour = Colour
 
     CrossSection = CrossSection
     
+
     midPoint =  Line.PointAtNormalizedLength(0.5)
     parameter = Line.ClosestPoint(midPoint, 0.01)[1]
     perpFrame = ghcomp.PerpFrame( Line, parameter )
     perpFrame.Rotate(ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
     vecGeomTransf = [ perpFrame.XAxis, perpFrame.YAxis, perpFrame.ZAxis ]
 
-    colour = Colour
     Area = float(CrossSection[0])
     rho = float(CrossSection[6][4])
     massDens = Area * rho
@@ -53,12 +69,4 @@ if CrossSection is None:
 
 
 if checkData != False:
-    beamWrapper = LineToBeam(Line, CrossSection, Colour )
-
-
-
-
-
-
-
-
+    beamWrapper = LineToBeam(Line, CrossSection, Colour, orientSection, beamType)
