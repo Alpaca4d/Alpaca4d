@@ -2,16 +2,15 @@
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
         Cds : Cds =  caratteristiche delle sollecitazioni ( Italian Name) - Is Stress characteristics .
-        if you enter '0' view N ( forces in direction 3 ) ;
-        if you enter '1' view V1  ( forces in direction 1 ).
-        if you enter '2' view V2  ( forces in direction 2 ).
-        if you enter '3' view M2 ( Moments in direction 2 ) ;
-        if you enter '4' view M1  ( Moments in direction 1 ).
-        if you enter '5' view Mt  ( Moments in direction 3 ).
-        scale: number that multiplies the real forces.
-        If you don't enter anything it will be automatically scaled. 
+        '0' view N (forces in direction 3)
+        '1' view V1 (forces in direction 1)
+        '2' view V2 (forces in direction 2)
+        '3' view M2 (Moments in direction 2)
+        '4' view M1 (Moments in direction 1)
+        '5' view Mt (Moments in direction 3)
+        scale: Diagram multiplier. Default is AutoScale 
     Output:
-       diagram : view mesh outputs which represents the trend of the chosen stress .
+       diagram : Mesh outputs which represents the trend of the chosen stress.
        """
 
 import Rhino.Geometry as rg

@@ -40,8 +40,9 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     outputFolder = os.path.join(ghFolderPath,'assembleData')
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
-    #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-    fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py'
+    userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
+    fileName = os.path.join(userObjectFolder, r'Alpaca4d\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')
+    #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py'
 
 
     earthQuakeSettings = []

@@ -1,10 +1,10 @@
 ﻿"""Generate Model view 
     Inputs:
-        AlpacaStaticOutput: Output of solver on static Analyses.
+        AlpacaStaticOutput: Static Analyses output solver.
     Output:
        Points : points of the model .
-       Trans : Translation of the model points .
-       Rot : Rotation of the model points .
+       Trans : Translation of the model points.
+       Rot : Rotation of the model points.
        """
 
 import Rhino.Geometry as rg

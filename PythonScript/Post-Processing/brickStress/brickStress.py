@@ -1,23 +1,22 @@
 ﻿"""Generate Model view 
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
-        stressView :  stress acting on the brick nodes.
-        if you enter '0' view sigmaX ( membrane stress X ) ;
-        if you enter '1' view sigmaY  ( membrane stress Y );
-        if you enter '2' view sigmaZ ( membrane stress XY );
-        if you enter '3' view tauX  ( transverse shear forces X );
-        if you enter '4' view tauY ( transverse shear forces Y );
-        if you enter '3' view tauZ  ( transverse shear forces Z );
+        stressView:  stress acting on the brick nodes.
+            '0'= view sigmaX (membrane stress X).
+            '1'= view sigmaY (membrane stress Y).
+            '2'= view sigmaZ (membrane stress XY).
+            '3'=view tauX  (transverse shear forces X).
+            '4'=view tauY (transverse shear forces Y).
+            '5'=view tauZ  (transverse shear forces Z).
     Output:
-        brick :  mesh that represented the brick ( color later ).
-        stressValue : valor of stress acting on the brick nodes.
+        brick:  mesh representing the brick.
+        stressValue: values of stress acting on the brick nodes.
         """
         
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper as gh
-#import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc

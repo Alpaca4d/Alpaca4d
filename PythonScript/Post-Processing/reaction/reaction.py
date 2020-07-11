@@ -8,7 +8,7 @@
        tagPoints :  nodes tag of Model .
        ReactionForce : Vector of reaction Forces { Rx, Ry, Rz }.
        ReactionMoment : Vector of reaction Moments { Mx, My, Mz }.
-       view : elemet for forces view .
+       view : element for forces view .
        """
 
 import Rhino.Geometry as rg

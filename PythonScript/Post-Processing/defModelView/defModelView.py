@@ -2,21 +2,21 @@
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
 
-        direction : view relative color of the traslation :
-        if you enter '0' view traslation X ;
-        if you enter '1' view traslation Y ;
-        if you enter '2' view traslation Z .
+        direction : view relative color of the traslation:
+            '0' view traslation X.
+            '1' view traslation Y.
+            '2' view traslation Z.
 
         scale: number that multiplies the real displacements. 
 
-        modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model. 
+        modelExstrud : 'True' = view exstrude model, 'False' = view analitic model. 
 
     Output:
-       ModelDisp : view deformed model :
+       ModelDisp: view deformed model :
        beam --> polyline;
        shell --> mesh;
        brick --> solid .
-       ModelCurve : analitic line ( polyline) of the beaom or truss Element .
+       ModelCurve : analitic line ( polyline) of the beam or truss Element .
        max_min : max end min of displacement of the structure .
        """
 

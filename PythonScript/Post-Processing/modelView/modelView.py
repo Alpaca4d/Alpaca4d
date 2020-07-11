@@ -1,14 +1,11 @@
 """Generate Model view 
     Inputs:
         AlpacaModel: Output of Assemble Model.
-        modelExstrud : if Boolean Toggle is 'True' view exstrude model , if ' False ' view analitic model.
-                       if you don't enter anything then it will be 'True'.
-        Load : if Boolean Toggle is 'True' view forces model  , if  ' False ' you don't see .
-               if you don't enter anything then it will be 'True'. 
+        modelExstrud : 'True' = view exstrude model , 'False' = view analitic model. Default is 'True'.
+        Load : if Boolean Toggle is 'True' view forces model  , if  ' False ' you don't see . Default is 'True'. 
         Support : if Boolean Toggle is 'True' view constraints  model  , if ' False ' you don't see .
                   if you don't enter anything then it will be 'True'.
-        LocalAxes : if Boolean Toggle is 'True' view local axis of beam or truss element  , if is ' False ' you don't see .
-                    if you don't enter anything then it will be 'True'.
+        LocalAxes : 'True' = view local axis of beam or truss element. Default is 'True'
         nodeTag : if Boolean Toggle is 'True' view mode tag of model , if ' False ' you don't see .
                   if you don't enter anything then it will be 'True'.
         elementTag : if Boolean Toggle is 'True' view tag of element , if  ' False ' you don't see .

@@ -1,15 +1,15 @@
 ﻿"""Generate Model view 
     Inputs:
-        AlpacaStaticOutput: Output of solver on static Analyses.
+        AlpacaStaticOutput: Output of Static Solver Analyses.
         numberResults : number of discretizations for beam.
     Output:
-       tagElement : number of the tag of Beam or Truss element .
-       N : normal force values ( forces in direction 3 )
-       V1 : shear force values ( forces in direction 1 ).
-       V2 : shear force values ( forces in direction 2 ).
-       Mt : torque value ( Moments in direction 3 ).
-       M1 : bending moment ( Moments in direction 1 ).
-       M2 : bending moment ( Moments in direction 2 ).
+       tagElement : Beam or Truss element's tag number.
+       N : normal force values (forces in direction 3) [kN].
+       V1 : shear force values (forces in direction 1) [kN].
+       V2 : shear force values (forces in direction 2) [kN].
+       Mt : torque value (Moments in direction 3) [kNm].
+       M1 : bending moment (Moments in direction 1) [kNm].
+       M2 : bending moment (Moments in direction 2) [kNm].
        """
 
 import Rhino.Geometry as rg

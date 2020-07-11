@@ -4,18 +4,16 @@
         numberResults : number of discretizations for beam.
     Output:
        tagElement : number of the tag of Beam or Truss element .
-       localTrans : Displacements related to the local system ( 1- red, 2-green, 3-blue).
-       localRot : Rotation related to the local system ( 1- red, 2-green, 3-blue).
-       globalTrans : Displacements related to the global system ( XYZ ).
-       globalRot : Rotation related to the global system ( XYZ ).
+       localTrans : Displacements related to the local axis ( 1-Red, 2-Green, 3-Blue).
+       localRot : Rotation related to the local axis ( 1-Red, 2-Green, 3-Blue).
+       globalTrans : Displacements related to the global axis ( XYZ ).
+       globalRot : Rotation related to the global axis ( XYZ ).
        """
 
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper as gh
-#import ghpythonlib.components as ghcomp
-#import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
