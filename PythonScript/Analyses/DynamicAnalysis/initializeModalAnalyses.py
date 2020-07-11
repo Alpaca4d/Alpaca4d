@@ -36,6 +36,9 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
     fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\DynamicAnalysis\openSees_ModalSolver.py'
 
 
+    fileName = '"' + fileName + '"'
+    wrapperFile = '"' + wrapperFile + '"'
+
     modalAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
     modalAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
     modalAnalyses.Arguments = wrapperFile + " " + str(numVibrationModes)

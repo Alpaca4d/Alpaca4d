@@ -33,6 +33,9 @@ def InitializeStaticAnalysis(AlpacaModel):
     #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
     fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\openSees_StaticSolver.py'
 
+    fileName = '"' + fileName + '"'
+    wrapperFile = '"' + wrapperFile + '"'
+
 
     staticAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
     staticAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden

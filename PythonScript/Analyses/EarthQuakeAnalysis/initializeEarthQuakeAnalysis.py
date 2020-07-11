@@ -68,7 +68,9 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
         for item in earthQuakeSettings:
             f.write("%s\n" % item)
 
-
+    fileName = '"' + fileName + '"'
+    wrapperFile = '"' + wrapperFile + '"'
+    earthQuakeSettingsFile = '"' + earthQuakeSettingsFile + '"'
 
     EarthQuakeAnalysis = System.Diagnostics.ProcessStartInfo(fileName)
     EarthQuakeAnalysis.Arguments = wrapperFile + " " + earthQuakeSettingsFile
