@@ -382,6 +382,9 @@ class MeshToShell(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Mesh to Shell", "Mesh to Shell", """Generate a Shell MITC4 element""", "Alpaca", "1_Element")
         return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.primary
     
     def get_ComponentGuid(self):
         return System.Guid("5893c851-24e0-4663-bbb6-0b04412d8603")
@@ -470,6 +473,9 @@ class LineToBeam(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Line to Beam", "Line to Beam", """Generate a Timoshenko Beam element or a Truss element""", "Alpaca", "1_Element")
         return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.primary
     
     def get_ComponentGuid(self):
         return System.Guid("62d77f49-538e-4406-8e43-c118566d4ab2")
@@ -582,6 +588,9 @@ class BrickElement(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Brick Element", "Brick Element", """Generate a Brick Element""", "Alpaca", "1_Element")
         return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.primary
     
     def get_ComponentGuid(self):
         return System.Guid("5eaa283f-c4d1-45f7-9613-edfc53ef081a")
@@ -670,7 +679,10 @@ class Support(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Support", "Support", """Generate support for the structure.""", "Alpaca", "1_Element")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.secondary
+
     def get_ComponentGuid(self):
         return System.Guid("31d76834-23e7-4358-b245-13b7c321b576")
     
@@ -1155,6 +1167,9 @@ class ShellSection(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Shell Section", "Shell Section", """Generate a Plate cross section""", "Alpaca", "2_Cross Section")
         return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.secondary
     
     def get_ComponentGuid(self):
         return System.Guid("e5559d4b-a93b-461e-a7e4-ff3b48398fbf")
@@ -1744,7 +1759,7 @@ class MassLoad(component):
 
 # 5_Analysis
 
-class MyComponent(component):
+class staticAnalyses(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Static Analysis", "Static Analysis", """Calculate the Static Response of the structure""", "Alpaca", "5_Analysis")

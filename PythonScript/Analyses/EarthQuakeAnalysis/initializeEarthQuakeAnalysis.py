@@ -1,3 +1,22 @@
+"""Calculate the Static Response of the structure
+    Inputs:
+        AlpacaModel: Assembled model to perform Static Analyses.
+        TmaxAnalyses: Time Frame where the structure will be analyse
+        GroundMotionDirection: Direction of the earthQuake. 1 = X, 2 = Y, 3 = Z
+        GroundMotionValues: Acceleration values for each time step
+        GroundMotionTimeStep: time step for each acceleration value
+        GroundMotionFactor: Multiplier of the GroundMotionValues
+        TimeStepIncrement: integration step size. Recomended value is 0.1 times the time step
+        Damping: Damping value
+        NewmarkGamma: Gamma value to implement the Newmark integrator.
+        NewmarkBeta: Beta value to implement the Newmark integrator.
+    Output:
+       AlpacaGroundMotionOutput: Analysed Alpaca model.
+       maxDisplacement: Maximum displacement of structure [mm].
+       minDisplacement: Minimum displacement of structure [mm].
+       """
+
+
 import System
 import os
 import Grasshopper as gh
