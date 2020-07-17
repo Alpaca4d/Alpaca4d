@@ -52,4 +52,3 @@
 
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
 * [ ] Compile and Test
-* [ ] make it working with external python
