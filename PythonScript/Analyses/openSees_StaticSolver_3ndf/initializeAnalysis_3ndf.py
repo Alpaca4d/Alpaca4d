@@ -24,7 +24,7 @@ wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 
 userObjectFolder = gh.Folders.DefaultUserObjectFolder
-fileName = os.path.join(userObjectFolder, r'Alpaca4d\LinearAnalyses\openSees_StaticSolver_3ndf.py')
+fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver_3ndf.py')
 
 fileName = '"' + fileName + '"'
 wrapperFile = '"' + wrapperFile + '"'

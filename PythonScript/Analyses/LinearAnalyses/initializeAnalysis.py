@@ -31,7 +31,7 @@ def InitializeStaticAnalysis(AlpacaModel):
 
 
     userObjectFolder = gh.Folders.DefaultUserObjectFolder
-    fileName = os.path.join(userObjectFolder, r'Alpaca4d\LinearAnalyses\openSees_StaticSolver.py')
+    fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
     #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\openSees_StaticSolver.py'
 
     fileName = '"' + fileName + '"'
