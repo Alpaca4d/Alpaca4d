@@ -66,29 +66,33 @@ def defShellQuad( ele, node, nodeDisp, scaleDef ):
     eleNodeTag = ele[1]
     color = ele[2][2]
     thick = ele[2][1]
-    index1 = eleNodeTag[0]
-    index2 = eleNodeTag[1]
-    index3 = eleNodeTag[2]
-    index4 = eleNodeTag[3]
+    #print( eleNodeTag )
+    #print( eleNodeTag )
+    index1 = eleNodeTag[0] 
+    index2 = eleNodeTag[1] 
+    index3 = eleNodeTag[2] 
+    index4 = eleNodeTag[3] 
     
-    trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-    rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+    trasl1 = nodeDisp.get( index1 , "never")[0]
+    rotate1 = nodeDisp.get( index1 , "never")[1]
     
-    trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-    rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+    trasl2 = nodeDisp.get( index2 , "never")[0]
+    rotate2 = nodeDisp.get( index2 , "never")[1]
     
-    trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-    rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+    trasl3 = nodeDisp.get( index3 , "never")[0]
+    rotate3 = nodeDisp.get( index3 , "never")[1]
     
-    trasl4 = nodeDisp.get( index4 -1 , "never")[0]
-    rotate4 = nodeDisp.get( index4 -1 , "never")[1]
+    trasl4 = nodeDisp.get( index4 , "never")[0]
+    rotate4 = nodeDisp.get( index4 , "never")[1]
     
     ## CREO IL MODELLO DEFORMATO  ##
     
-    pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-    pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-    pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-    pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+    pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+    pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+    pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+    pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
+    #print( index1 - 1)
+    #print( nodeDisp )
     vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
     pointDef1.Transform( vectortrasl1 )
     vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
@@ -124,23 +128,23 @@ def defShellTriangle( ele, node, nodeDisp, scaleDef ):
     eleTag = ele[0]
     eleNodeTag = ele[1]
     color = ele[2][1]
-    index1 = eleNodeTag[0]
-    index2 = eleNodeTag[1]
-    index3 = eleNodeTag[2]
+    index1 = eleNodeTag[0] - 1
+    index2 = eleNodeTag[1] - 1
+    index3 = eleNodeTag[2] - 1
     
-    trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-    rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+    trasl1 = nodeDisp.get( index1 , "never")[0]
+    rotate1 = nodeDisp.get( index1  , "never")[1]
     
-    trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-    rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+    trasl2 = nodeDisp.get( index2 , "never")[0]
+    rotate2 = nodeDisp.get( index2 , "never")[1]
     
-    trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-    rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+    trasl3 = nodeDisp.get( index3 , "never")[0]
+    rotate3 = nodeDisp.get( index3 , "never")[1]
     
     ## CREO IL MODELLO DEFORMATO  ##
-    pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-    pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-    pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
+    pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+    pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+    pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
     vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
     pointDef1.Transform( vectortrasl1 )
     vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
@@ -172,33 +176,33 @@ def defSolid( ele, node, nodeDisp, scaleDef ):
     color = ele[2][1]
     thick = ele[2][1]
     #print( eleNodeTag )
-    index1 = eleNodeTag[0]
-    index2 = eleNodeTag[1]
-    index3 = eleNodeTag[2]
-    index4 = eleNodeTag[3]
-    index5 = eleNodeTag[4]
-    index6 = eleNodeTag[5]
-    index7 = eleNodeTag[6]
-    index8 = eleNodeTag[7]
+    index1 = eleNodeTag[0] - 1
+    index2 = eleNodeTag[1] - 1
+    index3 = eleNodeTag[2] - 1
+    index4 = eleNodeTag[3] - 1
+    index5 = eleNodeTag[4] - 1
+    index6 = eleNodeTag[5] - 1
+    index7 = eleNodeTag[6] - 1
+    index8 = eleNodeTag[7] - 1
     
-    trasl1 = nodeDisp.get( index1 -1 , "never")
-    trasl2 = nodeDisp.get( index2 -1 , "never")
-    trasl3 = nodeDisp.get( index3 -1 , "never")
-    trasl4 = nodeDisp.get( index4 -1 , "never")
-    trasl5 = nodeDisp.get( index5 -1 , "never")
-    trasl6 = nodeDisp.get( index6 -1 , "never")
-    trasl7 = nodeDisp.get( index7 -1 , "never")
-    trasl8 = nodeDisp.get( index8 -1 , "never")
+    trasl1 = nodeDisp.get( index1 , "never")
+    trasl2 = nodeDisp.get( index2 , "never")
+    trasl3 = nodeDisp.get( index3 , "never")
+    trasl4 = nodeDisp.get( index4 , "never")
+    trasl5 = nodeDisp.get( index5 , "never")
+    trasl6 = nodeDisp.get( index6 , "never")
+    trasl7 = nodeDisp.get( index7 , "never")
+    trasl8 = nodeDisp.get( index8 , "never")
     
     ## CREO IL MODELLO DEFORMATO  ##
-    pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-    pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-    pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-    pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-    pointDef5 = rg.Point3d.Clone( node.get( index5 -1 , "never") )
-    pointDef6 = rg.Point3d.Clone( node.get( index6 -1 , "never") )
-    pointDef7 = rg.Point3d.Clone( node.get( index7 -1 , "never") )
-    pointDef8 = rg.Point3d.Clone( node.get( index8 -1 , "never") )
+    pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+    pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+    pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+    pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
+    pointDef5 = rg.Point3d.Clone( node.get( index5 , "never") )
+    pointDef6 = rg.Point3d.Clone( node.get( index6 , "never") )
+    pointDef7 = rg.Point3d.Clone( node.get( index7 , "never") )
+    pointDef8 = rg.Point3d.Clone( node.get( index8 , "never") )
     vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
     pointDef1.Transform( vectortrasl1 )
     vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
@@ -243,21 +247,21 @@ def defTetraSolid( ele, node, nodeDisp, scaleDef ):
     eleNodeTag = ele[1]
     color = ele[2][1]
     #print( eleNodeTag )
-    index1 = eleNodeTag[0]
-    index2 = eleNodeTag[1]
-    index3 = eleNodeTag[2]
-    index4 = eleNodeTag[3]
+    index1 = eleNodeTag[0] - 1
+    index2 = eleNodeTag[1] - 1
+    index3 = eleNodeTag[2] - 1
+    index4 = eleNodeTag[3] - 1
     
-    trasl1 = nodeDisp.get( index1 -1 , "never")
-    trasl2 = nodeDisp.get( index2 -1 , "never")
-    trasl3 = nodeDisp.get( index3 -1 , "never")
-    trasl4 = nodeDisp.get( index4 -1 , "never")
+    trasl1 = nodeDisp.get( index1 , "never")
+    trasl2 = nodeDisp.get( index2 , "never")
+    trasl3 = nodeDisp.get( index3 , "never")
+    trasl4 = nodeDisp.get( index4 , "never")
     
     ## CREO IL MODELLO DEFORMATO  ##
-    pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-    pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-    pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-    pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+    pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+    pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+    pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+    pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
     
     vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
     pointDef1.Transform( vectortrasl1 )
@@ -292,6 +296,7 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
     propSection = ele[2]
     indexStart = ele[1][0]
     indexEnd = ele[1][1]
+    #print( indexStart, indexEnd )
     color = propSection[12]
     E = propSection[1]
     G = propSection[2]
@@ -436,7 +441,7 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             defSection2 = [row[1] for row in defSection ]
             meshdef = meshLoft3( defSection1,  color )
             meshdef.Append( meshLoft3( defSection2,  color ) )
-            print( meshdef )
+            #print( meshdef )
 
     else  :
         meshdef = meshLoft3( defSection,  color )
@@ -450,16 +455,17 @@ def defTruss( ele, node, nodeDisp, scale ):
     color = propSection[12]
     indexStart = ele[1][0]
     indexEnd = ele[1][1]
+    #print( indexStart, indexEnd )
     E = propSection[1]
     A = propSection[3]
     
-    traslStart = pointDispWrapperDict.get( indexStart , "never")
-    traslEnd = pointDispWrapperDict.get( indexEnd  , "never")
+    traslStart = nodeDisp.get( indexStart , "never")
+    traslEnd = nodeDisp.get( indexEnd  , "never")
     if len( traslStart ) == 2:
-        traslStart = pointDispWrapperDict.get( indexStart  , "never")[0]
-        traslEnd = pointDispWrapperDict.get( indexEnd  , "never")[0]
-    pointStart = pointWrapperDict.get( indexStart  , "never")
-    pointEnd = pointWrapperDict.get( indexEnd  , "never")
+        traslStart = nodeDisp.get( indexStart  , "never")[0]
+        traslEnd = nodeDisp.get( indexEnd  , "never")[0]
+    pointStart = node.get( indexStart  , "never")
+    pointEnd = node.get( indexEnd  , "never")
     #print( traslStart[1] )
     line = rg.LineCurve( pointStart,  pointEnd )
 
@@ -563,7 +569,7 @@ def defTruss( ele, node, nodeDisp, scale ):
             defSection2 = [row[1] for row in defSection ]
             meshdef = meshLoft3( defSection1,  color )
             meshdef.Append( meshLoft3( defSection2,  color ) )
-            print( meshdef )
+            #print( meshdef )
 
     else  :
         meshdef = meshLoft3( defSection,  color )
@@ -574,11 +580,11 @@ def meshLoft3( point, color ):
     meshElement = rg.Mesh()
     meshEle = rg.Mesh()
     pointSection1 = point
-    print( point )
+    #print( point )
     for i in range(0,len(pointSection1)):
         for j in range(0, len(pointSection1[0])):
             vertix = pointSection1[i][j]
-            print( type(vertix) )
+            #print( type(vertix) )
             meshEle.Vertices.Add( vertix ) 
             #meshEle.VertexColors.Add( color[0],color[1],color[2] );
     k = len(pointSection1[0])
@@ -633,12 +639,14 @@ with open(path, 'r') as f:
     lines = f.readlines()
     for n, line in enumerate(lines):
         if (n % speed) == 0:
+            #print( n % speed )
             line = line.strip().split(" ")
             timeStep.append( line[0] )
             displacementTemp = line[1:]
             n = 6
             displacementTime = [displacementTemp[i:i + n] for i in range(0, len(displacementTemp), n)]
             displacement.append(displacementTime)
+
 
 
 
@@ -679,9 +687,11 @@ if Animate and not Reset:
 
 
 stepValue = displacement[myCounter]
+#print( stepValue[0][0] )
 pointDef = []
 for indexPoint, value in enumerate(stepValue):
-    tagPoint = indexPoint + 1
+    tagPoint = indexPoint  + 1
+    #print( tagPoint )
     traslX = float(value[0])
     traslY = float(value[1])
     traslZ = float(value[2])
@@ -693,7 +703,7 @@ timePointDef = dict( pointDef )
 
 if myCounter > (len(displacement)) :
     myCounter = 1
-print(myCounter)
+#print(myCounter)
 
 nodeValue = []
 #ShellOut = openSeesOutputWrapper[4]
@@ -701,7 +711,8 @@ nodeValue = []
 pointWrapper = []
 
 for value in point:
-    index = value[0]
+    index = value[0] 
+    #print( index )
     pointWrapper.append( [index, rg.Point3d(value[1][0],value[1][1],value[1][2]) ] )
 
 ## Dict. for point ##
