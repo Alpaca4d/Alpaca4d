@@ -32,10 +32,10 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
     outputFolder = os.path.join(ghFolderPath,'assembleData')
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
-    #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-    #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\DynamicAnalysis\openSees_ModalSolver.py'
+
     userObjectFolder = gh.Folders.DefaultUserObjectFolder
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\DynamicAnalysis\openSees_ModalSolver.py')
+    #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\DynamicAnalysis\openSees_ModalSolver.py'
 
 
 
