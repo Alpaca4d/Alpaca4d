@@ -1,10 +1,24 @@
-﻿import math
+﻿"""Generate a  double T cross Section
+    Inputs:
+        sectionName: Name of the section.
+        Bsup: Width upper Flange
+        Binf: Width lower Flange
+        H: Depth of section [ mm ]
+        tsup: upper Flange thickness [ mm ]
+        tinf: lower Flange thickness [ mm ]
+        tw: Web thickness [ mm ]
+        uniaxialMaterial: Material element.
+    Output:
+       CrossSection: CrossSection element.
+       """
+
+import math
 import Grasshopper as gh
 
-def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, uniaxialMaterial):
+def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, tw, uniaxialMaterial):
     sectionName = sectionName
     shape = "doubleT"
-    Bsup, tsup, Binf, tinf, H, ta = Bsup/1000, tsup/1000, Binf/1000, tinf/1000, H/1000, ta/1000     # Input value in mm ---> Output m
+    Bsup, tsup, Binf, tinf, H, ta = Bsup/1000, tsup/1000, Binf/1000, tinf/1000, H/1000, tw/1000     # Input value in mm ---> Output m
     A1, y1 = Bsup*tsup, (H - tsup/2 )
     A2, y2 = ( H - tsup -tinf )*ta, (H-tsup-tinf)/2 + tinf
     A3, y3 = Binf*tinf, tinf/2
@@ -56,9 +70,9 @@ if H is None:
     msg = "input 'H' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if ta is None:
+if tw is None:
     checkData = False
-    msg = "input 'ta' failed to collect data"
+    msg = "input 'tw' failed to collect data"
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if uniaxialMaterial is None:
@@ -67,5 +81,5 @@ if uniaxialMaterial is None:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    CrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, ta, uniaxialMaterial)
+    CrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, tw, uniaxialMaterial)
 

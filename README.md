@@ -13,7 +13,7 @@
 * [x] modal analyses doesn't start from mode 1
 * [x] add "IPE" section
 
-* [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
+* [x] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
 * [x] add inetia zz in ipe section
 * [x] add box section
 

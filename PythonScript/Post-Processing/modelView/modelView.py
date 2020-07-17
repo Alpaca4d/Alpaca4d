@@ -669,6 +669,7 @@ def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False
         fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
         forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
 
+    #print( forceMax )
     forceMin = min( forceMax )
 
 
@@ -705,7 +706,7 @@ def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False
             for index, x in enumerate(DivCurve):
                 beamPoint = lineBeam.PointAt(DivCurve[index]) 
                 ancorPoint.append( beamPoint )
-                forceDisplay.append(  forceVector*scale  )
+                forceDisplay.append( forceVector )
 
     forceDisplay = th.list_to_tree( [ ancorPoint, forceDisplay ] )
     if len(openSeesNodalMass)>0:
