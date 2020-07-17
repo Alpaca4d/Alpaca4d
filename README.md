@@ -47,8 +47,8 @@
 * [ ] Documentation - example
 * [ ] Big Alpaca with colorful rectangle in the background
 * [x] Icons
+* [ ] problem whit trasformation global force in eleLoad
 
 
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
 * [ ] Compile and Test
-* [ ] make it working with external python

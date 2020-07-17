@@ -16,20 +16,26 @@ for dirpath, dirnames, filenames in os.walk(workingDirectory):
             os.remove(file)
             #print("I removed the file")
 
-ghFilePath = ghenv.LocalScope.ghdoc.Path
+
+
 ghFolderPath = os.path.dirname(ghFilePath)
 outputFolder = os.path.join(ghFolderPath,'assembleData')
 wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 
+userObjectFolder = gh.Folders.DefaultUserObjectFolder
+fileName = os.path.join(userObjectFolder, r'Alpaca4d\LinearAnalyses\openSees_StaticSolver_3ndf.py')
+
+fileName = '"' + fileName + '"'
+wrapperFile = '"' + wrapperFile + '"'
 
 
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\openSees_StaticSolver_3ndf.py'
-
-staticAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
-staticAnalyses.Arguments = wrapperFile
-process = System.Diagnostics.Process.Start(staticAnalyses)
+staticAnalyses_3ndf = System.Diagnostics.ProcessStartInfo(fileName)
+staticAnalyses_3ndf.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+staticAnalyses_3ndf.Arguments = wrapperFile
+process = System.Diagnostics.Process.Start(staticAnalyses_3ndf)
 System.Diagnostics.Process.WaitForExit(process)
+
 
 ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
 ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
