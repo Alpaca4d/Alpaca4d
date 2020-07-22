@@ -882,14 +882,14 @@ def meshLoft4( point, value, valueMax, valueMin ):
                 index4 = i*k
             meshEle.Faces.AddFace(index1, index2, index3, index4)
     return meshEle
-
+'''
 colorValor = []
 numberDivide = []
 for value in traslBeamValue :
-    row = [row[i] for row in value ]
+    row = [row[direction] for row in value ]
     numberDivide.append( len(row)  )
     for valor in row:
-        color = gradientJet( valor, tMax[i], tMin[i] )
+        color = gradientJet( valor, tMax[direction], tMin[direction] )
         colour = rs.CreateColor( color[0], color[1], color[2] )
         colorValor.append( colour )
 
@@ -897,7 +897,7 @@ for shellEle, value in zip(ShellDefModel,traslShellValue) :
     shellColor = shellEle.DuplicateMesh()
     shellColor.VertexColors.Clear()
     for j in range(0,shellEle.Vertices.Count):
-        jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
+        jetColor = gradientJet(value[j][direction], tMax[direction], tMin[direction])
         shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
     modelDisp.append( shellColor)
 #dup.VertexColors.CreateMonotoneMesh(Color.Red)
@@ -906,13 +906,13 @@ for solidEle, value in zip(SolidDefModel,traslSolidValue) :
     solidColor = solidEle.DuplicateMesh()
     solidColor.VertexColors.Clear()
     for j in range(0,solidEle.Vertices.Count):
-        jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
+        jetColor = gradientJet(value[j][direction], tMax[direction], tMin[direction])
         solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
     modelDisp.append( solidColor)
         #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
 
-max_min = th.list_to_tree([ tMax[i], tMin[i] ])
-
+max_min = th.list_to_tree([ tMax[direction], tMin[direction] ])
+'''
 if modelExstrud == False or modelExstrud == None :
     ModelDisp  = modelDisp
     ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
