@@ -240,7 +240,7 @@ ops.analysis("Static")
 # perform the analysis
 ops.analyze(1)
 
-ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to zero
+ops.loadConst('-time', 0.0) #maintain constant gravity loads and reset time to zero
 
 
 
@@ -286,10 +286,10 @@ for line in earthQuakeSettingLines:
 
 
 
-#print(f"GroundMotionValues = {GroundMotionValues}")
-#print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
-#print(f'GMfact = {GMfact}')
-#print(f"GMdirection = {GMdirection}")
+print(f"GroundMotionValues = {GroundMotionValues}")
+print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
+print(f'GMfact = {GMfact}')
+print(f"GMdirection = {GMdirection}")
 
 
 # to make it more reliable
@@ -311,8 +311,8 @@ Omega = math.pow(Lambda, 0.5)
 
 
 betaKcomm = 2 * (damping/Omega)
-alphaM = 0.0				# M-prop. damping; D = alphaM*M	
-betaKcurr = 0.0		# K-proportional damping;      +beatKcurr*KCurrent
+alphaM = 0.0                # M-prop. damping; D = alphaM*M 
+betaKcurr = 0.0     # K-proportional damping;      +beatKcurr*KCurrent
 betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
 
 ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
