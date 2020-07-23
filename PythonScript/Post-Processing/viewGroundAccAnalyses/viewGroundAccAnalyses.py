@@ -13,7 +13,7 @@ import time
 fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
 sys.path.append(fileName)
 # importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
+import DomeFunc as dg
 #---------------------------------------------------------#
 
 ## Funzione cerchio ##
@@ -650,6 +650,7 @@ with open(path, 'r') as f:
 
 
 
+
 # I change the List Structure to have an ouput
 # this change will not affect the work done before
 
@@ -680,7 +681,10 @@ if "myCounter" not in globals() or Reset:
     myCounter = 0
 
 if Animate and not Reset:
-    myCounter += 1
+    if myCounter >= len(displacement) - 1:
+        myCounter = 0
+    else:
+        myCounter += 1
     updateComponent(1)
 
 
@@ -701,9 +705,6 @@ for indexPoint, value in enumerate(stepValue):
     pointDef.append([ tagPoint, [ rg.Point3d( traslX, traslY, traslZ ), rg.Point3d( rotX, rotY, rotZ ) ]])
 timePointDef = dict( pointDef )
 
-if myCounter > (len(displacement)) :
-    myCounter = 1
-#print(myCounter)
 
 nodeValue = []
 #ShellOut = openSeesOutputWrapper[4]
@@ -816,12 +817,6 @@ tMax = [  max(TraslX)  ,  max(TraslY) ,  max(TraslZ)  ]
 tMin = [   min(TraslX) ,  min(TraslY) , min(TraslZ)  ]
 
 
-if direction == 0:
-    i = 0
-elif direction == 1:
-    i = 1
-elif direction == 2:
-    i = 2
 
 def gradientJet(value, valueMax, valueMin):
 
@@ -889,7 +884,7 @@ for value in traslBeamValue :
     row = [row[i] for row in value ]
     numberDivide.append( len(row)  )
     for valor in row:
-        color = gradientJet( valor, tMax[i], tMin[i] )
+        color = gradientJet( valor, tMax[direction], tMin[direction] )
         colour = rs.CreateColor( color[0], color[1], color[2] )
         colorValor.append( colour )
 
@@ -897,7 +892,7 @@ for shellEle, value in zip(ShellDefModel,traslShellValue) :
     shellColor = shellEle.DuplicateMesh()
     shellColor.VertexColors.Clear()
     for j in range(0,shellEle.Vertices.Count):
-        jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
+        jetColor = gradientJet(value[j][direction], tMax[direction], tMin[direction])
         shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
     modelDisp.append( shellColor)
 #dup.VertexColors.CreateMonotoneMesh(Color.Red)

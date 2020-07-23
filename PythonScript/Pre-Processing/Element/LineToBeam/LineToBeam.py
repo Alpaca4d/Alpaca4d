@@ -10,7 +10,7 @@
        """
 
 import Rhino.Geometry as rg
-from Rhino.RhinoMath import *
+import Rhino.RhinoMath
 from System.Drawing import Color
 import ghpythonlib.components as ghcomp
 import Grasshopper as gh
@@ -45,7 +45,7 @@ def LineToBeam(Line, CrossSection, Colour, orientSection, beamType):
     midPoint =  Line.PointAtNormalizedLength(0.5)
     parameter = Line.ClosestPoint(midPoint, 0.01)[1]
     perpFrame = ghcomp.PerpFrame( Line, parameter )
-    perpFrame.Rotate(ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
+    perpFrame.Rotate(Rhino.RhinoMath.ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
     vecGeomTransf = [ perpFrame.XAxis, perpFrame.YAxis, perpFrame.ZAxis ]
 
     Area = float(CrossSection[0])
@@ -53,7 +53,7 @@ def LineToBeam(Line, CrossSection, Colour, orientSection, beamType):
     massDens = Area * rho
 
 
-    return [[Line, elementType, CrossSection, vecGeomTransf, colour, massDens,perpFrame]]
+    return [[Line, elementType, CrossSection, vecGeomTransf, colour, massDens, perpFrame]]
 
 checkData = True
 
