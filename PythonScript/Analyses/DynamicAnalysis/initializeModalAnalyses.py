@@ -33,20 +33,29 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 
+
     userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\DynamicAnalysis\openSees_ModalSolver.py')
-    #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\DynamicAnalysis\openSees_ModalSolver.py'
-
-
-
-    fileName = '"' + fileName + '"'
+    
     wrapperFile = '"' + wrapperFile + '"'
+    fileName = '"' + fileName + '"'
+    
+    p = System.Diagnostics.Process()
+    p.StartInfo.RedirectStandardOutput = True
+    p.StartInfo.RedirectStandardError = True
 
-    modalAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
-    modalAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-    modalAnalyses.Arguments = wrapperFile + " " + str(numVibrationModes)
-    process = System.Diagnostics.Process.Start(modalAnalyses)
-    System.Diagnostics.Process.WaitForExit(process)
+    p.StartInfo.UseShellExecute = False
+    p.StartInfo.CreateNoWindow = True
+    
+    p.StartInfo.FileName = pythonInterpreter
+    p.StartInfo.Arguments = fileName + " " + wrapperFile + " " + str(numVibrationModes)
+    p.Start()
+    p.WaitForExit()
+    
+    
+    msg = p.StandardError.ReadToEnd()
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
 
     ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
     ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py

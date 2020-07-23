@@ -40,9 +40,6 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     outputFolder = os.path.join(ghFolderPath,'assembleData')
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
-    userObjectFolder = gh.Folders.DefaultUserObjectFolder
-    fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')
-    #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py'
 
 
     earthQuakeSettings = []
@@ -62,21 +59,42 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     earthQuakeSettings.append( "TIMESTEP {}".format(TimeStepIncrement) )
 
 
-
     earthQuakeSettingsFile = os.path.join( outputFolder,'earthQuakeSettingsFile.txt')
 
     with open(earthQuakeSettingsFile, 'w') as f:
         for item in earthQuakeSettings:
             f.write("%s\n" % item)
 
+
+    userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
+    fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')
+
+
     fileName = '"' + fileName + '"'
     wrapperFile = '"' + wrapperFile + '"'
     earthQuakeSettingsFile = '"' + earthQuakeSettingsFile + '"'
+    
+    p = System.Diagnostics.Process()
+    p.StartInfo.RedirectStandardOutput = False
+    p.StartInfo.RedirectStandardError = True
 
-    EarthQuakeAnalysis = System.Diagnostics.ProcessStartInfo(fileName)
-    EarthQuakeAnalysis.Arguments = wrapperFile + " " + earthQuakeSettingsFile
-    process = System.Diagnostics.Process.Start(EarthQuakeAnalysis)
-    System.Diagnostics.Process.WaitForExit(process)
+    p.StartInfo.UseShellExecute = False
+    p.StartInfo.CreateNoWindow = False
+    
+    p.StartInfo.FileName = pythonInterpreter
+    p.StartInfo.Arguments = fileName + " " + wrapperFile + " " + earthQuakeSettingsFile
+    p.Start()
+    p.WaitForExit()
+    
+    
+    msg = p.StandardError.ReadToEnd()
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
+
+
+
+
+
 
 
     print("I have finished")
