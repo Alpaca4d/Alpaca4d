@@ -2,7 +2,7 @@ import sys
 import openseespy.opensees as ops
 import os
 
-#filename = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesModel.txt'
+#filename = r'C:\Users\FORMAT\Desktop\assembleData\openSeesModel.txt'
 filename = sys.argv[1]
 inputName = filename.split("\\")[-1]
 
@@ -121,12 +121,12 @@ for n in range(0, len(openSeesBeam)):
     elementProperties.append([ eleTag, [eleType, E, G, A, Avz, Avy, Jxx, Iy, Iz, orientVector, sectionGeomProperties, matTag, color] ])
 
 
-    if eleType is 'Truss':
+    if eleType == 'Truss':
         trussTag.append( eleTag - 1 )
         ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag ) # TO CONTROL!!!
-        
 
-    elif eleType is 'ElasticTimoshenkoBeam':
+
+    elif eleType == 'ElasticTimoshenkoBeam':
         beamTag.append( eleTag - 1 )
         ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
 
@@ -313,3 +313,5 @@ outputFileName = filefolder+'openSeesOutputWrapper.txt'
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
         f.write("%s\n" % item)
+
+print("analyses Finished")

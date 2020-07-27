@@ -11,15 +11,15 @@ $env:WINPYDIRBASE = "$dp0\.."
 $env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
 
 # avoid double_init (will only resize screen)
-if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"\python-3.8.3.amd64")) ) {
+if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"\python-3.7.7.amd64")) ) {
 
 
-$env:WINPYDIR = $env:WINPYDIRBASE+"\python-3.8.3.amd64"
+$env:WINPYDIR = $env:WINPYDIRBASE+"\python-3.7.7.amd64"
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 $env:PYTHON = "%WINPYDIR%\python.exe"
 
 
-$env:WINPYVER = '3.8.3.0dot'
+$env:WINPYVER = '3.7.7.1dot'
 $env:HOME = "$env:WINPYDIRBASE\settings"
 
 # rem read https://github.com/winpython/winpython/issues/839

@@ -8,11 +8,11 @@ set WINPYDIRBASE=%CD%
 set WINPYDIRBASETMP=
 popd
 
-set WINPYDIR=%WINPYDIRBASE%\python-3.8.3.amd64
+set WINPYDIR=%WINPYDIRBASE%\python-3.7.7.amd64
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 set PYTHON=%WINPYDIR%\python.exe
 
-set WINPYVER=3.8.3.0dot
+set WINPYVER=3.7.7.1dot
 set HOME=%WINPYDIRBASE%\settings
 rem read https://github.com/winpython/winpython/issues/839
 rem set USERPROFILE=%HOME%
