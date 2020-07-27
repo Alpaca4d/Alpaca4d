@@ -1,6 +1,19 @@
 import sys
-import openseespy.opensees as ops
 import os
+from datetime import date
+
+import openseespy.opensees as ops
+
+# perform Low Level License check
+
+ExpireDate = date(2010, 10, 1)
+actualDay = date.today()
+remainingDate = (ExpireDate - actualDay).days
+
+
+if remainingDate < 0:
+    sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@xxxxxx.com to renew the license")
+
 
 #filename = r'C:\Users\FORMAT\Desktop\assembleData\openSeesModel.txt'
 filename = sys.argv[1]

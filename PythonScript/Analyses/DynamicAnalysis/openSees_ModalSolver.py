@@ -1,7 +1,19 @@
 import sys
+from datetime import date
 import openseespy.opensees as ops
 import math
 import time
+
+
+ExpireDate = date(2010, 10, 1)
+actualDay = date.today()
+remainingDate = (ExpireDate - actualDay).days
+
+
+if remainingDate < 0:
+    sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@xxxxxx.com to renew the license")
+
+
 
 filename = sys.argv[1]
 numEigenvalues = int(sys.argv[2])
