@@ -22,23 +22,12 @@ import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
 ## node e nodeDisp son dictionary ##
 def forceTimoshenkoBeam( ele, node, force, loadDict, numberResults ):
     #---------------- WORLD PLANE ----------------------#
@@ -90,7 +79,7 @@ def forceTimoshenkoBeam( ele, node, force, loadDict, numberResults ):
     M3J = localMomentStart.Z # 
     ##------------------ displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    DivCurve = dg.linspace( 0, Length, numberResults )
+    DivCurve = linspace( 0, Length, numberResults )
     if numberResults == None:
         DivCurve = [ 0, Length]
         
@@ -177,7 +166,7 @@ def forceTrussValue(  ele, node, force, loadDict, numberResults ):
     M3J = localMomentStart.Z # 
     ##------------------ displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    DivCurve = dg.linspace( 0, Length, numberResults )
+    DivCurve = linspace( 0, Length, numberResults )
     if numberResults == None:
         DivCurve = [ 0, Length]
         

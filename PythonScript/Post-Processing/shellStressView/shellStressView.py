@@ -21,12 +21,12 @@ import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper as gh
 #import System as sy #DV
 import sys
+import os
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
+
+ 
+
 #---------------------------------------------------------------------------------------#
 def ShellStressQuad( ele, node ):
     eleTag = ele[0]
@@ -108,9 +108,11 @@ def shellStressView( AlpacaStaticOutput, stressView ):
 
     ## Dict. for force ##
     #forceWrapperDict = dict( forceWrapper )
-    ####
+    ghFilePath = ghenv.LocalScope.ghdoc.Path
+    workingDirectory = os.path.dirname(ghFilePath)
+    outputFile = os.path.join(workingDirectory, 'assembleData' )
+    outputFile = os.path.join(outputFile, 'tensionShell.out' )
     #---------------------------------------------------#
-    outputFile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\tension.out'
 
     with open(outputFile, 'r') as f:
         lines = f.readlines()

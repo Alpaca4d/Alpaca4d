@@ -34,27 +34,26 @@ import rhinoscriptsyntax as rs
 import sys
 
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-folderName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(folderName)
-
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
-
 #---------------------------------------------------------------------------------------#
+
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+## Funzione rettangolo ##
+def AddRectangleFromCenter(plane, width, height):
+    a = plane.PointAt(-width * 0.5, -height * 0.5 )
+    b = plane.PointAt(-width * 0.5,  height * 0.5 )
+    c = plane.PointAt( width * 0.5,  height * 0.5 )
+    d = plane.PointAt( width * 0.5,  -height * 0.5 )
+    #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
+    rectangle  = [a, b, c, d] 
+    return rectangle
+    
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 1.85*mt.pi, 15 )
+    t = linspace( 0 , 1.85*mt.pi, 15 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)
@@ -276,7 +275,7 @@ def Beam( ele, node):
         
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
-            section = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section = AddRectangleFromCenter( sectionPlane, width, height )
             sectionForm.append( section )
         elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
@@ -296,8 +295,8 @@ def Beam( ele, node):
             sectionForm.append( section )
         elif dimSection[0] == 'rectangularHollow' :
             width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
-            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
-            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            section1 = AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
             sectionForm.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]
@@ -792,24 +791,6 @@ def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False
                 a.append( supp )
             if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 1  : # cerniera lungo x
                 supp = rg.Brep()
-                plane = rg.Plane.WorldZX
-                radius = 0.15
-                length = radius*3.50
-                vector = rg.Vector3d( 0, -length/2 , -radius ) 
-                vectorTrasl = rg.Point3d.Add( center_point, vector )
-                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-                plane.Transform( trasl )
-                circle = rg.Circle(plane, radius)
-                supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
-                plane2 = rg.Plane.WorldXY
-                vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
-                vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-                trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-                plane2.Transform( trasl2 )
-                supp.Append( AddForm3Center(plane2, length, radius*2) )
-                a.append( supp )
-            if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 0  : # cerniera lungo y
-                supp = rg.Brep()
                 plane = rg.Plane.WorldYZ
                 radius = 0.15
                 length = radius*3.50
@@ -825,6 +806,24 @@ def ModelViewer(AlpacaModel, modelExstrud = False, Load = False, Support = False
                 trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
                 plane2.Transform( trasl2 )
                 supp.Append( AddForm2Center(plane2, length, radius*2) )
+                a.append( supp )
+            if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 0  : # cerniera lungo y
+                supp = rg.Brep()
+                plane = rg.Plane.WorldZX
+                radius = 0.15
+                length = radius*3.50
+                vector = rg.Vector3d( 0, -length/2 , -radius ) 
+                vectorTrasl = rg.Point3d.Add( center_point, vector )
+                trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                plane.Transform( trasl )
+                circle = rg.Circle(plane, radius)
+                supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
+                plane2 = rg.Plane.WorldXY
+                vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
+                vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                plane2.Transform( trasl2 )
+                supp.Append( AddForm3Center(plane2, length, radius*2) )
                 a.append( supp )
             if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 0   : # cerniera sferica
                 radius = 0.15

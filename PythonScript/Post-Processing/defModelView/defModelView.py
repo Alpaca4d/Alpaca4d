@@ -31,27 +31,67 @@ import rhinoscriptsyntax as rs
 import Rhino.Display as rd
 from scriptcontext import doc
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
 
 #---------------------------------------------------------------------------------------#
+## -------------FUNZIONI DI FORMA PER TRAVE DI TYMOSHENKO------------------ ##
+
+def alphat( E, G, I, At ):
+    return (E*I)/(G*At)
+
+## Spostamenti e rotazioni ##
+def spostu( x, L, uI, uJ ):
+    return -(-L*uI + uI*x - uJ*x)/L
+    
+def spostv( x, L, vI, vJ, thetaI, thetaJ, alphay ):
+    return (L**3*thetaI*x + L**3*vI - 2*L**2*thetaI*x**2 - L**2*thetaJ*x**2 + 6*L*alphay*thetaI*x - 6*L*alphay*thetaJ*x + 12*L*alphay*vI + L*thetaI*x**3 + L*thetaJ*x**3 - 3*L*vI*x**2 + 3*L*vJ*x**2 - 6*alphay*thetaI*x**2 + 6*alphay*thetaJ*x**2 - 12*alphay*vI*x + 12*alphay*vJ*x + 2*vI*x**3 - 2*vJ*x**3)/(L*(L**2 + 12*alphay))
+    
+def spostw( x, L, wI, wJ, psiI, psiJ, alphaz ):
+    return -(L**3*psiI*x - L**3*wI - 2*L**2*psiI*x**2 - L**2*psiJ*x**2 - 6*L*alphaz*psiI*x + 6*L*alphaz*psiJ*x + 12*L*alphaz*wI + L*psiI*x**3 + L*psiJ*x**3 + 3*L*wI*x**2 - 3*L*wJ*x**2 + 6*alphaz*psiI*x**2 - 6*alphaz*psiJ*x**2 - 12*alphaz*wI*x + 12*alphaz*wJ*x - 2*wI*x**3 + 2*wJ*x**3)/(L*(L**2 - 12*alphaz))
+    
+def thetaz(x, L, vI, vJ, thetaI, thetaJ, alphay): 
+    return (L**3*thetaI - 4*L**2*thetaI*x - 2*L**2*thetaJ*x + 12*L*alphay*thetaI + 3*L*thetaI*x**2 + 3*L*thetaJ*x**2 - 6*L*vI*x + 6*L*vJ*x - 12*alphay*thetaI*x + 12*alphay*thetaJ*x + 6*vI*x**2 - 6*vJ*x**2)/(L*(L**2 + 12*alphay))
+    
+def phix(x, L, phiI, phiJ):
+    return -(-L*phiI + phiI*x - phiJ*x)/L
+
+def psiy(x, L, wI, wJ, psiI, psiJ, alphaz): 
+    return (L**3*psiI - 4*L**2*psiI*x - 2*L**2*psiJ*x - 12*L*alphaz*psiI + 3*L*psiI*x**2 + 3*L*psiJ*x**2 + 6*L*wI*x - 6*L*wJ*x + 12*alphaz*psiI*x - 12*alphaz*psiJ*x - 6*wI*x**2 + 6*wJ*x**2)/(L*(L**2 - 12*alphaz))
+    
+def gammay( L, vI, vJ, thetaI, thetaJ, alphay): 
+
+    return (L*thetaI + L*thetaJ + 2*vI - 2*vJ)/(L*(L**2 + 12*alphay))
+    
+def gammaz( L, wI, wJ, psiI, psiJ, alphaz):
+
+    return -(L*psiI + L*psiJ - 2*wI + 2*wJ)/(L*(L**2 - 12*alphaz))
+
+##------------------------------------------------------------------------- --##
+
+def scaleAutomatic( Num , Den ):
+    if Den < 0.1 :
+        return Num
+    else :
+        return Num*1/Den
+
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+## Funzione rettangolo ##
+def AddRectangleFromCenter(plane, width, height):
+    a = plane.PointAt(-width * 0.5, -height * 0.5 )
+    b = plane.PointAt(-width * 0.5,  height * 0.5 )
+    c = plane.PointAt( width * 0.5,  height * 0.5 )
+    d = plane.PointAt( width * 0.5,  -height * 0.5 )
+    #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
+    rectangle  = [a, b, c, d] 
+    return rectangle
+    
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 1.80*mt.pi, 16 )
+    t = linspace( 0 , 1.80*mt.pi, 16 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)
@@ -377,14 +417,18 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
     rJ3 = localRotEnd[2]  # 
     ##------------------ displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    divideDistance = 0.5
-    DivCurve = line.DivideByLength( divideDistance, True )
+    #divideDistance = 0.5
+    segmentCount = Length/0.5
+    #print( segmentCount )
+    DivCurve = line.DivideByCount( segmentCount, True )
+    #DivCurve = line.DivideEquidistant(divideDistance)
+    #print( DivCurve )
     if DivCurve == None:
         DivCurve = [ 0, Length]
         
     #s = dg.linspace(0,Length, len(PointsDivLength))
-    AlphaY = dg.alphat( E, G, Iy, Avz )
-    AlphaZ = dg.alphat( E, G, Iz, Avy )
+    AlphaY = alphat( E, G, Iy, Avz )
+    AlphaZ = alphat( E, G, Iz, Avy )
     
     globalTransVector = []
     globalRotVector = []
@@ -396,22 +440,22 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
     for index, x in enumerate(DivCurve):
         beamPoint = line.PointAt(DivCurve[index]) 
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-        u3 = dg.spostu(x, Length, uI3, uJ3)
+        u3 = spostu(x, Length, uI3, uJ3)
         u3Vector = u3*axis3
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
-        v1 =  dg.spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+        v1 =  spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
         v1Vector = v1*axis1 
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
-        v2 =  dg.spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+        v2 =  spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
         v2Vector = v2*axis2 
         
         ## RISULTANTE SPOSTAMENTI ##
         transResult = v1Vector + v2Vector + u3Vector
         
 
-        r1x =  dg.psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
-        r2x =  dg.thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
-        r3x = dg.phix(x, Length, rI3, rJ3)
+        r1x =  psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+        r2x =  thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+        r3x = phix(x, Length, rI3, rJ3)
         
         rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
         
@@ -424,7 +468,7 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
         sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
-            section = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section = AddRectangleFromCenter( sectionPlane, width, height )
             defSection.append( section )
         elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
@@ -447,8 +491,8 @@ def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
             defSection.append( section )
         elif dimSection[0] == 'rectangularHollow' :
             width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
-            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
-            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            section1 = AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
             defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]
@@ -527,8 +571,12 @@ def defTruss( ele, node, nodeDisp, scale ):
     uJ3 = localTraslEnd.Z # spostamento linea d'asse
     ##-------------- displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    divideDistance = 0.5
-    DivCurve = line.DivideByLength( divideDistance, True )
+    #divideDistance = 0.5
+    segmentCount = Length/0.5
+    #print( segmentCount )
+    DivCurve = line.DivideByCount( segmentCount, True )
+    #DivCurve = line.DivideEquidistant(divideDistance)
+    #print( DivCurve )
     if DivCurve == None:
         DivCurve = [ 0, Length]
     defPoint = []
@@ -540,7 +588,7 @@ def defTruss( ele, node, nodeDisp, scale ):
     for index, x in enumerate(DivCurve):
         beamPoint = line.PointAt(DivCurve[index]) 
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-        u3 = dg.spostu(x, Length, uI3, uJ3)
+        u3 = spostu(x, Length, uI3, uJ3)
         u3Vector = u3*axis3
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
         v1 =  x*( uJ1 - uI1 )/Length + uI1
@@ -557,7 +605,7 @@ def defTruss( ele, node, nodeDisp, scale ):
         sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
-            section = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section = AddRectangleFromCenter( sectionPlane, width, height )
             defSection.append( section )
         elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
@@ -580,8 +628,8 @@ def defTruss( ele, node, nodeDisp, scale ):
             defSection.append( section )
         elif dimSection[0] == 'rectangularHollow' :
             width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
-            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
-            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            section1 = AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
             defSection.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]
@@ -674,7 +722,7 @@ def gradientJet(value, valueMax, valueMin):
 
     #domain = linspace( valueMin,  valueMax, len( listcolo ) )
     n = len( listcolo )
-    domain = dg.linspace( valueMin, valueMax, n)
+    domain = linspace( valueMin, valueMax, n)
     
     for i in range(1,n):
         if  domain[i-1] <= value <= domain[i]:
@@ -764,7 +812,7 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
     DefMax = max( mt.fabs(defMax),mt.fabs(defMin))
 
     if scale == None:
-        scaleDef = dg.scaleAutomatic( coordMax , DefMax )
+        scaleDef = scaleAutomatic( coordMax , DefMax )
 
     else :
         scaleDef = scale
@@ -830,7 +878,7 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
             
         elif nNode == 3:
             #print( nNode )
-            shellDefModel = dg.defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
+            shellDefModel = defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
             ShellDefModel.append( shellDefModel[0] )
             traslShellValue.append( shellDefModel[1] )
             rotShellValue.append( shellDefModel[2] )
@@ -929,6 +977,6 @@ if direction is None:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
+    #print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
     ModelDisp, ModelCurve, max_min = defModelView( AlpacaStaticOutput, direction , scale, modelExstrud  )
 

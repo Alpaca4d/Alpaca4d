@@ -18,24 +18,46 @@ import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
+## -------------FUNZIONI DI FORMA PER TRAVE DI TYMOSHENKO------------------ ##
 
+def alphat( E, G, I, At ):
+    return (E*I)/(G*At)
+
+## Spostamenti e rotazioni ##
+def spostu( x, L, uI, uJ ):
+    return -(-L*uI + uI*x - uJ*x)/L
+    
+def spostv( x, L, vI, vJ, thetaI, thetaJ, alphay ):
+    return (L**3*thetaI*x + L**3*vI - 2*L**2*thetaI*x**2 - L**2*thetaJ*x**2 + 6*L*alphay*thetaI*x - 6*L*alphay*thetaJ*x + 12*L*alphay*vI + L*thetaI*x**3 + L*thetaJ*x**3 - 3*L*vI*x**2 + 3*L*vJ*x**2 - 6*alphay*thetaI*x**2 + 6*alphay*thetaJ*x**2 - 12*alphay*vI*x + 12*alphay*vJ*x + 2*vI*x**3 - 2*vJ*x**3)/(L*(L**2 + 12*alphay))
+    
+def spostw( x, L, wI, wJ, psiI, psiJ, alphaz ):
+    return -(L**3*psiI*x - L**3*wI - 2*L**2*psiI*x**2 - L**2*psiJ*x**2 - 6*L*alphaz*psiI*x + 6*L*alphaz*psiJ*x + 12*L*alphaz*wI + L*psiI*x**3 + L*psiJ*x**3 + 3*L*wI*x**2 - 3*L*wJ*x**2 + 6*alphaz*psiI*x**2 - 6*alphaz*psiJ*x**2 - 12*alphaz*wI*x + 12*alphaz*wJ*x - 2*wI*x**3 + 2*wJ*x**3)/(L*(L**2 - 12*alphaz))
+    
+def thetaz(x, L, vI, vJ, thetaI, thetaJ, alphay): 
+    return (L**3*thetaI - 4*L**2*thetaI*x - 2*L**2*thetaJ*x + 12*L*alphay*thetaI + 3*L*thetaI*x**2 + 3*L*thetaJ*x**2 - 6*L*vI*x + 6*L*vJ*x - 12*alphay*thetaI*x + 12*alphay*thetaJ*x + 6*vI*x**2 - 6*vJ*x**2)/(L*(L**2 + 12*alphay))
+    
+def phix(x, L, phiI, phiJ):
+    return -(-L*phiI + phiI*x - phiJ*x)/L
+
+def psiy(x, L, wI, wJ, psiI, psiJ, alphaz): 
+    return (L**3*psiI - 4*L**2*psiI*x - 2*L**2*psiJ*x - 12*L*alphaz*psiI + 3*L*psiI*x**2 + 3*L*psiJ*x**2 + 6*L*wI*x - 6*L*wJ*x + 12*alphaz*psiI*x - 12*alphaz*psiJ*x - 6*wI*x**2 + 6*wJ*x**2)/(L*(L**2 - 12*alphaz))
+    
+def gammay( L, vI, vJ, thetaI, thetaJ, alphay): 
+
+    return (L*thetaI + L*thetaJ + 2*vI - 2*vJ)/(L*(L**2 + 12*alphay))
+    
+def gammaz( L, wI, wJ, psiI, psiJ, alphaz):
+
+    return -(L*psiI + L*psiJ - 2*wI + 2*wJ)/(L*(L**2 - 12*alphaz))
+
+##------------------------------------------------------------------------- --##
+
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
 ## node e nodeDisp son dictionary ##
 def defValueTimoshenkoBeamValue( ele, node, nodeDisp, numberResults ):
     #---------------- WORLD PLANE ----------------------#
@@ -97,13 +119,13 @@ def defValueTimoshenkoBeamValue( ele, node, nodeDisp, numberResults ):
     rJ3 = localRotEnd[2]  # 
     ##------------------ displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    DivCurve = dg.linspace( 0, Length, numberResults )
+    DivCurve = linspace( 0, Length, numberResults )
     if DivCurve == None:
         DivCurve = [ 0, Length]
         
     #s = dg.linspace(0,Length, len(PointsDivLength))
-    AlphaY = dg.alphat( E, G, Iy, Avz )
-    AlphaZ = dg.alphat( E, G, Iz, Avy )
+    AlphaY = alphat( E, G, Iy, Avz )
+    AlphaZ = alphat( E, G, Iz, Avy )
     
     globalTransVector = []
     globalRotVector = []
@@ -114,22 +136,22 @@ def defValueTimoshenkoBeamValue( ele, node, nodeDisp, numberResults ):
     #----------------------------------------------------------------#
     for index, x in enumerate(DivCurve):
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-        u3 = dg.spostu(x, Length, uI3, uJ3)
+        u3 = spostu(x, Length, uI3, uJ3)
         u3Vector = u3*axis3
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
-        v1 =  dg.spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+        v1 =  spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
         v1Vector = v1*axis1 
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
-        v2 =  dg.spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+        v2 =  spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
         v2Vector = v2*axis2 
         
         ## RISULTANTE SPOSTAMENTI ##
         transResult = v1Vector + v2Vector + u3Vector
         localTransVector.append( transResult )
 
-        r2x =  dg.thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
-        r1x =  dg.psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
-        r3x = dg.phix(x, Length, rI3, rJ3)
+        r2x =  thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+        r1x =  psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+        r3x = phix(x, Length, rI3, rJ3)
         
         rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
         localRotVector.append( rotResult )
@@ -192,7 +214,7 @@ def defTrussValue( ele, node, nodeDisp, numberResults ):
     uJ3 = localTraslEnd.Z # spostamento linea d'asse
     ##-------------- displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    DivCurve = dg.linspace( 0, Length, numberResults )
+    DivCurve = linspace( 0, Length, numberResults )
     if DivCurve == None:
         DivCurve = [ 0, Length]
 
@@ -203,7 +225,7 @@ def defTrussValue( ele, node, nodeDisp, numberResults ):
     #----------------------------------------------------------------#
     for index, x in enumerate(DivCurve):
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-        u3 = dg.spostu(x, Length, uI3, uJ3)
+        u3 = spostu(x, Length, uI3, uJ3)
         u3Vector = u3*axis3
         ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
         v1 =  x*( uJ1 - uI1 )/Length + uI1
@@ -230,22 +252,15 @@ def beamDisp( AlpacaStaticOutput, numberResults ):
 
     diplacementWrapper = AlpacaStaticOutput[0]
     EleOut = AlpacaStaticOutput[2]
-
-    pointWrapper = []
-    transWrapper = []
-    rotWrapper = []
-
-    diplacementWrapper = AlpacaStaticOutput[0]
-    EleOut = AlpacaStaticOutput[2]
     nodeValue = []
     displacementValue = []
 
     pointWrapper = []
     dispWrapper = []
-
     for index,item in enumerate(diplacementWrapper):
         nodeValue.append( item[0] )
         displacementValue.append( item[1] )
+        print( item[0] )
         pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
         if len(item[1]) == 3:
             dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
