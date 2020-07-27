@@ -34,7 +34,7 @@ def Assemble(Element, Support, Load, Mass):
             points.append(endPoint)
             geomTransf.append(element[3])
             matWrapper.append([element[2][6][0], element[2][6][1:] ]) # to be careful because we are assigning "unixial" inside the solver. We need to find a clever way to assigning outside
-        elif (element[1] == "ShellMITC4") or (element[1] == "ShellDKGT"):
+        elif (element[1] == "ShellMITC4") or (element[1] == "shellDKGT"):
             mesh = element[0]
             vertices = mesh.Vertices
             for i in range(vertices.Count):
@@ -160,7 +160,7 @@ def Assemble(Element, Support, Load, Mass):
             
             MassOfStructure += element[0].GetLength() * massDens * 100    # kN to kg
             
-        elif (element[1] == "ShellMITC4") or (element[1] == "ShellDKGT"):
+        elif (element[1] == "ShellMITC4") or (element[1] == "shellDKGT"):
             typeElement = element[1]
             eleTag = eleTag
             shellNodesRhino = element[0].Vertices

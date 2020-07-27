@@ -148,9 +148,9 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'):
+    if (eleType == 'ShellMITC4') or (eleType == 'shellDKGT'):
+    	
         shellTag.append( eleTag )
-        #print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
 for item in openSeesSolid:
@@ -224,6 +224,7 @@ TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
 TensionFilePathTag = TensionFilePath + '/tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")# ho problemi con shellTag
 ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
+
 '''
 TensionFilePathTag = TensionFilePath + '/eleForceGlobal.out' 
 ops.recorder('Element','-file', TensionFilePathTag , '-closeOnWrite', '-ele', *beamTag, 'globalForce')

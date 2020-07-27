@@ -24,7 +24,7 @@ def MeshToShell(Mesh, Colour, CrossSection):
         else:
             colour = Colour
     else:
-        elementType = "ShellDKGT"
+        elementType = "shellDKGT"
     newMesh = Mesh
     
     CrossSection = CrossSection
