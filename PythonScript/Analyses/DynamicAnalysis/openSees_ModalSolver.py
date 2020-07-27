@@ -5,13 +5,13 @@ import math
 import time
 
 
-ExpireDate = date(2010, 10, 1)
+ExpireDate = date(2020, 10, 1)
 actualDay = date.today()
 remainingDate = (ExpireDate - actualDay).days
 
 
 if remainingDate < 0:
-    sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@xxxxxx.com to renew the license")
+    sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@gmail.com to renew the license")
 
 
 
