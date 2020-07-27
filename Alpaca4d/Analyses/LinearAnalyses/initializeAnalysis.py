@@ -13,8 +13,9 @@ import Grasshopper as gh
 
 def InitializeStaticAnalysis(AlpacaModel):
     ghFilePath = ghenv.LocalScope.ghdoc.Path
-
+    print( ghFilePath )
     workingDirectory = os.path.dirname(ghFilePath) 
+    print( workingDirectory )
     outputFileName = 'openSeesOutputWrapper.txt'
 
     for dirpath, dirnames, filenames in os.walk(workingDirectory):
@@ -29,20 +30,29 @@ def InitializeStaticAnalysis(AlpacaModel):
     outputFolder = os.path.join(ghFolderPath,'assembleData')
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
-
     userObjectFolder = gh.Folders.DefaultUserObjectFolder
-    fileName = os.path.join(userObjectFolder, r'Alpaca4d\LinearAnalyses\openSees_StaticSolver.py')
-    #fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\openSees_StaticSolver.py'
-
-    fileName = '"' + fileName + '"'
+    pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
+    fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
+    
     wrapperFile = '"' + wrapperFile + '"'
+    fileName = '"' + fileName + '"'
+    
+    p = System.Diagnostics.Process()
+    p.StartInfo.RedirectStandardOutput = True
+    p.StartInfo.RedirectStandardError = True
 
+    p.StartInfo.UseShellExecute = False
+    p.StartInfo.CreateNoWindow = True
+    
+    p.StartInfo.FileName = pythonInterpreter
+    p.StartInfo.Arguments = fileName + " " + wrapperFile
+    p.Start()
+    p.WaitForExit()
+    
+    
+    msg = p.StandardError.ReadToEnd()
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
 
-    staticAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
-    staticAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-    staticAnalyses.Arguments = wrapperFile
-    process = System.Diagnostics.Process.Start(staticAnalyses)
-    System.Diagnostics.Process.WaitForExit(process)
 
     ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
     ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
@@ -77,4 +87,4 @@ if not AlpacaModel:
 
 if checkData != False:
     AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
-    maxDisplacement = None
+    #maxDisplacement = None

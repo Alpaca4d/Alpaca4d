@@ -1,6 +1,19 @@
 import sys
-import openseespy.opensees as ops
 import os
+from datetime import date
+
+import openseespy.opensees as ops
+
+# perform Low Level License check
+
+ExpireDate = date(2010, 10, 1)
+actualDay = date.today()
+remainingDate = (ExpireDate - actualDay).days
+
+
+if remainingDate < 0:
+    sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@xxxxxx.com to renew the license")
+
 
 #filename = r'C:\Users\FORMAT\Desktop\assembleData\openSeesModel.txt'
 filename = sys.argv[1]
@@ -124,7 +137,7 @@ for n in range(0, len(openSeesBeam)):
     if eleType == 'Truss':
         trussTag.append( eleTag - 1 )
         ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag ) # TO CONTROL!!!
-        
+
 
     elif eleType == 'ElasticTimoshenkoBeam':
         beamTag.append( eleTag - 1 )
@@ -148,9 +161,9 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'):
+    if (eleType == 'ShellMITC4') or (eleType == 'shellDKGT'):
+    	
         shellTag.append( eleTag )
-        #print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
 for item in openSeesSolid:
@@ -224,6 +237,7 @@ TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
 TensionFilePathTag = TensionFilePath + '/tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")# ho problemi con shellTag
 ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
+
 '''
 TensionFilePathTag = TensionFilePath + '/eleForceGlobal.out' 
 ops.recorder('Element','-file', TensionFilePathTag , '-closeOnWrite', '-ele', *beamTag, 'globalForce')
@@ -312,3 +326,5 @@ outputFileName = filefolder+'openSeesOutputWrapper.txt'
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
         f.write("%s\n" % item)
+
+print("analyses Finished")

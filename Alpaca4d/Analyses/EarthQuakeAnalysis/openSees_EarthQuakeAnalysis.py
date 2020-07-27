@@ -1,9 +1,19 @@
 import sys
 import os
-import openseespy.opensees as ops
 import math
 import time
-import matplotlib.pyplot as plt
+from datetime import date
+import openseespy.opensees as ops
+
+
+
+ExpireDate = date(2010, 10, 1)
+actualDay = date.today()
+remainingDate = (ExpireDate - actualDay).days
+
+
+if remainingDate < 0:
+    sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@xxxxxx.com to renew the license")
 
 
 filename = sys.argv[1]
@@ -154,9 +164,9 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellMITC4') or (eleType == 'ShellDKGT'): # to modify becaue shell will be ShellMITC4
+    if (eleType == 'ShellMITC4') or (eleType == 'shellDKGT'):
 
-        ops.element( 'ShellMITC4' , eleTag, *eleNodes, secTag)
+        ops.element( eleType , eleTag, *eleNodes, secTag)
         #ops.element( eleType , eleTag, *eleNodes, secTag)
 
 for item in openSeesSolid:
@@ -240,7 +250,7 @@ ops.analysis("Static")
 # perform the analysis
 ops.analyze(1)
 
-ops.loadConst('-time', 0.0)	#maintain constant gravity loads and reset time to zero
+ops.loadConst('-time', 0.0) #maintain constant gravity loads and reset time to zero
 
 
 
@@ -286,10 +296,10 @@ for line in earthQuakeSettingLines:
 
 
 
-#print(f"GroundMotionValues = {GroundMotionValues}")
-#print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
-#print(f'GMfact = {GMfact}')
-#print(f"GMdirection = {GMdirection}")
+print(f"GroundMotionValues = {GroundMotionValues}")
+print(f'GroundMotionTimeStep = {GroundMotionTimeStep}')
+print(f'GMfact = {GMfact}')
+print(f"GMdirection = {GMdirection}")
 
 
 # to make it more reliable
@@ -311,8 +321,8 @@ Omega = math.pow(Lambda, 0.5)
 
 
 betaKcomm = 2 * (damping/Omega)
-alphaM = 0.0				# M-prop. damping; D = alphaM*M	
-betaKcurr = 0.0		# K-proportional damping;      +beatKcurr*KCurrent
+alphaM = 0.0                # M-prop. damping; D = alphaM*M 
+betaKcurr = 0.0     # K-proportional damping;      +beatKcurr*KCurrent
 betaKinit = 0.0 # initial-stiffness proportional damping      +beatKinit*Kini
 
 ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
