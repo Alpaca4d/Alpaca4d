@@ -267,7 +267,7 @@ def Assemble(Element, Support, Load, Mass):
                        openSeesSolid])
                        
                        
-    ghFilePath = ghenv.LocalScope.ghdoc.Path
+    ghFilePath = ghenv.Component.Attributes.Owner.OnPingDocument().FilePath
     ghFolderPath = os.path.dirname(ghFilePath)
     
     

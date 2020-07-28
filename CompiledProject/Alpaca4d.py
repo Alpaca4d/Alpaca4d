@@ -3,15 +3,16 @@ import Grasshopper, GhPython
 import System
 import Rhino
 import rhinoscriptsyntax as rs
+import GhPython
 
 
 
-# 0_Assemble
+# 0|Assemble
 
 class Assemble(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Assemble", "Assemble", """Generate a text file model to be sent to OpenSees""", "Alpaca", "0_Model")
+            "Assemble", "Assemble", """Generate a text file model to be sent to OpenSees""", "Alpaca", "0|Model")
         return instance
     
     def get_ComponentGuid(self):
@@ -92,7 +93,6 @@ class Assemble(component):
             secTagWrapper = []
             
             for element in Element:
-                print(element[1])
                 if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
                     
                     startPoint = element[0].PointAt(element[0].Domain[0])
@@ -155,7 +155,6 @@ class Assemble(component):
             openSeesSecTag = openSeesSecTag
             secTagDict = dict(openSeesSecTag)
             
-            #print(secTagDict)
             
             # create GeomTransf
             geomTransf = [row[0] for row in geomTransf ]
@@ -219,7 +218,6 @@ class Assemble(component):
                     orientVector = [ axis1, axis2, axis3 ]
             
                     massDens = element[5]
-                    #print(massDens)
                     sectionGeomProperties = element[2][7]
                     color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
                     matTag = matNameDict.setdefault(element[2][6][0])[0]
@@ -334,7 +332,7 @@ class Assemble(component):
                                openSeesSolid])
                                
                                
-            ghFilePath = ghenv.LocalScope.ghdoc.Path
+            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
             ghFolderPath = os.path.dirname(ghFilePath)
             
             
@@ -374,20 +372,146 @@ class Assemble(component):
             return (AlpacaModel, MassOfStructure)
 
 
+# 1|Element
 
-# 1_Define Elements
-
-class MeshToShell(component):
+class LinetoBeam(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Mesh to Shell", "Mesh to Shell", """Generate a Shell MITC4 element""", "Alpaca", "1_Element")
+            "Line to Beam", "Line to Beam", """Generate a Timoshenko Beam element or a Truss element""", "Alpaca", "1|Element")
         return instance
-
-    def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.primary
     
     def get_ComponentGuid(self):
-        return System.Guid("5893c851-24e0-4663-bbb6-0b04412d8603")
+        return System.Guid("3d4af836-2ddf-47fa-bf6c-0991645a2dcd")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_Curve()
+        self.SetUpParam(p, "Line", "Line", "Straight line representing the structural element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "Colour", "Colour", "Colour of the element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "CrossSection", "CrossSection", "Cross section of the element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "orientSection", "orientSection", "Rotation angle in degrees about local X-axis.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "beamType", "beamType", "0: Truss  1: Beam. Default is Beam.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "beamWrapper", "beamWrapper", "Beam with properties.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        p3 = self.marshal.GetInput(DA, 3)
+        p4 = self.marshal.GetInput(DA, 4)
+        result = self.RunScript(p0, p1, p2, p3, p4)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAIxSURBVEhLY6Ab+M8QyvyWR9v6BbeOOFSIugBoeOZrbu2/b7m1vi1gl1UGCrFCZKgE3nBrdb7l1v7/kEvzvykTxyWg0E0g5gNLUgN84lETucGltsaXhe9vqKHo/3IX2f9A4fNAzA5WQCWwPEDG4d8+/4r//ybZ/y91BltyCohZwLJUALFqvPL/N9r2/j8aXA22JM9eGmTJcSBmAqugAsjR4FP4v9mu///JMIhP0q0lQZYchUhTB1Rp8SmCLTkTVQK2JN5cHGTJQYg0dUC7voAa2JKLCXlgSyKMxECW7IBIUwdMMhXSAltyPS0TbEmwgSjIkg0QaeqAuTaiBmBL7uSk/P870f6/n64wyJKlEGnqgOWuEuZgSx4UxP//PcHuv5eWEMiS6RBp6oB1/tL2YEuelEb//wW0xFVDEGRJF0SacgDKB1si5NzAljyviPj/o9/uv6OqAMiSWrAKKgBQjt6dqOT3f4t93/+X1aH/v/fZ/rdR4gdZUgBWQQXAzsjAeDhDJfj/Vofe/29qg/5/7bX9b67AB7IkDaKEcsAJtORkgXrU/22OPf/fNQT8/9Jj899EjhdkSTRECYVAmEGYF2jJuXLN+P/bnbr/v23w/V/nIQ+yYBVEBRUAHwOfEBMj41WQJcGyTv9dWXj/3uZQP/eaS9cYqoRywMXAJQmkbikwsh1/AKysQJXWG05tqmZCEGCJZ+AXeMupeQ1Y7f4E1o6FUHHqAmAEML7l1tCBcukBGBgA7Fvc9xvyXtoAAAAASUVORK5CYII="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, Line, Colour, CrossSection, orientSection, beamType):
+
+        
+        import Rhino.Geometry as rg
+        import Rhino.RhinoMath
+        from System.Drawing import Color
+        import ghpythonlib.components as ghcomp
+        import Grasshopper as gh
+        
+        def LineToBeam(Line, CrossSection, Colour, orientSection, beamType):
+        
+            if orientSection is None:
+                orientSection = 0
+        
+            if beamType is None:
+                beamType = 1
+        
+        
+        
+            Line = Line
+            if beamType == 1 or None:
+                elementType = "ElasticTimoshenkoBeam"
+                if Colour is None:
+                    colour = Color.FromArgb(195, 195, 13)
+                else:
+                    colour = Colour
+            elif beamType == 0:
+                elementType = "Truss"
+                if Colour is None:
+                    colour = Color.FromArgb(179, 62, 143)
+                else:
+                    colour = Colour
+        
+            CrossSection = CrossSection
+            
+        
+            midPoint =  Line.PointAtNormalizedLength(0.5)
+            parameter = Line.ClosestPoint(midPoint, 0.01)[1]
+            perpFrame = ghcomp.PerpFrame( Line, parameter )
+            perpFrame.Rotate(Rhino.RhinoMath.ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
+            vecGeomTransf = [ perpFrame.XAxis, perpFrame.YAxis, perpFrame.ZAxis ]
+        
+            Area = float(CrossSection[0])
+            rho = float(CrossSection[6][4])
+            massDens = Area * rho
+        
+        
+            return [[Line, elementType, CrossSection, vecGeomTransf, colour, massDens, perpFrame]]
+        
+        checkData = True
+        
+        if Line is None:
+            checkData = False
+            msg = "input 'Line' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if CrossSection is None:
+            checkData = False
+            msg = "input 'CrossSection' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        
+        if checkData != False:
+            beamWrapper = LineToBeam(Line, CrossSection, Colour, orientSection, beamType)
+            return beamWrapper
+
+class MeshtoShell(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Mesh to Shell", "Mesh to Shell", """Generate a Shell MITC4 element""", "Alpaca", "1|Element")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("aa075ef3-3eb2-48a3-884f-4a9e585f14d8")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -401,7 +525,7 @@ class MeshToShell(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_Colour()
+        p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "Colour", "Colour", "Colour of the element.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
@@ -430,10 +554,14 @@ class MeshToShell(component):
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAKrSURBVEhL7ZNdSFNhGMfPlUWE2znufc8529xsbc7NHTfJdDWbYpZWkKSyNCj7wNSSJDPLcJoWM/qyGRJEFNlFhBdhEtRteBdUd1ZEWHTRVRfRlbb9e89HRkVQXUQX+8HD4ZzzPP//w/s+D5chw7/BYTLxhPDlhJg7RItwi1JhULKYo34/l2Wk/D5+jsui1FxEiNBAKT8mUuGpSM0f2RN2OQelXkl7qu8sFljMsLzLosg3UUpFQ+ZnCDGF1GRiEeaMYhS5KBpKHRiu82LmSAnenFqD1FgFFi5F8XwgjKn2EJLb/ThQ5UJlwIpcZswae8vitiH7DZEIfRJd7EyL6iIbumvcuLlbwWy8DAvJKNLMIJWswPtEBI97V+MuM0nUFyAWdiDik2GVLGm1VpKWE0Nah51rPE+SMbF2CIPFrWj1b0P1ilI4JWnRUO2wSrGibPGYctLWguBnx7pY2rPzXDpw+hk8LeOpXxjwCTul2OPaipFgJyYjZzAdHdXiengA/aF9qPdU6UaVzfO+nul04cjL+dDVTylfYhaurnsQtxwH7w1rOYQQyZDWEQk/qtjcOOrbhR3OWoRzAvBmOxGxBBFzbMAxXwuGQ+26Qd0J2GJnka1sgqm4DuaSBtiaLsB78gnyD01qOTZBsBvSOmz8ruRbHSm102vhfkxFL2rd34mMYEhpQ5u7HmU0oBXL1R3w9D1C4fk5FN9IIzj+Af74DDx7x5FbUqPlSJLZaUjrSBZ+MxvHF+yndkk2kaA8L4RGz3p0Kc1Iru5BYtVBrdjbMQFf7wOsbIzDHqqAlOvQvrP6dywesoHpdLu5JYb09zidzqVszDayS+9Sl4oVvvpq+uOUsZF+zfLuszjMljCo1hoyf4Ysy8vYJteyQejWN5nfz5ZR+atNzpDhf4PjvgA3CByIXQYHsgAAAABJRU5ErkJggg=="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
     
     def RunScript(self, Mesh, Colour, CrossSection):
+        
+        
         import Rhino.Geometry as rg
         import Grasshopper as gh
+        from System.Drawing import Color 
         
         def MeshToShell(Mesh, Colour, CrossSection):
             
@@ -442,12 +570,15 @@ class MeshToShell(component):
             elementType = []
             if Mesh.Vertices.Count == 4:
                 elementType = "ShellMITC4"
+                if Colour is None:
+                    colour = Color.FromArgb(49, 159, 255)
+                else:
+                    colour = Colour
             else:
-                elementType = "ShellDKGT"
+                elementType = "shellDKGT"
             newMesh = Mesh
             
             CrossSection = CrossSection
-            colour = Colour
             return[ [ newMesh , elementType, CrossSection, colour] ]
         
         checkData = True
@@ -467,125 +598,10 @@ class MeshToShell(component):
             shellWrapper = MeshToShell(Mesh, Colour, CrossSection)
             return shellWrapper
 
-class LineToBeam(component):
-    def __new__(cls):
-        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Line to Beam", "Line to Beam", """Generate a Timoshenko Beam element or a Truss element""", "Alpaca", "1_Element")
-        return instance
-
-    def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.primary
-    
-    def get_ComponentGuid(self):
-        return System.Guid("62d77f49-538e-4406-8e43-c118566d4ab2")
-    
-    def SetUpParam(self, p, name, nickname, description):
-        p.Name = name
-        p.NickName = nickname
-        p.Description = description
-        p.Optional = True
-    
-    def RegisterInputParams(self, pManager):
-        p = Grasshopper.Kernel.Parameters.Param_Curve()
-        self.SetUpParam(p, "Line", "Line", "Straight line representing the structural element.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_Colour()
-        self.SetUpParam(p, "Colour", "Colour", "Colour of the element.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "CrossSection", "CrossSection", "Cross section of the element.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_Number()
-        self.SetUpParam(p, "orientSection", "orientSection", "Rotation angle in degrees about local X-axis.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "beamType", "beamType", "0: Truss  1: Beam. Default is Beam.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-    
-    def RegisterOutputParams(self, pManager):
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "beamWrapper", "beamWrapper", "Beam with properties.")
-        self.Params.Output.Add(p)
-        
-    
-    def SolveInstance(self, DA):
-        p0 = self.marshal.GetInput(DA, 0)
-        p1 = self.marshal.GetInput(DA, 1)
-        p2 = self.marshal.GetInput(DA, 2)
-        p3 = self.marshal.GetInput(DA, 3)
-        p4 = self.marshal.GetInput(DA, 4)
-        result = self.RunScript(p0, p1, p2, p3, p4)
-
-        if result is not None:
-            self.marshal.SetOutput(result, DA, 0, True)
-        
-    def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAIxSURBVEhLY6Ab+M8QyvyWR9v6BbeOOFSIugBoeOZrbu2/b7m1vi1gl1UGCrFCZKgE3nBrdb7l1v7/kEvzvykTxyWg0E0g5gNLUgN84lETucGltsaXhe9vqKHo/3IX2f9A4fNAzA5WQCWwPEDG4d8+/4r//ybZ/y91BltyCohZwLJUALFqvPL/N9r2/j8aXA22JM9eGmTJcSBmAqugAsjR4FP4v9mu///JMIhP0q0lQZYchUhTB1Rp8SmCLTkTVQK2JN5cHGTJQYg0dUC7voAa2JKLCXlgSyKMxECW7IBIUwdMMhXSAltyPS0TbEmwgSjIkg0QaeqAuTaiBmBL7uSk/P870f6/n64wyJKlEGnqgOWuEuZgSx4UxP//PcHuv5eWEMiS6RBp6oB1/tL2YEuelEb//wW0xFVDEGRJF0SacgDKB1si5NzAljyviPj/o9/uv6OqAMiSWrAKKgBQjt6dqOT3f4t93/+X1aH/v/fZ/rdR4gdZUgBWQQXAzsjAeDhDJfj/Vofe/29qg/5/7bX9b67AB7IkDaKEcsAJtORkgXrU/22OPf/fNQT8/9Jj899EjhdkSTRECYVAmEGYF2jJuXLN+P/bnbr/v23w/V/nIQ+yYBVEBRUAHwOfEBMj41WQJcGyTv9dWXj/3uZQP/eaS9cYqoRywMXAJQmkbikwsh1/AKysQJXWG05tqmZCEGCJZ+AXeMupeQ1Y7f4E1o6FUHHqAmAEML7l1tCBcukBGBgA7Fvc9xvyXtoAAAAASUVORK5CYII="
-        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
-
-    
-    def RunScript(self, Line, Colour, CrossSection, orientSection, beamType):       
-        import Rhino.Geometry as rg
-        import Rhino.RhinoMath
-        from System.Drawing import Color
-        import ghpythonlib.components as ghcomp
-        import Grasshopper as gh
-        
-        def LineToBeam(Line, CrossSection, Colour):
-        
-            Line = Line
-            if beamType == 1 or None:
-                elementType = "ElasticTimoshenkoBeam"
-            else:
-                elementType = "Truss"
-        
-            CrossSection = CrossSection
-            
-            midPoint =  Line.PointAtNormalizedLength(0.5)
-            parameter = Line.ClosestPoint(midPoint, 0.01)[1]
-            perpFrame = ghcomp.PerpFrame( Line, parameter )
-            perpFrame.Rotate(Rhino.RhinoMath.ToRadians(orientSection), perpFrame.ZAxis, perpFrame.Origin)
-            vecGeomTransf = [ perpFrame.XAxis, perpFrame.YAxis, perpFrame.ZAxis ]
-        
-            colour = Colour
-            Area = float(CrossSection[0])
-            rho = float(CrossSection[6][4])
-            massDens = Area * rho
-        
-        
-            return [[Line, elementType, CrossSection, vecGeomTransf, colour, massDens,perpFrame]]
-        
-        checkData = True
-        
-        if Line is None:
-            checkData = False
-            msg = "input 'Line' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        if CrossSection is None:
-            checkData = False
-            msg = "input 'CrossSection' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        
-        if checkData != False:
-            beamWrapper = LineToBeam(Line, CrossSection, Colour )
-            return beamWrapper
-
 class BrickElement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Brick Element", "Brick Element", """Generate a Brick Element""", "Alpaca", "1_Element")
+            "Brick Element", "Brick Element", """Generate a Brick Element""", "Alpaca", "1|Element")
         return instance
 
     def get_Exposure(self): #override Exposure property
@@ -676,7 +692,7 @@ class BrickElement(component):
 class Support(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Support", "Support", """Generate support for the structure.""", "Alpaca", "1_Element")
+            "Support", "Support", """Generate support for the structure.""", "Alpaca", "1|Element")
         return instance
 
     def get_Exposure(self): #override Exposure property
@@ -698,32 +714,32 @@ class Support(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "Tx", "Tx", "Translation in X. TRUE if it is Fixed.")
+        self.SetUpParam(p, "Tx", "Tx", "Translation in X. TRUE = Fixed.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "Ty", "Ty", "Translation in Y. TRUE if it is Fixed.")
+        self.SetUpParam(p, "Ty", "Ty", "Translation in Y. TRUE = Fixed.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "Tz", "Tz", "Translation in Z. TRUE if it is Fixed.")
+        self.SetUpParam(p, "Tz", "Tz", "Translation in Z. TRUE = Fixed.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "Rx", "Rx", "Rotation about the X axis. TRUE if it is Fixed.")
+        self.SetUpParam(p, "Rx", "Rx", "Rotation about the X axis. TRUE = Fixed.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "Ry", "Ry", "Rotation about the Y axis. TRUE if it is Fixed.")
+        self.SetUpParam(p, "Ry", "Ry", "Rotation about the Y axis. TRUE = Fixed.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "Rz", "Rz", "Rotation about the Z axis. TRUE if it is Fixed.")
+        self.SetUpParam(p, "Rz", "Rz", "Rotation about the Z axis. TRUE = Fixed.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -784,12 +800,12 @@ class Support(component):
 
 
 
-# 2_Define Cross Sections
+# 2|Define Cross Sections
 
 class RectangularCrossSection(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Rectangular Cross Section", "Rectangular Cross Section", """Generate a Rectangular cross section""", "Alpaca", "2_Cross Section")
+            "Rectangular Cross Section", "Rectangular Cross Section", """Generate a Rectangular cross section""", "Alpaca", "2|Cross Section")
         return instance
     
     def get_ComponentGuid(self):
@@ -900,7 +916,7 @@ class RectangularCrossSection(component):
 class CircularCrossSection(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Circular Cross Section", "Circular Cross Section", """Generate a circular cross section""", "Alpaca", "2_Cross Section")
+            "Circular Cross Section", "Circular Cross Section", """Generate a circular cross section""", "Alpaca", "2|Cross Section")
         return instance
     
     def get_ComponentGuid(self):
@@ -1017,7 +1033,7 @@ class CircularCrossSection(component):
 class GenericCrossSection(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Generic Cross Section", "Generic Cross Section", """Generate a Generic cross section""", "Alpaca", "2_Cross Section")
+            "Generic Cross Section", "Generic Cross Section", """Generate a Generic cross section""", "Alpaca", "2|Cross Section")
         return instance
     
     def get_ComponentGuid(self):
@@ -1161,10 +1177,288 @@ class GenericCrossSection(component):
             CrossSection = GenericCrossSection(sectionName, Area, Ay, Az, Iyy, Izz, J, uniaxialMaterial)
             return CrossSection
 
+class doubleTCrossSection(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "double T section", "double T section", """Generate a  double T cross Section""", "Alpaca", "2|Cross Section")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("2b198612-d5c6-4172-b861-8fe8d869cffb")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "sectionName", "sectionName", "Name of the section.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "Bsup", "Bsup", "Width Top Flange")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "Binf", "Binf", "Width Bottom Flange")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "H", "H", "Height of section [ mm ]")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "tsup", "tsup", "Top Flange thickness [ mm ]")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "tinf", "tinf", "Bottom Flange thickness [ mm ]")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "tw", "tw", "Web thickness [ mm ]")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "uniaxialMaterial", "uniaxialMaterial", "Material element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "CrossSection", "CrossSection", "CrossSection element.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        p3 = self.marshal.GetInput(DA, 3)
+        p4 = self.marshal.GetInput(DA, 4)
+        p5 = self.marshal.GetInput(DA, 5)
+        p6 = self.marshal.GetInput(DA, 6)
+        p7 = self.marshal.GetInput(DA, 7)
+        result = self.RunScript(p0, p1, p2, p3, p4, p5, p6, p7)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAIGSURBVEhLYxhIwAXEpkBsQQSWBWKSgQ8Q/ycS/wFibiAmCXgB8X/F7NX/VSsP/VerOf5fvf7Mf42mC/81W6/+12q/8V+r6+5/hfSlMEtEQJpIAWALNBrP/9fuffRfq/POf8P5/+FYu+seWFwpbyPZFtgDMUwzGIMsA1sw799/TjkDZLlPQCwExCQDbSA2AeIMIEZYMB9ogYwuyOBWqLwOEFMErID4v2rFAXgQsYspgyzIBctSAYAtUKs6AreATVSRBhYAUxLcAhHFf0Ax6lqgXn8ayQKFv0Ax6lqAiGRQEClRP4iMak79L88+/N9qxnfqW8DKxPLfpXD//812/f/jam/85xJTpZ4FE4yLXJdbtf5fZ98HtmCj/YT/a2y7/+vwKVPHAmVeOaswOdf/DRErwRY0Ju/6H6Dq/1+UXYC6ceBdehxsQUDHE7LjgBGIJYFYDA27AfF/3Umv/ge3PfpvNvv3f05ZPZAFdUhqYJgZiHGCSCAGZSCQZgysP+PLf4PZP8HJlFPOEKsaIN4NxDhBHAMj43+ZqAn/5RLn/JdLnvdfPnXhf4W0Jf8Vs1b9N5jzC54PQOWSctH2/yolu/6rlO39r1p+4L+wbRLIgssQo7CDOCY2rv/6M7/CDSIFS4W0E7QglpGJ5T+Pmt1/HnXSMbs4OG/gtQAUSZ1A3E8BjgBiegEGBgCt2GE7BlaH+gAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, sectionName, Bsup, Binf, H, tsup, tinf, tw, uniaxialMaterial):
+        
+        import math
+        import Grasshopper as gh
+        
+        def doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, tw, uniaxialMaterial):
+            sectionName = sectionName
+            shape = "doubleT"
+            Bsup, tsup, Binf, tinf, H, ta = Bsup/1000, tsup/1000, Binf/1000, tinf/1000, H/1000, tw/1000     # Input value in mm ---> Output m
+            A1, y1 = Bsup*tsup, (H - tsup/2 )
+            A2, y2 = ( H - tsup -tinf )*ta, (H-tsup-tinf)/2 + tinf
+            A3, y3 = Binf*tinf, tinf/2
+            yg = ( A1*y1 + A2*y2 + A3*y3 )/(A1 + A2 + A3 )
+            Area = A1 + A2 + A3
+            ky = Area/ A2
+            kz = Area/ ( A1 + A3 )
+            Ay = Area/ky # da riguardare
+            Az = Area/ky # da riguardare
+            Iyy = Bsup*tsup**3/12 + ( Bsup*tsup )*( H - yg - tsup/2 )**2 + ( H -tsup - tinf )**3/12 + ( H - tsup - tinf )*ta*( math.fabs(( H - tsup - tinf )/2 - yg) )**2 + Binf*tinf**3/12 + Binf*tinf*( yg - tinf/2 )**2
+            Izz = tsup*Bsup**3/12 + tinf*Binf**3/12 + ( H -tsup - tinf )*ta**3/12
+            #J = Iyy + Izz
+            J = 1/3*( Bsup*tsup**3 + Binf*tinf**3 + ( H - tsup - tinf )*ta**3 ) # Prandt per sezioni sottile aperte
+        
+            material = uniaxialMaterial
+            print( Iyy, Izz, yg )
+        
+            return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, Bsup, tsup, Binf, tinf, H, ta, yg], sectionName ]]
+        
+        checkData = True
+        
+        if sectionName is None:
+            checkData = False
+            msg = "input 'sectionName' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if Bsup is None:
+            checkData = False
+            msg = "input 'Bsup' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if tsup is None:
+            checkData = False
+            msg = "input 'tsup' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if Binf is None:
+            checkData = False
+            msg = "input 'Binf' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if tinf is None:
+            checkData = False
+            msg = "input 'tinf' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if H is None:
+            checkData = False
+            msg = "input 'H' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if tw is None:
+            checkData = False
+            msg = "input 'tw' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if uniaxialMaterial is None:
+            checkData = False
+            msg = "input 'uniaxialMaterial' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            CrossSection = doubleTCrossSection(sectionName, Bsup, tsup, Binf, tinf, H, tw, uniaxialMaterial)
+            return CrossSection
+
+class RectangularHollowCrossSection(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Rectangular Hollow Section", "Rectangular Hollow Section", """Generate a Rectangular cross section""", "Alpaca", "2|Cross Section")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("1a9b9268-eeac-440c-9ccd-449aeb0b53eb")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_String()
+        self.SetUpParam(p, "sectionName", "sectionName", "Name of the section.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "base", "base", "Base of cross section [mm].")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "height", "height", "Height of cross section [mm].")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "thickness", "thickness", "Wall thickness [mm].")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "uniaxialMaterial", "uniaxialMaterial", "Material element.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "CrossSection", "CrossSection", "CrossSection element.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        p3 = self.marshal.GetInput(DA, 3)
+        p4 = self.marshal.GetInput(DA, 4)
+        result = self.RunScript(p0, p1, p2, p3, p4)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMxSURBVEhLxZXZb0xhGMZ7QWemm15Yugzt7DPtTKO0Ss2iJCIuGokLf4FIdF+IFFVqDXpGiYjY90i16QylEiKhVFFbEYnEhcR+QUJLMa/nPXO+aMTX1A1P8kvOOc/7fs853znn+2L+hxaAZaAW1IBqUAUqQYVGOSjTKAUlYClYAobVKPBBn+oifaoTOEiXwthJN8EGrKQbz1hIN85MseNMFDuWyaTRY1IJvUwRDyTTaPDJVNJCuQfpr/DsfC8CZvNAMkUDSs+QO/iKEhwBSrB5KcHui+LwR685mVmgiMbkFlPO7o/k2fFmRE8QCz6bSlvJ2dArGvYCBQQ1doBmsBOcBORouENu5aWonwWkUgPMZW1qE46ZTDYksgH1ZtzbX4j6ABsy6UC/GrDmtmjIYEMiFyDn2ruUvfW5qPezIZMe9JvLWyNDAiaxIZEHIOAeZW15NuKAAXN5Oznqb4mGiWyw2gJK8unArgTtlJULyLkOAZueinofGzIZwIC5IoSA7giOucHIBivsb9oX9m7v0U5Z+YCcjffJtfGxCPCyIRMHfDFXhMmx+qZoMLb7mk0hX3BhyKtcDnuVdyGfsqjdG8yBN4NrnI0PyLX+oaifCaSKA1/NlWfJ/isgPeRr2hz2K/QbffB4vtXBeZq0+kIglRpgUQO6RUMaG+FA0I277w37lBuhwDZnm28bvxv+axHQN/Sz5qeSKh4MWqrOkX3VDdGQygYrHFAWh/xKvXbKmgvIteER3lmPqJ/OhkxaQAcCrouGFDYkmg/UgCH1wwbwJ/jNUn2e7CtHFFAM1C/IVndV1BewIVMiQMAFBHSJhglsSLQQIOAJ2VZcEfXT2JCJA75bahBQd0008EK3GTSBXWAP2A8Ogy6gBliXXxL1/G9IlQR+WGs6ydP8luKxVBsycskwiZmMDcg1aDB6IoD0Rjfp090Ul5mHpfo1WWs7RUAeDyRTNKD24h83leGwVHeIgKk8kEwcEOE7TvLMo8TsuZSYNUfdWMTmE28tpHhzAcWZ8ikuY4r6ZAZjDunTskTAsFPEagA8xwfAQXAI8HwzR8BRcAwc1zgBeOM5BVpAMvhXion5CQJfvsgrfdM6AAAAAElFTkSuQmCC"
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, sectionName, base, height, thickness, uniaxialMaterial):
+        
+        
+        import math
+        import Grasshopper as gh
+        
+        def RectangularHollowCrossSection(sectionName, base, height, thickness, uniaxialMaterial):
+            
+            sectionName = sectionName
+            shape = "rectangularHollow"
+            base = base / 1000                      # Input value in mm ---> Output m
+            height = height / 1000                  # Input value in mm ---> Output m
+            thickness = thickness/1000              # Input value in mm ---> Output m
+            Area = base * height - ( base - 2*thickness )*( height - 2*thickness )
+            ky = Area/( base*thickness*2 )
+            kz = Area/( height*thickness*2 )
+            Ay = Area * ky
+            Az = Area * kz
+            Iyy = base*(height)**3/12 - ( base - 2*thickness )*( height - 2*thickness )**3/12
+            Izz = base**3*height/12 - ( base - 2*thickness )**3*( height - 2*thickness )/12
+            #J = Iyy + Izz
+            J = ( 4*(( base - thickness)*( height - thickness))**2*thickness )/( 2*( height - thickness) + 2*( base - thickness) )
+        
+            material = uniaxialMaterial
+        
+            return [[Area, Ay, Az, Iyy, Izz, J, material, [shape, base, height, thickness ], sectionName ]]
+        
+        checkData = True
+        
+        if sectionName is None:
+            checkData = False
+            msg = "input 'sectionName' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if base is None:
+            checkData = False
+            msg = "input 'base' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if height is None:
+            checkData = False
+            msg = "input 'height' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if thickness is None:
+            checkData = False
+            msg = "input 'thickness' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if uniaxialMaterial is None:
+            checkData = False
+            msg = "input 'uniaxialMaterial' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            CrossSection = RectangularHollowCrossSection(sectionName, base, height, thickness, uniaxialMaterial)
+            return CrossSection
+
 class ShellSection(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Shell Section", "Shell Section", """Generate a Plate cross section""", "Alpaca", "2_Cross Section")
+            "Shell Section", "Shell Section", """Generate a Plate cross section""", "Alpaca", "2|Cross Section")
         return instance
 
     def get_Exposure(self): #override Exposure property
@@ -1252,12 +1546,12 @@ class ShellSection(component):
 
 
 
-# 3_Define Materials
+# 3|Define Materials
 
 class nDMaterial(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "nDMaterial", "nDMaterial", """Generate a n-Dimensional Elastic Isotropic Material""", "Alpaca", "3_Material")
+            "nDMaterial", "nDMaterial", """Generate a n-Dimensional Elastic Isotropic Material""", "Alpaca", "3|Material")
         return instance
     
     def get_ComponentGuid(self):
@@ -1330,12 +1624,12 @@ class nDMaterial(component):
         
         def ElasticMaterial(matName, E, G, v, rho, fy):
         
-            E = E * 1000                               # Input value in N/mm2 ---> Output kN/m2
+            E = E * 1000.0                               # Input value in N/mm2 ---> Output kN/m2
             if v == None:
-                G = G * 1000                           # Input value in N/mm2 ---> Output kN/m2
-                v = (E / (2 * G)) - 1
+                G = G * 1000.0                           # Input value in N/mm2 ---> Output kN/m2
+                v = (E / (2.0 * G)) - 1
             else:
-                G = E / (2 * (1 + v))
+                G = E / (2.0 * (1.0 + v))
         
             rho = rho                                  # Force Density
             fy = fy                                    # Input value in N/mm2
@@ -1377,7 +1671,7 @@ class nDMaterial(component):
 class uniaxialMaterial(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "uniaxialMaterial", "uniaxialMaterial", """Generate a uniaxial Elastic Material""", "Alpaca", "3_Material")
+            "uniaxialMaterial", "uniaxialMaterial", """Generate a uniaxial Elastic Material""", "Alpaca", "3|Material")
         return instance
     
     def get_ComponentGuid(self):
@@ -1451,12 +1745,12 @@ class uniaxialMaterial(component):
         
         def ElasticMaterial(matName, E, G, v, rho, fy):
         
-            E = E * 1000                               # Input value in N/mm2 ---> Output kN/m2
+            E = E * 1000.0                               # Input value in N/mm2 ---> Output kN/m2
             if v == None:
-                G = G * 1000                           # Input value in N/mm2 ---> Output kN/m2
-                v = (E / (2 * G)) - 1
+                G = G * 1000.0                           # Input value in N/mm2 ---> Output kN/m2
+                v = (E / (2.0 * G)) - 1.0
             else:
-                G = E / (2 * (1 + v))
+                G = E / (2.0 * (1.0 + v))
         
             rho = rho                                  # Input value kN/m3
             
@@ -1497,16 +1791,16 @@ class uniaxialMaterial(component):
 
 
 
-# 4_Define Loads
+# 4|Define Loads
 
 class PointLoad(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Point Load", "Point Load", """Generate a point load.""", "Alpaca", "4_Load")
+            "Point Load", "Point Load", """Generate a point load.""", "Alpaca", "4|Load")
         return instance
     
     def get_ComponentGuid(self):
-        return System.Guid("ec152d87-d9a8-447d-b636-770d5e0e8623")
+        return System.Guid("5fcdb364-cff0-4315-85e0-f984d8d9a38b")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -1559,23 +1853,14 @@ class PointLoad(component):
         def pointLoad(Force, Moment, Pos):
         
             Pos = Pos
-            Force = Force                   # Input value in kN ---> Output kN
-            Moment = Moment                 # Input value in kNm ---> Output kNm
+            Force = rg.Vector3d(0,0,0) if Force is None else Force                   # Input value in kN ---> Output kN
+            Moment = rg.Vector3d(0,0,0) if Moment is None else Moment                 # Input value in kNm ---> Output kNm
             loadType = "pointLoad"
         
             return [[Pos, Force, Moment, loadType]]
         
         checkData = True
         
-        if Force is None:
-            checkData = False
-            msg = "input 'Force' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        if Moment is None:
-            checkData = False
-            msg = "input 'Moment' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if Pos is None:
             checkData = False
@@ -1590,7 +1875,7 @@ class PointLoad(component):
 class LinearLoad(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Linear Load", "Linear Load", """Generate a uniform Distributed Load""", "Alpaca", "4_Load")
+            "Linear Load", "Linear Load", """Generate a uniform Distributed Load""", "Alpaca", "4|Load")
         return instance
     
     def get_ComponentGuid(self):
@@ -1685,7 +1970,7 @@ class LinearLoad(component):
 class MassLoad(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Mass Point", "Mass Point", """Add a concentrated Mass to a node.""", "Alpaca", "4_Load")
+            "Mass Point", "Mass Point", """Add a concentrated Mass to a node.""", "Alpaca", "4|Load")
         return instance
     
     def get_ComponentGuid(self):
@@ -1756,16 +2041,17 @@ class MassLoad(component):
             return Mass
 
 
-# 5_Analysis
+# 5|Analysis
 
-class staticAnalyses(component):
+
+class StaticAnalyses(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Static Analysis", "Static Analysis", """Calculate the Static Response of the structure""", "Alpaca", "5_Analysis")
+            "Analyze", "Analyze", """Calculate the Static Response of the structure""", "Alpaca", "5|Analyses")
         return instance
     
     def get_ComponentGuid(self):
-        return System.Guid("cd85b401-cbee-4271-9296-75955256affe")
+        return System.Guid("2e2ee996-5a1f-48e3-93bd-df211c55dce5")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -1785,21 +2071,13 @@ class staticAnalyses(component):
         self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Analysed Alpaca model.")
         self.Params.Output.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "maxDisplacement", "maxDisplacement", "Maximum displacement of structure [mm].")
-        self.Params.Output.Add(p)
-        
     
     def SolveInstance(self, DA):
         p0 = self.marshal.GetInput(DA, 0)
         result = self.RunScript(p0)
 
         if result is not None:
-            if not hasattr(result, '__getitem__'):
-                self.marshal.SetOutput(result, DA, 0, True)
-            else:
-                self.marshal.SetOutput(result[0], DA, 0, True)
-                self.marshal.SetOutput(result[1], DA, 1, True)
+            self.marshal.SetOutput(result, DA, 0, True)
         
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAKbSURBVEhL7dRfSFNRHAfwe+82d73TnG5LbdqmbolrlcKUiJAgn7IosKCHon9UD2JRgUo9WYH9AcNWyvqDDz1IQYZYkmEtNKGggh586kVKESGhsjRN9+v7u3fGgrtwUVDQFz5w/uycc8/dPUf4G7MM2iBdrf2BnISDMAAF3PA744WjWlHIhyat+ENSwK0VE89eWKEV1bSAUSuq4b6HQODjhkSzB+YH8utpBbNaE4QKq2h4d8zkII9kjqA+DrybhDK/AxNcASdwrEmCONQuu76OW5ZTh+zmHbyG2N3FDT9FOSyF09G6PVqeT+0W4yLiyVmXtsBzrUs/EhyAm/DK7zeQoog8aBiqgXdwHjgbHaLx/UCyJzKkFFHInENbjWn825DWrZ9dTqc0W18vzzU3KxQOp1JfXyo1NiZTIGDgwVMwBi+9knn6rpxHPHmZpHBfGBrBAbqpglt2u0j9/am6urtTKHhRmXqUnK9OzK8laHby5PchiSfRiwHWQAMUZmdLupPHGg541MlHLT4q1Z6+EuJmHxwBG1RkFJbQic5T1PM4V3dyNlibPcMLXNKe/hnIEDd8aMqA75inuTsvU0kbkb/pLVVu9840tJROPAjnzMUu8OReWqTX7vqCP/kDxqyDn0aB23DIWrqN/BdGyF1zZ0LO8c2ircugWKn4+izVdFyjGz3lEV4gGFTIZhM/oZ8P4IKyGcYy1u6mpHTXZ5TfwAuwiZJxclVoUt3VytaP5K/aQRaLOIq+TbDgWKEbRuAwHIcs6DRZs6aLr06Tty5MslPdVS8kfKkVwX7IBL5nFgOn3bG+mjI31JJokAdR56+Fv7qEw1dAPdRBHjdEc9ZSsJpEo4lP8hKt6ddzBs5pxe/hV8dHnz/j//mnIgjfAFbfBYlCcDTMAAAAAElFTkSuQmCC"
@@ -1814,8 +2092,8 @@ class staticAnalyses(component):
         import Grasshopper as gh
         
         def InitializeStaticAnalysis(AlpacaModel):
-            ghFilePath = ghenv.LocalScope.ghdoc.Path
-        
+            
+            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
             workingDirectory = os.path.dirname(ghFilePath) 
             outputFileName = 'openSeesOutputWrapper.txt'
         
@@ -1831,16 +2109,29 @@ class staticAnalyses(component):
             outputFolder = os.path.join(ghFolderPath,'assembleData')
             wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
         
+            userObjectFolder = gh.Folders.DefaultUserObjectFolder
+            pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
+            
+            wrapperFile = '"' + wrapperFile + '"'
+            fileName = '"' + fileName + '"'
+            
+            p = System.Diagnostics.Process()
+            p.StartInfo.RedirectStandardOutput = True
+            p.StartInfo.RedirectStandardError = True
         
-            #userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-            fileName = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses\openSees_StaticSolver.py'
+            p.StartInfo.UseShellExecute = False
+            p.StartInfo.CreateNoWindow = True
+            
+            p.StartInfo.FileName = pythonInterpreter
+            p.StartInfo.Arguments = fileName + " " + wrapperFile
+            p.Start()
+            p.WaitForExit()
+            
+            
+            msg = p.StandardError.ReadToEnd()
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
         
-        
-            staticAnalyses = System.Diagnostics.ProcessStartInfo(fileName)
-            staticAnalyses.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-            staticAnalyses.Arguments = wrapperFile
-            process = System.Diagnostics.Process.Start(staticAnalyses)
-            System.Diagnostics.Process.WaitForExit(process)
         
             ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
             ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
@@ -1875,9 +2166,155 @@ class staticAnalyses(component):
         
         if checkData != False:
             AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
-            maxDisplacement = None
-            return (AlpacaStaticOutput, maxDisplacement)
+            #maxDisplacement = None
+            return AlpacaStaticOutput
 
+
+class ModalAnalyses(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Modal Analyses", "Modal Analyses", """Generate a circular cross section""", "Alpaca", "5|Analyses")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("bab459c1-dd65-463e-84fa-67a320a4dfa5")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaModel", "AlpacaModel", "Assemble model to perform Modal Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "numVibrationModes", "numVibrationModes", "Script input numVibrationModes.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaModalOutput", "AlpacaModalOutput", "Analysed Alpaca model.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "frequency", "frequency", "Frequencies of the corrisponding modes [Hz].")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "period", "period", "Periods of the corrisponding modes [s].")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        result = self.RunScript(p0, p1)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAOWSURBVEhL3ZVbaFRHGMfnnDm3PXuym41J3LhubiQxF6PdhkKtsaKBRvEhoWpIqT6ECClJwXoh2ja0pYK12pcaMcXivRFvoG19UEkbIURTivhgUhto05QELxUVpNVSrdP/N7N5CHE3VfDFP/w4c/7f7Myeb77zHfZcqwJ0gnx5N1GpoEoNn05rOGcC1/vgjHTG6y3wLTgOcsl4Un1cU2OKnTtdkZGh0UafK1sqAHYAHcwF74IxzdUY+w7XsLpNrPeWLDFFT0+KOHXKE8Gg3KRehVg1WKSGUnvi18p83RhdyD2a2ws86SZQxOfTxOnTntykqcmmH/WoEFsOXlJDqY/A7BLdunHZLRI3/WUiqPG/4LkymkQnmpttuUE4rNMGTcpmNaBSDVkreB20HXSyxS0sTszSHTo7hyYk08o5cwy5QSgkU/SistnboACYYDMIRDU++LtbIhcfcotFvmYMw59UteXlXG7Q0GDRBlQxlNd2wAEd8meg7UNrqrjuLxWrzXQR1szz8OipJigIZoL5YCPKdKSlRaXo5ElPeJ58il3xOVI60/rrjdS/r2Hxr5AizrStsA0VHa9NmsZuZ2ZqoqhIlzmPxfidWEzvKyzUjsHfhzlUOX45O65aPdBPh0qpedMI/QsrpiLjlQVGt293RXd3iujq8kRlJb8Cb6qMJhZ/wwhepcV/Q94jGv8J3mMPdqCigsuFOzv9orRUPwdvngolVeFmK+shbbDNyqL0rVf2RF2qq7NkrletkvUeUXZypTH9/Yu+QjHgzqB//wuskIpMFDWtK9XVpujocEVenva9spMqbYURGv4VqVnA3Tu4p8JIKuqOPzc22qK11aGneFm6Sq+BTWqoFGL6hqNOjqhSiy9T7uSajtL8h87BNNmWuEeHRrVOTW0sx9Ne4b6bM9EaMKZ6p3eDGiCV+aTaX19vCfQhekPRGNlaMNb3O+LXrSbTfsS1eDH3DjWYqVeX8sDeteaU6/AsQH+KfvtYVdu2/A5sAEvBCjLjagPU++n7ECVjo5XZe8FXIM7YebcOOzmPDlrZf3zt5N77xAgPUTyRDoBBcATYZMRF1UWLfyHvoHVmxg99voKHe+zoo0NO9oM1RsbIqL9E7LanfxOfklB0yC+o4ThR/yGk3jHTzx6wItcaeejiMSd6v92O3KVm96Ud/RPhyV7U/6Wycua8GmS8qtYIfFDHU7d8amUdaeJT6CNElfksxdh/LtT+vpyTzI0AAAAASUVORK5CYII="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaModel, numVibrationModes):
+        
+        
+        import System
+        import os
+        import Grasshopper as gh
+        
+        def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
+            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+        
+            # delete file if already there
+            workingDirectory = os.path.dirname(ghFilePath) 
+            outputFileName = 'openSeesModalOutputWrapper.txt'
+        
+            for dirpath, dirnames, filenames in os.walk(workingDirectory):
+                for filename in filenames:
+                    if filename == outputFileName:
+                        file = os.path.join(dirpath,outputFileName)
+                        os.remove(file)
+        
+        
+            ghFolderPath = os.path.dirname(ghFilePath)
+            outputFolder = os.path.join(ghFolderPath,'assembleData')
+            wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
+        
+        
+        
+            userObjectFolder = gh.Folders.DefaultUserObjectFolder
+            pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\DynamicAnalysis\openSees_ModalSolver.py')
+            
+            wrapperFile = '"' + wrapperFile + '"'
+            fileName = '"' + fileName + '"'
+            
+            p = System.Diagnostics.Process()
+            p.StartInfo.RedirectStandardOutput = True
+            p.StartInfo.RedirectStandardError = True
+        
+            p.StartInfo.UseShellExecute = False
+            p.StartInfo.CreateNoWindow = True
+            
+            p.StartInfo.FileName = pythonInterpreter
+            p.StartInfo.Arguments = fileName + " " + wrapperFile + " " + str(numVibrationModes)
+            p.Start()
+            p.WaitForExit()
+            
+            
+            msg = p.StandardError.ReadToEnd()
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
+        
+            ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+        
+            outputFile = os.path.join(outputFolder, outputFileName)
+        
+            with open(outputFile, 'r') as f:
+                lines = f.readlines()
+                nodeModalDispWrapper = eval( lines[0].strip() )
+                elementModalWrapper = eval( lines[1].strip() )
+                period = eval( lines[2].strip() )
+                frequency = eval( lines[3].strip() )
+        
+        
+            AlpacaModalOutputWrapper = ([nodeModalDispWrapper,
+                                    elementModalWrapper,
+                                    period,
+                                    frequency])
+        
+            return [AlpacaModalOutputWrapper, period, frequency]
+        
+        checkData = True
+        
+        if not AlpacaModel:
+            checkData = False
+            msg = "input 'AlpacaModel' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if numVibrationModes is None:
+            checkData = False
+            msg = "input 'numEigenvalues' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        
+        if checkData != False:
+            AlpacaModalOutput, period, frequency = InitializeModalAnalysis(AlpacaModel, numVibrationModes)
+            return (AlpacaModalOutput, frequency, period)
 
 
 

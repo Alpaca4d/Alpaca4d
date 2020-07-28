@@ -3,6 +3,7 @@
         sectionName: Name of the section.
         base: Base of cross section [mm].
         height: Height of cross section [mm].
+        thickness: Wall thickness [mm].
         uniaxialMaterial: Material element.
     Output:
        CrossSection: CrossSection element.
@@ -20,7 +21,7 @@ def RectangularHollowCrossSection(sectionName, base, height, thickness, uniaxial
     height = height / 1000                  # Input value in mm ---> Output m
     thickness = thickness/1000              # Input value in mm ---> Output m
     Area = base * height - ( base - 2*thickness )*( height - 2*thickness )
-    ky = Area/( base*thickness*2 ) # 
+    ky = Area/( base*thickness*2 )
     kz = Area/( height*thickness*2 )
     Ay = Area * ky
     Az = Area * kz

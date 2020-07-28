@@ -1,11 +1,11 @@
 ﻿"""Generate a  double T cross Section
     Inputs:
         sectionName: Name of the section.
-        Bsup: Width upper Flange
-        Binf: Width lower Flange
-        H: Depth of section [ mm ]
-        tsup: upper Flange thickness [ mm ]
-        tinf: lower Flange thickness [ mm ]
+        Bsup: Width Top Flange
+        Binf: Width Bottom Flange
+        H: Height of section [ mm ]
+        tsup: Top Flange thickness [ mm ]
+        tinf: Bottom Flange thickness [ mm ]
         tw: Web thickness [ mm ]
         uniaxialMaterial: Material element.
     Output:

@@ -1,3 +1,3 @@
 import clr
 
-clr.CompileModules("Alpaca4d.ghpy", "preProcessing.py")
+clr.CompileModules("Alpaca4d.ghpy", "Alpaca4d.py")
