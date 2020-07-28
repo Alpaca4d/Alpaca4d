@@ -232,10 +232,10 @@ for item in openSeesBeamLoad:
     #TensionFilePath = os.path.join(workingDirectory, "tension.out")
     #ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',elementTag,'stresses')
 
- 
-TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
-TensionFilePathTag = TensionFilePath + '/tension.out' 
-#TensionFilePath = os.path.join(workingDirectory, "tension.out")# ho problemi con shellTag
+workingDirectory = os.path.split(filename)[0]
+TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
+#TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
+#TensionFilePathTag = TensionFilePath + '/tension.out' 
 ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
 
 '''

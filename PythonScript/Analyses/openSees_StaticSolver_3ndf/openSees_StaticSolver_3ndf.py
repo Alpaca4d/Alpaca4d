@@ -224,9 +224,11 @@ for item in openSeesBeamLoad:
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
 
-TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
+#TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
 # ho problemi con shellTag
+workingDirectory = os.path.split(filename)[0]
+TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
 ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*solidTag,'stresses')
 print(ops.getEleTags())
 # ------------------------------
