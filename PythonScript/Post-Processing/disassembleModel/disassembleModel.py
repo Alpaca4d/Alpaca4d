@@ -19,15 +19,25 @@ import rhinoscriptsyntax as rs
 import sys
 
 
-folderName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(folderName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
-
 #---------------------------------------------------------------------------------------#
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+## Funzione rettangolo ##
+def AddRectangleFromCenter(plane, width, height):
+    a = plane.PointAt(-width * 0.5, -height * 0.5 )
+    b = plane.PointAt(-width * 0.5,  height * 0.5 )
+    c = plane.PointAt( width * 0.5,  height * 0.5 )
+    d = plane.PointAt( width * 0.5,  -height * 0.5 )
+    #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
+    rectangle  = [a, b, c, d] 
+    return rectangle
 ## Funzione cerchio ##
 def AddCircleFromCenter( plane, radius):
-    t = dg.linspace( 0 , 1.80*mt.pi, 20 )
+    t = linspace( 0 , 1.80*mt.pi, 20 )
     a = []
     for ti in t:
         x = radius*mt.cos(ti)
@@ -249,7 +259,7 @@ def Beam( ele, node):
         
         if dimSection[0] == 'rectangular' :
             width, height = dimSection[1], dimSection[2]
-            section = dg.AddRectangleFromCenter( sectionPlane, width, height )
+            section = AddRectangleFromCenter( sectionPlane, width, height )
             sectionForm.append( section )
         elif dimSection[0] == 'circular' :
             radius1  = dimSection[1]/2
@@ -269,8 +279,8 @@ def Beam( ele, node):
             sectionForm.append( section )
         elif dimSection[0] == 'rectangularHollow' :
             width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
-            section1 = dg.AddRectangleFromCenter( sectionPlane, width, height )
-            section2 = dg.AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+            section1 = AddRectangleFromCenter( sectionPlane, width, height )
+            section2 = AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
             sectionForm.append( [ section1, section2 ] )
         elif dimSection[0] == 'Generic' :
             radius  = dimSection[1]

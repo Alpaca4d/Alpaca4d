@@ -23,22 +23,6 @@ import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
 def scaleAutomatic( valueMax, valueMin):
     if max( valueMax,mt.fabs(valueMin)) < 0.000000001 :
@@ -133,8 +117,8 @@ def forceTimoshenkoBeam( ele, node, force, loadDict ):
     M3J = localMomentStart.Z # 
     ##------------------ displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    divideDistance = 0.5
-    DivCurve = line.DivideByLength( divideDistance, True )
+    segmentCount = Length/0.5
+    DivCurve = line.DivideByCount( segmentCount, True )
     if DivCurve == None:
         DivCurve = [ 0, Length]
         
@@ -224,8 +208,8 @@ def forceTrussValue(  ele, node, force, loadDict ):
     M3J = localMomentStart.Z # 
     ##------------------ displacement value -------------------------##
     Length = rg.Curve.GetLength( line )
-    divideDistance = 0.5
-    DivCurve = line.DivideByLength( divideDistance, True )
+    segmentCount = Length/0.5
+    DivCurve = line.DivideByCount( segmentCount, True )
     if DivCurve == None:
         DivCurve = [ 0, Length]
         
