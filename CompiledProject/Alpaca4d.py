@@ -3174,7 +3174,10 @@ class NodeDisplacement(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Node Displacement (Alpaca4d)", "Node Displacement ", """Compute nodal displacement in the Global Axis system""", "Alpaca", "6|Numerical Output")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.primary
+
     def get_ComponentGuid(self):
         return System.Guid("d4b31c40-fab9-43af-99f6-6e62fc7c418d")
     
@@ -3270,12 +3273,164 @@ class NodeDisplacement(component):
             Points, Trans, Rot = NodeDisp( AlpacaStaticOutput )
             return (Points, Trans, Rot)
 
+class ReactionForces(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Reaction Forces (Alpaca4d)", "Reaction Forces (Alpaca4d)", """Compute the reaction forces""", "Alpaca", "6|Numerical Output")
+        return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.primary
+
+    def get_ComponentGuid(self):
+        return System.Guid("0be5f38d-6134-4ff3-9702-d2898a4da0c4")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "tagPoints", "tagPoints", "nodes tag of Model .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "ReactionForce", "ReactionForce", "Vector of reaction Forces { Rx, Ry, Rz }. [kN]")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "ReactionMoment", "ReactionMoment", "Vector of reaction Moments { Mx, My, Mz }. [kN]")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAH0SURBVEhL7ZKxSxxBFMa3CDZJpYje7OxdbmfuXMa7jV6KxKQQTCpBCNiIjZIikEbQSrAIBIz4V1goJKQ50l0XSBuCrQQtbPRudsRIICIW63vju4McenerV1j4gwfzvt33vp331knC00LhDUYpCFIkdZdSsRhjoAlJ3eXeoMFzpXqfKDXSHHWD0WJxsflZGIZZKm8PNJl/OVaIJ6dURzHxahhNy1TeHjR4uxDE335nOor1LZHcYHpW2cJOYuFDPqFBGE5gQZKAxS9T+e2oZTKDdPyPw4HwIR1vzhETLwz3NyltEDvjD4wrfmiWzZN0M4wry5r5Z2DkkWSJPPnecBlHTFZIag1+ER0bHGeGHmvun9tGrvhIsqPTQQpupQ2T/yBO4Z0ZenQ9hokt+NpFSi2ay0/Q/FfE/Qgabtf61SPUd9x8SCbbhvlzVZZ7bQtaYbhYA4PPlFoOPTGMDbDRCQv6Klz10qPLHXBZg9GNkdQaXKZ2/RNsRJKlbkBpA5j9FNz6IFaqh6T24MIiLr9SarnKoJrNDoC+B3t5R1JnHAzKfhjVDprgjFFrNjBu7hlou9B8g6Rk4IgiV36Bpn9xJxiw7H3jiRWY+Xerw/mqvy4ROiVKcJNV+A1/aib/4K2OPLFUv1nXuG7JXaOazvnGy81TehdwnAv/6hsy2W8YaQAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaStaticOutput):
+        
+        import Rhino.Geometry as rg
+        import math
+        import ghpythonlib.treehelpers as th # per data tree
+        import Grasshopper as gh
+        
+        
+        def reaction(AlpacaStaticOutput):
+            
+            global tagPoints
+            global ReactionForce
+            global ReactionMoment
+            global view
+        
+            scale = 1
+        
+        
+            diplacementWrapper = AlpacaStaticOutput[0]
+            reactionOut = AlpacaStaticOutput[1]
+
+        
+            pointWrapper = []
+        
+            for index,item in enumerate(diplacementWrapper):
+                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+        
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+        
+            ## per scalare le reazioni #
+            rowReaction = [row[1] for row in reactionOut ]
+        
+            valorReaction = []
+            for valor in rowReaction:
+                rx = math.fabs( valor[0] )
+                ry = math.fabs( valor[1] )
+                rz = math.fabs( valor[2] )
+                mx = math.fabs( valor[3] )
+                my = math.fabs( valor[4] )
+                mz = math.fabs( valor[5] )
+                valorReaction.append( [ rx, ry, rz, mx, my, mz ] )
+        
+            rx = max([row[0] for row in valorReaction ])
+            ry = max([row[1] for row in valorReaction ])
+            rz = max([row[2] for row in valorReaction ])
+            mx = max([row[3] for row in valorReaction ])
+            my = max([row[4] for row in valorReaction ])
+            mz = max([row[5] for row in valorReaction ])
+            # -------------------------------------------------------#
+        
+            ReactionForce = []
+            ReactionMoment = []
+            viewElement = []
+            tagPoints = []
+            for value in reactionOut:
+                pointIndex = value[0]
+                tagPoints.append( pointIndex )
+                point = pointWrapperDict.get( pointIndex , "never")
+                Rx = rg.Vector3d( value[1][0], 0, 0 )
+                Ry = rg.Vector3d( 0,value[1][1], 0 )
+                Rz = rg.Vector3d( 0,0, value[1][2] )
+                Mx = rg.Vector3d( value[1][3], 0, 0 )
+                My = rg.Vector3d( 0, value[1][4], 0 )
+                Mz = rg.Vector3d( 0,0, value[1][5] )
+                Rxyz = Rx + Ry + Rz
+                Mxyz = Mx + My + Mz
+                viewElement.append( [ point, Rx/rx*scale, Ry/ry*scale, Rz/rz*scale, Mx/mx*scale, My/my*scale, Mz/mz*scale ] )
+                ReactionForce.append( Rxyz )
+                ReactionMoment.append( Mxyz )
+        
+            point = [row[0] for row in viewElement ]
+            Rx = [row[1] for row in viewElement ]
+            Ry = [row[2] for row in viewElement ]
+            Rz = [row[3] for row in viewElement ]
+            Mx = [row[4] for row in viewElement ]
+            My = [row[5] for row in viewElement ]
+            Mz = [row[6] for row in viewElement ]
+        
+        
+            return tagPoints, ReactionForce, ReactionMoment
+        
+        checkData = True
+        
+        if not AlpacaStaticOutput :
+            checkData = False
+            msg = "input 'AlpacaStaticOutput' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+
+        if checkData != False :
+            tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput )
+            return (tagPoints, ReactionForce, ReactionMoment)
+
 class BeamDisplacement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Beam Displacement (Alpaca4d)", "Beam Displacement", """Compute the beam displacement """, "Alpaca", "6|Numerical Output")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.secondary
+
     def get_ComponentGuid(self):
         return System.Guid("7ad38934-180e-48bb-b266-bf495a59e1fa")
     
@@ -3646,12 +3801,385 @@ class BeamDisplacement(component):
             tagElement, localTrans, localRot, globalTrans, globalRot = beamDisp( AlpacaStaticOutput , numberResults )
             return (tagElement, localTrans, localRot, globalTrans, globalRot)
 
+class BeamForces(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Beam Forces (Alpaca4d)", "Beam Forces", """Compute the internal forces of a beam""", "Alpaca", "6|Numerical Output")
+        return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.secondary
+    
+    def get_ComponentGuid(self):
+        return System.Guid("a1593306-5f65-4c4d-af95-270566d05a89")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of Static Solver Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "numberResults", "numberResults", "number of discretizations for beam. Defauls is 2.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "tagElement", "tagElement", "Beam or Truss element's tag number.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "N", "N", "normal force values (forces in direction 3) [kN].")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "V1", "V1", "shear force values (forces in direction 1) [kN].")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "V2", "V2", "shear force values (forces in direction 2) [kN].")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Mt", "Mt", "torque value (Moments in direction 3) [kNm].")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "M1", "M1", "bending moment (Moments in direction 1) [kNm].")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "M2", "M2", "bending moment (Moments in direction 2) [kNm].")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        result = self.RunScript(p0, p1)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+                self.marshal.SetOutput(result[3], DA, 3, True)
+                self.marshal.SetOutput(result[4], DA, 4, True)
+                self.marshal.SetOutput(result[5], DA, 5, True)
+                self.marshal.SetOutput(result[6], DA, 6, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAALVSURBVEhLYyADMBoyc/ppsLLqANkcECEGhvvy8hxvVFT4rmhpsUGFyAPyDGwaDQySVxKZhI86MnGlgQx+IaOo+1pG5eJrKZWMd5JKclCl5AETNs7gYkbRazlMwndjmQW63bm4JF/Kqii/klJ++0pGpe2NvKomVCnZgNefhX9JHJPQ0VQGkdrNQjLSQNdnvZFRqXsjoyr9n4GBCaqOfMDFwCBZwCiyuIhRbMFSQSnLN1Iqp9/Lqyv8pzT8kUEW0PVFjCI7Z/JJLn4lo7wbKkwVIAXEzdIMLOvDmfguT+GSug8MomiIFGUAFLZcTEyMp8sDdL+W++v9D9aV/WbAyrH3looKO0QJZUABiFd1xZj9fzkr6v//lcn/99Z6/vc2lL0BFNcHq6AAGMiJcM9IsFcFGwzDF7oC/5f76j0GymdClJEHzFUl+acBDf/3Y0kC3PBbE0L+t4QafuRgZdwMVMMPUUo6UJYT5lmZ66798928GLjhT2dE/k92VPsqwsO+BKgGFHRkg1wJPo4LIZaKf/fWe/0DGf5pQdz/QFOFP/Ii3J1AeW2IMvJBtL286ElHGZH/7vJi/y93BfzxNZb7LyXE2Q6U04AooQzwlHELzaxgF/6cxCTyX5iH/R9QbBoQy4BlKQWg4veulGL/Bj6ZBwkMgs90GTivAoVZgZgRrIBSACx+fV9Lq5Rv5pdpj2YQmlbEIHoFKCwMxCxgBZSC1zLKE4ClZOIKQXEdPwYB7xoGyU/6DJwFQJ+AgogZoopMAAqeN9IqG9/IKAUCudxGDBy2voz8Z0oZRb96M/D6CZKb9oHlOSO4+pNW6X4jrdz1WlbJBCjMpgesIl1ZeBYVM4r9imMQXB/GIGgN0UEmeC2j9BoYPHveyKq4gioRYGEjYMTKGlbNLPoqm1F0VgqDiDFUKXngtbRywwtpRb2nkpLA+gUB9NnZFcxZWfUsGPiEoELDGjAwAADq5NfuCxJ3AwAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaStaticOutput, numberResults):
+        
+        import Rhino.Geometry as rg
+        import math
+        import ghpythonlib.treehelpers as th # per data tree
+        import Grasshopper as gh
+        import ghpythonlib.components as ghcomp
+        import sys
+        import rhinoscriptsyntax as rs
+        from scriptcontext import doc
+        
+        
+        def linspace(a, b, n=100):
+            if n < 2:
+                return b
+            diff = (float(b) - a)/(n - 1)
+            return [diff * i + a  for i in range(n)]
+        
+        def forceTimoshenkoBeam( ele, node, force, loadDict, numberResults ):
+            #---------------- WORLD PLANE ----------------------#
+            WorldPlane = rg.Plane.WorldXY
+            #--------- Propriety TimoshenkoBeam  ----------------#
+            TagEle = ele[0]
+            propSection = ele[2]
+            indexStart = ele[1][0]
+            indexEnd = ele[1][1]
+            #---- traslation and rotation index start & end ------- #
+            forceStart = force.get( TagEle , "never")[0]
+            momentStart = force.get( TagEle , "never")[1]
+            forceEnd = force.get( TagEle , "never")[2]
+            momentEnd = force.get( TagEle , "never")[3]
+            ##-------------------------------------------- ------------##
+            pointStart = node.get( indexStart -1 , "never")
+            pointEnd = node.get( indexEnd -1 , "never")
+            line = rg.LineCurve( pointStart, pointEnd )
+            #-------------------------versor ---------------------------#
+            axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+            axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+            axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
+            #---------- WORLD PLANE on point start of line ---------------#
+            traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
+            WorldPlane.Transform( traslPlane )
+            #-------------------------------------------------------------#
+            planeStart = rg.Plane(pointStart, axis1, axis2 )
+            #planeStart = rg.Plane(pointStart, axis3 )
+            localPlane = planeStart
+            xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
+            localForceStart = rg.Point3d( forceStart )
+            vectorTrasform = rg.Transform.TransformList( xform, [ forceStart, momentStart, forceEnd, momentEnd ] )
+            #print( vectorTrasform[0] )
+            localForceStart = vectorTrasform[0]
+            F1I = localForceStart.X # spostamento in direzione dell'asse rosso 
+            F2I = localForceStart.Y # spostamento in direzione dell'asse verde
+            F3I = localForceStart.Z # spostamento linea d'asse
+            localMomentStart = vectorTrasform[1]
+            M1I = localMomentStart.X # 
+            M2I = localMomentStart.Y # 
+            M3I = localMomentStart.Z # 
+            localForceEnd = vectorTrasform[2]
+            F1J = localForceStart.X # spostamento in direzione dell'asse rosso 
+            F2J = localForceStart.Y # spostamento in direzione dell'asse verde
+            F3J = localForceStart.Z # spostamento linea d'asse
+            localMomentEnd = vectorTrasform[3]
+            M1J = localMomentStart.X # 
+            M2J = localMomentStart.Y # 
+            M3J = localMomentStart.Z # 
+            ##------------------ displacement value -------------------------##
+            Length = rg.Curve.GetLength( line )
+            DivCurve = linspace( 0, Length, numberResults )
+            if numberResults == None:
+                DivCurve = [ 0, Length]
+                
+            uniformLoad = loadDict.get( TagEle , [0,0,0])
+            q1 = uniformLoad[0]
+            q2 = uniformLoad[1]
+            q3 = uniformLoad[2]
+            
+            N, V1, V2, Mt, M1, M2 = [], [], [], [], [], [] 
+            #----------------------- local to global-------------------------#
+            xform2 = xform.TryGetInverse()
+            #----------------------------------------------------------------#
+            for index, x in enumerate(DivCurve):
+                ## forza normale 3 ##
+                Nx = F3I - q3*x
+                N.append( Nx )
+                ## Taglio in direzione 1 ##
+                V1x = F1I + q1*x
+                V1.append( V1x )
+                ## Taglio in direzione 2 ##
+                V2x = F2I - q2*x
+                V2.append( V2x )
+                ## momento torcente ##
+                Mtx = M3I
+                Mt.append( Mtx )
+                ## Taglio in direzione 1 ##
+                M1x = M1I + F2I*x - q2*x**2/2
+                M1.append( M1x )
+                ## Taglio in direzione 2 ##
+                M2x = M2I - F1I*x - q1*x**2/2
+                M2.append( M2x )
+                
+            eleForceValue = [ N, V1, V2, Mt, M1, M2 ]
+            return   eleForceValue 
+        
+        
+        def forceTrussValue(  ele, node, force, loadDict, numberResults ):
+            #---------------- WORLD PLANE ----------------------#
+            WorldPlane = rg.Plane.WorldXY
+            #--------- Propriety TimoshenkoBeam  ----------------#
+            TagEle = ele[0]
+            propSection = ele[2]
+            indexStart = ele[1][0]
+            indexEnd = ele[1][1]
+            #---- traslation and rotation index start & end ------- #
+            forceStart = force.get( TagEle  , "never")[0]
+            momentStart = force.get( TagEle  , "never")[1]
+            forceEnd = force.get( TagEle , "never")[2]
+            momentEnd = force.get( TagEle , "never")[3]
+            ##-------------------------------------------- ------------##
+            pointStart = node.get( indexStart -1 , "never")
+            pointEnd = node.get( indexEnd -1 , "never")
+            line = rg.LineCurve( pointStart, pointEnd )
+            #-------------------------versor ---------------------------#
+            axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+            axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+            axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
+            #---------- WORLD PLANE on point start of line ---------------#
+            traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
+            WorldPlane.Transform( traslPlane )
+            #-------------------------------------------------------------#
+            planeStart = rg.Plane(pointStart, axis1, axis2 )
+            #planeStart = rg.Plane(pointStart, axis3 )
+            localPlane = planeStart
+            xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
+            localForceStart = rg.Point3d( forceStart )
+            vectorTrasform = rg.Transform.TransformList( xform, [ forceStart, momentStart, forceEnd, momentEnd ] )
+            #print( vectorTrasform[0] )
+            localForceStart = vectorTrasform[0]
+            F1I = localForceStart.X # spostamento in direzione dell'asse rosso 
+            F2I = localForceStart.Y # spostamento in direzione dell'asse verde
+            F3I = localForceStart.Z # spostamento linea d'asse
+            localMomentStart = vectorTrasform[1]
+            M1I = localMomentStart.X # 
+            M2I = localMomentStart.Y # 
+            M3I = localMomentStart.Z # 
+            localForceEnd = vectorTrasform[2]
+            F1J = localForceStart.X # spostamento in direzione dell'asse rosso 
+            F2J = localForceStart.Y # spostamento in direzione dell'asse verde
+            F3J = localForceStart.Z # spostamento linea d'asse
+            localMomentEnd = vectorTrasform[3]
+            M1J = localMomentStart.X # 
+            M2J = localMomentStart.Y # 
+            M3J = localMomentStart.Z # 
+            ##------------------ displacement value -------------------------##
+            Length = rg.Curve.GetLength( line )
+            DivCurve = linspace( 0, Length, numberResults )
+            if numberResults == None:
+                DivCurve = [ 0, Length]
+                
+            uniformLoad = loadDict.get( TagEle , [0,0,0])
+            q1 = uniformLoad[0]
+            q2 = uniformLoad[1]
+            q3 = uniformLoad[2]
+            
+            N, V1, V2, Mt, M1, M2 = [], [], [], [], [], [] 
+            #----------------------- local to global-------------------------#
+            xform2 = xform.TryGetInverse()
+            #----------------------------------------------------------------#
+            for index, x in enumerate(DivCurve):
+                ## forza normale 3 ##
+                Nx = F3I - q3*x
+                N.append( Nx )
+                ## Taglio in direzione 1 ##
+                V1x = F1I 
+                V1.append( V1x )
+                ## Taglio in direzione 2 ##
+                V2x = F2I 
+                V2.append( V2x )
+                ## momento torcente ##
+                Mtx = M3I
+                Mt.append( Mtx )
+                ## Taglio in direzione 1 ##
+                M1x = M1I 
+                M1.append( M1x )
+                ## Taglio in direzione 2 ##
+                M2x = M2I 
+                M2.append( M2x )
+                
+            eleForceValue = [ N, V1, V2, Mt, M1, M2 ]
+            return  eleForceValue
+        
+        
+        def beamForces( AlpacaStaticOutput, numberResults ):
+        
+            # define output
+            global tagElement
+            global N
+            global V1
+            global V2
+            global Mt
+            global M1
+            global M2
+        
+            if numberResults is None:
+                numberResults = 2
+        
+            diplacementWrapper = AlpacaStaticOutput[0]
+            EleOut = AlpacaStaticOutput[2]
+            eleLoad = AlpacaStaticOutput[3]
+            ForceOut = AlpacaStaticOutput[4]
+        
+            pointWrapper = []
+            for index,item in enumerate(diplacementWrapper):
+                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+        
+            ## Dict. for load ##
+            loadWrapperPaired = []
+        
+            for item in eleLoad:
+                loadWrapperPaired.append( [item[0], item[1:]] )
+        
+            loadWrapperDict = dict( loadWrapperPaired )
+            ####
+        
+            forceWrapper = []
+            for item in ForceOut:
+                index = item[0]
+                if len(item[1]) == 12: # 6 nodo start e 6 nodo end
+                    Fi = rg.Point3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+                    Mi = rg.Point3d( item[1][3], item[1][4], item[1][5] )
+                    Fj = rg.Point3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+                    Mj = rg.Point3d( item[1][9], item[1][10], item[1][11] )
+                    forceWrapper.append( [index, [ Fi, Mi, Fj, Mj ]] )
+        
+            ## Dict. for force ##
+            forceWrapperDict = dict( forceWrapper )
+            ####
+        
+            N, V1, V2, Mt, M1, M2 = [],[],[],[],[],[]
+            tag = []
+        
+            for ele in EleOut :
+                eleTag = ele[0]
+                eleType = ele[2][0]
+                if eleType == 'ElasticTimoshenkoBeam' :
+                    tag.append( eleTag )
+                    valueTBeam = forceTimoshenkoBeam( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict, numberResults )
+                    N.append(valueTBeam[0])
+                    V1.append(valueTBeam[1])
+                    V2.append(valueTBeam[2])
+                    Mt.append(valueTBeam[3])
+                    M1.append(valueTBeam[4])
+                    M2.append(valueTBeam[5])
+                elif eleType == 'Truss' :
+                    tag.append( eleTag )
+                    valueTruss = forceTrussValue( ele, pointWrapperDict, forceWrapperDict, loadWrapperDict, numberResults )
+                    N.append(valueTruss[0])
+                    V1.append(valueTruss[1])
+                    V2.append(valueTruss[2])
+                    Mt.append(valueTruss[3])
+                    M1.append(valueTruss[4])
+                    M2.append(valueTruss[5])
+                    
+            tagElement = th.list_to_tree( tag )
+            N = th.list_to_tree( N )
+            V1 = th.list_to_tree( V1 )
+            V2 = th.list_to_tree( V2 )
+            Mt = th.list_to_tree( Mt )
+            M1 = th.list_to_tree( M1 )
+            M2 = th.list_to_tree( M2 )
+        
+            return tagElement, N, V1, V2, Mt, M1, M2
+        
+        
+        checkData = True
+        
+        if not AlpacaStaticOutput:
+            checkData = False
+            msg = "input 'AlpacaStaticOutput' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        
+        if checkData != False:
+            tagElement, N, V1, V2, Mt, M1, M2 = beamForces( AlpacaStaticOutput, numberResults )
+            return (tagElement, N, V1, V2, Mt, M1, M2)
+
 class ShellDisplacement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Shell Displacement (Alpaca4d)", "Shell Displacement", """Compute the shell displacement""", "Alpaca", "6|Numerical Output")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.tertiary
+
     def get_ComponentGuid(self):
         return System.Guid("00fff614-43bb-471b-ae6b-1641e09e0650")
     
@@ -3815,12 +4343,199 @@ class ShellDisplacement(component):
             tagElement, Trans, Rot = shellDisp( AlpacaStaticOutput )
             return (tagElement, Trans, Rot)
 
+class ShellForces(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Shell Forces (Alpaca4d)", "Shell Forces", """Compute internal shell forces""", "Alpaca", "6|Numerical Output")
+        return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.tertiary
+
+    def get_ComponentGuid(self):
+        return System.Guid("7b280ab1-0c7c-4ff8-9815-4d3986ed953b")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "tagElement", "tagElement", "number of the tag of Beam or Truss element .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Fx", "Fx", "Forces in direction X  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Fy", "Fy", "Forces in direction Y of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Fz", "Fz", "Forces in direction Z  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Mx", "Mx", "Moments in direction X  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "My", "My", "Moments in direction Y  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Mz", "Mz", "Moments in direction Z  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+                self.marshal.SetOutput(result[3], DA, 3, True)
+                self.marshal.SetOutput(result[4], DA, 4, True)
+                self.marshal.SetOutput(result[5], DA, 5, True)
+                self.marshal.SetOutput(result[6], DA, 6, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAALqSURBVEhLtVVNaNRAFI4/KKKgSLU2mTRtMtlts5tuu0st/aGtRcT+qa2ybS+iiCDYYxVFe9BjD55UEJEKFaUgiIoevOlJUOhBPFgFRdA1mWwr6M2f8b10tkR3t5sW/OAjb17mzTfvZeZFKoYsqbY9YoyKYVEwYp5yiEHFMDw8hR5kxLgrhkXBCH2cVfRuMQwHLnWszQlwSVot3Hn4SqytIDCdlY002sJdGo5KDU8xnnkyfctI5KRw58FTzEGX6J4n6++YFqkR7uII7oIR/ZInG5/ndH2zcBUELP7UVYwJMZS4Za0T5gKgBKs8zazNEj3uErPdIeYDJkejnyoiZUw19uGcVCpVlkgkqoJEH76DDBsz5fp2tKFUzR6h42gvYm5HleYRfcaV6SuX0A/AnzDpzZBlnUnaNkc27mzhTa1dfxF9uffAI7C58xD7C2IdWO8b8DuUsEnILAAzYYpxMVNetxGD2geO8pHJ10ty1/CoL/CRkA34vZhKrzvbrE15pfoXyxUQYRJuTphLA4MwuNCiQeImUvH4AREWHmEF2npHeL1t7xZh4RFWoLmrjycsq16EhUdYgdbuNE/FYp0iLDz+yzeYpXS9MKVkPJ7uOHS84KJBLkvAUSNt0H7HUAiD2nqG+ODEI94/PsX7z93kfWdv8J6xqz57T1/zfS17BhYFHNmsZzI94S+WAzS1w9isfCr0JdzG39DkXuyPxfqhTDNIOCUPG2z7HjynG2KxSZ+2fQt9yGRdXRNTzAvQ+H7ATZ6F53MkXNpOvyzYPf0OSugxELwNPUVFcVepNf1dLAFHMRNIpkZl2OBlVzWvYItA4o0W0xYQdMxXRqqhn7gZLVolXHnwGyW2dSDa6HMrayr8l6UA6U1CRhxEpoQrD64W6YZ576FdP4Hf5l7hLg0s25fqeDkKYPrB0xUE/u2gLHeg3sNgrxHu8ECBUimv6J+cA5ymzLymbRHDgoAM7vunZSUIkzZuIPeB8yFJfwANJ+00XtlwtwAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaStaticOutput):
+        
+        import Rhino.Geometry as rg
+        import math as mt
+        import ghpythonlib.treehelpers as th # per data tree
+        import Grasshopper as gh
+        import sys
+        import rhinoscriptsyntax as rs
+        from scriptcontext import doc
+        
+        
+        def shellForces( AlpacaStaticOutput ):
+        
+        
+            diplacementWrapper = AlpacaStaticOutput[0]
+            EleOut = AlpacaStaticOutput[2]
+            ForceOut = AlpacaStaticOutput[4]
+        
+            pointWrapper = []
+            for index,item in enumerate(diplacementWrapper):
+                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+        
+            forceWrapper = []
+            for item in ForceOut:
+                index = item[0]
+                if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
+                    Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+                    Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
+                    Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+                    Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
+                    Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
+                    Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
+                    Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
+                    Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
+                    forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
+                                [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
+                                [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
+                                [ Mi.X, Mj.X,  Mk.X, Mw.X ],
+                                [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
+                                [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
+                    forceWrapper .append( [index, forceOut ])
+        
+                if len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
+                    Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+                    Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
+                    Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+                    Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
+                    Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
+                    Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
+                    forceOut = [[ Fi.X, Fj.X, Fk.X ],
+                                [ Fi.Y, Fj.Y, Fk.Y ],
+                                [ Fi.Z, Fj.Z, Fk.Z ],
+                                [ Mi.X, Mj.X,  Mk.X ],
+                                [ Mi.Y, Mj.Y, Mk.Y ],
+                                [ Mi.Z, Mj.Z, Mk.Z ]]
+                    forceWrapper .append( [index, forceOut ])
+        
+            ## Dict. for force ##
+            forceWrapperDict = dict( forceWrapper )
+            ####
+            Fx, Fy, Fz, Mx, My, Mz = [],[],[],[],[],[]
+            tag = []
+        
+            for ele in EleOut :
+                eleTag = ele[0]
+                eleType = ele[2][0]
+                if eleType == "ShellMITC4" :
+                    tag.append( eleTag )
+                    outputForce = forceWrapperDict.get( eleTag )
+                    Fx.append( outputForce[0] )
+                    Fy.append( outputForce[1] )
+                    Fz.append( outputForce[2] )
+                    Mx.append( outputForce[3] )
+                    My.append( outputForce[4] )
+                    Mz.append( outputForce[5] )
+                elif eleType == "ShellDKGT" :
+                    tag.append( eleTag )
+                    outputForce = forceWrapperDict.get( eleTag )
+                    Fx.append( outputForce[0] )
+                    Fy.append( outputForce[1] )
+                    Fz.append( outputForce[2] )
+                    Mx.append( outputForce[3] )
+                    My.append( outputForce[4] )
+                    Mz.append( outputForce[5] )
+                    
+            tagElement = th.list_to_tree( tag )
+            Fx = th.list_to_tree( Fx )
+            Fy = th.list_to_tree( Fy )
+            Fz = th.list_to_tree( Fz )
+            Mx = th.list_to_tree( Mx )
+            My = th.list_to_tree( My )
+            Mz = th.list_to_tree( Mz )
+        
+            return tagElement, Fx, Fy, Fz, Mx, My, Mz
+        
+        checkData = True
+        
+        if not AlpacaStaticOutput:
+            checkData = False
+            msg = "input 'AlpacaStaticOutput' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            tagElement, Fx, Fy, Fz, Mx, My, Mz = shellForces( AlpacaStaticOutput )
+            return (tagElement, Fx, Fy, Fz, Mx, My, Mz)
+
 class BrickDisplacement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "Brick Displacement (Alpaca4d)", "Brick Displacement", """Compute the brick displacement""", "Alpaca", "6|Numerical Output")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.quarternary
+
     def get_ComponentGuid(self):
         return System.Guid("d9065ef7-6370-4ddf-a219-75f1f6243075")
     
@@ -3974,154 +4689,6 @@ class BrickDisplacement(component):
         if checkData != False:
             tagElement, Trans = brickDisp( AlpacaStaticOutput )
             return (tagElement, Trans)
-
-class ReactionForces(component):
-    def __new__(cls):
-        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Reaction Forces (Alpaca4d)", "Reaction Forces (Alpaca4d)", """Compute reaction forces""", "Alpaca", "6|Numerical Output")
-        return instance
-    
-    def get_ComponentGuid(self):
-        return System.Guid("0be5f38d-6134-4ff3-9702-d2898a4da0c4")
-    
-    def SetUpParam(self, p, name, nickname, description):
-        p.Name = name
-        p.NickName = nickname
-        p.Description = description
-        p.Optional = True
-    
-    def RegisterInputParams(self, pManager):
-        p = GhPython.Assemblies.MarshalParam()
-        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
-        self.Params.Input.Add(p)
-        
-    
-    def RegisterOutputParams(self, pManager):
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "tagPoints", "tagPoints", "nodes tag of Model .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ReactionForce", "ReactionForce", "Vector of reaction Forces { Rx, Ry, Rz }. [kN]")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ReactionMoment", "ReactionMoment", "Vector of reaction Moments { Mx, My, Mz }. [kN]")
-        self.Params.Output.Add(p)
-        
-    
-    def SolveInstance(self, DA):
-        p0 = self.marshal.GetInput(DA, 0)
-        result = self.RunScript(p0)
-
-        if result is not None:
-            if not hasattr(result, '__getitem__'):
-                self.marshal.SetOutput(result, DA, 0, True)
-            else:
-                self.marshal.SetOutput(result[0], DA, 0, True)
-                self.marshal.SetOutput(result[1], DA, 1, True)
-                self.marshal.SetOutput(result[2], DA, 2, True)
-        
-    def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAH0SURBVEhL7ZKxSxxBFMa3CDZJpYje7OxdbmfuXMa7jV6KxKQQTCpBCNiIjZIikEbQSrAIBIz4V1goJKQ50l0XSBuCrQQtbPRudsRIICIW63vju4McenerV1j4gwfzvt33vp331knC00LhDUYpCFIkdZdSsRhjoAlJ3eXeoMFzpXqfKDXSHHWD0WJxsflZGIZZKm8PNJl/OVaIJ6dURzHxahhNy1TeHjR4uxDE335nOor1LZHcYHpW2cJOYuFDPqFBGE5gQZKAxS9T+e2oZTKDdPyPw4HwIR1vzhETLwz3NyltEDvjD4wrfmiWzZN0M4wry5r5Z2DkkWSJPPnecBlHTFZIag1+ER0bHGeGHmvun9tGrvhIsqPTQQpupQ2T/yBO4Z0ZenQ9hokt+NpFSi2ay0/Q/FfE/Qgabtf61SPUd9x8SCbbhvlzVZZ7bQtaYbhYA4PPlFoOPTGMDbDRCQv6Klz10qPLHXBZg9GNkdQaXKZ2/RNsRJKlbkBpA5j9FNz6IFaqh6T24MIiLr9SarnKoJrNDoC+B3t5R1JnHAzKfhjVDprgjFFrNjBu7hlou9B8g6Rk4IgiV36Bpn9xJxiw7H3jiRWY+Xerw/mqvy4ROiVKcJNV+A1/aib/4K2OPLFUv1nXuG7JXaOazvnGy81TehdwnAv/6hsy2W8YaQAAAABJRU5ErkJggg=="
-        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
-
-    
-    def RunScript(self, AlpacaStaticOutput):
-        
-        import Rhino.Geometry as rg
-        import math
-        import ghpythonlib.treehelpers as th # per data tree
-        import Grasshopper as gh
-        
-        
-        def reaction(AlpacaStaticOutput, scale = 1):
-        
-            # define output
-        
-            global tagPoints
-            global ReactionForce
-            global ReactionMoment
-            global view
-        
-            scale = 1
-        
-        
-            diplacementWrapper = AlpacaStaticOutput[0]
-            reactionOut = AlpacaStaticOutput[1]
-
-        
-            pointWrapper = []
-        
-            for index,item in enumerate(diplacementWrapper):
-                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-        
-            ## Dict. for point ##
-            pointWrapperDict = dict( pointWrapper )
-        
-            ## per scalare le reazioni #
-            rowReaction = [row[1] for row in reactionOut ]
-        
-            valorReaction = []
-            for valor in rowReaction:
-                rx = math.fabs( valor[0] )
-                ry = math.fabs( valor[1] )
-                rz = math.fabs( valor[2] )
-                mx = math.fabs( valor[3] )
-                my = math.fabs( valor[4] )
-                mz = math.fabs( valor[5] )
-                valorReaction.append( [ rx, ry, rz, mx, my, mz ] )
-        
-            rx = max([row[0] for row in valorReaction ])
-            ry = max([row[1] for row in valorReaction ])
-            rz = max([row[2] for row in valorReaction ])
-            mx = max([row[3] for row in valorReaction ])
-            my = max([row[4] for row in valorReaction ])
-            mz = max([row[5] for row in valorReaction ])
-            # -------------------------------------------------------#
-        
-            ReactionForce = []
-            ReactionMoment = []
-            viewElement = []
-            tagPoints = []
-            for value in reactionOut:
-                pointIndex = value[0]
-                tagPoints.append( pointIndex )
-                point = pointWrapperDict.get( pointIndex , "never")
-                Rx = rg.Vector3d( value[1][0], 0, 0 )
-                Ry = rg.Vector3d( 0,value[1][1], 0 )
-                Rz = rg.Vector3d( 0,0, value[1][2] )
-                Mx = rg.Vector3d( value[1][3], 0, 0 )
-                My = rg.Vector3d( 0, value[1][4], 0 )
-                Mz = rg.Vector3d( 0,0, value[1][5] )
-                Rxyz = Rx + Ry + Rz
-                Mxyz = Mx + My + Mz
-                viewElement.append( [ point, Rx/rx*scale, Ry/ry*scale, Rz/rz*scale, Mx/mx*scale, My/my*scale, Mz/mz*scale ] )
-                ReactionForce.append( Rxyz )
-                ReactionMoment.append( Mxyz )
-        
-            point = [row[0] for row in viewElement ]
-            Rx = [row[1] for row in viewElement ]
-            Ry = [row[2] for row in viewElement ]
-            Rz = [row[3] for row in viewElement ]
-            Mx = [row[4] for row in viewElement ]
-            My = [row[5] for row in viewElement ]
-            Mz = [row[6] for row in viewElement ]
-        
-        
-            return tagPoints, ReactionForce, ReactionMoment
-        
-        checkData = True
-        
-        if not AlpacaStaticOutput :
-            checkData = False
-            msg = "input 'AlpacaStaticOutput' failed to collect data"
-            ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        if checkData != False :
-            tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput )
-            return (tagPoints, ReactionForce, ReactionMoment)
 
 
 
