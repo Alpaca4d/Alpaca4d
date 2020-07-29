@@ -2037,6 +2037,580 @@ class Assemble(component):
             AlpacaModel, MassOfStructure = Assemble(Element, Support, Load, Mass)
             return (AlpacaModel, MassOfStructure)
 
+class DisassembleModel(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Disassemble Model (Alpaca4d)", "Disassemble Model", """Deconstruct a structural model and show all the elements""", "Alpaca", "4|Model")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("1872eaa1-f567-4db4-947f-3fbaaa01d62c")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaModel", "AlpacaModel", "Output of Assemble Model.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "ModelView", "ModelView", "analitic element ( beam, shell, brick ... ).")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "ModelViewExtruded", "ModelViewExtruded", "extruded model .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Points", "Points", "points of model .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Support", "Support", "info support .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Load", "Load", "info Load .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Material", "Material", "info Material.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Section", "Section", "info Section.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+                self.marshal.SetOutput(result[3], DA, 3, True)
+                self.marshal.SetOutput(result[4], DA, 4, True)
+                self.marshal.SetOutput(result[5], DA, 5, True)
+                self.marshal.SetOutput(result[6], DA, 6, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAVbSURBVEhLrVVpcFNVGL1toWhbLEtBsyfNnrwXkrwkTUNIKaWJgFCFaZGOMmVYXNgZisoPijPSlpRKqwWnEEZBlAHECkUZGAR0ZGSRRVQGFAFBRgHFnyJIj99NXwlaZcTxzNx5y73vfPee73zfY3diGVPkxZnSLT8yt9tt9omiVX78f1DPVKfrmHI6v/eKYqVHFNuSEzJqGOsh3/431DFVYilToZ4p35k4wGSkAD87HI4cPtfKpJ61TLG9jqnF5OK/oIYpsmiDcxqYWpBfdUcdU5S90UuD9hwdKNC5YrPtgsflGsfn6OOWlgw1D/4RGEtLfkDoIqbgl+j61Z1z3VDP8nPjaYrrP6hMONLfgJl5RhTYhfZ6ppjR2lONS0oj1mRqQCed2EVMm7q04X4tVvXU4NkHDGvdTmcryTtNpkzB47Hr/H5bf/pgz7E8A35Sm3CSRsghoLGHGmcfMibfnRqYT6dQXV3KFBc58X56v8JkQ4nFgWBRDMWVs+ERhKMybSckScqiyEdI851L0lXPb83W4SqRnX4wH5PsTmzSWnBWY04G4GN3Xz1Wq814yuZAga8AxRNmYVT1ayiduhgF4eGgExwPOhz9ZHravSiur5phQ/mTdsQMth0raMecqPUBPWapLRjncGK9wYqduXosttgxVHQhPGoCRsxtxog5TQiPHA+vIFwh4ldoSDJtJySXMC8UFPBSwoSalSYEvCLm9svH96T3TspD1GjnO0Jtbz3ilOSoyY7hkxai+PGZCEoBjKf5yX3yDxXpdPfJlCl4vTaFJAjbfHbHzTK9FeNIjtFOAdVWB77TmHCG9H0514AXKoqwUfLg6+rRmDbQhKjLhXlKM05rzdhPcjWmq3+nvGwjM5R2cxFV6xjS/+aiXuprVTorKkgOLs+XlMzNWVosI9dca54AbJycHNfXVmGz1433yMqXyW187Y903d/XkHRSLVOd5MXKHSmHYIy7h9pEYTxd+esJ2S2H+hmwrIcGVxoqbpN3jW/oJGu0NjSnq/FuXqcRyshtCVKB10otUx4ml3ll+hTI37NXUoL5zriLXqei2xUr7Bbg6JQomjO12NdHj2dIzgX+aiRCCYTFAOZnaRdsYixDpkyBNzteiXvJKfwE20mCphw9jk+L4uLisbfJb6yrwudPx7CWgvN1fPfxgji2htsxdNBgeJ1Oo0yZQg0bkEOl/umO3rrkR4fJPZzgbSokXsF7RodxbGoUl+MV2CCIWE7StNBJLyiM2Ku3oFhwIeTy36ICa5IpU6hhjkzS7IO2bG1SFh7gIjmo0WynI7tRqbWimZzDpWshRzVl63GeiPm6rrGbpFqUqXlTpkyB2m86kb/VmKbC+7T7NqrgBpUZMUFCMPQcIqUfIiCNRcTqxC6dBQco8U20e07K+9I5MgRvISco0dRifuH9SabuBCV1GFlqFQWpm56r3z7MZL/ll8rg85RiSMkWFA5+EX7pUYSL1yFA+rZRNXP78gDcwmTJyyTtGbqeoi77BbXyiEz9Z5B2q32eaMfgoQkUPfwZwsM2Q3L5IA0KIxL9GJGSdgSdEg7IFuYjkfS82i9T3B2U+d0Bf2VHJLqXCPd1BHyVCBbOo7GATvAYAv4nMFZl2bA8Q3njWwrCc9WQpuqoY9q+MsXdUV5enkH9ZiHt+DefdyQKw0uSJ+EjNCTOe9EhvoZkmPRqhvrWiQEG/k84L3/+70FS+TxO56lg4XwiP4hI7BN4B5Xc5O/lJfRTUsxoTOPVqtolv7o3uFyu7Fi+7aDfOwaBwBT+81ghT90G7X4hFWWL/HjvIClClJdHSJotoij+rc6NTK2Sb/8BjP0B/RGKSGWJ3ywAAAAASUVORK5CYII="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaModel):
+        
+        import Rhino.Geometry as rg
+        import math as mt
+        import ghpythonlib.treehelpers as th # per data tree
+        import Grasshopper as gh
+        import rhinoscriptsyntax as rs
+        import sys
+        
+        
+        #---------------------------------------------------------------------------------------#
+        def linspace(a, b, n=100):
+            if n < 2:
+                return b
+            diff = (float(b) - a)/(n - 1)
+            return [diff * i + a  for i in range(n)]
+        
+        ## Funzione rettangolo ##
+        def AddRectangleFromCenter(plane, width, height):
+            a = plane.PointAt(-width * 0.5, -height * 0.5 )
+            b = plane.PointAt(-width * 0.5,  height * 0.5 )
+            c = plane.PointAt( width * 0.5,  height * 0.5 )
+            d = plane.PointAt( width * 0.5,  -height * 0.5 )
+            #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
+            rectangle  = [a, b, c, d] 
+            return rectangle
+        ## Funzione cerchio ##
+        def AddCircleFromCenter( plane, radius):
+            t = linspace( 0 , 1.80*mt.pi, 20 )
+            a = []
+            for ti in t:
+                x = radius*mt.cos(ti)
+                y = radius*mt.sin(ti)
+                a.append( plane.PointAt( x, y ) )
+            #circle = rg.PolylineCurve( a )
+            circle  = a 
+            return circle
+        
+        def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+            p1 = plane.PointAt( -(yg - tinf), ta/2 )
+            p2 = plane.PointAt( -(yg - tinf), Binf/2 )
+            p3 = plane.PointAt( -yg, Binf/2 )
+            p4 = plane.PointAt( -yg, -Binf/2 )
+            p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
+            p6 = plane.PointAt( -(yg - tinf), -ta/2 )
+            p7 = plane.PointAt( (H - yg - tsup), -ta/2)
+            p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
+            p9 = plane.PointAt( (H - yg ), -Bsup/2 )
+            p10 = plane.PointAt( (H - yg ), Bsup/2 )
+            p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
+            p12 = plane.PointAt( (H - yg - tsup), ta/2 )
+        
+            wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
+            return wirframe
+        
+        def ShellQuad( ele, node):
+            eleTag = ele[1]
+            eleNodeTag = ele[2]
+            color = ele[5]
+            thick = ele[4]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            
+            ## CREO IL MODELLO  ##
+            point1 = node.get( index1 -1 , "never")
+            point2 = node.get( index2 -1 , "never")
+            point3 = node.get( index3 -1 , "never")
+            point4 =  node.get( index4 -1 , "never")
+            
+            shellModel = rg.Mesh()
+            shellModel.Vertices.Add( point1 ) #0
+            shellModel.Vertices.Add( point2 ) #1
+            shellModel.Vertices.Add( point3 ) #2
+            shellModel.Vertices.Add( point4 ) #3
+            
+            
+            shellModel.Faces.AddFace(0, 1, 2, 3)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellModel.VertexColors.CreateMonotoneMesh( colour )
+        
+            vt = shellModel.Vertices
+            shellModel.FaceNormals.ComputeFaceNormals()
+            fid,MPt = shellModel.ClosestPoint(vt[0],0.01)
+            normalFace = shellModel.FaceNormals[fid]
+            vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
+            trasl = rg.Transform.Translation( vectormoltiplicate )
+            moveShell = rg.Mesh.DuplicateMesh(shellModel)
+            moveShell.Transform( trasl )
+            extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
+            
+            return  [ shellModel, extrudeShell ] 
+        
+        def ShellTriangle( ele, node ):
+            
+            eleTag = ele[1]
+            eleNodeTag = ele[2]
+            color = ele[5]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            point1 =  node.get( index1 -1 , "never")
+            point2 =  node.get( index2 -1 , "never")
+            point3 =  node.get( index3 -1 , "never")
+            
+            shellModel = rg.Mesh()
+            shellModel.Vertices.Add( point1 ) #0
+            shellModel.Vertices.Add( point2 ) #1
+            shellModel.Vertices.Add( point3 ) #2
+            
+            shellModel.Faces.AddFace(0, 1, 2)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellModel.VertexColors.CreateMonotoneMesh( colour )
+            
+            vt = shellModel.Vertices
+            shellModel.FaceNormals.ComputeFaceNormals()
+            fid,MPt = shellModel.ClosestPoint(vt[0],0.01)
+            normalFace = shellModel.FaceNormals[fid]
+            vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 ) 
+            trasl = rg.Transform.Translation( vectormoltiplicate )
+            moveShell = rg.Mesh.DuplicateMesh(shellModel)
+            moveShell.Transform( trasl )
+            extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
+            
+            return  [ shellModel, extrudeShell ]
+            
+        def Solid( ele, node ):
+            
+            eleTag = ele[1]
+            eleNodeTag = ele[2]
+            color = ele[5]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            index5 = eleNodeTag[4]
+            index6 = eleNodeTag[5]
+            index7 = eleNodeTag[6]
+            index8 = eleNodeTag[7]
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            point1 =  node.get( index1 -1 , "never")
+            point2 =  node.get( index2 -1 , "never")
+            point3 =  node.get( index3 -1 , "never")
+            point4 =  node.get( index4 -1 , "never")
+            point5 =  node.get( index5 -1 , "never")
+            point6 =  node.get( index6 -1 , "never")
+            point7 =  node.get( index7 -1 , "never")
+            point8 =  node.get( index8 -1 , "never")
+            #print( type(pointDef1) ) 
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( point1 ) #0
+            shellDefModel.Vertices.Add( point2 ) #1
+            shellDefModel.Vertices.Add( point3 ) #2
+            shellDefModel.Vertices.Add( point4 ) #3
+            shellDefModel.Vertices.Add( point5 ) #4
+            shellDefModel.Vertices.Add( point6 ) #5
+            shellDefModel.Vertices.Add( point7 ) #6
+            shellDefModel.Vertices.Add( point8 ) #7
+        
+            shellDefModel.Faces.AddFace(0, 1, 2, 3)
+            shellDefModel.Faces.AddFace(4, 5, 6, 7)
+            shellDefModel.Faces.AddFace(0, 1, 5, 4)
+            shellDefModel.Faces.AddFace(1, 2, 6, 5)
+            shellDefModel.Faces.AddFace(2, 3, 7, 6)
+            shellDefModel.Faces.AddFace(3, 0, 4, 7)
+            
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+            return  shellDefModel
+        
+        def TetraSolid( ele, node ):
+            
+            eleTag = ele[1]
+            eleNodeTag = ele[2]
+            color = ele[5]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            point1 =  node.get( index1 -1 , "never")
+            point2 =  node.get( index2 -1 , "never")
+            point3 =  node.get( index3 -1 , "never")
+            point4 =  node.get( index4 -1 , "never")
+            
+            #print( type(pointDef1) )
+            
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( point1 ) #0
+            shellDefModel.Vertices.Add( point2 ) #1
+            shellDefModel.Vertices.Add( point3 ) #2
+            shellDefModel.Vertices.Add( point4 ) #3
+            
+            
+            shellDefModel.Faces.AddFace( 0, 1, 2 )
+            shellDefModel.Faces.AddFace( 0, 1, 3 )
+            shellDefModel.Faces.AddFace( 1, 2, 3 )
+            shellDefModel.Faces.AddFace( 0, 2, 3 )
+            colour = rs.CreateColor( color[0], color[1], color[2], 0 )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+            
+            return  shellDefModel
+        ## node e nodeDisp son dictionary ##
+        def Beam( ele, node):
+            TagEle = ele[1]
+            indexStart = ele[2][0]
+            indexEnd = ele[2][1]
+            color = ele[16]
+            dimSection = ele[14]
+            pointStart = node.get( indexStart  , "never")
+            pointEnd = node.get( indexEnd  , "never")
+            line = rg.LineCurve( pointStart, pointEnd )
+            axis1 =  rg.Vector3d( ele[13][0][0], ele[13][0][1], ele[13][0][2]  )
+            axis2 =  rg.Vector3d( ele[13][1][0], ele[13][1][1], ele[13][1][2]  )
+            axis3 =  rg.Vector3d( ele[13][2][0], ele[13][2][1], ele[13][2][2]  )
+            versor = [ axis1, axis2, axis3 ] 
+            
+            planeStart = rg.Plane(pointStart, axis1, axis2)
+            planeEnd = rg.Plane(pointEnd, axis1, axis2)
+            plane = [ planeStart, planeEnd ]
+            
+            sectionForm = []
+            sectionPolyline = []
+            for sectionPlane in plane:
+                
+                if dimSection[0] == 'rectangular' :
+                    width, height = dimSection[1], dimSection[2]
+                    section = AddRectangleFromCenter( sectionPlane, width, height )
+                    sectionForm.append( section )
+                elif dimSection[0] == 'circular' :
+                    radius1  = dimSection[1]/2
+                    radius2  = dimSection[1]/2 - dimSection[2]
+                    section1 = AddCircleFromCenter( sectionPlane, radius1 )
+                    section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                    sectionForm.append( [ section1, section2 ] )
+                elif dimSection[0] == 'doubleT' :
+                    Bsup = dimSection[1]
+                    tsup = dimSection[2]
+                    Binf = dimSection[3]
+                    tinf = dimSection[4]
+                    H =  dimSection[5]
+                    ta =  dimSection[6]
+                    yg =  dimSection[7]
+                    section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
+                    sectionForm.append( section )
+                elif dimSection[0] == 'rectangularHollow' :
+                    width, height, thickness = dimSection[1], dimSection[2], dimSection[3]
+                    section1 = AddRectangleFromCenter( sectionPlane, width, height )
+                    section2 = AddRectangleFromCenter( sectionPlane, width - (2*thickness), height - (2*thickness) )
+                    sectionForm.append( [ section1, section2 ] )
+                elif dimSection[0] == 'Generic' :
+                    radius  = dimSection[1]
+                    section = AddCircleFromCenter( sectionPlane, radius )
+                    sectionForm.append( section )
+                #print(sectionForm)
+        
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+        
+            if dimSection[0] == 'circular' :
+                sectionForm1 = [row[0] for row in sectionForm ]
+                sectionForm2 = [row[1] for row in sectionForm ]
+                meshExtr = meshLoft3( sectionForm1,  color )
+                meshExtr.Append( meshLoft3( sectionForm2,  color ) )
+                sectionStartEnd = [ [sectionForm1[0], sectionForm2[0]], [sectionForm1[-1], sectionForm2[-1]]  ]
+                for iSection in sectionStartEnd :
+                    iMesh = rg.Mesh()
+                    for iPoint, jPoint in zip(iSection[0],iSection[1])  :
+                        iMesh.Vertices.Add( iPoint )
+                        iMesh.Vertices.Add( jPoint )
+                    for i in range(0,len(iSection[0]) - 1): # sistemare
+                        index1 = i*2 # 0
+                        index2 = index1 + 1 #1
+                        index3 = index1 + 3 #2
+                        index4 = index1 + 2 #3
+                        iMesh.Faces.AddFace(index1, index2, index3, index4)
+                    iMesh.Faces.AddFace(index4, index3, 1, 0)
+                    iMesh.VertexColors.CreateMonotoneMesh( colour )
+                    meshExtr.Append( iMesh )
+                    #meshExtr.IsClosed()
+            elif  dimSection[0] == 'rectangular' : 
+                meshExtr = meshLoft3( sectionForm,  color )
+                sectionStartEnd = [ sectionForm[0], sectionForm[-1] ]
+                for iSection in sectionStartEnd :
+                    iMesh = rg.Mesh()
+                    for iPoint in iSection :
+                         iMesh.Vertices.Add( iPoint )
+                    iMesh.Faces.AddFace(0, 1, 2, 3)
+                    iMesh.VertexColors.CreateMonotoneMesh( colour )
+                    meshExtr.Append( iMesh )
+            elif  dimSection[0] == 'doubleT' : 
+                meshExtr = meshLoft3( sectionForm,  color )
+                sectionStartEnd = [ sectionForm[0], sectionForm[-1] ]
+                for iSection in sectionStartEnd :
+                    iMesh = rg.Mesh()
+                    for iPoint in iSection :
+                         iMesh.Vertices.Add( iPoint )
+                    iMesh.Faces.AddFace( 0, 1, 2 )
+                    iMesh.Faces.AddFace(2, 3, 5, 0 )
+                    iMesh.Faces.AddFace( 3, 4, 5 )
+                    iMesh.Faces.AddFace( 5, 6, 11, 0 )
+                    iMesh.Faces.AddFace( 6, 7, 8 )
+                    iMesh.Faces.AddFace( 8, 9, 11, 6 )
+                    iMesh.Faces.AddFace( 9, 10, 11 )
+                    #iMesh.Faces.AddFace(3, 2, 1, 4)
+                    #iMesh.Faces.AddFace( 5, 6, 11, 0 )
+                    #iMesh.Faces.AddFace(7, 8, 9, 10)
+                    iMesh.VertexColors.CreateMonotoneMesh( colour )
+                    meshExtr.Append( iMesh ) 
+            elif  dimSection[0] == 'rectangularHollow' : 
+                sectionForm1 = [row[0] for row in sectionForm ]
+                sectionForm2 = [row[1] for row in sectionForm ]
+                meshExtr = meshLoft3( sectionForm1,  color )
+                meshExtr.Append( meshLoft3( sectionForm2,  color ) )
+                sectionStartEnd = [ [sectionForm1[0], sectionForm2[0]], [sectionForm1[-1], sectionForm2[-1]]  ]
+                for iSection in sectionStartEnd :
+                    iMesh = rg.Mesh()
+                    for iPoint, jPoint in zip(iSection[0],iSection[1])  :
+                        iMesh.Vertices.Add( iPoint )
+                        iMesh.Vertices.Add( jPoint )
+                    iMesh.Faces.AddFace(0, 1, 3, 2)
+                    iMesh.Faces.AddFace(2, 3, 5, 4)
+                    iMesh.Faces.AddFace(4, 5, 7, 6)
+                    iMesh.Faces.AddFace(6, 7, 1, 0)
+                    iMesh.VertexColors.CreateMonotoneMesh( colour )
+                    meshExtr.Append( iMesh )
+                    #meshExtr.IsClosed()
+        
+            elif dimSection[0] == 'Generic' :
+                meshExtr = meshLoft3( sectionForm,  color )
+        
+            return [ line, meshExtr, colour ]
+        
+        ## Mesh from close section eith gradient color ##
+        def meshLoft3( point, color ):
+            #print( point )
+            meshEle = rg.Mesh()
+            pointSection1 = point
+            for i in range(0,len(pointSection1)):
+                for j in range(0, len(pointSection1[0])):
+                    vertix = pointSection1[i][j]
+                    #print( type(vertix) )
+                    meshEle.Vertices.Add( vertix ) 
+                    #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+            k = len(pointSection1[0])
+            for i in range(0,len(pointSection1)-1):
+                for j in range(0, len(pointSection1[0])):
+                    if j < k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = index2 + 1
+                        index4 = index1 + 1
+                    elif j == k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = (i+1)*k
+                        index4 = i*k
+                    meshEle.Faces.AddFace(index1, index2, index3, index4)
+                    #rs.ObjectColor(scyl,(255,0,0))
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            meshEle.VertexColors.CreateMonotoneMesh( colour )
+            meshElement = meshEle
+            #meshdElement.IsClosed(True)
+            
+            return meshElement
+
+
+        def disassembleModel(AlpacaModel ):
+        
+            nodeWrapper = AlpacaModel[0]
+            GeomTransf = AlpacaModel[1]
+            openSeesBeam = AlpacaModel[2]
+            openSeesSupport = AlpacaModel[3]
+            openSeesNodeLoad = AlpacaModel[4]
+            openSeesMatTag = AlpacaModel[7]
+            openSeesShell = AlpacaModel[8]
+            openSeesSecTag = AlpacaModel[9]
+            openSeesSolid = AlpacaModel[10]
+        
+            pointWrapper = []
+            for item in nodeWrapper:
+                point = rg.Point3d(item[1],item[2],item[3])
+                pointWrapper.append( [item[0], point ] )
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+            ####
+            Points = [row[1] for row in pointWrapper ]
+        
+            model = []
+            extrudedModel = []
+        
+            for ele in openSeesBeam :
+                eleTag = ele[1]
+                beamModel = Beam( ele, pointWrapperDict )
+                model.append([ eleTag, beamModel[0] ])
+                extrudedModel.append([ eleTag, beamModel[1] ])
+        
+            for ele in openSeesShell :
+                nNode = len( ele[2] )
+                eleTag =  ele[1] 
+                if nNode == 4 :
+                    shellModel = ShellQuad( ele, pointWrapperDict )
+                    model.append([ eleTag,shellModel[0] ])
+                    extrudedModel.append([ eleTag,shellModel[1] ])
+                elif nNode == 3:
+                    shellModel = ShellTriangle( ele, pointWrapperDict )
+                    model.append([ eleTag,shellModel[0] ])
+                    extrudedModel.append([ eleTag,shellModel[1] ])
+        
+            for ele in openSeesSolid :
+                nNode = len( ele[2] )
+                eleTag =  ele[1]
+                eleType = ele[0] 
+                if nNode == 8:
+                    solidModel = Solid( ele, pointWrapperDict )
+                    model.append([ eleTag, solidModel ])
+                    extrudedModel.append([ eleTag, solidModel ])
+                elif  eleType == 'FourNodeTetrahedron' :
+                    #print(ele)
+                    solidModel = TetraSolid( ele, pointWrapperDict )
+                    model.append([ eleTag, solidModel ])
+                    extrudedModel.append([ eleTag, solidModel ])
+        
+            modelDict = dict( model )
+            modelExstrudedDict = dict( extrudedModel )
+            ModelView = []
+            ModelViewExtruded = []
+            for i in range(0,len(modelDict)):
+                ModelView.append( modelDict.get( i  , "never" ))
+                ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
+        
+            #--------------------------------------------------------------#
+        
+        
+        
+            forceDisplay = []
+            for item in openSeesNodeLoad:
+                loadWrapper = "{3}; Pos=[{4}]; F={1}; M={2}".format(item[0],item[1][:3],item[1][3:], item[2], pointWrapperDict.get(item[0]))
+                forceDisplay.append(loadWrapper)
+            Load = forceDisplay
+        
+        
+        
+            Support = []
+        
+            for support in openSeesSupport :
+                index = support[0]
+                pos = pointWrapperDict.get(index)
+                supportType = support[1:]
+                supportTypeTemp = []
+                for number in supportType:
+                    if number == 1:
+                        dof = True
+                    else:
+                        dof = False
+                    supportTypeTemp.append(dof)
+                supportWrapper = "Support; Pos=[{0}]; DOF={1}".format(pos,supportTypeTemp)
+                Support.append( supportWrapper )
+        
+        
+            Material = []
+        
+            for item in openSeesMatTag:
+                Grade= item[0].split("_")[0]
+                dimensionType = item[0].split("_")[1]
+                typeMat = item[0].split("_")[2]
+                E = item[1][1][0]
+                G = item[1][1][1]
+                v = item[1][1][2]
+                gamma = item[1][1][3]
+                fy = item[1][1][4]
+                Material.append( "grade={}; type={}; E={}; G={}; v={}; gamma={}; fy={}".format(Grade,typeMat,E,G,v,gamma,fy))
+        
+        
+            Section = []
+        
+            for item in openSeesSecTag:
+                name = item[0].split("_")[0]
+                typeSec = item[0].split("_")[1]
+                Section.append("name={}; type={}".format(name, typeSec))
+        
+            return ModelView, ModelViewExtruded, Points, Support, Load, Material, Section
+        
+        checkData = True
+        
+        if not AlpacaModel:
+            checkData = False
+            msg = "input 'AlpacaModel' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            ModelView, ModelViewExtruded, Points, Support, Load, Material, Section = disassembleModel( AlpacaModel )
+            return (ModelView, ModelViewExtruded, Points, Support, Load, Material, Section)
+
 
 # 5|Analysis
 
@@ -3238,7 +3812,7 @@ class ShellDisplacement(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            Points, Trans, Rot = shellDisp( AlpacaStaticOutput )
+            tagElement, Trans, Rot = shellDisp( AlpacaStaticOutput )
             return (tagElement, Trans, Rot)
 
 class BrickDisplacement(component):
@@ -3400,6 +3974,154 @@ class BrickDisplacement(component):
         if checkData != False:
             tagElement, Trans = brickDisp( AlpacaStaticOutput )
             return (tagElement, Trans)
+
+class ReactionForces(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Reaction Forces (Alpaca4d)", "Reaction Forces (Alpaca4d)", """Compute reaction forces""", "Alpaca", "6|Numerical Output")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("0be5f38d-6134-4ff3-9702-d2898a4da0c4")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "tagPoints", "tagPoints", "nodes tag of Model .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "ReactionForce", "ReactionForce", "Vector of reaction Forces { Rx, Ry, Rz }. [kN]")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "ReactionMoment", "ReactionMoment", "Vector of reaction Moments { Mx, My, Mz }. [kN]")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAH0SURBVEhL7ZKxSxxBFMa3CDZJpYje7OxdbmfuXMa7jV6KxKQQTCpBCNiIjZIikEbQSrAIBIz4V1goJKQ50l0XSBuCrQQtbPRudsRIICIW63vju4McenerV1j4gwfzvt33vp331knC00LhDUYpCFIkdZdSsRhjoAlJ3eXeoMFzpXqfKDXSHHWD0WJxsflZGIZZKm8PNJl/OVaIJ6dURzHxahhNy1TeHjR4uxDE335nOor1LZHcYHpW2cJOYuFDPqFBGE5gQZKAxS9T+e2oZTKDdPyPw4HwIR1vzhETLwz3NyltEDvjD4wrfmiWzZN0M4wry5r5Z2DkkWSJPPnecBlHTFZIag1+ER0bHGeGHmvun9tGrvhIsqPTQQpupQ2T/yBO4Z0ZenQ9hokt+NpFSi2ay0/Q/FfE/Qgabtf61SPUd9x8SCbbhvlzVZZ7bQtaYbhYA4PPlFoOPTGMDbDRCQv6Klz10qPLHXBZg9GNkdQaXKZ2/RNsRJKlbkBpA5j9FNz6IFaqh6T24MIiLr9SarnKoJrNDoC+B3t5R1JnHAzKfhjVDprgjFFrNjBu7hlou9B8g6Rk4IgiV36Bpn9xJxiw7H3jiRWY+Xerw/mqvy4ROiVKcJNV+A1/aib/4K2OPLFUv1nXuG7JXaOazvnGy81TehdwnAv/6hsy2W8YaQAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaStaticOutput):
+        
+        import Rhino.Geometry as rg
+        import math
+        import ghpythonlib.treehelpers as th # per data tree
+        import Grasshopper as gh
+        
+        
+        def reaction(AlpacaStaticOutput, scale = 1):
+        
+            # define output
+        
+            global tagPoints
+            global ReactionForce
+            global ReactionMoment
+            global view
+        
+            scale = 1
+        
+        
+            diplacementWrapper = AlpacaStaticOutput[0]
+            reactionOut = AlpacaStaticOutput[1]
+
+        
+            pointWrapper = []
+        
+            for index,item in enumerate(diplacementWrapper):
+                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+        
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+        
+            ## per scalare le reazioni #
+            rowReaction = [row[1] for row in reactionOut ]
+        
+            valorReaction = []
+            for valor in rowReaction:
+                rx = math.fabs( valor[0] )
+                ry = math.fabs( valor[1] )
+                rz = math.fabs( valor[2] )
+                mx = math.fabs( valor[3] )
+                my = math.fabs( valor[4] )
+                mz = math.fabs( valor[5] )
+                valorReaction.append( [ rx, ry, rz, mx, my, mz ] )
+        
+            rx = max([row[0] for row in valorReaction ])
+            ry = max([row[1] for row in valorReaction ])
+            rz = max([row[2] for row in valorReaction ])
+            mx = max([row[3] for row in valorReaction ])
+            my = max([row[4] for row in valorReaction ])
+            mz = max([row[5] for row in valorReaction ])
+            # -------------------------------------------------------#
+        
+            ReactionForce = []
+            ReactionMoment = []
+            viewElement = []
+            tagPoints = []
+            for value in reactionOut:
+                pointIndex = value[0]
+                tagPoints.append( pointIndex )
+                point = pointWrapperDict.get( pointIndex , "never")
+                Rx = rg.Vector3d( value[1][0], 0, 0 )
+                Ry = rg.Vector3d( 0,value[1][1], 0 )
+                Rz = rg.Vector3d( 0,0, value[1][2] )
+                Mx = rg.Vector3d( value[1][3], 0, 0 )
+                My = rg.Vector3d( 0, value[1][4], 0 )
+                Mz = rg.Vector3d( 0,0, value[1][5] )
+                Rxyz = Rx + Ry + Rz
+                Mxyz = Mx + My + Mz
+                viewElement.append( [ point, Rx/rx*scale, Ry/ry*scale, Rz/rz*scale, Mx/mx*scale, My/my*scale, Mz/mz*scale ] )
+                ReactionForce.append( Rxyz )
+                ReactionMoment.append( Mxyz )
+        
+            point = [row[0] for row in viewElement ]
+            Rx = [row[1] for row in viewElement ]
+            Ry = [row[2] for row in viewElement ]
+            Rz = [row[3] for row in viewElement ]
+            Mx = [row[4] for row in viewElement ]
+            My = [row[5] for row in viewElement ]
+            Mz = [row[6] for row in viewElement ]
+        
+        
+            return tagPoints, ReactionForce, ReactionMoment
+        
+        checkData = True
+        
+        if not AlpacaStaticOutput :
+            checkData = False
+            msg = "input 'AlpacaStaticOutput' failed to collect data"
+            ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False :
+            tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput )
+            return (tagPoints, ReactionForce, ReactionMoment)
 
 
 

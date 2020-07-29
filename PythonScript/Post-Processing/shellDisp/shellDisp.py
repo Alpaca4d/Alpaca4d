@@ -118,4 +118,4 @@ if not AlpacaStaticOutput :
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    Points, Trans, Rot = shellDisp( AlpacaStaticOutput )
+    tagElement, Trans, Rot = shellDisp( AlpacaStaticOutput )

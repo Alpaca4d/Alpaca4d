@@ -20,20 +20,15 @@ import sys
 
 
 #---------------------------------------------------------------------------------------#
-def reaction(AlpacaStaticOutput, scale, reactionForceView = False, reactionMomentsView = False):
+def reaction(AlpacaStaticOutput):
 
     # define output
 
     global tagPoints
     global ReactionForce
     global ReactionMoment
-    global view
-
-    reactionForceView = False if reactionForceView is None else reactionForceView
-    reactionMomentsView = False if reactionMomentsView is None else reactionMomentsView
-
-    if scale is None :
-        scale = 1
+   
+    scale = 1
 
 
     diplacementWrapper = AlpacaStaticOutput[0]
@@ -97,16 +92,8 @@ def reaction(AlpacaStaticOutput, scale, reactionForceView = False, reactionMomen
     My = [row[5] for row in viewElement ]
     Mz = [row[6] for row in viewElement ]
 
-    null = [rg.Vector3d( 0, 0, 0 )]*len(Rx)
 
-    if reactionForcesView == True and reactionMomentsView == False or reactionForcesView == None and reactionMomentsView == False :
-        view = th.list_to_tree( [ point, Rx, Ry, Rz, null, null, null ]  )
-    elif reactionForcesView == False and reactionMomentsView == True or reactionForcesView == False and reactionMomentsView == None :
-        view = th.list_to_tree( [ point, null, null, null, Mx, My, Mz ]   )
-    elif reactionForcesView == True and reactionMomentsView == True or reactionForcesView == None and reactionMomentsView == None :
-        view = th.list_to_tree( [ point, Rx, Ry, Rz,Mx, My, Mz ]  )
-
-    return tagPoints, ReactionForce, ReactionMoment, view
+    return tagPoints, ReactionForce, ReactionMoment
 
 checkData = True
 
@@ -116,4 +103,4 @@ if not AlpacaStaticOutput :
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False :
-    tagPoints, ReactionForce, ReactionMoments, view = reaction( AlpacaStaticOutput, scale, reactionForcesView, reactionMomentsView  )
+    tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput )
