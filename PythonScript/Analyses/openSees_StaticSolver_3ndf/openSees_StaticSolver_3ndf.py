@@ -19,6 +19,8 @@ if remainingDate < 0:
 filename = sys.argv[1]
 inputName = filename.split("\\")[-1]
 
+workingDirectory = os.path.split(filename)[0]
+
 
 with open(filename, 'r') as f:
     lines = f.readlines()
@@ -227,10 +229,11 @@ for item in openSeesBeamLoad:
 #TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
 #TensionFilePath = os.path.join(workingDirectory, "tension.out")
 # ho problemi con shellTag
-workingDirectory = os.path.split(filename)[0]
+
 TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
 ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*solidTag,'stresses')
-print(ops.getEleTags())
+
+
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
@@ -302,13 +305,13 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         elementOutputWrapper,
                         elementLoad])
 
-#length = len(filename)-len(inputName)
-#filefolder = filename[0:length]
+length = len(filename)-len(inputName)
+filefolder = filename[0:length]
 
 
+outputFileName = filefolder + 'openSeesOutputWrapper.txt'
+#outputFileName = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesOutputWrapper.txt'
 
-#outputFileName = filefolder + 'openSeesOutputWrapper.txt'
-outputFileName = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
