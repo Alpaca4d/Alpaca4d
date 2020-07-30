@@ -17,10 +17,10 @@ if remainingDate < 0:
 #filename = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesModel.txt'
 
 filename = sys.argv[1]
-inputName = filename.split("\\")[-1]
+
 
 workingDirectory = os.path.split(filename)[0]
-
+inputName = os.path.split(filename)[1]
 
 with open(filename, 'r') as f:
     lines = f.readlines()
@@ -227,10 +227,10 @@ for item in openSeesBeamLoad:
 
 
 #TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
-#TensionFilePath = os.path.join(workingDirectory, "tension.out")
 # ho problemi con shellTag
 
 TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
+
 ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*solidTag,'stresses')
 
 

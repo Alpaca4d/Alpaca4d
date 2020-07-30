@@ -106,10 +106,9 @@ def shellStressView( AlpacaStaticOutput, stressView ):
 
     ## Dict. for force ##
     #forceWrapperDict = dict( forceWrapper )
-    ghFilePath = ghenv.LocalScope.ghdoc.Path
+    ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
     workingDirectory = os.path.dirname(ghFilePath)
-    outputFile = os.path.join(workingDirectory, 'assembleData' )
-    outputFile = os.path.join(outputFile, 'tensionShell.out' )
+    outputFile = os.path.join(workingDirectory, 'assembleData\\tensionShell.out' )
     #---------------------------------------------------#
 
     with open(outputFile, 'r') as f:

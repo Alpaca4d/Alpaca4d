@@ -2,17 +2,17 @@
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
         stressView:  stress acting on the brick nodes.
-            '0'= view sigmaX (membrane stress X).
-            '1'= view sigmaY (membrane stress Y).
-            '2'= view sigmaZ (membrane stress XY).
-            '3'=view tauX  (transverse shear forces X).
-            '4'=view tauY (transverse shear forces Y).
-            '5'=view tauZ  (transverse shear forces Z).
+            '0' - sigmaX (membrane stress X).
+            '1' - sigmaY (membrane stress Y).
+            '2' - sigmaZ (membrane stress XY).
+            '3' - tauX  (transverse shear forces X).
+            '4' - tauY (transverse shear forces Y).
+            '5' - tauZ  (transverse shear forces Z).
     Output:
         brick:  mesh representing the brick.
         stressValue: values of stress acting on the brick nodes.
         """
-        
+
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
@@ -20,10 +20,7 @@ import Grasshopper as gh
 import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
+
 #---------------------------------------------------------------------------------------#
 def Solid( ele, node ):
     
@@ -130,11 +127,9 @@ def brickStressView( AlpacaStaticOutput, stressView ):
         elif  len(item[0])  == 'FourNodeTetrahedron':
              EleTag.append([item[0], 24])
 
-    ## Dict. for force ##
-    #forceWrapperDict = dict( forceWrapper )
-    ####
-    #---------------------------------------------------#
-    outputFile = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out'
+    ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+    workingDirectory = os.path.dirname(ghFilePath)
+    outputFile = os.path.join(workingDirectory, 'assembleData\\tensionShell.out' )
 
     with open(outputFile, 'r') as f:
         lines = f.readlines()
