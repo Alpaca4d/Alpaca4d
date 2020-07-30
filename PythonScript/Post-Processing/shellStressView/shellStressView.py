@@ -2,24 +2,22 @@
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
         stressView :  stress acting on the shell nodes.
-        if you enter '0' view sigmaX ( membrane stress X ) ;
-        if you enter '1' view sigmaY  ( membrane stress Y );
-        if you enter '2' view sigmaXY ( membrane stress XY );
-        if you enter '3' view tauX  ( transverse shear forces X );
-        if you enter '4' view tauY ( transverse shear forces Y ).
-        if you enter '5' view mX ( bending moment X ) ;
-        if you enter '6' view my  ( bending moment Y );
-        if you enter '7' view mxy ( bending moment XY  );
+        '0' - sigmaX ( membrane stress X ) ;
+        '1' - sigmaY  ( membrane stress Y );
+        '2' - sigmaXY ( membrane stress XY );
+        '3' - tauX  ( transverse shear forces X );
+        '4' - tauY ( transverse shear forces Y ).
+        '5' - mX ( bending moment X ) ;
+        '6' - my  ( bending moment Y );
+        '7' - mxy ( bending moment XY  );
     Output:
-        shell :  mesh that represented the shell ( color later ).
+        shell :  mesh that represent the shell.
         stressValue : valor of stress acting on the shell nodes.
         """
 
 import Rhino.Geometry as rg
-import math as mt
-import ghpythonlib.treehelpers as th # per data tree
+import ghpythonlib.treehelpers as th
 import Grasshopper as gh
-#import System as sy #DV
 import sys
 import os
 import rhinoscriptsyntax as rs
@@ -120,14 +118,13 @@ def shellStressView( AlpacaStaticOutput, stressView ):
         
     #print(len(tensionList)/len(shellTag))
 
-    w = stressView
-    #print(w + 24)
+    #print(stressView + 24)
     tensionDic = []
     for n,eleTag in enumerate(shellTag) :
         tensionShell = []
         for i in range( (n)*32, ( n + 1 )*32  ):
             tensionShell.append( float(tensionList[i]) )
-        tensionView = [ tensionShell[ w ], tensionShell[ w + 8 ], tensionShell[ w + 16 ], tensionShell[ w + 24 ] ]
+        tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ], tensionShell[ stressView + 24 ] ]
         tensionDic.append([ eleTag, tensionView ])
 
     stressDict = dict( tensionDic )

@@ -17,7 +17,9 @@ if remainingDate < 0:
 
 #filename = r'C:\Users\FORMAT\Desktop\assembleData\openSeesModel.txt'
 filename = sys.argv[1]
-inputName = filename.split("\\")[-1]
+
+workingDirectory = os.path.split(filename)[0]
+inputName = os.path.split(filename)[1]
 
 
 
@@ -226,24 +228,14 @@ for item in openSeesBeamLoad:
 
 
 
-#for elementTag in elementTagList: 
-    #TensionFilePath = r'C:\Users\domy7\Desktop\Magistrale\CorsoOpenSees\scripts\Mesh'
-    #TensionFilePathTag = TensionFilePath + '/tension_' + str(elementTag) + '.out'
-    #TensionFilePath = os.path.join(workingDirectory, "tension.out")
-    #ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',elementTag,'stresses')
-
-workingDirectory = os.path.split(filename)[0]
-TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
 #TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
 #TensionFilePathTag = TensionFilePath + '/tension.out' 
+
+TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
+
 ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
 
-'''
-TensionFilePathTag = TensionFilePath + '/eleForceGlobal.out' 
-ops.recorder('Element','-file', TensionFilePathTag , '-closeOnWrite', '-ele', *beamTag, 'globalForce')
-TensionFilePathTag = TensionFilePath + '/eleForceLocal.out' 
-ops.recorder('Element','-file', TensionFilePathTag, '-closeOnWrite', '-ele', *beamTag, 'localForce')
-'''
+
 # ------------------------------
 # Start of analysis generation
 # ------------------------------

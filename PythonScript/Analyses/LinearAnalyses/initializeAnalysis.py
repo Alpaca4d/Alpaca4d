@@ -33,8 +33,9 @@ def InitializeStaticAnalysis(AlpacaModel):
     pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
     
-    wrapperFile = '"' + wrapperFile + '"'
     fileName = '"' + fileName + '"'
+    wrapperFile = '"' + wrapperFile + '"'
+
     
     p = System.Diagnostics.Process()
     p.StartInfo.RedirectStandardOutput = True

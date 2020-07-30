@@ -4527,17 +4527,17 @@ class ShellForces(component):
             tagElement, Fx, Fy, Fz, Mx, My, Mz = shellForces( AlpacaStaticOutput )
             return (tagElement, Fx, Fy, Fz, Mx, My, Mz)
 
-class BrickDisplacement(component):
+class ShellStress(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Brick Displacement (Alpaca4d)", "Brick Displacement", """Compute the brick displacement""", "Alpaca", "6|Numerical Output")
+            "Shell Stress (Alpaca4d)", "Shell Stress", """Compute the internal stress on a shell""", "Alpaca", "6|Numerical Output")
         return instance
 
     def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.quarternary
+        return Grasshopper.Kernel.GH_Exposure.tertiary
 
     def get_ComponentGuid(self):
-        return System.Guid("d9065ef7-6370-4ddf-a219-75f1f6243075")
+        return System.Guid("bacc44e0-0723-4a4d-b519-769a24f9734c")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -4551,20 +4551,26 @@ class BrickDisplacement(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
         
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "stressView", "stressView", "stress acting on the shell nodes.\n'0' - sigmaX ( membrane stress X ) ;\n'1' - sigmaY  ( membrane stress Y );\n'2' - sigmaXY ( membrane stress XY );\n'3' - tauX  ( transverse shear forces X );\n'4' - tauY ( transverse shear forces Y ).\n'5' - mX ( bending moment X ) ;\n'6' - my  ( bending moment Y );\n'7' - mxy ( bending moment XY  );")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "tagElement", "tagElement", "number of the tag of Brick element .")
+        self.SetUpParam(p, "shell", "shell", "mesh that represent the shell.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Trans", "Trans", "Translation of the nodal briks .")
+        self.SetUpParam(p, "stressValue", "stressValue", "value of stress acting on the shell nodes.")
         self.Params.Output.Add(p)
         
     
     def SolveInstance(self, DA):
         p0 = self.marshal.GetInput(DA, 0)
-        result = self.RunScript(p0)
+        p1 = self.marshal.GetInput(DA, 1)
+        result = self.RunScript(p0, p1)
 
         if result is not None:
             if not hasattr(result, '__getitem__'):
@@ -4574,121 +4580,161 @@ class BrickDisplacement(component):
                 self.marshal.SetOutput(result[1], DA, 1, True)
         
     def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAANBSURBVEhLzZRZSFRRGMfnzuaMzuJsOupsOuMdZ5zMmkgbdTRzyZKxBVzaV0xDwrWiqGxRIrOXgrKFgrLlqYJ6qKCgh+olgiLopYIWCqKol6Dy/PvOtaeIbLSgH/w499xzvu+759x7rux/IUC2k06pN0EEMpdsJi8oFfKXFn0CW1rig0Ihf0b3vOS40JMnKOHrVKMW66uD2NM4DWfaynBwVQRrZ/lZS2UAKqXiNc0LSRFxUkhicFkB7u+dh4UFHhxbV4KeujzsWzIdd/fEpLZhRhZo3mMpIk4i4SzriDdVz58WDwcWSAmPNhcjJ90IP+mx6Vhv/VRegG9V3JS5rLqRminOkVxHMsQ0I7JS9OisnYTuWB4udldgcbGX3e6tHXcBB+3/i4iYgtn5DvQ1TZMS72oIY025n51sjfL7zGc3MJp7aTQkfrxU5HlpwI6O2hDrieWxGipm0ms+09g1soWc8KfqIZ+S78lzZD2ZTP5M6o92XPCE2tHLX1JEfiH5WfnrBNWC8GbInIqwWsNf+GnSII2ME76SArKJPCSXyT4NW9PwzuHDTqMVzbpkKGTCExrLIeNCQ/YrlYkfEzR2RK1RbMhux+HwELbZcqXkd+0uqVCdVsdXckyK+kP4i35gNE9GUcUtFJReht9WyhqdTejxb0SH2MnaLAG8yfDiZooTGQolUwnCW4pRSdFjYCSfh+paUbnlLJzZjRBztyBafQ95+f3ozNnMhsJH0SV2o0KrR6ZShdOWNNgVSr6KCinDGATVSQboUlwIzFmNotZBBMrbEC4ahsOzCBptOtKTMjHbXoPl7hXYbrQyvl1dBhMvcHA0xe8Jmlw5iA3cQJI1A/6qZXR9HSp6Wod7EUqq7qBS3MC2BXegXezEfKOXXbFlIEmQf6DYP/qVB7XJNkxf0Yv8+i7GCyjoc5yxto85MpuYL9CDiGcJjtA27Q71IWopRKIg54eybDR8bLI1BjObtekU3IVzUd59HIlmO4us3//Nnb2SiaGtUKvN/H/0iDxPdpBxn+qYIMhf+mY2oHLrMJQJiShuOTCis7h54qukKM2aICbylMkV4AWYySV+pf4gSWft7xIjX5H9Uu8fkfCjjROZ7Ds/dSxM449GbQAAAABJRU5ErkJggg=="
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAANISURBVEhL7ZNbSJNhGMf3uVPDwumWUzc3Uxse0jnX3CgPM8uVYUZnKVQyCgKTDoTYCS3MDqbkxTxVM1uxaVq2UuwiL5IkguiiA4GQ0OkiIrrpcOG/531X0kV09CKoP/z43vd53uf/Pe/7vZ/on5WcSAsMp1aRxAGJRHhqMEpB4wFCxxJ/KjvhCQkTv19boETHsBaXHxuw5UAY5Iqg15TbwFf9ohRECXF7dooMlfUqXLyvR99dAzwt0ei+roe3Tw/XUBSMJjnbTTcRTvxQ0cQhiVR46VgWjIb6SG7EOv4Cm7trouG7Foj3PtRj/SYlpFLhBdUWcZdvKFsQiXpiwmQfi7cp4R7RTRq6/TrU7YzD5ooMbC1ywplXgaKSbSh0rsfu8mxUVxpReyIKh7o0iE2Ssd24CSV3JSUSdxPMcuxqVON8fzQ8bXpcvKfH/vZ4LC8rhzXrDArm96AkqQaF87zIWXxnkpVzO7DG3Iy8HD8sGa0oTCuZUIc7IAjicfINZS/YNTtVjq7RQMfsnHccmYNlqVtRYHMjN38UqywtWJLt54b5uUNYne7CwrxhirdiwaKbPL7c1oWyhH18bJnnQVCQ9Dl5s+sskhF7QpTid8UVamTm70dW/q3PRWexKW47md3gcxa32E5hQXoTqnSlWJdci4WWZlitLhSZGuB0DGKp/RyCZ8RPkGchM/9aScSIKjwHdsc1buh0DPDnkpR6FCdUo5ZMejIuoDulEYNZQ7hi88KXfAy+OQ1oM7eg2nQcMer57Bu4uOM3JCYqxBLFW2PyHthy+rHGdBQuSwf89l5cSDgIb+Jhbv6FntRm/oI+czvqqBGqf0QEM7PvKYYYjFToJk7NPc2N+qnz3rQW9Jrb+A681H1rYg3OUOcs70lvh0qm+kB1Vu7wE6JbKyqVi+WvNsaU45L1PK5mDuBk8j50RtnROV2LYZUBIxq6cZp4GBUadu57eeUvKoLwGWcYUTXThHFtLB5rYvEkIg5jxD31LDSFhrOjuUlIWMHvaoVEEJ5VTg/FA80svNLFc+5EGBAsBL2hfGxg2Z+J/TgdRolswj9Ti5faOFhk01j3pTw7hVokFglj1oC5LxCaerGr2Emo+Oy//lKJRJ8AAgSWcEbrIvgAAAAASUVORK5CYII="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaStaticOutput):
-        
+    def RunScript(self, AlpacaStaticOutput, stressView):        
         import Rhino.Geometry as rg
-        import ghpythonlib.treehelpers as th # per data tree
+        import ghpythonlib.treehelpers as th
         import Grasshopper as gh
+        import sys
+        import os
+        import rhinoscriptsyntax as rs
+        from scriptcontext import doc
         
         
-        def DefSolidValue( ele, node, nodeDisp ):
-            
+        
+        #---------------------------------------------------------------------------------------#
+        def ShellStressQuad( ele, node ):
             eleTag = ele[0]
             eleNodeTag = ele[1]
-            #print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
-            index5 = eleNodeTag[4]
-            index6 = eleNodeTag[5]
-            index7 = eleNodeTag[6]
-            index8 = eleNodeTag[7]
-            
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
-            trasl5 = nodeDisp.get( index5 -1 , "never")
-            trasl6 = nodeDisp.get( index6 -1 , "never")
-            trasl7 = nodeDisp.get( index7 -1 , "never")
-            trasl8 = nodeDisp.get( index8 -1 , "never")
-        
-            return  [trasl1, trasl2, trasl3,trasl4, trasl5, trasl6, trasl7, trasl8 ]
-        
-        def DefTetraSolidValue( ele, node, nodeDisp ):
-            
-            eleTag = ele[0]
-            eleNodeTag = ele[1]
-            color = ele[2][1]
-            #print( eleNodeTag )
+            color = ele[2][2]
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
             index4 = eleNodeTag[3]
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
-            return  [trasl1, trasl2, trasl3, trasl4]
+            ## CREO IL MODELLO  ##
+            point1 = node.get( index1 -1 , "never")
+            point2 = node.get( index2 -1 , "never")
+            point3 = node.get( index3 -1 , "never")
+            point4 =  node.get( index4 -1 , "never")
+            
+            shellModel = rg.Mesh()
+            shellModel.Vertices.Add( point1 ) #0
+            shellModel.Vertices.Add( point2 ) #1
+            shellModel.Vertices.Add( point3 ) #2
+            shellModel.Vertices.Add( point4 ) #3
+            
+            shellModel.Faces.AddFace(0, 1, 2, 3)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellModel.VertexColors.CreateMonotoneMesh( colour )
+            return  shellModel 
         
-        def brickDisp( AlpacaStaticOutput ):
+        def ShellTriangle( ele, node ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            point1 =  node.get( index1 -1 , "never")
+            point2 =  node.get( index2 -1 , "never")
+            point3 =  node.get( index3 -1 , "never")
+            
+            shellModel = rg.Mesh()
+            shellModel.Vertices.Add( point1 ) #0
+            shellModel.Vertices.Add( point2 ) #1
+            shellModel.Vertices.Add( point3 ) #2
+            
+            shellModel.Faces.AddFace(0, 1, 2)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellModel.VertexColors.CreateMonotoneMesh( colour )
+            
+            return  shellModel
         
-            global tagElement
-            global Trans
+        #--------------------------------------------------------------------------
+        def shellStressView( AlpacaStaticOutput, stressView ):
+        
+            global shell
+            global stressValue
         
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
+            ForceOut = AlpacaStaticOutput[4]
+            #print( ForceOut[0] )
+            #print( ForceOut[1] )
+            #nodalForce = openSeesOutputWrapper[5]
+        
+            #nodalForcerDict = dict( nodalForce )
         
             pointWrapper = []
-            transWrapper = []
-        
-            diplacementWrapper = AlpacaStaticOutput[0]
-            EleOut = AlpacaStaticOutput[2]
-            nodeValue = []
-            displacementValue = []
-        
-        
-            pointWrapper = []
-            dispWrapper = []
-        
             for index,item in enumerate(diplacementWrapper):
-                nodeValue.append( item[0] )
-                displacementValue.append( item[1] )
                 pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-                dispWrapper.append( [index, rg.Vector3d( item[1][0], item[1][1], item[1][2] ) ] )
-        
             ## Dict. for point ##
             pointWrapperDict = dict( pointWrapper )
-            pointDispWrapperDict = dict( dispWrapper )
-            ####
         
-            trans = []
-            tag = []
+            shellTag = []
+            for item in EleOut:
+                if  len(item[1])  == 4:
+                     shellTag.append(item[0])
+        
+            ## Dict. for force ##
+            #forceWrapperDict = dict( forceWrapper )
+            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+            workingDirectory = os.path.dirname(ghFilePath)
+            outputFile = os.path.join(workingDirectory, 'assembleData' )
+            outputFile = os.path.join(outputFile, 'tensionShell.out' )
+            #---------------------------------------------------#
+        
+            with open(outputFile, 'r') as f:
+                lines = f.readlines()
+                tensionList = lines[0].split()
+                
+            #print(len(tensionList)/len(shellTag))
+        
+            #print(stressView + 24)
+            tensionDic = []
+            for n,eleTag in enumerate(shellTag) :
+                tensionShell = []
+                for i in range( (n)*32, ( n + 1 )*32  ):
+                    tensionShell.append( float(tensionList[i]) )
+                tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ], tensionShell[ stressView + 24 ] ]
+                tensionDic.append([ eleTag, tensionView ])
+        
+            stressDict = dict( tensionDic )
+            stressValue = th.list_to_tree( stressDict.values() )
+            
+            #print( stressDict.get(2))
+            #print( stressDict )
+            #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+            #print( tensionDic[0] )
+            
+            shell = []
             for ele in EleOut :
-                tagEle = ele[0]
+                eleTag = ele[0]
                 eleType = ele[2][0]
-                nNode = len( ele[1] )
-                if nNode == 8:
-                    trasl = DefSolidValue( ele, pointWrapperDict, pointDispWrapperDict )
-                    trans.append(trasl)
-                    tag.append( tagEle )
-                elif eleType == 'FourNodeTetrahedron' :
-                    trasl  = DefTetraSolidValue( ele, pointWrapperDict, pointDispWrapperDict )
-                    trans.append(trasl)
-                    tag.append( tagEle )
-                    
-            tagElement = tag
-            Trans = th.list_to_tree( trans )
+                if eleType == "ShellMITC4" :
+                    shellModel = ShellStressQuad( ele, pointWrapperDict )
+                    shell.append( shellModel )
+                elif eleType == "ShellDKGT" :
+                    outputForce = forceWrapperDict.get( eleTag )
+                    shellModel = ShellTriangle( ele, pointWrapperDict )
+                    shell.append( shellModel )
         
-            return tagElement, Trans 
-        
+            return shell, stressValue
         
         checkData = True
         
         if not AlpacaStaticOutput :
             checkData = False
-            msg = "input 'AlpacaStaticOutput' failed to collect data"
+            msg = "input 'AlpacaStaticOutput' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if stressView is None :
+            checkData = False
+            msg = " input 'stressView' failed to collect data"  
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            tagElement, Trans = brickDisp( AlpacaStaticOutput )
-            return (tagElement, Trans)
+            shell, stressValue = shellStressView( AlpacaStaticOutput, stressView )
+            return (shell, stressValue)
+
 
 
 
