@@ -1200,6 +1200,10 @@ class MeshtoShell(component):
                     colour = Colour
             else:
                 elementType = "shellDKGT"
+                if Colour is None:
+                    colour = Color.FromArgb(49, 159, 255)
+                else:
+                    colour = Colour
             newMesh = Mesh
             
             CrossSection = CrossSection
