@@ -116,7 +116,6 @@ def defShellQuad( ele, node, nodeDisp, scaleDef ):
     eleNodeTag = ele[1]
     color = ele[2][2]
     thick = ele[2][1]
-    print( eleNodeTag )
     index1 = eleNodeTag[0]
     index2 = eleNodeTag[1]
     index3 = eleNodeTag[2]
@@ -174,7 +173,9 @@ def defShellTriangle( ele, node, nodeDisp, scaleDef ):
     
     eleTag = ele[0]
     eleNodeTag = ele[1]
-    color = ele[2][1]
+    color = ele[2][2]
+    thick = ele[2][1]
+    
     index1 = eleNodeTag[0]
     index2 = eleNodeTag[1]
     index3 = eleNodeTag[2]

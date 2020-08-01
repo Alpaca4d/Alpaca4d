@@ -122,6 +122,7 @@ def ShellTriangle( ele, node ):
     
     eleTag = ele[1]
     eleNodeTag = ele[2]
+    thick = ele[4]
     color = ele[5]
     index1 = eleNodeTag[0]
     index2 = eleNodeTag[1]

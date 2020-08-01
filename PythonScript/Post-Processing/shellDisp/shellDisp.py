@@ -35,7 +35,7 @@ def defShellQuadValue( ele, node, nodeDisp ):
     
     return  [[trasl1, trasl2, trasl3, trasl4], [rotate1, rotate2, rotate3, rotate4]]
 
-def defShellTriangleValue( ele, node, nodeDisp, scaleDef ):
+def defShellTriangleValue( ele, node, nodeDisp ):
     
     eleTag = ele[0]
     eleNodeTag = ele[1]

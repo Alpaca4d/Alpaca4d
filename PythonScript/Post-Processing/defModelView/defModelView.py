@@ -196,7 +196,8 @@ def defShellTriangle( ele, node, nodeDisp, scaleDef ):
     
     eleTag = ele[0]
     eleNodeTag = ele[1]
-    color = ele[2][1]
+    color = ele[2][2]
+    thick = ele[2][1]
     index1 = eleNodeTag[0]
     index2 = eleNodeTag[1]
     index3 = eleNodeTag[2]
@@ -227,6 +228,9 @@ def defShellTriangle( ele, node, nodeDisp, scaleDef ):
     
     shellDefModel.Faces.AddFace(0, 1, 2)
     colour = rs.CreateColor( color[0], color[1], color[2] )
+    shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+
+
     vt = shellDefModel.Vertices
     shellDefModel.FaceNormals.ComputeFaceNormals()
     fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
