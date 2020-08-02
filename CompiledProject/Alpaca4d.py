@@ -1217,12 +1217,12 @@ class MeshToShell(component):
         if Mesh is None:
             checkData = False
             msg = "input 'Mesh' failed to collect data"
-            ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if CrossSection is None:
             checkData = False
             msg = "input 'CrossSection' failed to collect data"
-            ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         
         if checkData != False:
