@@ -48,4 +48,11 @@ if CrossSection is None:
 
 
 if checkData != False:
-    shellWrapper = MeshToShell(Mesh, Colour, CrossSection)
+    Mesh.Unweld(0, True)
+    explodedMesh = Mesh.ExplodeAtUnweldedEdges()
+    shellWrapper = []
+    if explodedMesh.Length > 0:
+        for mesh in explodedMesh:
+            shellWrapper.append(MeshToShell(mesh, Colour, CrossSection))
+    elif explodedMesh.Length == 0:
+            shellWrapper.append(MeshToShell(Mesh, Colour, CrossSection))

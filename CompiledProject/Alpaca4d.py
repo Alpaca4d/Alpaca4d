@@ -1128,14 +1128,17 @@ class LinetoBeam(component):
             beamWrapper = LineToBeam(Line, CrossSection, Colour, orientSection, beamType)
             return beamWrapper
 
-class MeshtoShell(component):
+class MeshToShell(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Mesh to Shell (Alpaca4d)", "Mesh to Shell", """Generate a Shell MITC4 element""", "Alpaca", "2|Element")
+            "Mesh to Shell (Alpaca4d)", "Mesh to Shell", """Generate a Shell element""", "Alpaca", "2|Element")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.secondary
+
     def get_ComponentGuid(self):
-        return System.Guid("aa075ef3-3eb2-48a3-884f-4a9e585f14d8")
+        return System.Guid("dbfd19cc-44bb-43ca-abf4-45846a4228d5")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -1207,24 +1210,33 @@ class MeshtoShell(component):
             newMesh = Mesh
             
             CrossSection = CrossSection
-            return[ [ newMesh , elementType, CrossSection, colour] ]
+            return [newMesh , elementType, CrossSection, colour]
         
         checkData = True
         
         if Mesh is None:
             checkData = False
             msg = "input 'Mesh' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+            ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if CrossSection is None:
             checkData = False
             msg = "input 'CrossSection' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+            ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         
         if checkData != False:
-            shellWrapper = MeshToShell(Mesh, Colour, CrossSection)
+            Mesh.Unweld(0, True)
+            explodedMesh = Mesh.ExplodeAtUnweldedEdges()
+            shellWrapper = []
+            if explodedMesh.Length > 0:
+                for mesh in explodedMesh:
+                    shellWrapper.append(MeshToShell(mesh, Colour, CrossSection))
+            elif explodedMesh.Length == 0:
+                    shellWrapper.append(MeshToShell(Mesh, Colour, CrossSection))
             return shellWrapper
+
+
 
 class BrickElement(component):
     def __new__(cls):
@@ -1679,14 +1691,14 @@ class MassLoad(component):
 
 # 4|Assemble
 
-class Assemble(component):
+class AssembleModel(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Assemble (Alpaca4d)", "Assemble", """Generate a text file model to be sent to OpenSees""", "Alpaca", "4|Model")
+            "Assemble Model (Alpaca 4d)", "Assemble Model", """Generate a text file model to be sent to OpenSees""", "Alpaca", "4|Model")
         return instance
     
     def get_ComponentGuid(self):
-        return System.Guid("f2c70622-da97-4a8f-a35a-50191848ea9d")
+        return System.Guid("d3cdb92e-6545-4a92-981f-1b37e8351a4a")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -1763,6 +1775,7 @@ class Assemble(component):
             secTagWrapper = []
             
             for element in Element:
+                print(element[1])
                 if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
                     
                     startPoint = element[0].PointAt(element[0].Domain[0])
@@ -1771,7 +1784,7 @@ class Assemble(component):
                     points.append(endPoint)
                     geomTransf.append(element[3])
                     matWrapper.append([element[2][6][0], element[2][6][1:] ]) # to be careful because we are assigning "unixial" inside the solver. We need to find a clever way to assigning outside
-                elif (element[1] == "ShellMITC4") or (element[1] == "ShellDKGT"):
+                elif (element[1] == "ShellMITC4") or (element[1] == "shellDKGT"):
                     mesh = element[0]
                     vertices = mesh.Vertices
                     for i in range(vertices.Count):
@@ -1825,6 +1838,7 @@ class Assemble(component):
             openSeesSecTag = openSeesSecTag
             secTagDict = dict(openSeesSecTag)
             
+            #print(secTagDict)
             
             # create GeomTransf
             geomTransf = [row[0] for row in geomTransf ]
@@ -1888,6 +1902,7 @@ class Assemble(component):
                     orientVector = [ axis1, axis2, axis3 ]
             
                     massDens = element[5]
+                    #print(massDens)
                     sectionGeomProperties = element[2][7]
                     color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
                     matTag = matNameDict.setdefault(element[2][6][0])[0]
@@ -1895,7 +1910,7 @@ class Assemble(component):
                     
                     MassOfStructure += element[0].GetLength() * massDens * 100    # kN to kg
                     
-                elif (element[1] == "ShellMITC4") or (element[1] == "ShellDKGT"):
+                elif (element[1] == "ShellMITC4") or (element[1] == "shellDKGT"):
                     typeElement = element[1]
                     eleTag = eleTag
                     shellNodesRhino = element[0].Vertices
@@ -2033,6 +2048,7 @@ class Assemble(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if not Load:
+            checkData = False
             msg = "input 'Load' failed to collect data"
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
@@ -2048,7 +2064,7 @@ class DisassembleModel(component):
         return instance
     
     def get_ComponentGuid(self):
-        return System.Guid("1872eaa1-f567-4db4-947f-3fbaaa01d62c")
+        return System.Guid("ed0f1331-7492-4895-b996-02991b22bfd2")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -2153,6 +2169,21 @@ class DisassembleModel(component):
             return circle
         
         def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+            #-------------------1---------2 #
+            '''
+            p1 = plane.PointAt(ta/2, -(yg - tinf) )
+            p2 = plane.PointAt( Binf/2,  -(yg - tinf) )
+            p3 = plane.PointAt( Binf/2,  -yg )
+            p4 = plane.PointAt( -Binf/2,  -yg )
+            p5 = plane.PointAt( -Binf/2, -(yg - tinf) ) 
+            p6 = plane.PointAt( -ta/2,  -(yg - tinf) )
+            p7 = plane.PointAt( -ta/2,  (H - yg - tsup))
+            p8 = plane.PointAt( -Bsup/2,  (H - yg - tsup) )
+            p9 = plane.PointAt( -Bsup/2,  (H - yg ) )
+            p10 = plane.PointAt( Bsup/2,  (H - yg ) )
+            p11 = plane.PointAt( Bsup/2,  (H - yg - tsup) )
+            p12 = plane.PointAt( ta/2,  (H - yg - tsup) )
+            '''
             p1 = plane.PointAt( -(yg - tinf), ta/2 )
             p2 = plane.PointAt( -(yg - tinf), Binf/2 )
             p3 = plane.PointAt( -yg, Binf/2 )
@@ -2212,6 +2243,7 @@ class DisassembleModel(component):
             
             eleTag = ele[1]
             eleNodeTag = ele[2]
+            thick = ele[4]
             color = ele[5]
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
@@ -2486,9 +2518,8 @@ class DisassembleModel(component):
             #meshdElement.IsClosed(True)
             
             return meshElement
-
-
-        def disassembleModel(AlpacaModel ):
+        # ------------------------------------------------------------------------------- #
+        def diassembleModel(AlpacaModel ):
         
             nodeWrapper = AlpacaModel[0]
             GeomTransf = AlpacaModel[1]
@@ -2612,8 +2643,9 @@ class DisassembleModel(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            ModelView, ModelViewExtruded, Points, Support, Load, Material, Section = disassembleModel( AlpacaModel )
+            ModelView, ModelViewExtruded, Points, Support, Load, Material, Section = diassembleModel( AlpacaModel )
             return (ModelView, ModelViewExtruded, Points, Support, Load, Material, Section)
+
 
 
 # 5|Analysis
@@ -3173,6 +3205,7 @@ class GroundMotionAnalyses(component):
 
 # 6|Numerical Output
 
+# Node
 class NodeDisplacement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -3426,6 +3459,8 @@ class ReactionForces(component):
             tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput )
             return (tagPoints, ReactionForce, ReactionMoment)
 
+
+# Beam
 class BeamDisplacement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -4175,17 +4210,19 @@ class BeamForces(component):
             tagElement, N, V1, V2, Mt, M1, M2 = beamForces( AlpacaStaticOutput, numberResults )
             return (tagElement, N, V1, V2, Mt, M1, M2)
 
+
+# Shell
 class ShellDisplacement(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Shell Displacement (Alpaca4d)", "Shell Displacement", """Compute the shell displacement""", "Alpaca", "6|Numerical Output")
+            "Shell Displacement (Alpaca 4d)", "Shell Displacement", """Compute the shell displacement""", "Alpaca", "6|Numerical Output")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.tertiary
 
     def get_ComponentGuid(self):
-        return System.Guid("00fff614-43bb-471b-ae6b-1641e09e0650")
+        return System.Guid("907b967d-5d93-4dc2-9e62-b1232ed0f173")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -4261,7 +4298,7 @@ class ShellDisplacement(component):
             
             return  [[trasl1, trasl2, trasl3, trasl4], [rotate1, rotate2, rotate3, rotate4]]
         
-        def defShellTriangleValue( ele, node, nodeDisp, scaleDef ):
+        def defShellTriangleValue( ele, node, nodeDisp ):
             
             eleTag = ele[0]
             eleNodeTag = ele[1]
@@ -4347,397 +4384,9 @@ class ShellDisplacement(component):
             tagElement, Trans, Rot = shellDisp( AlpacaStaticOutput )
             return (tagElement, Trans, Rot)
 
-class ShellForces(component):
-    def __new__(cls):
-        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Shell Forces (Alpaca4d)", "Shell Forces", """Compute internal shell forces""", "Alpaca", "6|Numerical Output")
-        return instance
 
-    def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.tertiary
 
-    def get_ComponentGuid(self):
-        return System.Guid("7b280ab1-0c7c-4ff8-9815-4d3986ed953b")
-    
-    def SetUpParam(self, p, name, nickname, description):
-        p.Name = name
-        p.NickName = nickname
-        p.Description = description
-        p.Optional = True
-    
-    def RegisterInputParams(self, pManager):
-        p = GhPython.Assemblies.MarshalParam()
-        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
-        self.Params.Input.Add(p)
-        
-    
-    def RegisterOutputParams(self, pManager):
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "tagElement", "tagElement", "number of the tag of Beam or Truss element .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Fx", "Fx", "Forces in direction X  of the Shell nodes .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Fy", "Fy", "Forces in direction Y of the Shell nodes .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Fz", "Fz", "Forces in direction Z  of the Shell nodes .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Mx", "Mx", "Moments in direction X  of the Shell nodes .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "My", "My", "Moments in direction Y  of the Shell nodes .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Mz", "Mz", "Moments in direction Z  of the Shell nodes .")
-        self.Params.Output.Add(p)
-        
-    
-    def SolveInstance(self, DA):
-        p0 = self.marshal.GetInput(DA, 0)
-        result = self.RunScript(p0)
-
-        if result is not None:
-            if not hasattr(result, '__getitem__'):
-                self.marshal.SetOutput(result, DA, 0, True)
-            else:
-                self.marshal.SetOutput(result[0], DA, 0, True)
-                self.marshal.SetOutput(result[1], DA, 1, True)
-                self.marshal.SetOutput(result[2], DA, 2, True)
-                self.marshal.SetOutput(result[3], DA, 3, True)
-                self.marshal.SetOutput(result[4], DA, 4, True)
-                self.marshal.SetOutput(result[5], DA, 5, True)
-                self.marshal.SetOutput(result[6], DA, 6, True)
-        
-    def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAALqSURBVEhLtVVNaNRAFI4/KKKgSLU2mTRtMtlts5tuu0st/aGtRcT+qa2ybS+iiCDYYxVFe9BjD55UEJEKFaUgiIoevOlJUOhBPFgFRdA1mWwr6M2f8b10tkR3t5sW/OAjb17mzTfvZeZFKoYsqbY9YoyKYVEwYp5yiEHFMDw8hR5kxLgrhkXBCH2cVfRuMQwHLnWszQlwSVot3Hn4SqytIDCdlY002sJdGo5KDU8xnnkyfctI5KRw58FTzEGX6J4n6++YFqkR7uII7oIR/ZInG5/ndH2zcBUELP7UVYwJMZS4Za0T5gKgBKs8zazNEj3uErPdIeYDJkejnyoiZUw19uGcVCpVlkgkqoJEH76DDBsz5fp2tKFUzR6h42gvYm5HleYRfcaV6SuX0A/AnzDpzZBlnUnaNkc27mzhTa1dfxF9uffAI7C58xD7C2IdWO8b8DuUsEnILAAzYYpxMVNetxGD2geO8pHJ10ty1/CoL/CRkA34vZhKrzvbrE15pfoXyxUQYRJuTphLA4MwuNCiQeImUvH4AREWHmEF2npHeL1t7xZh4RFWoLmrjycsq16EhUdYgdbuNE/FYp0iLDz+yzeYpXS9MKVkPJ7uOHS84KJBLkvAUSNt0H7HUAiD2nqG+ODEI94/PsX7z93kfWdv8J6xqz57T1/zfS17BhYFHNmsZzI94S+WAzS1w9isfCr0JdzG39DkXuyPxfqhTDNIOCUPG2z7HjynG2KxSZ+2fQt9yGRdXRNTzAvQ+H7ATZ6F53MkXNpOvyzYPf0OSugxELwNPUVFcVepNf1dLAFHMRNIpkZl2OBlVzWvYItA4o0W0xYQdMxXRqqhn7gZLVolXHnwGyW2dSDa6HMrayr8l6UA6U1CRhxEpoQrD64W6YZ576FdP4Hf5l7hLg0s25fqeDkKYPrB0xUE/u2gLHeg3sNgrxHu8ECBUimv6J+cA5ymzLymbRHDgoAM7vunZSUIkzZuIPeB8yFJfwANJ+00XtlwtwAAAABJRU5ErkJggg=="
-        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
-
-    
-    def RunScript(self, AlpacaStaticOutput):
-        
-        import Rhino.Geometry as rg
-        import math as mt
-        import ghpythonlib.treehelpers as th # per data tree
-        import Grasshopper as gh
-        import sys
-        import rhinoscriptsyntax as rs
-        from scriptcontext import doc
-        
-        
-        def shellForces( AlpacaStaticOutput ):
-        
-        
-            diplacementWrapper = AlpacaStaticOutput[0]
-            EleOut = AlpacaStaticOutput[2]
-            ForceOut = AlpacaStaticOutput[4]
-        
-            pointWrapper = []
-            for index,item in enumerate(diplacementWrapper):
-                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-            ## Dict. for point ##
-            pointWrapperDict = dict( pointWrapper )
-        
-            forceWrapper = []
-            for item in ForceOut:
-                index = item[0]
-                if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
-                    Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-                    Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
-                    Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-                    Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
-                    Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-                    Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-                    Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
-                    Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
-                    forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
-                                [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
-                                [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
-                                [ Mi.X, Mj.X,  Mk.X, Mw.X ],
-                                [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
-                                [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
-                    forceWrapper .append( [index, forceOut ])
-        
-                if len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
-                    Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
-                    Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
-                    Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
-                    Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
-                    Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
-                    Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
-                    forceOut = [[ Fi.X, Fj.X, Fk.X ],
-                                [ Fi.Y, Fj.Y, Fk.Y ],
-                                [ Fi.Z, Fj.Z, Fk.Z ],
-                                [ Mi.X, Mj.X,  Mk.X ],
-                                [ Mi.Y, Mj.Y, Mk.Y ],
-                                [ Mi.Z, Mj.Z, Mk.Z ]]
-                    forceWrapper .append( [index, forceOut ])
-        
-            ## Dict. for force ##
-            forceWrapperDict = dict( forceWrapper )
-            ####
-            Fx, Fy, Fz, Mx, My, Mz = [],[],[],[],[],[]
-            tag = []
-        
-            for ele in EleOut :
-                eleTag = ele[0]
-                eleType = ele[2][0]
-                if eleType == "ShellMITC4" :
-                    tag.append( eleTag )
-                    outputForce = forceWrapperDict.get( eleTag )
-                    Fx.append( outputForce[0] )
-                    Fy.append( outputForce[1] )
-                    Fz.append( outputForce[2] )
-                    Mx.append( outputForce[3] )
-                    My.append( outputForce[4] )
-                    Mz.append( outputForce[5] )
-                elif eleType == "ShellDKGT" :
-                    tag.append( eleTag )
-                    outputForce = forceWrapperDict.get( eleTag )
-                    Fx.append( outputForce[0] )
-                    Fy.append( outputForce[1] )
-                    Fz.append( outputForce[2] )
-                    Mx.append( outputForce[3] )
-                    My.append( outputForce[4] )
-                    Mz.append( outputForce[5] )
-                    
-            tagElement = th.list_to_tree( tag )
-            Fx = th.list_to_tree( Fx )
-            Fy = th.list_to_tree( Fy )
-            Fz = th.list_to_tree( Fz )
-            Mx = th.list_to_tree( Mx )
-            My = th.list_to_tree( My )
-            Mz = th.list_to_tree( Mz )
-        
-            return tagElement, Fx, Fy, Fz, Mx, My, Mz
-        
-        checkData = True
-        
-        if not AlpacaStaticOutput:
-            checkData = False
-            msg = "input 'AlpacaStaticOutput' failed to collect data"  
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        if checkData != False:
-            tagElement, Fx, Fy, Fz, Mx, My, Mz = shellForces( AlpacaStaticOutput )
-            return (tagElement, Fx, Fy, Fz, Mx, My, Mz)
-
-class ShellStress(component):
-    def __new__(cls):
-        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Shell Stress (Alpaca4d)", "Shell Stress", """Compute the internal stress on a shell""", "Alpaca", "6|Numerical Output")
-        return instance
-
-    def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.tertiary
-
-    def get_ComponentGuid(self):
-        return System.Guid("bacc44e0-0723-4a4d-b519-769a24f9734c")
-    
-    def SetUpParam(self, p, name, nickname, description):
-        p.Name = name
-        p.NickName = nickname
-        p.Description = description
-        p.Optional = True
-    
-    def RegisterInputParams(self, pManager):
-        p = GhPython.Assemblies.MarshalParam()
-        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
-        self.Params.Input.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "stressView", "stressView", "stress acting on the shell nodes.\n'0' - sigmaX ( membrane stress X ) ;\n'1' - sigmaY  ( membrane stress Y );\n'2' - sigmaXY ( membrane stress XY );\n'3' - tauX  ( transverse shear forces X );\n'4' - tauY ( transverse shear forces Y ).\n'5' - mX ( bending moment X ) ;\n'6' - my  ( bending moment Y );\n'7' - mxy ( bending moment XY  );")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-    
-    def RegisterOutputParams(self, pManager):
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "shell", "shell", "mesh that represent the shell.")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "stressValue", "stressValue", "value of stress acting on the shell nodes.")
-        self.Params.Output.Add(p)
-        
-    
-    def SolveInstance(self, DA):
-        p0 = self.marshal.GetInput(DA, 0)
-        p1 = self.marshal.GetInput(DA, 1)
-        result = self.RunScript(p0, p1)
-
-        if result is not None:
-            if not hasattr(result, '__getitem__'):
-                self.marshal.SetOutput(result, DA, 0, True)
-            else:
-                self.marshal.SetOutput(result[0], DA, 0, True)
-                self.marshal.SetOutput(result[1], DA, 1, True)
-        
-    def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAANISURBVEhL7ZNbSJNhGMf3uVPDwumWUzc3Uxse0jnX3CgPM8uVYUZnKVQyCgKTDoTYCS3MDqbkxTxVM1uxaVq2UuwiL5IkguiiA4GQ0OkiIrrpcOG/531X0kV09CKoP/z43vd53uf/Pe/7vZ/on5WcSAsMp1aRxAGJRHhqMEpB4wFCxxJ/KjvhCQkTv19boETHsBaXHxuw5UAY5Iqg15TbwFf9ohRECXF7dooMlfUqXLyvR99dAzwt0ei+roe3Tw/XUBSMJjnbTTcRTvxQ0cQhiVR46VgWjIb6SG7EOv4Cm7trouG7Foj3PtRj/SYlpFLhBdUWcZdvKFsQiXpiwmQfi7cp4R7RTRq6/TrU7YzD5ooMbC1ywplXgaKSbSh0rsfu8mxUVxpReyIKh7o0iE2Ssd24CSV3JSUSdxPMcuxqVON8fzQ8bXpcvKfH/vZ4LC8rhzXrDArm96AkqQaF87zIWXxnkpVzO7DG3Iy8HD8sGa0oTCuZUIc7IAjicfINZS/YNTtVjq7RQMfsnHccmYNlqVtRYHMjN38UqywtWJLt54b5uUNYne7CwrxhirdiwaKbPL7c1oWyhH18bJnnQVCQ9Dl5s+sskhF7QpTid8UVamTm70dW/q3PRWexKW47md3gcxa32E5hQXoTqnSlWJdci4WWZlitLhSZGuB0DGKp/RyCZ8RPkGchM/9aScSIKjwHdsc1buh0DPDnkpR6FCdUo5ZMejIuoDulEYNZQ7hi88KXfAy+OQ1oM7eg2nQcMer57Bu4uOM3JCYqxBLFW2PyHthy+rHGdBQuSwf89l5cSDgIb+Jhbv6FntRm/oI+czvqqBGqf0QEM7PvKYYYjFToJk7NPc2N+qnz3rQW9Jrb+A681H1rYg3OUOcs70lvh0qm+kB1Vu7wE6JbKyqVi+WvNsaU45L1PK5mDuBk8j50RtnROV2LYZUBIxq6cZp4GBUadu57eeUvKoLwGWcYUTXThHFtLB5rYvEkIg5jxD31LDSFhrOjuUlIWMHvaoVEEJ5VTg/FA80svNLFc+5EGBAsBL2hfGxg2Z+J/TgdRolswj9Ti5faOFhk01j3pTw7hVokFglj1oC5LxCaerGr2Emo+Oy//lKJRJ8AAgSWcEbrIvgAAAAASUVORK5CYII="
-        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
-
-    
-    def RunScript(self, AlpacaStaticOutput, stressView):        
-        import Rhino.Geometry as rg
-        import ghpythonlib.treehelpers as th
-        import Grasshopper as gh
-        import sys
-        import os
-        import rhinoscriptsyntax as rs
-        from scriptcontext import doc
-        
-        
-        
-        #---------------------------------------------------------------------------------------#
-        def ShellStressQuad( ele, node ):
-            eleTag = ele[0]
-            eleNodeTag = ele[1]
-            color = ele[2][2]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
-            
-            ## CREO IL MODELLO  ##
-            point1 = node.get( index1 -1 , "never")
-            point2 = node.get( index2 -1 , "never")
-            point3 = node.get( index3 -1 , "never")
-            point4 =  node.get( index4 -1 , "never")
-            
-            shellModel = rg.Mesh()
-            shellModel.Vertices.Add( point1 ) #0
-            shellModel.Vertices.Add( point2 ) #1
-            shellModel.Vertices.Add( point3 ) #2
-            shellModel.Vertices.Add( point4 ) #3
-            
-            shellModel.Faces.AddFace(0, 1, 2, 3)
-            colour = rs.CreateColor( color[0], color[1], color[2] )
-            shellModel.VertexColors.CreateMonotoneMesh( colour )
-            return  shellModel 
-        
-        def ShellTriangle( ele, node ):
-            
-            eleTag = ele[0]
-            eleNodeTag = ele[1]
-            color = ele[2][2]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            
-            
-            ## CREO IL MODELLO DEFORMATO  ##
-            point1 =  node.get( index1 -1 , "never")
-            point2 =  node.get( index2 -1 , "never")
-            point3 =  node.get( index3 -1 , "never")
-            
-            shellModel = rg.Mesh()
-            shellModel.Vertices.Add( point1 ) #0
-            shellModel.Vertices.Add( point2 ) #1
-            shellModel.Vertices.Add( point3 ) #2
-            
-            shellModel.Faces.AddFace(0, 1, 2)
-            colour = rs.CreateColor( color[0], color[1], color[2] )
-            shellModel.VertexColors.CreateMonotoneMesh( colour )
-            
-            return  shellModel
-        
-        #--------------------------------------------------------------------------
-        def shellStressView( AlpacaStaticOutput, stressView ):
-        
-            global shell
-            global stressValue
-        
-            diplacementWrapper = AlpacaStaticOutput[0]
-            EleOut = AlpacaStaticOutput[2]
-            ForceOut = AlpacaStaticOutput[4]
-            #print( ForceOut[0] )
-            #print( ForceOut[1] )
-            #nodalForce = openSeesOutputWrapper[5]
-        
-            #nodalForcerDict = dict( nodalForce )
-        
-            pointWrapper = []
-            for index,item in enumerate(diplacementWrapper):
-                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
-            ## Dict. for point ##
-            pointWrapperDict = dict( pointWrapper )
-        
-            shellTag = []
-            for item in EleOut:
-                if  len(item[1])  == 4:
-                     shellTag.append(item[0])
-        
-            ## Dict. for force ##
-            #forceWrapperDict = dict( forceWrapper )
-            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
-            workingDirectory = os.path.dirname(ghFilePath)
-            outputFile = os.path.join(workingDirectory, 'assembleData\\tensionShell.out' )
-            #---------------------------------------------------#
-        
-            with open(outputFile, 'r') as f:
-                lines = f.readlines()
-                tensionList = lines[0].split()
-                
-            #print(len(tensionList)/len(shellTag))
-        
-            #print(stressView + 24)
-            tensionDic = []
-            for n,eleTag in enumerate(shellTag) :
-                tensionShell = []
-                for i in range( (n)*32, ( n + 1 )*32  ):
-                    tensionShell.append( float(tensionList[i]) )
-                tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ], tensionShell[ stressView + 24 ] ]
-                tensionDic.append([ eleTag, tensionView ])
-        
-            stressDict = dict( tensionDic )
-            stressValue = th.list_to_tree( stressDict.values() )
-            
-            #print( stressDict.get(2))
-            #print( stressDict )
-            #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
-            #print( tensionDic[0] )
-            
-            shell = []
-            for ele in EleOut :
-                eleTag = ele[0]
-                eleType = ele[2][0]
-                if eleType == "ShellMITC4" :
-                    shellModel = ShellStressQuad( ele, pointWrapperDict )
-                    shell.append( shellModel )
-                elif eleType == "ShellDKGT" :
-                    outputForce = forceWrapperDict.get( eleTag )
-                    shellModel = ShellTriangle( ele, pointWrapperDict )
-                    shell.append( shellModel )
-        
-            return shell, stressValue
-        
-        checkData = True
-        
-        if not AlpacaStaticOutput :
-            checkData = False
-            msg = "input 'AlpacaStaticOutput' failed to collect data"  
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        if stressView is None :
-            checkData = False
-            msg = " input 'stressView' failed to collect data"  
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-        
-        if checkData != False:
-            shell, stressValue = shellStressView( AlpacaStaticOutput, stressView )
-            return (shell, stressValue)
-
+# Brick
 class BrickStress(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -4970,7 +4619,6 @@ class BrickStress(component):
         if checkData != False:
             brick, stressValue = brickStressView( AlpacaStaticOutput, stressView )
             return (brick, stressValue)
-
 
 
 # General Info
