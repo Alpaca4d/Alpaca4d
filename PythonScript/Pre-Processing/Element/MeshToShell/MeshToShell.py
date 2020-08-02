@@ -14,7 +14,7 @@ from System.Drawing import Color
 
 def MeshToShell(Mesh, Colour, CrossSection):
     
-    
+    Mesh.Unweld(0, True)
     elementType = []
     if Mesh.Vertices.Count == 4:
         elementType = "ShellMITC4"
@@ -31,7 +31,7 @@ def MeshToShell(Mesh, Colour, CrossSection):
     newMesh = Mesh
     
     CrossSection = CrossSection
-    return[ [ newMesh , elementType, CrossSection, colour] ]
+    return [ newMesh , elementType, CrossSection, colour] 
 
 checkData = True
 
