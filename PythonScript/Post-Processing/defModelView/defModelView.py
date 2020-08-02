@@ -957,6 +957,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
     '''
 
     if modelExstrud == False or modelExstrud == None:
+        ModelDisp = None
         ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
         ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
         ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
