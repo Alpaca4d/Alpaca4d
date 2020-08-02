@@ -14,7 +14,6 @@ from System.Drawing import Color
 
 def MeshToShell(Mesh, Colour, CrossSection):
     
-    Mesh.Unweld(0, True)
     
     elementType = []
     if Mesh.Vertices.Count == 4:
