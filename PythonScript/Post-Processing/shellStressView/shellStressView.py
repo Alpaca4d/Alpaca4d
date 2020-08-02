@@ -50,9 +50,10 @@ def ShellStressQuad( ele, node ):
     shellModel.Faces.AddFace(0, 1, 2, 3)
     colour = rs.CreateColor( color[0], color[1], color[2] )
     shellModel.VertexColors.CreateMonotoneMesh( colour )
+
     return  shellModel 
 
-def ShellTriangle( ele, node ):
+def ShellStressTriangle( ele, node ):
     
     eleTag = ele[0]
     eleNodeTag = ele[1]
@@ -62,7 +63,7 @@ def ShellTriangle( ele, node ):
     index3 = eleNodeTag[2]
     
     
-    ## CREO IL MODELLO DEFORMATO  ##
+    ## CREO IL MODELLO  ##
     point1 =  node.get( index1 -1 , "never")
     point2 =  node.get( index2 -1 , "never")
     point3 =  node.get( index3 -1 , "never")
@@ -99,31 +100,60 @@ def shellStressView( AlpacaStaticOutput, stressView ):
     ## Dict. for point ##
     pointWrapperDict = dict( pointWrapper )
 
-    shellTag = []
+    shell4Tag = []
+    shell3Tag = []
     for item in EleOut:
         if  len(item[1])  == 4:
-             shellTag.append(item[0])
+             shell4Tag.append(item[0])
+
+        if  len(item[1])  == 3:
+             shell3Tag.append(item[0])
 
     ## Dict. for force ##
     #forceWrapperDict = dict( forceWrapper )
-    ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
-    workingDirectory = os.path.dirname(ghFilePath)
-    outputFile = os.path.join(workingDirectory, 'assembleData\\tensionShell.out' )
+    #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+    ghFilePath = ghenv.LocalScope.ghdoc.Path
+    workingDirectory = os.path.dirname( ghFilePath )
+    outputFile4 = os.path.join(workingDirectory, 'assembleData\\tensionShell4.out' )
+    outputFile3 = os.path.join(workingDirectory, 'assembleData\\tensionShell3.out' )
     #---------------------------------------------------#
+    tensionDic = []
 
-    with open(outputFile, 'r') as f:
-        lines = f.readlines()
-        tensionList = lines[0].split()
+
+
+
+
         
     #print(len(tensionList)/len(shellTag))
 
     #print(stressView + 24)
-    tensionDic = []
-    for n,eleTag in enumerate(shellTag) :
+
+    with open(outputFile4, 'r') as f:
+        lines = f.readlines()
+        if lines :
+            tension4List = lines[0].split()
+
+    #print( len( shell4Tag  ), len( tension4List ))
+
+    for n,eleTag in enumerate(shell4Tag) :
         tensionShell = []
         for i in range( (n)*32, ( n + 1 )*32  ):
-            tensionShell.append( float(tensionList[i]) )
+            tensionShell.append( float(tension4List[i]) )
         tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ], tensionShell[ stressView + 24 ] ]
+        tensionDic.append([ eleTag, tensionView ])
+
+    with open(outputFile3, 'r') as f:
+        lines = f.readlines()
+        if lines :
+            tension3List = lines[0].split()
+
+    #print( len( shell3Tag  ), len( tension3List ))
+
+    for n,eleTag in enumerate(shell3Tag) :
+        tensionShell = []
+        for i in range( (n)*32, ( n + 1 )*32  ): # invece di 32 dovrebbe essere
+            tensionShell.append( float(tension3List[i]) )
+        tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ] ]
         tensionDic.append([ eleTag, tensionView ])
 
     stressDict = dict( tensionDic )
@@ -150,9 +180,9 @@ def shellStressView( AlpacaStaticOutput, stressView ):
         if eleType == "ShellMITC4" :
             shellModel = ShellStressQuad( ele, pointWrapperDict )
             shell.append( shellModel )
-        elif eleType == "ShellDKGT" :
-            outputForce = forceWrapperDict.get( eleTag )
-            shellModel = ShellTriangle( ele, pointWrapperDict )
+        elif eleType == "shellDKGT" :
+            #outputForce = forceWrapperDict.get( eleTag )
+            shellModel = ShellStressTriangle( ele, pointWrapperDict )
             shell.append( shellModel )
 
     return shell, stressValue

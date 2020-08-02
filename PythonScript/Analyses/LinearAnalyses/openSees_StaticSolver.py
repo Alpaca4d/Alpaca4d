@@ -145,7 +145,8 @@ for n in range(0, len(openSeesBeam)):
         beamTag.append( eleTag - 1 )
         ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
 
-shellTag = []
+shell4Tag = []
+shell3Tag = []
 for item in openSeesShell:
 
     eleType = item[0]
@@ -163,9 +164,14 @@ for item in openSeesShell:
 
     elementProperties.append([ eleTag, [eleType, thick ,color] ])
 
-    if (eleType == 'ShellMITC4') or (eleType == 'shellDKGT'):
+    if eleType == 'ShellMITC4' :
     	
-        shellTag.append( eleTag )
+        shell4Tag.append( eleTag )
+        ops.element( eleType , eleTag, *eleNodes, secTag)
+
+    if eleType == 'shellDKGT':
+        
+        shell3Tag.append( eleTag )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 
 for item in openSeesSolid:
@@ -231,10 +237,11 @@ for item in openSeesBeamLoad:
 #TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\LinearAnalyses'
 #TensionFilePathTag = TensionFilePath + '/tension.out' 
 
-TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
+TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell4.out' )
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shell4Tag,'stresses')
 
-ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shellTag,'stresses')
-
+TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell3.out' )
+ops.recorder('Element','-file', TensionFilePathTag ,'-closeOnWrite','-ele',*shell3Tag,'stresses')
 
 # ------------------------------
 # Start of analysis generation
