@@ -932,7 +932,7 @@ for solidEle, value in zip(SolidDefModel,traslSolidValue) :
 '''
 
 if modelExstrud == False or modelExstrud == None :
-    #ModelDisp  = modelDisp
+    ModelDisp  = None
     #ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
     ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
     ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
