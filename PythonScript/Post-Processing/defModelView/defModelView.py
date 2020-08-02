@@ -763,11 +763,12 @@ def meshLoft4( point, value, valueMax, valueMin ):
     return meshEle
 
 #----------------------------------------------------------------------#
-def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
+def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
 
     global ModelDisp
     global ModelCurve
-    global max_min
+    global ModelShell
+    global ModelSolid
     global dimSection
 
     #modelExstrud = False if modelExstrud is None else modelExstrud
@@ -821,17 +822,18 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
     else :
         scaleDef = scale
 
-    modelCurve = []
-    ShellDefModel = []
+
+
     ExtrudedView = []
     modelDisp = []
 
+    modelCurve = []
     traslBeamValue = []
     rotBeamValue = []
 
+    ShellDefModel = []
     traslShellValue = []
     rotShellValue = []
-    ExtrudedShell = []
 
     SolidDefModel = []
     traslSolidValue = []
@@ -853,7 +855,6 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
             traslBeamValue.append( globalTrans ) 
             rotBeamValue.append( globalRot )
             modelCurve.append( defpolyline )
-            modelDisp.append( defpolyline )
             # estrusione della beam #
             ExtrudedView.append( meshdef )
             #doc.Objects.AddMesh( meshdef )
@@ -867,7 +868,6 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
             globalTrans = valueTruss[2]
             traslBeamValue.append( globalTrans ) 
             modelCurve.append( defpolyline )
-            modelDisp.append( defpolyline )
             ExtrudedView.append( meshdef )
             #doc.Objects.AddMesh( meshdef )
 
@@ -903,7 +903,7 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
             SolidDefModel.append( solidDefModel[0] )
             traslSolidValue.append( solidDefModel[1] )
             ExtrudedView.append( solidDefModel[0] )
-
+    '''
     # Max Beam #
     flattenTrasl = []
     for valuetrasl in traslBeamValue:
@@ -936,7 +936,7 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
             color = gradientJet( valor, tMax[i], tMin[i] )
             colour = rs.CreateColor( color[0], color[1], color[2] )
             colorValor.append( colour )
-
+    
     for shellEle, value in zip(ShellDefModel,traslShellValue) :
         shellColor = shellEle.DuplicateMesh()
         shellColor.VertexColors.Clear()
@@ -954,19 +954,20 @@ def defModelView(AlpacaStaticOutput, direction , scale, modelExstrud = False ):
             solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
         modelDisp.append( solidColor)
             #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
-
+    '''
 
     if modelExstrud == False or modelExstrud == None:
-        ModelDisp  = modelDisp
-        ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
-        max_min = th.list_to_tree([ tMax[i], tMin[i] ])
+        ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
+        ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
+        ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
+        #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
         
     else  :
         ModelDisp = ExtrudedView
         ModelCurve = None
-        max_min = None
+        #max_min = None
 
-    return ModelDisp, ModelCurve, max_min
+    return ModelDisp, ModelCurve, ModelShell, ModelSolid
 
 checkData = True
 
@@ -974,13 +975,13 @@ if not AlpacaStaticOutput:
     checkData = False
     msg = "input 'AlpacaStaticOutput' failed to collect data"  
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-
+'''
 if direction is None:
     checkData = False
     msg = "input 'direction' failed to collect data"  
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-
+'''
 if checkData != False:
     #print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
-    ModelDisp, ModelCurve, max_min = defModelView( AlpacaStaticOutput, direction , scale, modelExstrud  )
+    ModelDisp, ModelCurve, ModelShell, ModelSolid = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
 

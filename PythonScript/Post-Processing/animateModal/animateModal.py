@@ -740,7 +740,6 @@ else :
 modelCurve = []
 ShellDefModel = []
 ExtrudedView = rg.Mesh()
-modelDisp = []
 
 traslBeamValue = []
 rotBeamValue = []
@@ -769,7 +768,6 @@ for ele in EleOut :
         traslBeamValue.append( globalTrans ) 
         rotBeamValue.append( globalRot )
         modelCurve.append( defpolyline )
-        modelDisp.append( defpolyline )
         # estrusione della beam #
         ExtrudedView.Append( meshdef )
         #doc.Objects.AddMesh( meshdef )
@@ -783,7 +781,6 @@ for ele in EleOut :
         globalTrans = valueTruss[2]
         traslBeamValue.append( globalTrans ) 
         modelCurve.append( defpolyline )
-        modelDisp.append( defpolyline )
         ExtrudedView.Append( meshdef )
         #doc.Objects.AddMesh( meshdef )
 
@@ -819,7 +816,7 @@ for ele in EleOut :
         SolidDefModel.append( solidDefModel[0] )
         traslSolidValue.append( solidDefModel[1] )
         ExtrudedView.Append( solidDefModel[0] )
-
+'''
 # Max Beam #
 flattenTrasl = []
 for valuetrasl in traslBeamValue:
@@ -932,12 +929,15 @@ for solidEle, value in zip(SolidDefModel,traslSolidValue) :
         solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
     modelDisp.append( solidColor)
         #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
-
+'''
 
 if modelExstrud == False or modelExstrud == None :
-    ModelDisp  = modelDisp
-    ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
-    max_min = th.list_to_tree([ tMax[i], tMin[i] ])
+    #ModelDisp  = modelDisp
+    #ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
+    ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
+    ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
+    ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
+    #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
     
 else:
     ModelDisp = ExtrudedView

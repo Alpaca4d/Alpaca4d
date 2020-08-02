@@ -1,6 +1,6 @@
 ﻿import System
 import os
-import Grasshopper
+import Grasshopper as gh
 
 
 ghFilePath = ghenv.Component.Attributes.Owner.OnPingDocument().FilePath
@@ -24,17 +24,24 @@ wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 
 userObjectFolder = gh.Folders.DefaultUserObjectFolder
+pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
 fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver_3ndf.py')
-
+    
 fileName = '"' + fileName + '"'
 wrapperFile = '"' + wrapperFile + '"'
 
 
-staticAnalyses_3ndf = System.Diagnostics.ProcessStartInfo(fileName)
-staticAnalyses_3ndf.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-staticAnalyses_3ndf.Arguments = wrapperFile
-process = System.Diagnostics.Process.Start(staticAnalyses_3ndf)
-System.Diagnostics.Process.WaitForExit(process)
+p = System.Diagnostics.Process()
+p.StartInfo.RedirectStandardOutput = True
+p.StartInfo.RedirectStandardError = True
+
+p.StartInfo.UseShellExecute = False
+p.StartInfo.CreateNoWindow = True
+
+p.StartInfo.FileName = pythonInterpreter
+p.StartInfo.Arguments = fileName + " " + wrapperFile
+p.Start()
+p.WaitForExit()
 
 
 ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
