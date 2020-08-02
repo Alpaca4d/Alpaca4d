@@ -316,6 +316,7 @@ outputFileName = filefolder + 'openSeesOutputWrapper.txt'
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:
         f.write("%s\n" % item)
-
+        
+print("analyses Finished")
 
 
