@@ -14,7 +14,6 @@ remainingDate = (ExpireDate - actualDay).days
 if remainingDate < 0:
     sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@gmail.com to renew the license")
 
-
 #filename = r'C:\Users\FORMAT\Desktop\assembleData\openSeesModel.txt'
 filename = sys.argv[1]
 

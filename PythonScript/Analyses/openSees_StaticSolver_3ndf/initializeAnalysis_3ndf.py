@@ -25,7 +25,7 @@ wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 userObjectFolder = gh.Folders.DefaultUserObjectFolder
 pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
-fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver_3ndf.py')
+fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\openSees_StaticSolver_3ndf\openSees_StaticSolver_3ndf.py')
     
 fileName = '"' + fileName + '"'
 wrapperFile = '"' + wrapperFile + '"'
@@ -42,6 +42,9 @@ p.StartInfo.FileName = pythonInterpreter
 p.StartInfo.Arguments = fileName + " " + wrapperFile
 p.Start()
 p.WaitForExit()
+
+msg = p.StandardError.ReadToEnd()
+ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
 
 
 ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER

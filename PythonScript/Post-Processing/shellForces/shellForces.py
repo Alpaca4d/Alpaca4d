@@ -20,22 +20,6 @@ import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
 def shellForces( AlpacaStaticOutput ):
 
@@ -70,7 +54,7 @@ def shellForces( AlpacaStaticOutput ):
                         [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
             forceWrapper .append( [index, forceOut ])
 
-        if len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
+        if len(item[1]) == 18: #6* numo nodi = 18 elementi triangolari
             Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
             Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
             Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
@@ -103,7 +87,7 @@ def shellForces( AlpacaStaticOutput ):
             Mx.append( outputForce[3] )
             My.append( outputForce[4] )
             Mz.append( outputForce[5] )
-        elif eleType == "ShellDKGT" :
+        elif eleType == "shellDKGT" :
             tag.append( eleTag )
             outputForce = forceWrapperDict.get( eleTag )
             Fx.append( outputForce[0] )

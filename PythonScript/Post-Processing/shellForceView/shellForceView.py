@@ -22,22 +22,6 @@ import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
-'''
-ghFilePath = ghenv.LocalScope.ghdoc.Path
-ghFileName = ghenv.LocalScope.ghdoc.Name
-folderNameLength = len(ghFilePath)-len(ghFileName)-2 #have to remove '.gh'
-ghFolderPath = ghFilePath[0:folderNameLength]
-
-outputPath = ghFolderPath + 'assembleData'
-wrapperFile = ghFolderPath + 'assembleData\\openSeesModel.txt'
-
-userObjectFolder = Grasshopper.Folders.DefaultUserObjectFolder
-fileName = userObjectFolder + 'Alpaca'
-'''
-fileName = r'C:\GitHub\Alpaca4d\PythonScript\function'
-sys.path.append(fileName)
-# importante mettere import 'import Rhino.Geometry as rg' prima di importatre DomeFunc
-import DomeFunc as dg 
 #---------------------------------------------------------------------------------------#
 def ShellQuad( ele, node):
     eleTag = ele[0]
@@ -197,16 +181,16 @@ def shellForceView( AlpacaStaticOutput, viewForce ):
             ForceView.append( outputForce[viewForce] )
             shellModel = ShellQuad( ele, pointWrapperDict )
             shell.append( shellModel )
-        elif eleType == "ShellDKGT" :
+        elif eleType == "shellDKGT" :
             tag.append( eleTag )
             outputForce = forceWrapperDict.get( eleTag )
             ForceView.append( outputForce[viewForce] )
             shellModel = ShellTriangle( ele, pointWrapperDict )
             shell.append( shellModel )
             
-    tagElement = th.list_to_tree( tag )
+    #tagElement = th.list_to_tree( tag )
     ForceValue = th.list_to_tree( ForceView )
-
+    '''
     maxValue = []
     minValue = []
     for value in ForceView:
@@ -225,8 +209,8 @@ def shellForceView( AlpacaStaticOutput, viewForce ):
             jetColor = gradientJet(value[j], maxValue, minValue)
             shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
         modelForce.append( shellColor)
-
-    return modelForce, ForceValue
+    '''
+    return shell, ForceValue
 
 checkData = True
 
@@ -242,4 +226,4 @@ if viewForce is None :
 
 
 if checkData != False:
-    diagram = shellForceView( AlpacaStaticOutput, viewForce  )
+    shell, ForceValue = shellForceView( AlpacaStaticOutput, viewForce  )

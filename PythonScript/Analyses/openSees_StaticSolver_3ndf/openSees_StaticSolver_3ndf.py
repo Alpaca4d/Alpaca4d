@@ -15,9 +15,7 @@ if remainingDate < 0:
     sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@gmail.com to renew the license")
 
 #filename = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesModel.txt'
-
 filename = sys.argv[1]
-
 
 workingDirectory = os.path.split(filename)[0]
 inputName = os.path.split(filename)[1]
@@ -165,7 +163,8 @@ for item in openSeesShell:
         print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
         ops.element( eleType , eleTag, *eleNodes, secTag)
 '''
-solidTag = []
+brickTag = []
+tetraTag = []
 for item in openSeesSolid:
 
     eleType = item[0]
@@ -182,10 +181,15 @@ for item in openSeesSolid:
 
     elementProperties.append([ eleTag, [eleType,color] ])
 
-    if (eleType == 'bbarBrick') or (eleType == 'FourNodeTetrahedron'):
-        solidTag.append( eleTag )
+    if eleType == 'bbarBrick' :
+        brickTag.append( eleTag )
         #print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
-        ops.element( eleType , eleTag, *eleNodes, matTag, *force)                           
+        ops.element( eleType , eleTag, *eleNodes, matTag, *force)
+
+    if eleType ==  'FourNodeTetrahedron':
+        tetraTag.append( eleTag )
+        #print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
+        ops.element( eleType , eleTag, *eleNodes, matTag, *force)                          
 # transform elementproperties to  Dict to call the object by tag
 elementPropertiesDict = dict(elementProperties)
 
@@ -229,10 +233,11 @@ for item in openSeesBeamLoad:
 #TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
 # ho problemi con shellTag
 
-TensionFilePathTag = os.path.join(workingDirectory, 'tensionShell.out' )
+TensionFilePath = os.path.join(workingDirectory, 'tensionBrick.out' )
+ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*brickTag,'stresses')
 
-ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*solidTag,'stresses')
-
+TensionFilePath = os.path.join(workingDirectory, 'tensionBTetra.out' )
+ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*tetraTag,'stresses')
 
 # ------------------------------
 # Start of analysis generation
@@ -259,7 +264,8 @@ ops.algorithm("Newton")
 # create analysis object
 ops.analysis("Static")
 
-# perform the analysis
+print("starting Analysis")
+# perform the analysi
 ops.analyze(1)
 ## OUTPUT FILE ##
 
@@ -307,8 +313,6 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
 
 length = len(filename)-len(inputName)
 filefolder = filename[0:length]
-
-
 outputFileName = filefolder + 'openSeesOutputWrapper.txt'
 #outputFileName = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesOutputWrapper.txt'
 
