@@ -18,6 +18,7 @@ import math as mt
 import ghpythonlib.treehelpers as th # per data tree
 import Grasshopper as gh
 import sys
+import os
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
@@ -106,6 +107,7 @@ def TetraSolid( ele, node ):
 #--------------------------------------------------------------------------
 def brickStressView( AlpacaStaticOutput, stressView ):
 
+
     diplacementWrapper = AlpacaStaticOutput[0]
     EleOut = AlpacaStaticOutput[2]
     #print( ForceOut[0] )
@@ -127,29 +129,46 @@ def brickStressView( AlpacaStaticOutput, stressView ):
         elif  len(item[0])  == 'FourNodeTetrahedron':
              EleTag.append([item[0], 24])
 
-    ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+    #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+    ghFilePath = ghenv.LocalScope.ghdoc.Path
     workingDirectory = os.path.dirname(ghFilePath)
-    outputFile = os.path.join(workingDirectory, 'assembleData\\tensionShell.out' )
+    outputFileBrick = os.path.join(workingDirectory, 'assembleData\\tensionBrick.out' )
+    outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
 
-    with open(outputFile, 'r') as f:
+    with open(outputFileBrick, 'r') as f:
         lines = f.readlines()
-        tensionList = lines[0].split()
+        if lines :
+            tensionListBrick  = lines[0].split()
 
     #print(len(tensionList)/len(shellTag))
 
     w = stressView
     #print(w + 24)
     tensionDic = []
-    for n,eleTag in enumerate(EleTag) :
-        tensionShell = []
-        for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
-            tensionShell.append( float(tensionList[i]) )
-        if eleTag[1] == 48:
-            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ], tensionShell[ w + 24 ], tensionShell[ w + 30 ], tensionShell[ w + 36 ], tensionShell[ w + 42 ] ]
-        elif eleTag[1] == 24:
-            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ]]
-        tensionDic.append([ eleTag[0], tensionView ])
 
+    if lines :
+        for n,eleTag in enumerate(EleTag) :
+            tensionShell = []
+            for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
+                tensionShell.append( float(tensionListBrick[i]) )
+            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ], tensionShell[ w + 24 ], tensionShell[ w + 30 ], tensionShell[ w + 36 ], tensionShell[ w + 42 ] ]
+            tensionDic.append([ eleTag[0], tensionView ])
+
+    with open(outputFileTetra, 'r') as f:
+        lines = f.readlines()
+        if lines :
+            tensionListTetra  = lines[0].split()
+    
+    #print(len(tensionList)/len(shellTag))
+    #print(w + 24)
+    if lines :
+        for n,eleTag in enumerate(EleTag) :
+            tensionShell = []
+            for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
+                tensionShell.append( float(tensionListTetra[i]) )
+            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ]]
+            tensionDic.append([ eleTag[0], tensionView ])
+    
     stressDict = dict( tensionDic )
     stressValue = th.list_to_tree( stressDict.values() )
     #print( stressDict.get(2))

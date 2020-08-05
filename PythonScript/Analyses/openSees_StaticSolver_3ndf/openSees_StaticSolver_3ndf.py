@@ -236,7 +236,7 @@ for item in openSeesBeamLoad:
 TensionFilePath = os.path.join(workingDirectory, 'tensionBrick.out' )
 ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*brickTag,'stresses')
 
-TensionFilePath = os.path.join(workingDirectory, 'tensionBTetra.out' )
+TensionFilePath = os.path.join(workingDirectory, 'tensionTetra.out' )
 ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*tetraTag,'stresses')
 
 # ------------------------------
