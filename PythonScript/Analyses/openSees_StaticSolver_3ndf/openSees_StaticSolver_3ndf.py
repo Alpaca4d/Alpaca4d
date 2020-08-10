@@ -14,11 +14,12 @@ remainingDate = (ExpireDate - actualDay).days
 if remainingDate < 0:
     sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@gmail.com to renew the license")
 
-#filename = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesModel.txt'
+#filename = r'C:\Users\FORMAT\Desktop\brickTest\assembleData\openSeesModel.txt'
 filename = sys.argv[1]
 
 workingDirectory = os.path.split(filename)[0]
 inputName = os.path.split(filename)[1]
+
 
 with open(filename, 'r') as f:
     lines = f.readlines()
@@ -99,13 +100,7 @@ for item in openSeesSecTag:
         #print( 'ops.section( {0}, {1}, {2}, {3}, {4}, {5})'.format( typeSection, int(secTag), float(E_mod), float(nu), float(h), float(rho) ) )
         #print( f"ops.section({typeSection}, {secTag}, {E_mod}, {nu}, {h}, {rho})" )
 ## CREATE ELEMENT IN OPENSEES ##
-'''
-# Define geometric transformation:
-for i in range(0, len(gT)):
-    tag = gT[i][0]
-    vec = gT[i][1]
-    ops.geomTransf('Linear', tag , *vec)
-'''
+
 
 elementProperties = []
 
@@ -139,30 +134,6 @@ for n in range(0, len(openSeesBeam)):
         ops.element( eleType , eleTag , *[indexStart, indexEnd], float(A), matTag ) # TO CONTROL!!!
         
 
-    #elif eleType is 'ElasticTimoshenkoBeam':
-
-        #ops.element( eleType , eleTag , indexStart, indexEnd, E, G, A, Jxx, Iy, Iz, Avy, Avz, geomTag , '-mass', massDens,'-lMass')
-'''
-for item in openSeesShell:
-
-    eleType = item[0]
-    #print('eleType = ' + str(eleType))
-    eleTag = item[1] + 1
-    #print('eleTag = ' + str(eleTag))
-    eleNodes = item[2]
-    #print('eleNodes = ' + str(eleNodes))
-    secTag = item[3]
-    #print('secTag = ' + str(secTag))
-    thick = item[4]
-    #print('thick = ' + str(thick))
-    
-    elementProperties.append([ eleTag, [eleType, thick ] ])
-
-    if (eleType == 'ShellDKGQ') or (eleType == 'ShellDKGT'):
-
-        print('ops.element( {0}, {1}, *{2}, {3})'.format(eleType, eleTag, eleNodes, secTag)     )
-        ops.element( eleType , eleTag, *eleNodes, secTag)
-'''
 brickTag = []
 tetraTag = []
 for item in openSeesSolid:
@@ -201,7 +172,7 @@ for i in range(0, len(oSupport)):
     ops.fix( indexSupport, oSupport[i][1], oSupport[i][2], oSupport[i][3] )
 
 ## LOAD ##
-#plot_model()
+
 # create TimeSeries
 ops.timeSeries('Constant', 1)
 
@@ -230,23 +201,22 @@ for item in openSeesBeamLoad:
     elementLoad.append([ eleTags, Wy, Wz, Wx, loadType] )
 
 
-#TensionFilePath = r'C:\GitHub\Alpaca4d\PythonScript\Analyses\openSees_StaticSolver_3ndf\tension.out' 
-# ho problemi con shellTag
 
-TensionFilePath = os.path.join(workingDirectory, 'tensionBrick.out' )
-ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*brickTag,'stresses')
+"""
+if brickTag:
+    TensionFilePath = os.path.join(workingDirectory, 'tensionBrick.out' )
+    ops.recorder('Element','-file', TensionFilePath ,'-ele',*brickTag,'stresses')
 
-TensionFilePath = os.path.join(workingDirectory, 'tensionTetra.out' )
-ops.recorder('Element','-file', TensionFilePath ,'-closeOnWrite','-ele',*tetraTag,'stresses')
+if tetraTag:
+    TensionFilePath = os.path.join(workingDirectory, 'tensionTetra.out' )
+    ops.recorder('Element','-file', TensionFilePath ,'-ele',*tetraTag,'stresses')
+"""
 
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
 
-# create SOE
-# create constraint handler
-#ops.constraints("Plain")
-#ops.constraints("Transformation") # to allow Diaphgram constrain
+
 
 ops.system("BandSPD")
 
@@ -268,9 +238,10 @@ print("starting Analysis")
 # perform the analysi
 ops.analyze(1)
 ## OUTPUT FILE ##
-
+print("finished")
 ## DISPLACEMENT
 nodeDisplacementWrapper = []
+
 
 for i in range(1,len(ops.getNodeTags())+1):
     nodeTag = i
@@ -279,6 +250,7 @@ for i in range(1,len(ops.getNodeTags())+1):
     nodeDisplacementWrapper.append([oNode, oNodeDisp])
     
 #print( ops.getNodeTags() )
+#print(nodeDisplacementWrapper)
 #-----------------------------------------------------
 
 reactionWrapper = []
@@ -311,9 +283,8 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         elementOutputWrapper,
                         elementLoad])
 
-length = len(filename)-len(inputName)
-filefolder = filename[0:length]
-outputFileName = filefolder + 'openSeesOutputWrapper.txt'
+
+outputFileName = os.path.join(workingDirectory, 'openSeesOutputWrapper.txt' )
 #outputFileName = r'C:\GitHub\Alpaca4d\Grasshopper\assembleData\openSeesOutputWrapper.txt'
 
 
@@ -323,4 +294,4 @@ with open(outputFileName, 'w') as f:
         
 print("analyses Finished")
 
-
+ops.wipe()
