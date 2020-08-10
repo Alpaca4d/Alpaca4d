@@ -966,7 +966,9 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
     else  :
         ModelDisp = ExtrudedView
         ModelCurve = None
-        #max_min = None
+        ModelShell = None
+        ModelSolid = None
+
 
     return ModelDisp, ModelCurve, ModelShell, ModelSolid
 

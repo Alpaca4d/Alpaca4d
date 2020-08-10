@@ -941,5 +941,8 @@ if modelExstrud == False or modelExstrud == None :
     
 else:
     ModelDisp = ExtrudedView
+    ModelCurve = None
+    ModelShell = None
+    ModelSolid = None
 
 ########################################################################
