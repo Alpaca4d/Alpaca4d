@@ -67,7 +67,8 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
 
 
     userObjectFolder = gh.Folders.DefaultUserObjectFolder
-    pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
+    pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\python-3.7.7.amd64\python.exe')
+    #pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')
 
 
@@ -77,10 +78,10 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     
     p = System.Diagnostics.Process()
     p.StartInfo.RedirectStandardOutput = False
-    p.StartInfo.RedirectStandardError = True
+    p.StartInfo.RedirectStandardError = False
 
-    p.StartInfo.UseShellExecute = False
-    p.StartInfo.CreateNoWindow = False
+    p.StartInfo.UseShellExecute = True
+    p.StartInfo.CreateNoWindow = True
     
     p.StartInfo.FileName = pythonInterpreter
     p.StartInfo.Arguments = fileName + " " + wrapperFile + " " + earthQuakeSettingsFile
@@ -88,8 +89,8 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     p.WaitForExit()
     
     
-    msg = p.StandardError.ReadToEnd()
-    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
+    #msg = p.StandardError.ReadToEnd()
+    #ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
 
 
 
@@ -107,7 +108,7 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
 
     with open(outputFile, 'r') as f:
         lines = f.readlines()
-        nodeDispFilePath = lines[0]
+        nodeDispFilePath = lines[0].strip()
         elementModalWrapper = eval( lines[1].strip() )
         nodeWrapper = eval( lines[2].strip() )
         maxDisplacement = lines[3]
