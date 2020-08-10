@@ -202,11 +202,12 @@ for item in openSeesBeamLoad:
 
 
 
-"""
+
 if brickTag:
     TensionFilePath = os.path.join(workingDirectory, 'tensionBrick.out' )
     ops.recorder('Element','-file', TensionFilePath ,'-ele',*brickTag,'stresses')
-
+    
+"""
 if tetraTag:
     TensionFilePath = os.path.join(workingDirectory, 'tensionTetra.out' )
     ops.recorder('Element','-file', TensionFilePath ,'-ele',*tetraTag,'stresses')
