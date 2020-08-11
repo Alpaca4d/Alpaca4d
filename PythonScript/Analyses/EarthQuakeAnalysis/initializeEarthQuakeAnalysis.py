@@ -7,9 +7,9 @@
         GroundMotionTimeStep: time step for each acceleration value
         GroundMotionFactor: Multiplier of the GroundMotionValues
         TimeStepIncrement: integration step size. Recomended value is 0.1 times the time step
-        Damping: Damping value
-        NewmarkGamma: Gamma value to implement the Newmark integrator.
-        NewmarkBeta: Beta value to implement the Newmark integrator.
+        Damping: Damping value. Default is 0.02
+        NewmarkGamma: Gamma value to implement the Newmark integrator. Default is 0.5
+        NewmarkBeta: Beta value to implement the Newmark integrator. Default is 0.25
     Output:
        AlpacaGroundMotionOutput: Analysed Alpaca model.
        maxDisplacement: Maximum displacement of structure [mm].
@@ -39,9 +39,12 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     ghFolderPath = os.path.dirname(ghFilePath)
     outputFolder = os.path.join(ghFolderPath,'assembleData')
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
-
-
-
+    
+    GroundMotionFactor = 1 if GroundMotionFactor is None else GroundMotionFactor
+    Damping = 0.02 if Damping is None else Damping
+    NewmarkGamma = 0.5 if NewmarkGamma is None else NewmarkGamma
+    NewmarkBeta = 0.25 if NewmarkBeta is None else NewmarkBeta
+    
     earthQuakeSettings = []
 
     for item in GroundMotionValues:
@@ -91,12 +94,6 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
     
     #msg = p.StandardError.ReadToEnd()
     #ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
-
-
-
-
-
-
 
     print("I have finished")
 
