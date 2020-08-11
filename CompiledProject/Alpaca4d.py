@@ -2931,9 +2931,12 @@ class ModalAnalyses(component):
 class GroundMotionAnalyses(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Ground Motion Analysis", "Ground Motion Analysis", """Calculate the time history Response of the structure""", "Alpaca", "5|Analyses")
+            "Ground Motion Analysis (Alpaca4d)", "Ground Motion Analysis", """Calculate the time history Response of the structure""", "Alpaca", "5|Analyses")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.tertiary
+
     def get_ComponentGuid(self):
         return System.Guid("2654e443-0744-4de6-98e8-85a751a0cf8f")
     
@@ -4360,7 +4363,6 @@ class ShellDisplacement(component):
         if checkData != False:
             tagElement, Trans, Rot = shellDisp( AlpacaStaticOutput )
             return (tagElement, Trans, Rot)
-
 
 
 # Brick
