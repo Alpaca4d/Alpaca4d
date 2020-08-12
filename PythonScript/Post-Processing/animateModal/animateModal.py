@@ -14,6 +14,14 @@
         ModelSolid:
        """
 
+import Rhino.Geometry as rg
+import math as mt
+import ghpythonlib.treehelpers as th
+import Grasshopper as gh
+import sys
+import rhinoscriptsyntax as rs
+import Rhino.Display as rd
+from scriptcontext import doc
 
 def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel ):
 
@@ -23,6 +31,7 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
     Animate = False if Animate is None else Animate
     numberMode = 1 if numberMode is None else numberMode
     Reset = True if Reset is None else Reset
+    speed = 1 if speed is None else speed
     
     ExtrudedModel = True if ExtrudedModel is None else ExtrudedModel
     

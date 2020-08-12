@@ -272,9 +272,7 @@ openSeesModalOutputWrapper = ([nodeModalDispWrapper,
 
 
 
-length = len(filename)-len(inputName)
-filefolder = filename[0:length]
-outputFileName = filefolder+'openSeesModalOutputWrapper.txt'
+outputFileName = os.path.join(workingDirectory,'openSeesModalOutputWrapper.txt')
 
 with open(outputFileName, 'w') as f:
     for item in openSeesModalOutputWrapper:

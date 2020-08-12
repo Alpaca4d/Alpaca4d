@@ -19,8 +19,8 @@ if remainingDate < 0:
 filename = sys.argv[1]
 earthQuakeSettingsFile = sys.argv[2]
 
-#filename = r'C:\Users\FORMAT\Desktop\GroundMotionTest\assembleData\openSeesModel.txt'
-#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\GroundMotionTest\assembleData\earthQuakeSettingsFile.txt'
+#filename = r'C:\Users\FORMAT\Desktop\New folder\assembleData\openSeesModel.txt'
+#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\New folder\assembleData\earthQuakeSettingsFile.txt'
 
 
 workingDirectory = os.path.split(filename)[0]
@@ -446,9 +446,8 @@ openSeesModalOutputWrapper = ([nodeDispFilePath,
                                minDisplacement])
 
 
-length = len(filename)-len(inputName)
-filefolder = filename[0:length]
-outputFileName = filefolder + 'openSeesEarthQuakeAnalysisOutputWrapper.txt'
+outputFileName = os.path.join(workingDirectory, 'openSeesEarthQuakeAnalysisOutputWrapper.txt')
+
 
 print(outputFileName)
 with open(outputFileName, 'w') as f:

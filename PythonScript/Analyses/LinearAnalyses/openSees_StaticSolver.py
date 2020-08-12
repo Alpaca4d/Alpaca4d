@@ -317,9 +317,8 @@ openSeesOutputWrapper = ([nodeDisplacementWrapper,
                         eleForceOutputWrapper])
 
 
-length = len(filename)-len(inputName)
-filefolder = filename[0:length]
-outputFileName = filefolder+'openSeesOutputWrapper.txt'
+
+outputFileName = os.path.join(workingDirectory,'openSeesOutputWrapper.txt')
 
 with open(outputFileName, 'w') as f:
     for item in openSeesOutputWrapper:

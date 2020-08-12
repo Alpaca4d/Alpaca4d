@@ -5638,7 +5638,7 @@ class StaticModelView(component):
             ####
         
             ## FOR scala automatica ##
-            ## nodeValue è la lista delle cordinate
+
             rowX = [row[0] for row in nodeValue ]
             rowY = [row[1] for row in nodeValue ]
             rowZ = [row[2] for row in nodeValue ]
@@ -5647,7 +5647,6 @@ class StaticModelView(component):
             scaleMin = min( min(rowX), min(rowY), min(rowZ) )
             coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
         
-            ## displacementValue è la lista degli spostamenti
         
             rowDefX = [row[0] for row in displacementValue ]
             rowDefY = [row[1] for row in displacementValue ]
@@ -5787,7 +5786,7 @@ class ModalModelView(component):
         return Grasshopper.Kernel.GH_Exposure.primary
 
     def get_ComponentGuid(self):
-        return System.Guid("475dc6d7-0cac-42d7-b3de-7b7b71174b08")
+        return System.Guid("9b607f72-8829-4429-99fd-be2b0f3ebe56")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -5797,7 +5796,7 @@ class ModalModelView(component):
     
     def RegisterInputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "openSeesOutputWrapper", "AlpacaModalOutput", "")
+        self.SetUpParam(p, "AlpacaModalOutput", "AlpacaModalOutput", "")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
         
@@ -5806,7 +5805,7 @@ class ModalModelView(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_Number()
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
         self.SetUpParam(p, "speed", "speed", "")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
@@ -5883,20 +5882,33 @@ class ModalModelView(component):
         import rhinoscriptsyntax as rs
         import Rhino.Display as rd
         from scriptcontext import doc
-        
-        
-        #---------------------------------------------------------------------------------------#
-        ## -------------FUNZIONI DI FORMA PER TRAVE DI TYMOSHENKO------------------ ##
-        
-        
+
+
         def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel ):
-        
+            
+            def updateComponent(interval):
+                
+                ## Updates this component, similar to using a grasshopper timer 
+                
+                # Define callback action
+                def callBack(e):
+                    self.ExpireSolution(False)
+                    
+                # Get grasshopper document
+                ghDoc = self.OnPingDocument()
+                
+                # Schedule this component to expire
+                ghDoc.ScheduleSolution(interval,Grasshopper.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
+
+
+
             global myCounter
             
             
             Animate = False if Animate is None else Animate
             numberMode = 1 if numberMode is None else numberMode
-            Reset = True if Reset is None else Reset
+            Reset = False if Reset is None else Reset
+            speed = 1 if speed is None else speed
             
             ExtrudedModel = True if ExtrudedModel is None else ExtrudedModel
             
@@ -6526,23 +6538,6 @@ class ModalModelView(component):
                 
                 return meshElement
         
-            def updateComponent(interval):
-                
-                ## Updates this component, similar to using a grasshopper timer 
-                
-                # Define callback action
-                def callBack(e):
-                    self.ExpireSolution(False)
-                    
-                # Get grasshopper document
-                ghDoc = self.OnPingDocument()
-                
-                # Schedule this component to expire
-                ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
-        
-        
-        
-        
             diplacementWrapper = AlpacaModalOutput[0][numberMode-1] # number of mode will start from 1. First, Second, Third ect ect
             EleOut = AlpacaModalOutput[1]
             Period = AlpacaModalOutput[3]
@@ -6554,7 +6549,7 @@ class ModalModelView(component):
         
             # Update the variable and component
             if Animate and not Reset:
-                myCounter += 1/ ( (speed) * 10 )
+                myCounter += 1.0/ ( (speed) * 10.0 )
                 updateComponent(1)
         
             # Output counter
@@ -6587,7 +6582,7 @@ class ModalModelView(component):
             ####
         
             ## FOR scala automatica ##
-            ## nodeValue è la lista delle cordinate
+            ## nodeValue e' la lista delle cordinate
             rowX = [row[0] for row in nodeValue ]
             rowY = [row[1] for row in nodeValue ]
             rowZ = [row[2] for row in nodeValue ]
@@ -6596,7 +6591,7 @@ class ModalModelView(component):
             scaleMin = min( min(rowX), min(rowY), min(rowZ) )
             coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
         
-            ## displacementValue è la lista degli spostamenti
+            ## displacementValue e' la lista degli spostamenti
         
             rowDefX = [row[0] for row in displacementValue ]
             rowDefY = [row[1] for row in displacementValue ]
@@ -6720,6 +6715,7 @@ class ModalModelView(component):
         if checkData != False:
             ModelDisp, ModelCurve, ModelShell, ModelSolid = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel )
             return (ModelDisp, ModelCurve, ModelShell, ModelSolid)
+
 
 
 
