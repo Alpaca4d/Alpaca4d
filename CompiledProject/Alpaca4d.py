@@ -4365,6 +4365,188 @@ class ShellDisplacement(component):
             return (tagElement, Trans, Rot)
 
 
+class ShellForces(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Shell Force (Alpaca4d)", "Shell Force (Alpaca4d)", """Compute the internal force of a Shell element""", "Alpaca", "6|Numerical Output")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("d57dc582-7599-405d-9cf3-4b082c281d2e")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "tagElement", "tagElement", "number of the tag of Beam or Truss element .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Fx", "Fx", "Forces in direction X  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Fy", "Fy", "Forces in direction Y of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Fz", "Fz", "Forces in direction Z  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Mx", "Mx", "Moments in direction X  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "My", "My", "Moments in direction Y  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Mz", "Mz", "Moments in direction Z  of the Shell nodes .")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+                self.marshal.SetOutput(result[3], DA, 3, True)
+                self.marshal.SetOutput(result[4], DA, 4, True)
+                self.marshal.SetOutput(result[5], DA, 5, True)
+                self.marshal.SetOutput(result[6], DA, 6, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAALqSURBVEhLtVVNaNRAFI4/KKKgSLU2mTRtMtlts5tuu0st/aGtRcT+qa2ybS+iiCDYYxVFe9BjD55UEJEKFaUgiIoevOlJUOhBPFgFRdA1mWwr6M2f8b10tkR3t5sW/OAjb17mzTfvZeZFKoYsqbY9YoyKYVEwYp5yiEHFMDw8hR5kxLgrhkXBCH2cVfRuMQwHLnWszQlwSVot3Hn4SqytIDCdlY002sJdGo5KDU8xnnkyfctI5KRw58FTzEGX6J4n6++YFqkR7uII7oIR/ZInG5/ndH2zcBUELP7UVYwJMZS4Za0T5gKgBKs8zazNEj3uErPdIeYDJkejnyoiZUw19uGcVCpVlkgkqoJEH76DDBsz5fp2tKFUzR6h42gvYm5HleYRfcaV6SuX0A/AnzDpzZBlnUnaNkc27mzhTa1dfxF9uffAI7C58xD7C2IdWO8b8DuUsEnILAAzYYpxMVNetxGD2geO8pHJ10ty1/CoL/CRkA34vZhKrzvbrE15pfoXyxUQYRJuTphLA4MwuNCiQeImUvH4AREWHmEF2npHeL1t7xZh4RFWoLmrjycsq16EhUdYgdbuNE/FYp0iLDz+yzeYpXS9MKVkPJ7uOHS84KJBLkvAUSNt0H7HUAiD2nqG+ODEI94/PsX7z93kfWdv8J6xqz57T1/zfS17BhYFHNmsZzI94S+WAzS1w9isfCr0JdzG39DkXuyPxfqhTDNIOCUPG2z7HjynG2KxSZ+2fQt9yGRdXRNTzAvQ+H7ATZ6F53MkXNpOvyzYPf0OSugxELwNPUVFcVepNf1dLAFHMRNIpkZl2OBlVzWvYItA4o0W0xYQdMxXRqqhn7gZLVolXHnwGyW2dSDa6HMrayr8l6UA6U1CRhxEpoQrD64W6YZ576FdP4Hf5l7hLg0s25fqeDkKYPrB0xUE/u2gLHeg3sNgrxHu8ECBUimv6J+cA5ymzLymbRHDgoAM7vunZSUIkzZuIPeB8yFJfwANJ+00XtlwtwAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaStaticOutput):
+        
+        import Rhino.Geometry as rg
+        import math as mt
+        import ghpythonlib.treehelpers as th # per data tree
+        import Grasshopper as gh
+        import sys
+        import rhinoscriptsyntax as rs
+        from scriptcontext import doc
+        
+        #---------------------------------------------------------------------------------------#
+        def shellForces( AlpacaStaticOutput ):
+        
+        
+            diplacementWrapper = AlpacaStaticOutput[0]
+            EleOut = AlpacaStaticOutput[2]
+            ForceOut = AlpacaStaticOutput[4]
+        
+            pointWrapper = []
+            for index,item in enumerate(diplacementWrapper):
+                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+        
+            forceWrapper = []
+            for item in ForceOut:
+                index = item[0]
+                if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
+                    Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+                    Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
+                    Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+                    Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
+                    Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
+                    Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
+                    Fw = rg.Vector3d( item[1][18], item[1][19], item[1][20] ) # risultante nodo w
+                    Mw = rg.Vector3d( item[1][21], item[1][22], item[1][23] )
+                    forceOut = [[ Fi.X, Fj.X, Fk.X, Fw.X ],
+                                [ Fi.Y, Fj.Y, Fk.Y, Fw.Y ],
+                                [ Fi.Z, Fj.Z, Fk.Z, Fw.Z ],
+                                [ Mi.X, Mj.X,  Mk.X, Mw.X ],
+                                [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
+                                [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
+                    forceWrapper .append( [index, forceOut ])
+        
+                if len(item[1]) == 18: #6* numo nodi = 18 elementi triangolari
+                    Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
+                    Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
+                    Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
+                    Mj = rg.Vector3d( item[1][9], item[1][10], item[1][11] )
+                    Fk = rg.Vector3d( item[1][12], item[1][13], item[1][14] ) # risultante nodo k
+                    Mk = rg.Vector3d( item[1][15], item[1][16], item[1][17] )
+                    forceOut = [[ Fi.X, Fj.X, Fk.X ],
+                                [ Fi.Y, Fj.Y, Fk.Y ],
+                                [ Fi.Z, Fj.Z, Fk.Z ],
+                                [ Mi.X, Mj.X,  Mk.X ],
+                                [ Mi.Y, Mj.Y, Mk.Y ],
+                                [ Mi.Z, Mj.Z, Mk.Z ]]
+                    forceWrapper .append( [index, forceOut ])
+        
+            ## Dict. for force ##
+            forceWrapperDict = dict( forceWrapper )
+            ####
+            Fx, Fy, Fz, Mx, My, Mz = [],[],[],[],[],[]
+            tag = []
+        
+            for ele in EleOut :
+                eleTag = ele[0]
+                eleType = ele[2][0]
+                if eleType == "ShellMITC4" :
+                    tag.append( eleTag )
+                    outputForce = forceWrapperDict.get( eleTag )
+                    Fx.append( outputForce[0] )
+                    Fy.append( outputForce[1] )
+                    Fz.append( outputForce[2] )
+                    Mx.append( outputForce[3] )
+                    My.append( outputForce[4] )
+                    Mz.append( outputForce[5] )
+                elif eleType == "shellDKGT" :
+                    tag.append( eleTag )
+                    outputForce = forceWrapperDict.get( eleTag )
+                    Fx.append( outputForce[0] )
+                    Fy.append( outputForce[1] )
+                    Fz.append( outputForce[2] )
+                    Mx.append( outputForce[3] )
+                    My.append( outputForce[4] )
+                    Mz.append( outputForce[5] )
+                    
+            tagElement = th.list_to_tree( tag )
+            Fx = th.list_to_tree( Fx )
+            Fy = th.list_to_tree( Fy )
+            Fz = th.list_to_tree( Fz )
+            Mx = th.list_to_tree( Mx )
+            My = th.list_to_tree( My )
+            Mz = th.list_to_tree( Mz )
+        
+            return tagElement, Fx, Fy, Fz, Mx, My, Mz
+        
+        checkData = True
+        
+        if not AlpacaStaticOutput:
+            checkData = False
+            msg = "input 'AlpacaStaticOutput' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            tagElement, Fx, Fy, Fz, Mx, My, Mz = shellForces( AlpacaStaticOutput )
+            return (tagElement, Fx, Fy, Fz, Mx, My, Mz)
+
+
 # Brick
 class BrickStress(component):
     def __new__(cls):
