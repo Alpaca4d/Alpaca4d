@@ -1,4 +1,4 @@
-"""Generate a circular cross section
+"""Calculate the Natural Vibration of the structure
     Inputs:
         AlpacaModel: Assemble model to perform Modal Analyses.
         numEigenvalues: Number of modes to be calculated.

@@ -3,6 +3,7 @@ from datetime import date
 import openseespy.opensees as ops
 import math
 import time
+import os
 
 
 ExpireDate = date(2020, 10, 1)
@@ -17,10 +18,10 @@ if remainingDate < 0:
 
 filename = sys.argv[1]
 numEigenvalues = int(sys.argv[2])
-inputName = filename.split("\\")[-1]
 
 
-
+workingDirectory = os.path.split(filename)[0]
+inputName = os.path.split(filename)[1]
 
 with open(filename, 'r') as f:
     lines = f.readlines()

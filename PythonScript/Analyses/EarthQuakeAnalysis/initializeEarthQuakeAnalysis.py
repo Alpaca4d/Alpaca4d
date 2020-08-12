@@ -1,4 +1,4 @@
-"""Calculate the Static Response of the structure
+"""Calculate the Ground Motion Response of the structure
     Inputs:
         AlpacaModel: Assembled model to perform Static Analyses.
         TmaxAnalyses: Time Frame where the structure will be analyse
