@@ -1,24 +1,22 @@
-﻿"""Generate Model view 
+﻿"""Visualize Section Forces 
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
-        Cds : Cds =  caratteristiche delle sollecitazioni ( Italian Name) - Is Stress characteristics .
-        '0' view N (forces in direction 3)
-        '1' view V1 (forces in direction 1)
-        '2' view V2 (forces in direction 2)
-        '3' view M2 (Moments in direction 2)
-        '4' view M1 (Moments in direction 1)
-        '5' view Mt (Moments in direction 3)
-        scale: Diagram multiplier. Default is AutoScale 
+        SectionForces: Cross section forces.
+        N (forces in direction 3).
+        V1 (forces in direction 1).
+        V2 (forces in direction 2).
+        M2 (Moments around axis 2).
+        M1 (Moments around axis 1).
+        Mt (Moments around axis 3).
+        scale: Diagram multiplier. Default is AutoScale.
     Output:
        diagram : Mesh outputs which represents the trend of the chosen stress.
        """
 
 import Rhino.Geometry as rg
 import math as mt
-import ghpythonlib.treehelpers as th # per data tree
-#import ghpythonlib.components as ghcomp
+import ghpythonlib.treehelpers as th
 import Grasshopper as gh
-#import System as sy #DV
 import sys
 import rhinoscriptsyntax as rs
 from scriptcontext import doc
@@ -418,17 +416,17 @@ def cdsView( AlpacaStaticOutput, Cds, scale ):
     ## PLOT Mt ##
         Mtsurf.append( Mtmesh )
         
-    if Cds == 0:
+    if SectionForces == 'N':
         diagram = th.list_to_tree( Nsurf )
-    elif Cds == 1:
+    elif SectionForces == 'V1':
         diagram = th.list_to_tree( V1surf )
-    elif Cds == 2:
+    elif SectionForces == 'V2':
         diagram = th.list_to_tree( V2surf )
-    elif Cds == 3:
+    elif SectionForces == 'M2':
         diagram = th.list_to_tree( M2surf )
-    elif Cds == 4:
+    elif SectionForces == 'M1':
         diagram = th.list_to_tree( M1surf )
-    elif Cds == 5:
+    elif SectionForces == 'Mt':
         diagram = th.list_to_tree( Mtsurf )
 
     return diagram
@@ -440,11 +438,11 @@ if not AlpacaStaticOutput:
     msg = "input 'AlpacaStaticOutput' failed to collect data"  
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
-if Cds is None:
+if SectionForces is None:
     checkData = False
-    msg = " input 'Cds' failed to collect data"  
+    msg = " input 'SectionForces' failed to collect data"  
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 
 if checkData != False:
-    diagram = cdsView( AlpacaStaticOutput, Cds, scale  )
+    diagram = cdsView( AlpacaStaticOutput, SectionForces, scale  )

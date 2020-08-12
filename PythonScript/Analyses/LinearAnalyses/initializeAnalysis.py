@@ -87,4 +87,3 @@ if not AlpacaModel:
 
 if checkData != False:
     AlpacaStaticOutput = InitializeStaticAnalysis(AlpacaModel)
-    #maxDisplacement = None
