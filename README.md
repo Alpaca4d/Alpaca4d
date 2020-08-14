@@ -4,15 +4,15 @@
 
 ### Next Step
 
-* [] Create Static Model with Color
-* [] Create Modal Model with Color
-* [] Create GroundMotion Model with Color
+* [ ] Create Static Model with Color
+* [ ] Create Modal Model with Color
+* [ ] Create GroundMotion Model with Color
 
-* [] Create Beam Displacement Visualisation
-* [] Create Shell Displacement/Stress Visualisation
-* [] Create Brick Displacement/Stress Visualisation
+* [ ] Create Beam Displacement Visualisation
+* [ ] Create Shell Displacement/Stress Visualisation
+* [ ] Create Brick Displacement/Stress Visualisation
 
-* [ ] Documentation - example
+* [ ] Documentation - example (pdf)
 
 
 
