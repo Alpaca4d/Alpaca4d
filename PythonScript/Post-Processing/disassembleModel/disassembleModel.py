@@ -522,4 +522,4 @@ if not AlpacaModel:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    ModelView, ModelViewExtruded, Points, Support, Load, Material, Section = diassembleModel( AlpacaModel )
+    Element, ExtrudedElement, Points, Support, Load, Material, Section = diassembleModel( AlpacaModel )

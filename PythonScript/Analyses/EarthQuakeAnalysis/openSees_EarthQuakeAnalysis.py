@@ -19,8 +19,8 @@ if remainingDate < 0:
 filename = sys.argv[1]
 earthQuakeSettingsFile = sys.argv[2]
 
-#filename = r'C:\Users\FORMAT\Desktop\New folder\assembleData\openSeesModel.txt'
-#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\New folder\assembleData\earthQuakeSettingsFile.txt'
+#filename = r'C:\Users\FORMAT\Desktop\groundMotion Test\assembleData\openSeesModel.txt'
+#earthQuakeSettingsFile = r'C:\Users\FORMAT\Desktop\groundMotion Test\assembleData\earthQuakeSettingsFile.txt'
 
 
 workingDirectory = os.path.split(filename)[0]
@@ -329,6 +329,7 @@ ops.rayleigh(alphaM,betaKcurr, betaKinit, betaKcomm) # RAYLEIGH damping
 
 
 nodeDispFilePath = os.path.join(workingDirectory, "DFree.out")
+
 ops.recorder('Node', '-file', nodeDispFilePath ,'-time', '-node', '-dof', 1, 2, 3, 4, 5, 6, 'disp')
 
 
@@ -384,6 +385,7 @@ while ok == 0 and tCurrent < tAnalyses:
 
 
 print("Ground Motion Analyses Finished")
+
 
 #----------------------------------------------
 # THIS PART HAS TO BE DECIDE WITH DOMENICO
