@@ -2,6 +2,20 @@
 # openSeesGh
 ## To Do List
 
+### Next Step
+
+* [ ] Create Static Model with Color
+* [ ] Create Modal Model with Color
+* [ ] Create GroundMotion Model with Color
+
+* [ ] Create Beam Displacement Visualisation
+* [ ] Create Shell Displacement/Stress Visualisation
+* [ ] Create Brick Displacement/Stress Visualisation
+
+* [ ] Documentation - example (pdf)
+
+
+
 ### Domenico Gaudioso
 
 * [x] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
@@ -22,7 +36,6 @@
 * [x] add view concentrated mass load in model view ( create a sphere in node )
 * [ ] add coding (in panel or path script ) and view post processing. Let's make a new component for import and visualize a text file
 * [ ] modify loft mesh for brick ( problem con tetra )
-* [ ] make it work DomeFunction
 * [x] Add Warning to the components. Ask Marco for some reference script
 * [x] Create Cluster when necessary
 * [ ] password - Salvatore439505Merda506682!
@@ -38,20 +51,15 @@
 * [x] Update Circular Cross-Section for Hollow Cross Section
 * [x] creationFolder name is wrong. 
 * [x] Automatically delete existing Folder to avoid to read previous file when the analyses fail
-
 * [x] EarthQuake Analyses - update for different way to make analyses
 * [x] update "ShellMITC" element type instead of "ShellNTGQ"
 * [x] Add Warning to the components
-
 * [x] Color Palette for components
-* [ ] Documentation - example
-* [ ] Big Alpaca with colorful rectangle in the background
+* [x] Big Alpaca with colorful rectangle in the background
 * [x] Icons
 * [ ] problem whit trasformation global force in eleLoad
-
-
-* [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
-* [ ] Compile and Test
+* [x] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
+* [x] Compile and Test
 
 * [ ] social network pages - Facebook/Instagram
 * [ ] mail
