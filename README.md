@@ -13,6 +13,9 @@
 * [ ] Create Brick Displacement/Stress Visualisation
 
 * [ ] Documentation - example (pdf)
+* [ ] Create SocialMedia _ Facebook-Instagram
+* [ ] Mail
+
 
 
 
@@ -60,6 +63,6 @@
 * [ ] problem whit trasformation global force in eleLoad
 * [x] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
 * [x] Compile and Test
+* [ ] Ask about tetraRecorder
 
-* [ ] social network pages - Facebook/Instagram
-* [ ] mail
+
