@@ -19,7 +19,7 @@
        ModelCurve : analitic line ( polyline) of the beam or truss Element .
        max_min : max end min of displacement of the structure .
        """
-
+import Rhino as rc
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th # per data tree
@@ -29,6 +29,8 @@ import Grasshopper as gh
 import sys
 import rhinoscriptsyntax as rs
 import Rhino.Display as rd
+from scriptcontext import sticky as st
+import System.Drawing.Color
 from scriptcontext import doc
 
 
@@ -701,41 +703,45 @@ def meshLoft3( point, color ):
     
     return meshElement
 
-def gradientJet(value, valueMax, valueMin):
+def gradientJet(value, valueMin, valueMax, colorList ):
 
-    listcolo = [[0, 0, 102 ],
-                [0, 0, 255],
-                [0, 64, 255],
-                [0, 128, 255],
-                [0, 191, 255],
-                [0, 255, 255],
-                [0, 255, 191],
-                [0, 255, 128],
-                [0, 255, 64],
-                [0, 255, 0],
-                [64, 255, 0],
-                [128, 255, 0],
-                [191, 255, 0],
-                [255, 255, 0],
-                [255, 191, 0],
-                [255, 128, 0],
-                [255, 64, 0],
-                [255, 0, 0],
-                [230, 0, 0],
-                [204, 0, 0]]
+    if colorList is None :
+        listcolor = [ rs.CreateColor( 0, 0, 102 ),
+                    rs.CreateColor( 0, 0, 255),
+                    rs.CreateColor( 0, 64, 255 ),
+                    rs.CreateColor( 0, 128, 255 ),
+                    rs.CreateColor( 0, 191, 255 ),
+                    rs.CreateColor( 0, 255, 255 ),
+                    rs.CreateColor( 0, 255, 191 ),
+                    rs.CreateColor( 0, 255, 128 ),
+                    rs.CreateColor( 0, 255, 64 ),
+                    rs.CreateColor( 0, 255, 0 ),
+                    rs.CreateColor( 64, 255, 0 ),
+                    rs.CreateColor( 128, 255, 0 ),
+                    rs.CreateColor( 191, 255, 0 ),
+                    rs.CreateColor( 128, 255, 0 ),
+                    rs.CreateColor( 255, 255, 0 ),
+                    rs.CreateColor( 255, 191, 0 ),
+                    rs.CreateColor( 255, 128, 0 ),
+                    rs.CreateColor( 255, 64, 0 ),
+                    rs.CreateColor( 255, 0, 0 ),
+                    rs.CreateColor( 230, 0, 0 ),
+                    rs.CreateColor( 204, 0, 0 )]
+    else :
+        listcolor = colorList
 
     #domain = linspace( valueMin,  valueMax, len( listcolo ) )
-    n = len( listcolo )
+    n = len( listcolor )
     domain = linspace( valueMin, valueMax, n)
     
     for i in range(1,n):
         if  domain[i-1] <= value <= domain[i]:
-            return listcolo[ i-1 ]
+            return listcolor[ i-1 ]
         elif  valueMax <= value <= valueMax + 0.00001 :
-            return listcolo[ -1 ]
-        elif  valueMin - 0.00000000001 <= value <= valueMin  :
+            return listcolor[ -1 ]
+        elif  valueMin - 0.000001 <= value <= valueMin  :
             #print( value, valueMin)
-            return listcolo[ 0 ]
+            return listcolor[ 0 ]
 
 ## Mesh from close section eith gradient color ##
 def meshLoft4( point, value, valueMax, valueMin ):
@@ -764,6 +770,40 @@ def meshLoft4( point, value, valueMax, valueMin ):
 
 #----------------------------------------------------------------------#
 def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
+
+    if True:
+        for k,v in st.items():
+            if type(v) is rc.Display.CustomDisplay:
+                v.Dispose()
+                del st[k]
+    
+    
+    
+    
+    
+    
+    def customDisplay(Toggle,component):
+        
+        """ Make a custom display that is unique to the component and lives in sticky """
+        
+        # Make unique name and custom display
+        displayGuid = "customDisplay_" + str(component.InstanceGuid)
+        if displayGuid not in st:
+            st[displayGuid] = rc.Display.CustomDisplay(True)
+            
+        # Clear display each time component runs
+        st[displayGuid].Clear()
+        
+        # Return the display or get rid of it
+        if Toggle:
+            return st[displayGuid]
+        else:
+            st[displayGuid].Dispose()
+            del st[displayGuid]
+            return None
+    
+    cd = customDisplay(True ,ghenv.Component)
+    out = []
 
     global ModelDisp
     global ModelCurve
@@ -903,39 +943,72 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             SolidDefModel.append( solidDefModel[0] )
             traslSolidValue.append( solidDefModel[1] )
             ExtrudedView.append( solidDefModel[0] )
-    '''
-    # Max Beam #
-    flattenTrasl = []
+########################################################################################################################
+    # MAX an MIN VALOR
+    valorVector = []
+    # beam valor #
     for valuetrasl in traslBeamValue:
-        for value in valuetrasl:
-            flattenTrasl.append( value )
-
-    TraslX = [row[0] for row in flattenTrasl ]
-    TraslY = [row[1] for row in flattenTrasl ]
-    TraslZ = [row[2] for row in flattenTrasl ]
-
-    if len(TraslX) > 0:
-        #              txMax          tyMax         tzMax
-        tMax = [ max( max(rowDefX),max(TraslX)  ), max( max(rowDefY), max(TraslY) ), max( max(rowDefZ), max(TraslZ) ) ]
-        #              txMin          tyMin         tzMin
-        tMin = [ min( min(rowDefX), min(TraslX) ), min( min(rowDefY), min(TraslY) ), min( min(rowDefZ), min(TraslZ) ) ]
-    else:
-        #              txMax          tyMax         tzMax
-        tMax = [  max(rowDefX)  , max(rowDefY), max(rowDefZ) ]
-        #              txMin          tyMin         tzMin
-        tMin = [  min(rowDefX), min(rowDefY),  min(rowDefZ)  ]
-
-    i = direction 
-
-    colorValor = []
+        for valor in valuetrasl:
+            vectorTrasl = rg.Vector3d( valor )
+            if direction == 0:
+                valorVector.append( vectorTrasl.X ) 
+            elif direction == 1:
+                valorVector.append( vectorTrasl.Y )
+            elif direction == 2:
+                valorVector.append( vectorTrasl.Z ) 
+            elif direction == 3:
+                valorVector.append( vectorTrasl.Length )     
+    # POINT #
+    PointDisp = [row[1][0] for row in dispWrapper ] 
+    for nodeDisp in PointDisp :
+        vectorNodeDisp = rg.Vector3d( nodeDisp )
+        if direction == 0:
+            valorVector.append( vectorNodeDisp.X ) 
+        elif direction == 1:
+            valorVector.append( vectorNodeDisp.Y )
+        elif direction == 2:
+            valorVector.append( vectorNodeDisp.Z ) 
+        elif direction == 3:
+            valorVector.append( vectorNodeDisp.Length )
+    # MAX end MIN on structures point #
+    lowerLimit = min( valorVector )
+    upperLimit = max( valorVector )
+    print( lowerLimit, upperLimit )
+#####################################################################################
+    colorBeam = []
     numberDivide = []
     for value in traslBeamValue :
-        row = [row[i] for row in value ]
-        numberDivide.append( len(row)  )
-        for valor in row:
-            color = gradientJet( valor, tMax[i], tMin[i] )
-            colour = rs.CreateColor( color[0], color[1], color[2] )
-            colorValor.append( colour )
+        colorValor = []
+        for valor in valuetrasl:
+            vectorTrasl = rg.Vector3d( valor )
+
+            if direction == 0:
+                valorVector = vectorTrasl.X  
+            elif direction == 1:
+                valorVector = vectorTrasl.Y 
+            elif direction == 2:
+                valorVector = vectorTrasl.Z  
+            elif direction == 3:
+                valorVector = vectorTrasl.Length
+
+            color = gradientJet( valorVector, lowerLimit, upperLimit, colorList )
+            colorValor.append( color )
+        colorBeam.append( colorValor )
+        numberDivide.append( len(colorValor) )
+    #print( modelCurve[0])
+    segment = []
+    for curve, segmentCount in zip( modelCurve, numberDivide ):
+        print(segmentCount)
+        A = curve.DivideByCount( segmentCount - 1, True )
+        print( segmentCount )
+        segmentCurve = []
+        for i, t in enumerate( A ) :
+            if i == 0:
+                segmentCurve.append( rg.Curve.Trim( curve, A[i], A[i+1] ) )
+            else:
+                segmentCurve.append( rg.Curve.Trim( curve, A[i-1], A[i] ) )
+        segment.append( segmentCurve )
+
     
     for shellEle, value in zip(ShellDefModel,traslShellValue) :
         shellColor = shellEle.DuplicateMesh()
@@ -954,7 +1027,6 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
         modelDisp.append( solidColor)
             #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
-    '''
 
     if modelExstrud == False or modelExstrud == None:
         ModelDisp = None
@@ -970,7 +1042,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
         ModelSolid = None
 
 
-    return ModelDisp, ModelCurve, ModelShell, ModelSolid
+    return ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment
 
 checkData = True
 
@@ -984,7 +1056,12 @@ if direction is None:
     msg = "input 'direction' failed to collect data"  
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 '''
+
+if modelExstrud and  ghenv.Component.Hidden:
+    for crv,color in zip(segment,colorBeam):
+        cd.AddCurve(crv,color,3)
+
 if checkData != False:
     #print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
-    ModelDisp, ModelCurve, ModelShell, ModelSolid = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
+    ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
 
