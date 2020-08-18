@@ -707,38 +707,24 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
         
         return meshElement
 
-    def gradientJet(value, valueMin, valueMax, colorList ):
+    def gradient(value, valueMin, valueMax, colorList ):
 
         if colorList == [] :
-            listcolor = [ rs.CreateColor( 0, 0, 102 ),
-                        rs.CreateColor( 0, 0, 255),
-                        rs.CreateColor( 0, 64, 255 ),
-                        rs.CreateColor( 0, 128, 255 ),
-                        rs.CreateColor( 0, 191, 255 ),
-                        rs.CreateColor( 0, 255, 255 ),
-                        rs.CreateColor( 0, 255, 191 ),
-                        rs.CreateColor( 0, 255, 128 ),
-                        rs.CreateColor( 0, 255, 64 ),
-                        rs.CreateColor( 0, 255, 0 ),
-                        rs.CreateColor( 64, 255, 0 ),
-                        rs.CreateColor( 128, 255, 0 ),
-                        rs.CreateColor( 191, 255, 0 ),
-                        rs.CreateColor( 128, 255, 0 ),
-                        rs.CreateColor( 255, 255, 0 ),
-                        rs.CreateColor( 255, 191, 0 ),
-                        rs.CreateColor( 255, 128, 0 ),
-                        rs.CreateColor( 255, 64, 0 ),
-                        rs.CreateColor( 255, 0, 0 ),
-                        rs.CreateColor( 230, 0, 0 ),
-                        rs.CreateColor( 204, 0, 0 )]
+            listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                        rs.CreateColor( 240, 69, 7),
+                        rs.CreateColor( 251, 255, 0 ),
+                        rs.CreateColor( 77, 255, 0 ),
+                        rs.CreateColor( 0, 255, 221 ),
+                        rs.CreateColor( 0, 81, 255 )]
         else :
             listcolor = colorList
 
         n = len( listcolor )
         domain = linspace( valueMin, valueMax, n)
+        #print( domain )
         
         for i in range(1,n+1):
-            if  domain[i-1] <= value <= domain[i]:
+            if  domain[i-1] <= value <= domain[i] :
                 return listcolor[ i-1 ]
             '''
             elif  valueMax <= value <= valueMax + 0.00001 :
@@ -889,6 +875,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             traslBeamValue.append( globalTrans ) 
             rotBeamValue.append( globalRot )
             modelCurve.append( defpolyline )
+            modelDisp.append( defpolyline )
             # estrusione della beam #
             ExtrudedView.append( meshdef )
             #doc.Objects.AddMesh( meshdef )
@@ -903,6 +890,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             traslBeamValue.append( globalTrans ) 
             modelCurve.append( defpolyline )
             ExtrudedView.append( meshdef )
+            modelDisp.append( defpolyline )
             #doc.Objects.AddMesh( meshdef )
 
         elif nNode == 4 and eleType != 'FourNodeTetrahedron':
@@ -937,6 +925,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             SolidDefModel.append( solidDefModel[0] )
             traslSolidValue.append( solidDefModel[1] )
             ExtrudedView.append( solidDefModel[0] )
+
 ########################################################################################################################
     # MAX an MIN VALOR
     valorVector = []
@@ -967,13 +956,14 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
     # MAX end MIN on structures point #
     lowerLimit = min( valorVector )
     upperLimit = max( valorVector )
+    domainValues = [ lowerLimit, upperLimit ]
     #print( lowerLimit, upperLimit )
 #####################################################################################
     colorBeam = []
     numberDivide = []
     for value in traslBeamValue :
         colorValor = []
-        for valor in valuetrasl:
+        for valor in value:
             vectorTrasl = rg.Vector3d( valor )
 
             if direction == 0:
@@ -985,7 +975,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             elif direction == 3:
                 valorVector = vectorTrasl.Length
 
-            color = gradientJet( valorVector, lowerLimit, upperLimit, colorList )
+            color = gradient( valorVector, lowerLimit, upperLimit, colorList )
             colorValor.append( color )
         colorBeam.append( colorValor )
         numberDivide.append( len(colorValor) )
@@ -1007,9 +997,19 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
     for shellEle, value in zip(ShellDefModel,traslShellValue) :
         shellColor = shellEle.DuplicateMesh()
         shellColor.VertexColors.Clear()
-        for j in range(0,shellEle.Vertices.Count):
-            jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
-            shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
+        for j in range( 0,shellEle.Vertices.Count ):
+            vectorTrasl = rg.Vector3d( value[j] )
+            if direction == 0:
+                valorVector = vectorTrasl.X  
+            elif direction == 1:
+                valorVector = vectorTrasl.Y 
+            elif direction == 2:
+                valorVector = vectorTrasl.Z  
+            elif direction == 3:
+                valorVector = vectorTrasl.Length
+
+            color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+            shellColor.VertexColors.Add( color )
         modelDisp.append( shellColor)
     #dup.VertexColors.CreateMonotoneMesh(Color.Red)
     #doc.Objects.AddMesh(dup)
@@ -1017,9 +1017,19 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
         solidColor = solidEle.DuplicateMesh()
         solidColor.VertexColors.Clear()
         for j in range(0,solidEle.Vertices.Count):
-            jetColor = gradientJet(value[j][i], tMax[i], tMin[i])
-            solidColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
-        modelDisp.append( solidColor)
+            vectorTrasl = rg.Vector3d( value[j] )
+            if direction == 0:
+                valorVector = vectorTrasl.X  
+            elif direction == 1:
+                valorVector = vectorTrasl.Y 
+            elif direction == 2:
+                valorVector = vectorTrasl.Z  
+            elif direction == 3:
+                valorVector = vectorTrasl.Length
+
+            color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+            solidColor.VertexColors.Add( color )
+        modelDisp.append( shellColor)
             #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
 
     if Visualise and not ghenv.Component.Hidden:
@@ -1029,7 +1039,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
                 cd.AddLine(crv,color,3)
 
     if modelExstrud == False or modelExstrud == None:
-        ModelDisp = None
+        ModelDisp = modelDisp
         ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
         ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
         ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
@@ -1042,7 +1052,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
         ModelSolid = None
 
 
-    return ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment
+    return ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment, domainValues
 
 checkData = True
 
@@ -1053,6 +1063,6 @@ if not AlpacaStaticOutput:
 
 if checkData != False:
     #print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
-    ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
+    ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment, domainValues = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
 
 
