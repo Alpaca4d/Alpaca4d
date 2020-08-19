@@ -160,7 +160,7 @@ for item in openSeesSolid:
     if eleType ==  'FourNodeTetrahedron':
         tetraTag.append( eleTag )
         #print('ops.element( {0}, {1}, *{2}, {3}, {4})'.format(eleType, eleTag, eleNodes, matTag, force)     )
-        ops.element( eleType , eleTag, *eleNodes, matTag, *force)                          
+        ops.element( eleType , eleTag, *eleNodes, matTag, *force)
 # transform elementproperties to  Dict to call the object by tag
 elementPropertiesDict = dict(elementProperties)
 
