@@ -726,13 +726,10 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
         for i in range(1,n+1):
             if  domain[i-1] <= value <= domain[i] :
                 return listcolor[ i-1 ]
-            '''
-            elif  valueMax <= value <= valueMax + 0.00001 :
+            elif  valueMax <= value <= valueMax + 0.0000000000001 :
                 return listcolor[ -1 ]
-            elif  valueMin - 0.000001 <= value <= valueMin  :
-                #print( value, valueMin)
+            elif  valueMin - 0.0000000000001 <= value <= valueMin  :
                 return listcolor[ 0 ]
-            '''
 
     ## Mesh from close section eith gradient color ##
     def meshLoft4( point, value, valueMax, valueMin ):
@@ -942,7 +939,11 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
             elif direction == 3:
                 valorVector.append( vectorTrasl.Length )     
     # POINT #
-    PointDisp = [row[1][0] for row in dispWrapper ] 
+    if len(dispWrapper[0][1]) == 3 :
+        PointDisp = [row[1] for row in dispWrapper ] 
+    else:
+        PointDisp = [row[1][0] for row in dispWrapper ]
+
     for nodeDisp in PointDisp :
         vectorNodeDisp = rg.Vector3d( nodeDisp )
         if direction == 0:
@@ -957,7 +958,7 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
     lowerLimit = min( valorVector )
     upperLimit = max( valorVector )
     domainValues = [ lowerLimit, upperLimit ]
-    #print( lowerLimit, upperLimit )
+    print( lowerLimit, upperLimit )
 #####################################################################################
     colorBeam = []
     numberDivide = []
@@ -1029,30 +1030,23 @@ def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
 
             color = gradient( valorVector, lowerLimit, upperLimit, colorList )
             solidColor.VertexColors.Add( color )
-        modelDisp.append( shellColor)
+        modelDisp.append( solidColor )
             #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
 
     if Visualise and not ghenv.Component.Hidden:
         for crvList,listColor in zip( segment,colorBeam ):
             for crv, color in zip( crvList, listColor ):
-                print( ' ciao ')
+                #print( ' ciao ')
                 cd.AddLine(crv,color,3)
 
     if modelExstrud == False or modelExstrud == None:
         ModelDisp = modelDisp
-        ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
-        ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
-        ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
-        #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
         
     else  :
         ModelDisp = ExtrudedView
-        ModelCurve = None
-        ModelShell = None
-        ModelSolid = None
 
 
-    return ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment, domainValues
+    return ModelDisp, domainValues
 
 checkData = True
 
@@ -1063,6 +1057,6 @@ if not AlpacaStaticOutput:
 
 if checkData != False:
     #print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
-    ModelDisp, ModelCurve, ModelShell, ModelSolid, colorBeam, segment, domainValues = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
+    ModelDisp, domainValues = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
 
 
