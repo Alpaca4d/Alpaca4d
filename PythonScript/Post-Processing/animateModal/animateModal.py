@@ -13,7 +13,7 @@
         ModelShell:
         ModelSolid:
        """
-
+import Rhino as rc
 import Rhino.Geometry as rg
 import math as mt
 import ghpythonlib.treehelpers as th
@@ -22,7 +22,9 @@ import sys
 import rhinoscriptsyntax as rs
 import Rhino.Display as rd
 from scriptcontext import doc
-
+from scriptcontext import sticky as st
+import System.Drawing.Color
+#----------------------------------------------------------------------#
 def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel ):
 
     global myCounter
@@ -623,7 +625,7 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
                 defSection2 = [row[1] for row in defSection ]
                 meshdef = meshLoft3( defSection1,  color )
                 meshdef.Append( meshLoft3( defSection2,  color ) )
-                print( meshdef )
+                #print( meshdef )
 
         else  :
             meshdef = meshLoft3( defSection,  color )
@@ -661,6 +663,30 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
         
         return meshElement
 
+    def gradient(value, valueMin, valueMax, colorList ):
+
+        if colorList == [] :
+            listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                        rs.CreateColor( 240, 69, 7),
+                        rs.CreateColor( 251, 255, 0 ),
+                        rs.CreateColor( 77, 255, 0 ),
+                        rs.CreateColor( 0, 255, 221 ),
+                        rs.CreateColor( 0, 81, 255 )]
+        else :
+            listcolor = colorList
+
+        n = len( listcolor )
+        domain = linspace( valueMin, valueMax, n)
+        #print( domain )
+        
+        for i in range(1,n+1):
+            if  domain[i-1] <= value <= domain[i] :
+                return listcolor[ i-1 ]
+            elif  valueMax <= value <= valueMax + 0.0000000000001 :
+                return listcolor[ -1 ]
+            elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+                return listcolor[ 0 ]
+
     def updateComponent(interval):
         
         ## Updates this component, similar to using a grasshopper timer 
@@ -676,6 +702,39 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
         ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
 
 
+        if True:
+            for k,v in st.items():
+                if type(v) is rc.Display.CustomDisplay:
+                    v.Dispose()
+                    del st[k]
+    
+    def customDisplay(Toggle,component):
+        
+        """ Make a custom display that is unique to the component and lives in sticky """
+        
+        # Make unique name and custom display
+        displayGuid = "customDisplay_" + str(component.InstanceGuid)
+        if displayGuid not in st:
+            st[displayGuid] = rc.Display.CustomDisplay(True)
+            
+        # Clear display each time component runs
+        st[displayGuid].Clear()
+        
+        # Return the display or get rid of it
+        if Toggle:
+            return st[displayGuid]
+        else:
+            st[displayGuid].Dispose()
+            del st[displayGuid]
+            return None
+    
+    cd = customDisplay( True ,ghenv.Component)
+
+    global ModelDisp
+    global ModelCurve
+    global ModelShell
+    global ModelSolid
+    global dimSection
 
 
     diplacementWrapper = AlpacaModalOutput[0][numberMode-1] # number of mode will start from 1. First, Second, Third ect ect
@@ -747,9 +806,10 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
     else :
         scaleDef = scale
 
+    modelDisp = []
     modelCurve = []
     ShellDefModel = []
-    ExtrudedView = rg.Mesh()
+    ExtrudedView = []
 
     traslBeamValue = []
     rotBeamValue = []
@@ -779,7 +839,7 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
             rotBeamValue.append( globalRot )
             modelCurve.append( defpolyline )
             # estrusione della beam #
-            ExtrudedView.Append( meshdef )
+            ExtrudedView.append( meshdef )
             #doc.Objects.AddMesh( meshdef )
         elif eleType == 'Truss' :
             dimSection = ele[2][10]
@@ -791,7 +851,7 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
             globalTrans = valueTruss[2]
             traslBeamValue.append( globalTrans ) 
             modelCurve.append( defpolyline )
-            ExtrudedView.Append( meshdef )
+            ExtrudedView.append( meshdef )
             #doc.Objects.AddMesh( meshdef )
 
         elif nNode == 4 and eleType != 'FourNodeTetrahedron':
@@ -800,8 +860,7 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
             traslShellValue.append( shellDefModel[1] )
             rotShellValue.append( shellDefModel[2] )
             extrudeShell = shellDefModel[3]
-            ExtrudedView.Append( extrudeShell )
-            doc.Objects.AddMesh( extrudeShell)
+            ExtrudedView.append( extrudeShell )
             
         elif nNode == 3:
             #print( nNode )
@@ -810,39 +869,149 @@ def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, Extru
             traslShellValue.append( shellDefModel[1] )
             rotShellValue.append( shellDefModel[2] )
             extrudeShell = shellDefModel[3]
-            ExtrudedView.Append( extrudeShell )
-            doc.Objects.AddMesh( extrudeShell)
+            ExtrudedView.append( extrudeShell )
+
             
         elif nNode == 8:
             solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
             SolidDefModel.append( solidDefModel[0] )
             doc.Objects.AddMesh( solidDefModel[0] )
             traslSolidValue.append( solidDefModel[1] )
-            ExtrudedView.Append( solidDefModel[0] )
+            ExtrudedView.append( solidDefModel[0] )
             
         elif  eleType == 'FourNodeTetrahedron' :
             #print(ele)
             solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
             SolidDefModel.append( solidDefModel[0] )
             traslSolidValue.append( solidDefModel[1] )
-            ExtrudedView.Append( solidDefModel[0] )
+            ExtrudedView.append( solidDefModel[0] )
+
+    ########################################################################################################################
+    # MAX an MIN VALOR
+    valorVector = []
+    # beam valor #
+    for valuetrasl in traslBeamValue:
+        for valor in valuetrasl:
+            vectorTrasl = rg.Vector3d( valor )
+            if direction == 0:
+                valorVector.append( vectorTrasl.X ) 
+            elif direction == 1:
+                valorVector.append( vectorTrasl.Y )
+            elif direction == 2:
+                valorVector.append( vectorTrasl.Z ) 
+            elif direction == 3:
+                valorVector.append( vectorTrasl.Length )     
+    # POINT #
+    if len(dispWrapper[0][1]) == 3 :
+        PointDisp = [row[1] for row in dispWrapper ] 
+    else:
+        PointDisp = [row[1][0] for row in dispWrapper ]
+
+    for nodeDisp in PointDisp :
+        vectorNodeDisp = rg.Vector3d( nodeDisp )
+        if direction == 0:
+            valorVector.append( vectorNodeDisp.X ) 
+        elif direction == 1:
+            valorVector.append( vectorNodeDisp.Y )
+        elif direction == 2:
+            valorVector.append( vectorNodeDisp.Z ) 
+        elif direction == 3:
+            valorVector.append( vectorNodeDisp.Length )
+    # MAX end MIN on structures point #
+    lowerLimit = min( valorVector )
+    upperLimit = max( valorVector )
+    domainValues = [ lowerLimit, upperLimit ]
+    print( lowerLimit, upperLimit )
+#####################################################################################
+    colorBeam = []
+    numberDivide = []
+    for value in traslBeamValue :
+        colorValor = []
+        for valor in value:
+            vectorTrasl = rg.Vector3d( valor )
+
+            if direction == 0:
+                valorVector = vectorTrasl.X  
+            elif direction == 1:
+                valorVector = vectorTrasl.Y 
+            elif direction == 2:
+                valorVector = vectorTrasl.Z  
+            elif direction == 3:
+                valorVector = vectorTrasl.Length
+
+            #print( valorVector )
+
+            color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+            colorValor.append( color )
+        colorBeam.append( colorValor )
+        numberDivide.append( len(colorValor) )
+    #print( modelCurve[0])
+    segment = []
+    for curve, segmentCount in zip( modelCurve, numberDivide ):
+        #print(segmentCount)
+        parameter = curve.DivideByCount( segmentCount - 1, True )
+        segmentCurve = []
+        for i in range(1, len(parameter)) :
+                p1 =  rg.Curve.PointAt( curve, parameter[i-1] ) 
+                p2 = rg.Curve.PointAt( curve, parameter[i] )
+                segmentCurve.append( rg.Line( p1, p2 ) )
+        segment.append( segmentCurve )
+
+        #print( segment )
+
+    
+    for shellEle, value in zip(ShellDefModel,traslShellValue) :
+        shellColor = shellEle.DuplicateMesh()
+        shellColor.VertexColors.Clear()
+        for j in range( 0,shellEle.Vertices.Count ):
+            vectorTrasl = rg.Vector3d( value[j] )
+            if direction == 0:
+                valorVector = vectorTrasl.X  
+            elif direction == 1:
+                valorVector = vectorTrasl.Y 
+            elif direction == 2:
+                valorVector = vectorTrasl.Z  
+            elif direction == 3:
+                valorVector = vectorTrasl.Length
+
+            color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+            shellColor.VertexColors.Add( color )
+        modelDisp.append( shellColor)
+    #dup.VertexColors.CreateMonotoneMesh(Color.Red)
+    #doc.Objects.AddMesh(dup)
+    for solidEle, value in zip(SolidDefModel,traslSolidValue) :
+        solidColor = solidEle.DuplicateMesh()
+        solidColor.VertexColors.Clear()
+        for j in range(0,solidEle.Vertices.Count):
+            vectorTrasl = rg.Vector3d( value[j] )
+            if direction == 0:
+                valorVector = vectorTrasl.X  
+            elif direction == 1:
+                valorVector = vectorTrasl.Y 
+            elif direction == 2:
+                valorVector = vectorTrasl.Z  
+            elif direction == 3:
+                valorVector = vectorTrasl.Length
+
+            color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+            solidColor.VertexColors.Add( color )
+        modelDisp.append( solidColor )
+            #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
+
+    if Visualise and not ghenv.Component.Hidden:
+        for crvList,listColor in zip( segment,colorBeam ):
+            for crv, color in zip( crvList, listColor ):
+                #print( ' ciao ')
+                cd.AddLine(crv,color,3)
 
 
     if ExtrudedModel == False or ExtrudedModel == None :
-        ModelDisp  = None
-        #ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
-        ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
-        ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
-        ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
-        #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
+        ModelDisp  = modelDisp
         
     else:
         ModelDisp = ExtrudedView
-        ModelCurve = None
-        ModelShell = None
-        ModelSolid = None
 
-    return ModelDisp, ModelCurve, ModelShell, ModelSolid
+    return ModelDisp, domainValues
 
 
 checkData = True
@@ -853,5 +1022,5 @@ if not AlpacaModalOutput:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    ModelDisp, ModelCurve, ModelShell, ModelSolid = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel )
+    ModelDisp, domainValues = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, modelExstrud )
 

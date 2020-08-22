@@ -26,6 +26,36 @@ from scriptcontext import doc
  
 
 #---------------------------------------------------------------------------------------#
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+def gradient(value, valueMin, valueMax, colorList ):
+
+    if colorList == [] :
+        listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                    rs.CreateColor( 240, 69, 7),
+                    rs.CreateColor( 251, 255, 0 ),
+                    rs.CreateColor( 77, 255, 0 ),
+                    rs.CreateColor( 0, 255, 221 ),
+                    rs.CreateColor( 0, 81, 255 )]
+    else :
+        listcolor = colorList
+
+    n = len( listcolor )
+    domain = linspace( valueMin, valueMax, n)
+    #print( domain )
+    
+    for i in range(1,n+1):
+        if  domain[i-1] <= value <= domain[i] :
+            return listcolor[ i-1 ]
+        elif  valueMax <= value <= valueMax + 0.0000000000001 :
+            return listcolor[ -1 ]
+        elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+            return listcolor[ 0 ]
+
 def ShellStressQuad( ele, node ):
     eleTag = ele[0]
     eleNodeTag = ele[1]
@@ -118,12 +148,7 @@ def shellStressView( AlpacaStaticOutput, stressView ):
     outputFile3 = os.path.join(workingDirectory, 'assembleData\\tensionShell3.out' )
     #---------------------------------------------------#
     tensionDic = []
-
-
-
-
-
-        
+      
     #print(len(tensionList)/len(shellTag))
 
     #print(stressView + 24)
@@ -157,12 +182,12 @@ def shellStressView( AlpacaStaticOutput, stressView ):
         tensionDic.append([ eleTag, tensionView ])
 
     stressDict = dict( tensionDic )
-    stressValue = th.list_to_tree( stressDict.values() )
+    stressValue = stressDict.values() 
     #print( stressDict.get(2))
     #print( stressDict )
     #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
     #print( tensionDic[0] )
-    '''
+    
     maxValue = []
     minValue = []
     for value in stressDict.values():
@@ -171,8 +196,8 @@ def shellStressView( AlpacaStaticOutput, stressView ):
         
     maxValue = max( maxValue )
     minValue = min( minValue )
-    print( maxValue, minValue )
-    '''
+    domainValues = [minValue, maxValue ] 
+
     shell = []
     for ele in EleOut :
         eleTag = ele[0]
@@ -185,7 +210,17 @@ def shellStressView( AlpacaStaticOutput, stressView ):
             shellModel = ShellStressTriangle( ele, pointWrapperDict )
             shell.append( shellModel )
 
-    return shell, stressValue
+    modelStress = []
+    for shellEle, value in zip(shell,stressValue) :
+        shellColor = shellEle.DuplicateMesh()
+        shellColor.VertexColors.Clear()
+        for j in range(0,shellEle.Vertices.Count):
+            #print( value[j] )
+            jetColor = gradient(value[j], minValue, maxValue, colorList )
+            shellColor.VertexColors.Add( jetColor )
+        modelStress.append( shellColor)
+
+    return modelStress, stressValue, domainValues
 
 checkData = True
 
@@ -200,4 +235,4 @@ if stressView is None :
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if checkData != False:
-    shell, stressValue = shellStressView( AlpacaStaticOutput, stressView )
+    shell, stressValue, domainValues = shellStressView( AlpacaStaticOutput, stressView )
