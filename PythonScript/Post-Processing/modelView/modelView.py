@@ -10,7 +10,8 @@
         NodeTag: True: Visualise the NodeTag. Default is False
         ElementTag: True: Visualise the ElementTag. Default is False
     Output:
-        out:
+        AlpacaModel: Output of Assemble Model.
+        Model: Geometrical Model.
 """
 
 """

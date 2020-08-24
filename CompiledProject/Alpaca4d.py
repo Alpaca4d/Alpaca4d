@@ -28,11 +28,13 @@ class nDMaterial(component):
         p = Grasshopper.Kernel.Parameters.Param_String()
         self.SetUpParam(p, "matName", "matName", "Name of the material.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_String("S235"))
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
         self.SetUpParam(p, "E", "E", "Young's Modulus [MPa].")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(System.Array[float]([210000.0]))
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
@@ -43,16 +45,19 @@ class nDMaterial(component):
         p = Grasshopper.Kernel.Parameters.Param_Number()
         self.SetUpParam(p, "v", "v", "Poisson ratio.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(System.Array[float]([0.3]))
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
         self.SetUpParam(p, "rho", "rho", "specific weight [kN/m3].")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(System.Array[float]([78.5]))
         self.Params.Input.Add(p)
         
         p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "fy", "fy", "Yield stress value of the material [MPa]")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(System.Array[float]([23.5]))
         self.Params.Input.Add(p)
         
     
@@ -153,6 +158,7 @@ class uniaxialMaterial(component):
         p = Grasshopper.Kernel.Parameters.Param_Number()
         self.SetUpParam(p, "E", "E", "Young's Modulus [MPa].")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_Number(210000.0))
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
@@ -4789,14 +4795,14 @@ class BrickStress(component):
 class VisualiseModel(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Visualise Model (Alpaca4d)", "Visualise Model", """Visualise the assembled Model """, "Alpaca", "7|Visualisation")
+            "Visualise Model (Alpaca4d)", "Visualise Model", """Generate Model view """, "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.primary
 
     def get_ComponentGuid(self):
-        return System.Guid("b3ef06e3-0513-430d-ab66-c4c3e4ab93ab")
+        return System.Guid("ff420cf3-828f-45ea-ad20-93458d7f5cd6")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -4811,12 +4817,7 @@ class VisualiseModel(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "LineModel", "LineModel", "True: Visualise the stick Model. Default is False")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "ExtrudedModel", "ExtrudedModel", "True: Visualise the Extruded Model. Default is True")
+        self.SetUpParam(p, "Model", "Model", "True: Visualise the stick Model. Default is False")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -4853,7 +4854,11 @@ class VisualiseModel(component):
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "out", "out", "")
+        self.SetUpParam(p, "AlpacaModel", "AlpacaModel", "Output of Assemble Model.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Model", "Model", "Geometric Model")
         self.Params.Output.Add(p)
         
     
@@ -4866,18 +4871,21 @@ class VisualiseModel(component):
         p5 = self.marshal.GetInput(DA, 5)
         p6 = self.marshal.GetInput(DA, 6)
         p7 = self.marshal.GetInput(DA, 7)
-        p8 = self.marshal.GetInput(DA, 8)
-        result = self.RunScript(p0, p1, p2, p3, p4, p5, p6, p7, p8)
+        result = self.RunScript(p0, p1, p2, p3, p4, p5, p6, p7)
 
         if result is not None:
-            self.marshal.SetOutput(result, DA, 0, True)
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
         
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAN3SURBVEhLrZZ5SFRRFMZnXLJRQ9NyHEfHZcwtLFxLcUNzKQ2NotEEyYrKMcFASAVRibQUSlyLzIVwz61QpCyUEhELLZNAoQhRJCKS/CNQ53TOfc7kC5eU+eAH5y33fHPPvfe8EWxDOojRGvQQreoB8htZXOUbYopoTQ3IOS5k+oLYcaF2tNbAGJlFXNnVDkWDJ5GPq/xEZijW1RPMy+W7VLuEwnm8dkd2JH9kDHFbpR9JR6ZS8s2gJFEMjfskoCsQTuE9WvRtiwyGuJCpE+nwCBBBxycZtDpbwXdrR0g2MgG8n8Pe+A9JEKozkYfQr1NfjyKqsh4ruNssgSkre2YwKbEDQ6HOD3xmgmypUwhtP1rQQYRqTjEx5hMqgu4pWyhWillyNUeMDFX4/DqypYKRAS4UxCFUFrUG82ssmEGtp0STnGbSnBZCZaLZCtmbmygMWUboINGhUseLsgP6LHlFnxWMWtpqDDptbWGpMRlC3CRkEoJsqnDkJUK7QoE8XY2rL+eYMYOiLH55ukIPAbRchPrUIDKoRzbVceQrUoH0Ip8pFol0Fpre2TCD6iBLnkGPMoQZLNQlgchAj86KIbKhYpAJRIlQ7xlH+iMUxix53ZA1vJLYaJK/FstgpjKeGRDx/g40C9ooG2rtwlJM5Zq99VjMDApu88vTcdBRk5zozDhGBq00eD1R+6XtSD3mPJKEqEzNjZbaJ2XMoDKaX56uOG+ewdidONAV6i7guHXLpJR6hEJETjPsd/SF3YZSkMoUcPZqNEveMo5rYCPVJJ+ROsBgdhTPoCk5AfzM/WkWJ7mUf0X7dzq64Bkk1E6CV3QpBEe9hYDwN5D3yJ4ZFFaJYU4q1xj0SmXwqz6JZ1AelgGZLtnr7iY/CxcflvxM5Qh4+NUwA9+gUmj9wJWnNJFfnidHXXnJ5+4nQKlHObT5tYO+jj51A94Xr8gz/gYzCE57CEGRI8zg9CUFS07Nrc2Ja25qXlwI5Bl0psVBX+Bzhtdeb5oF79C9jynsYQY+sWUseWDEMGSVy5lBcYOlprkRE9jgRgtjeQblJ65oDFLl18jgHpdaIJAa7DFbicpvh8jcVnA6nKny8m8EZ/dcuFkvXi7ploBSYbYyILYBNYUW4mXaMWrILN0tRVXhWQVEjlsuNb9pLj33MRlGqPdrkz5E6/88/pFA8Ad56zG2IGnxYgAAAABJRU5ErkJggg=="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaModel, LineModel, ExtrudedModel, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
+    def RunScript(self, AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
         import Rhino.Geometry as rg
         import math as mt
@@ -4886,51 +4894,13 @@ class VisualiseModel(component):
         import rhinoscriptsyntax as rs
         import sys
         import Rhino as rc
-        from scriptcontext import sticky as st
         import System.Drawing.Color
         import scriptcontext as sc
         
         
-        def VisualiseModel(AlpacaModel, LineModel, ExtrudedModel, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
-            
-            if True:
-                for k,v in st.items():
-                    if type(v) is rc.Display.CustomDisplay:
-                        v.Dispose()
-                        del st[k]
-            
-            
-            
-            
-            
-            
-            def customDisplay(Toggle,component):
-                
-                """ Make a custom display that is unique to the component and lives in sticky """
-                
-                # Make unique name and custom display
-                displayGuid = "customDisplay_" + str(component.InstanceGuid)
-                if displayGuid not in st:
-                    st[displayGuid] = rc.Display.CustomDisplay(True)
-                    
-                # Clear display each time component runs
-                st[displayGuid].Clear()
-                
-                # Return the display or get rid of it
-                if Toggle:
-                    return st[displayGuid]
-                else:
-                    st[displayGuid].Dispose()
-                    del st[displayGuid]
-                    return None
-            
-            cd = customDisplay(True ,self)
-            out = []
+        def VisualiseModel(AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
-        
-        
-            LineModel = False if LineModel is None else LineModel
-            ExtrudedModel = True if ExtrudedModel is None else ExtrudedModel
+            Model = False if Model is None else Model
             Support = True if Support is None else Support
             Mass = False if Mass is None else Mass
             LocalAxis = False if LocalAxis is None else LocalAxis
@@ -5415,12 +5385,6 @@ class VisualiseModel(component):
             posTag = [row[1] for row in pointWrapper ]
             nodeTag = [row[0] for row in pointWrapper ]
             
-            if NodeTag:
-                cameraX = sc.doc.Views.ActiveView.ActiveViewport.CameraX
-                cameraY = sc.doc.Views.ActiveView.ActiveViewport.CameraY
-                for pos, index in zip(posTag, nodeTag):
-                    cd.AddText( rc.Display.Text3d( str(index) , rc.Geometry.Plane(pos, cameraX, cameraY) , 0.3 )    ,  System.Drawing.Color.Black)
-            
             
             model = []
             extrudedModel = []
@@ -5489,13 +5453,13 @@ class VisualiseModel(component):
             
             
             tagEle = th.list_to_tree( [ posEleTag, eleTag ]  )
-            
+            """
             if ElementTag:
                 for pos, index in zip(posEleTag, eleTag):
                     cameraX = sc.doc.Views.ActiveView.ActiveViewport.CameraX
                     cameraY = sc.doc.Views.ActiveView.ActiveViewport.CameraY
                     cd.AddText( rc.Display.Text3d( str(index) , rc.Geometry.Plane(pos, cameraX, cameraY)  , 0.3 )    ,  System.Drawing.Color.Red)
-            
+            """
             
             # --------------------------------#
             modelDict = dict( model )
@@ -5505,10 +5469,8 @@ class VisualiseModel(component):
             for i in range(0,len(modelDict)):
                 ModelView.append( modelDict.get( i  , "never" ))
                 ModelViewExtruded.append( modelExstrudedDict.get( i , "never" ))
-            #--------------------------------#
             
-            if ExtrudedModel:
-                out.append(ModelViewExtruded)
+            #--------------------------------#
             
             
             lineModel = th.list_to_tree( [ line, colorLine ]  )
@@ -5522,7 +5484,6 @@ class VisualiseModel(component):
             v3Display = []
             v2Display = []
             v1Display = []
-            eleTag = []
             versorLine = []
             
             for ele in openSeesBeam :
@@ -5540,22 +5501,24 @@ class VisualiseModel(component):
                 versor = [ axis1, axis2, axis3 ] 
                 versorLine.append( [ tag ,versor ]  )
                 midPoint.append( MidPoint )
-                v3Display.append( axis3*0.5 )
-                v2Display.append( axis2*0.5  )
-                v1Display.append( axis1*0.5  )
+                v3Display.append( axis3 )
+                v2Display.append( axis2  )
+                v1Display.append( axis1  )
             
             
             VersorLine = dict( versorLine )
             
             
             if LocalAxis:
-                for MidPoint, axis1, axis2, axis3 in zip( midPoint, v1Display, v2Display, v3Display):
-                    cd.AddVector(MidPoint,axis1,System.Drawing.Color.Red)
-                    cd.AddVector(MidPoint,axis2,System.Drawing.Color.Green)
-                    cd.AddVector(MidPoint,axis3,System.Drawing.Color.Blue)
-            
-            
-            
+                self.midPoint = midPoint
+                self.v1Display = v1Display
+                self.v2Display = v2Display
+                self.v3Display = v3Display
+            else:
+                self.midPoint = []
+                self.v1Display = []
+                self.v2Display = []
+                self.v3Display = []
             
             #######
             ####### Force
@@ -5613,11 +5576,7 @@ class VisualiseModel(component):
                     beamPoint = lineBeam.PointAt(DivCurve[index]) 
                     ancorPoint.append( beamPoint )
                     forceDisplay.append( forceVector )
-            
-            if Load == True:
-                for ancor, force in zip(ancorPoint, forceDisplay):
-                    cd.AddVector(ancor, force, System.Drawing.Color.DarkRed)
-            
+                
             #######
             ####### Mass
             #######
@@ -5644,145 +5603,170 @@ class VisualiseModel(component):
             #######Support
             #######
             
-            if Support:
-                supportBrep = []
+            supportBrep = []
+            
+            for support in openSeesSupport :
+                index = support[0]
+                pos = pointWrapperDict.get( index  , "never")
+                center_point = rg.Point3d( pos )
                 
-                for support in openSeesSupport :
-                    index = support[0]
-                    pos = pointWrapperDict.get( index  , "never")
-                    center_point = rg.Point3d( pos )
-                    
-                    if support[1] == 1 and support[2] == 0 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo y
-                        supp = rg.Brep()
-                        plane = rg.Plane.WorldYZ
-                        radius = 0.15
-                        length = radius*3.50
-                        vector = rg.Vector3d( -length/2, 0 , -2.5*radius ) 
-                        vectorTrasl = rg.Point3d.Add( center_point, vector )
-                        trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-                        plane.Transform( trasl )
-                        circle = rg.Circle(plane, radius/2)
-                        brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True )
-                        cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
-                        traslc1 = rg.Transform.Translation( 0, -length/4, 0 )
-                        cylinder1.Transform( traslc1 )
-                        cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
-                        supp.Append( cylinder1 )
-                        traslc2 = rg.Transform.Translation( 0, length/4, 0 )
-                        cylinder2.Transform( traslc2 )
-                        supp.Append( cylinder2 )
-                        plane2 = rg.Plane.WorldXY
-                        vector2 = rg.Vector3d( 0, 0 , 0 ) 
-                        vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-                        trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-                        plane2.Transform( trasl2 )
-                        supp.Append( AddForm2Center(plane2, length, radius*2) )
-                        supportBrep.append( supp )
-                    if support[1] == 0 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo x
-                        supp = rg.Brep()
-                        plane = rg.Plane.WorldZX
-                        radius = 0.15
-                        length = radius*3.50
-                        vector = rg.Vector3d( 0, -length/2 , -2.5*radius ) 
-                        vectorTrasl = rg.Point3d.Add( center_point, vector )
-                        trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-                        plane.Transform( trasl )
-                        circle = rg.Circle(plane, radius/2)
-                        brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) 
-                        cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
-                        traslc1 = rg.Transform.Translation( -length/4, 0, 0 )
-                        cylinder1.Transform( traslc1 )
-                        cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
-                        supp.Append( cylinder1 )
-                        traslc2 = rg.Transform.Translation( length/4, 0, 0 )
-                        cylinder2.Transform( traslc2 )
-                        supp.Append( cylinder2 )
-                        plane2 = rg.Plane.WorldXY
-                        vector2 = rg.Vector3d( 0, 0 , 0 )
-                        vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-                        trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-                        plane2.Transform( trasl2 )
-                        supp.Append( AddForm3Center(plane2, length, radius*2) )
-                        supportBrep.append( supp )
-                    if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 1  : # cerniera lungo x
-                        supp = rg.Brep()
-                        plane = rg.Plane.WorldYZ
-                        radius = 0.15
-                        length = radius*3.50
-                        vector = rg.Vector3d( -length/2, 0 , -radius )
-                        vectorTrasl = rg.Point3d.Add( center_point, vector )
-                        trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-                        plane.Transform( trasl )
-                        circle = rg.Circle(plane, radius)
-                        supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
-                        plane2 = rg.Plane.WorldXY
-                        vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
-                        vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-                        trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-                        plane2.Transform( trasl2 )
-                        supp.Append( AddForm2Center(plane2, length, radius*2) )
-                        supportBrep.append( supp )
-                    if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 0  : # cerniera lungo y
-                        supp = rg.Brep()
-                        plane = rg.Plane.WorldZX
-                        radius = 0.15
-                        length = radius*3.50
-                        vector = rg.Vector3d( 0, -length/2 , -radius ) 
-                        vectorTrasl = rg.Point3d.Add( center_point, vector )
-                        trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
-                        plane.Transform( trasl )
-                        circle = rg.Circle(plane, radius)
-                        supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
-                        plane2 = rg.Plane.WorldXY
-                        vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
-                        vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
-                        trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
-                        plane2.Transform( trasl2 )
-                        supp.Append( AddForm3Center(plane2, length, radius*2) )
-                        supportBrep.append( supp )
-                    if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 0   : # cerniera sferica
-                        radius = 0.15
-                        length = radius*3.50
-                        vector = rg.Vector3d( 0, 0 , -radius ) 
-                        center =  rg.Point3d.Add( center_point, vector )
-                        supp = rg.Brep()
-                        # sfera
-                        supp.Append( rg.Brep.CreateFromSphere(rg.Sphere( center, radius)))
-                        plane = rg.Plane.WorldXY
-                        vectorTrasl = rg.Point3d.Add( center_point, 1.70*vector )
-                        trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
-                        plane.Transform( trasl )
-                        # tronco di piramide
-                        supp.Append( AddForm1Center(plane, length, radius*2) )
-                        supportBrep.append( supp )
-                    if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1  and support[6] == 1 : # incastro
-                        supp = rg.Brep()
-                        plane = rg.Plane.WorldXY
-                        length = 0.5
-                        h = length/3
-                        vector = rg.Vector3d( 0, 0 , 0 )
-                        vectorTrasl = rg.Point3d.Add( center_point, vector )
-                        trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
-                        plane2 = rg.Plane.Clone( plane )
-                        plane2.Transform( trasl )
-                        supp = AddBoxFromCenter(plane2, length, h) 
-                        supportBrep.append( supp )
-                out.append(supportBrep)
+                if support[1] == 1 and support[2] == 0 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo y
+                    supp = rg.Brep()
+                    plane = rg.Plane.WorldYZ
+                    radius = 0.15
+                    length = radius*3.50
+                    vector = rg.Vector3d( -length/2, 0 , -2.5*radius ) 
+                    vectorTrasl = rg.Point3d.Add( center_point, vector )
+                    trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                    plane.Transform( trasl )
+                    circle = rg.Circle(plane, radius/2)
+                    brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True )
+                    cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
+                    traslc1 = rg.Transform.Translation( 0, -length/4, 0 )
+                    cylinder1.Transform( traslc1 )
+                    cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
+                    supp.Append( cylinder1 )
+                    traslc2 = rg.Transform.Translation( 0, length/4, 0 )
+                    cylinder2.Transform( traslc2 )
+                    supp.Append( cylinder2 )
+                    plane2 = rg.Plane.WorldXY
+                    vector2 = rg.Vector3d( 0, 0 , 0 ) 
+                    vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                    trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                    plane2.Transform( trasl2 )
+                    supp.Append( AddForm2Center(plane2, length, radius*2) )
+                    supportBrep.append( supp )
+                if support[1] == 0 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1 and support[6] == 1 : # carrello lungo x
+                    supp = rg.Brep()
+                    plane = rg.Plane.WorldZX
+                    radius = 0.15
+                    length = radius*3.50
+                    vector = rg.Vector3d( 0, -length/2 , -2.5*radius ) 
+                    vectorTrasl = rg.Point3d.Add( center_point, vector )
+                    trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                    plane.Transform( trasl )
+                    circle = rg.Circle(plane, radius/2)
+                    brepCylinder = rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) 
+                    cylinder1 = rg.Brep.DuplicateBrep(brepCylinder)
+                    traslc1 = rg.Transform.Translation( -length/4, 0, 0 )
+                    cylinder1.Transform( traslc1 )
+                    cylinder2 = rg.Brep.DuplicateBrep(brepCylinder)
+                    supp.Append( cylinder1 )
+                    traslc2 = rg.Transform.Translation( length/4, 0, 0 )
+                    cylinder2.Transform( traslc2 )
+                    supp.Append( cylinder2 )
+                    plane2 = rg.Plane.WorldXY
+                    vector2 = rg.Vector3d( 0, 0 , 0 )
+                    vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                    trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                    plane2.Transform( trasl2 )
+                    supp.Append( AddForm3Center(plane2, length, radius*2) )
+                    supportBrep.append( supp )
+                if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 1  : # cerniera lungo x
+                    supp = rg.Brep()
+                    plane = rg.Plane.WorldYZ
+                    radius = 0.15
+                    length = radius*3.50
+                    vector = rg.Vector3d( -length/2, 0 , -radius )
+                    vectorTrasl = rg.Point3d.Add( center_point, vector )
+                    trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                    plane.Transform( trasl )
+                    circle = rg.Circle(plane, radius)
+                    supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
+                    plane2 = rg.Plane.WorldXY
+                    vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
+                    vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                    trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                    plane2.Transform( trasl2 )
+                    supp.Append( AddForm2Center(plane2, length, radius*2) )
+                    supportBrep.append( supp )
+                if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 0  : # cerniera lungo y
+                    supp = rg.Brep()
+                    plane = rg.Plane.WorldZX
+                    radius = 0.15
+                    length = radius*3.50
+                    vector = rg.Vector3d( 0, -length/2 , -radius ) 
+                    vectorTrasl = rg.Point3d.Add( center_point, vector )
+                    trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z ) 
+                    plane.Transform( trasl )
+                    circle = rg.Circle(plane, radius)
+                    supp.Append( rg.Brep.CreateFromCylinder( rg.Cylinder(circle, length), True, True ) )
+                    plane2 = rg.Plane.WorldXY
+                    vector2 = rg.Vector3d( 0, 0 , -1.70*radius )
+                    vectorTrasl2 = rg.Point3d.Add( center_point, vector2 )
+                    trasl2 = rg.Transform.Translation( vectorTrasl2.X, vectorTrasl2.Y, vectorTrasl2.Z ) 
+                    plane2.Transform( trasl2 )
+                    supp.Append( AddForm3Center(plane2, length, radius*2) )
+                    supportBrep.append( supp )
+                if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 0 and support[5] == 0   : # cerniera sferica
+                    radius = 0.15
+                    length = radius*3.50
+                    vector = rg.Vector3d( 0, 0 , -radius ) 
+                    center =  rg.Point3d.Add( center_point, vector )
+                    supp = rg.Brep()
+                    # sfera
+                    supp.Append( rg.Brep.CreateFromSphere(rg.Sphere( center, radius)))
+                    plane = rg.Plane.WorldXY
+                    vectorTrasl = rg.Point3d.Add( center_point, 1.70*vector )
+                    trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
+                    plane.Transform( trasl )
+                    # tronco di piramide
+                    supp.Append( AddForm1Center(plane, length, radius*2) )
+                    supportBrep.append( supp )
+                if support[1] == 1 and support[2] == 1 and support[3] == 1 and support[4] == 1 and support[5] == 1  and support[6] == 1 : # incastro
+                    plane = rg.Plane.WorldXY
+                    length = 0.5
+                    h = length/3
+                    vector = rg.Vector3d( 0, 0 , 0 )
+                    vectorTrasl = rg.Point3d.Add( center_point, vector )
+                    trasl = rg.Transform.Translation( vectorTrasl.X, vectorTrasl.Y, vectorTrasl.Z  )
+                    plane2 = rg.Plane.Clone( plane )
+                    plane2.Transform( trasl )
+                    supp = AddBoxFromCenter(plane2, length, h)[0]
+                    supportBrep.append( supp[0] )
+
+            if Model == True:
+                self.line = line
+                self.colorLine = colorLine
+            else:
+                self.line = []
+                self.colorLine = []
+
+            if Load == True:
+                self.ancorPoint = ancorPoint
+                self.forceDisplay = forceDisplay
+            else:
+                self.ancorPoint = []
+                self.forceDisplay = []
+
+            if NodeTag == True:
+                self.posTag = posTag
+                self.nodeTag = nodeTag
+            else:
+                self.posTag = []
+                self.nodeTag = []
+
+            if ElementTag == True:
+                self.posEleTag = posEleTag
+                self.eleTag = eleTag
+            else:
+                self.posEleTag = []
+                self.eleTag = []
+
+            if Support == True:
+                self.supportBrep = supportBrep
+                self.material = rc.Display.DisplayMaterial(System.Drawing.Color.Cyan, 0.0)
+            else:
+                self.supportBrep = []
+                self.material = []
+                
             
+            if Model == True:
+                return AlpacaModel, ModelView
+            else:
+                return AlpacaModel, ModelViewExtruded
+            #return AlpacaModel, ModelView
             
-            
-            
-            
-            if LineModel:
-                for crv,color in zip(line,colorLine):
-                    cd.AddCurve(crv,color,3)
-                out.append(shellVisualise)
-                out.append(brickVisualise)
-            
-            out = th.list_to_tree(out)
-            
-            return out
-        
         checkData = True
         
         if not AlpacaModel:
@@ -5791,8 +5775,31 @@ class VisualiseModel(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            out = VisualiseModel(AlpacaModel, LineModel, ExtrudedModel, Support, Mass, LocalAxis, Load, NodeTag, ElementTag)
-            return out
+            AlpacaModel, Model = VisualiseModel(AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag)
+            return AlpacaModel, Model
+
+
+    def DrawViewportWires(self,arg):
+        
+        for crv, color in zip(self.line, self.colorLine):
+            arg.Display.DrawCurve(crv, color, 4)
+        
+        for ancor, force in zip(self.ancorPoint, self.forceDisplay):
+            arg.Display.DrawMarker(ancor, force, System.Drawing.Color.Black)
+        
+        for pos, tag in zip(self.posTag, self.nodeTag):
+            arg.Display.Draw2dText(str(tag), System.Drawing.Color.Blue, pos, True, 20)
+        
+        for pos, tag in zip(self.posEleTag, self.eleTag):
+            arg.Display.Draw2dText(str(tag), System.Drawing.Color.Red, pos, True, 20)
+        
+        for midPoint, axis1, axis2, axis3 in zip( self.midPoint, self.v1Display, self.v2Display, self.v3Display):
+            arg.Display.DrawLine( midPoint, midPoint + axis1, System.Drawing.Color.Red, 3 )
+            arg.Display.DrawLine( midPoint, midPoint + axis2, System.Drawing.Color.Green, 3 )
+            arg.Display.DrawLine( midPoint, midPoint + axis3, System.Drawing.Color.Blue, 3 )
+            
+        for brep in self.supportBrep:
+            arg.Display.DrawBrepShaded(brep,self.material)
 
 
 class StaticModelView(component):
