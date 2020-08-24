@@ -1,4 +1,4 @@
-"""Generate Model view 
+﻿"""Generate Model view 
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
         direction : view relative color of the traslation:
@@ -15,9 +15,6 @@
        max_min : max end min of displacement of the structure .
        """
 
-"""
-This component works only in SDK mode
-"""
 
 from ghpythonlib.componentbase import executingcomponent as component
 import Grasshopper, GhPython
