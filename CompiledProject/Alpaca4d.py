@@ -153,6 +153,7 @@ class uniaxialMaterial(component):
         p = Grasshopper.Kernel.Parameters.Param_String()
         self.SetUpParam(p, "matName", "matName", "Name of the material.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_String("S235"))
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
@@ -169,16 +170,19 @@ class uniaxialMaterial(component):
         p = Grasshopper.Kernel.Parameters.Param_Number()
         self.SetUpParam(p, "v", "v", "Poisson ratio.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_Number(0.3))
         self.Params.Input.Add(p)
         
         p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "rho", "rho", "specific weight [kN/m3].")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_Number(78.5))
         self.Params.Input.Add(p)
         
         p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "fy", "fy", "Yield stress value of the material [MPa]")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_Number(23.5))
         self.Params.Input.Add(p)
         
     
