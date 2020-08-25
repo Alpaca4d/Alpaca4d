@@ -23,6 +23,36 @@ import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
 #---------------------------------------------------------------------------------------#
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+def gradient(value, valueMin, valueMax, colorList ):
+
+    if colorList == [] :
+        listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                    rs.CreateColor( 240, 69, 7),
+                    rs.CreateColor( 251, 255, 0 ),
+                    rs.CreateColor( 77, 255, 0 ),
+                    rs.CreateColor( 0, 255, 221 ),
+                    rs.CreateColor( 0, 81, 255 )]
+    else :
+        listcolor = colorList
+
+    n = len( listcolor )
+    domain = linspace( valueMin, valueMax, n)
+    #print( domain )
+    
+    for i in range(1,n+1):
+        if  domain[i-1] <= value <= domain[i] :
+            return listcolor[ i-1 ]
+        elif  valueMax <= value <= valueMax + 0.0000000000001 :
+            return listcolor[ -1 ]
+        elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+            return listcolor[ 0 ]
+
 def ShellQuad( ele, node):
     eleTag = ele[0]
     eleNodeTag = ele[1]
@@ -76,40 +106,6 @@ def ShellTriangle( ele, node ):
     
     return  shellModel
 
-def gradientJet(value, valueMax, valueMin):
-
-    listcolo = [[0, 0, 102 ],
-                [0, 0, 255],
-                [0, 64, 255],
-                [0, 128, 255],
-                [0, 191, 255],
-                [0, 255, 255],
-                [0, 255, 191],
-                [0, 255, 128],
-                [0, 255, 64],
-                [0, 255, 0],
-                [64, 255, 0],
-                [128, 255, 0],
-                [191, 255, 0],
-                [255, 255, 0],
-                [255, 191, 0],
-                [255, 128, 0],
-                [255, 64, 0],
-                [255, 0, 0],
-                [230, 0, 0],
-                [204, 0, 0]]
-
-    #domain = linspace( valueMin,  valueMax, len( listcolo ) )
-    n = len( listcolo )
-    domain = dg.linspace( valueMin, valueMax, n)
-    
-    for i in range(1,n):
-        if  domain[i-1] <= value <= domain[i]:
-            return listcolo[ i ]
-        elif  valueMax <= value <= valueMax + 0.00001 :
-            return listcolo[ -1 ]
-        elif  valueMin - 0.00000000001 <= value <= valueMin  :
-            return listcolo[ 0 ]
 #--------------------------------------------------------------------------
 def shellForceView( AlpacaStaticOutput, viewForce ):
 
@@ -136,7 +132,7 @@ def shellForceView( AlpacaStaticOutput, viewForce ):
 
     for item in ForceOut:
         index = item[0]
-        if len(item[1]) == 24: #6* numo nodi = 24 elementi quadrati
+        if len(item[1]) == 24: #6* numo nodi = 24 ,elementi quadrati
             Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
             Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
             Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
@@ -151,7 +147,7 @@ def shellForceView( AlpacaStaticOutput, viewForce ):
                         [ Mi.X, Mj.X,  Mk.X, Mw.X ],
                         [ Mi.Y, Mj.Y, Mk.Y, Mw.Y ],
                         [ Mi.Z, Mj.Z, Mk.Z, Mw.Z ]]
-        elif len(item[1]) == 18: #6* numo nodi = 18 elementi quadrati
+        elif len(item[1]) == 18: #6* numo nodi = 18 ,elementi triangolae
             Fi = rg.Vector3d( item[1][0], item[1][1], item[1][2] ) # risultante nodo i
             Mi = rg.Vector3d( item[1][3], item[1][4], item[1][5] )
             Fj = rg.Vector3d( item[1][6], item[1][7], item[1][8] ) # risultante nodo j
@@ -189,8 +185,8 @@ def shellForceView( AlpacaStaticOutput, viewForce ):
             shell.append( shellModel )
             
     #tagElement = th.list_to_tree( tag )
-    ForceValue = th.list_to_tree( ForceView )
-    '''
+    ForceValue =  ForceView 
+    
     maxValue = []
     minValue = []
     for value in ForceView:
@@ -199,18 +195,31 @@ def shellForceView( AlpacaStaticOutput, viewForce ):
 
     maxValue = max( maxValue )
     minValue = min( minValue )
-    print( maxValue, minValue )
+    domainValues = [minValue, maxValue ]
+
+    
     modelForce = []
+    """
     for shellEle, value in zip(shell,ForceView) :
         shellColor = shellEle.DuplicateMesh()
         shellColor.VertexColors.Clear()
+
         for j in range(0,shellEle.Vertices.Count):
             #print( value[j] )
-            jetColor = gradientJet(value[j], maxValue, minValue)
-            shellColor.VertexColors.Add( jetColor[0],jetColor[1],jetColor[2] )
+            jetColor = gradient( value[j], minValue, maxValue, colorList )
+            shellColor.VertexColors.Add( jetColor )
         modelForce.append( shellColor)
-    '''
-    return shell, ForceValue
+    """
+    for shellEle, value in zip(shell,ForceView) :
+        shellColor = shellEle.DuplicateMesh()
+        shellColor.VertexColors.Clear()
+        faceforce = value[ face ]
+        Color = gradient( faceforce, minValue, maxValue, colorList )
+        shellColor.VertexColors.CreateMonotoneMesh( Color )
+        modelForce.append( shellColor)
+
+    
+    return modelForce, ForceValue, domainValues
 
 checkData = True
 
@@ -226,4 +235,4 @@ if viewForce is None :
 
 
 if checkData != False:
-    shell, ForceValue = shellForceView( AlpacaStaticOutput, viewForce  )
+    shell, ForceValue, domainValues = shellForceView( AlpacaStaticOutput, viewForce  )

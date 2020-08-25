@@ -23,6 +23,36 @@ import rhinoscriptsyntax as rs
 from scriptcontext import doc
 
 #---------------------------------------------------------------------------------------#
+def linspace(a, b, n=100):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+def gradient(value, valueMin, valueMax, colorList ):
+
+    if colorList == [] :
+        listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                    rs.CreateColor( 240, 69, 7),
+                    rs.CreateColor( 251, 255, 0 ),
+                    rs.CreateColor( 77, 255, 0 ),
+                    rs.CreateColor( 0, 255, 221 ),
+                    rs.CreateColor( 0, 81, 255 )]
+    else :
+        listcolor = colorList
+
+    n = len( listcolor )
+    domain = linspace( valueMin, valueMax, n)
+    #print( domain )
+    
+    for i in range(1,n+1):
+        if  domain[i-1] <= value <= domain[i] :
+            return listcolor[ i-1 ]
+        elif  valueMax <= value <= valueMax + 0.0000000000001 :
+            return listcolor[ -1 ]
+        elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+            return listcolor[ 0 ]
+
 def Solid( ele, node ):
     
     eleTag = ele[0]
@@ -122,37 +152,36 @@ def brickStressView( AlpacaStaticOutput, stressView ):
     ## Dict. for point ##
     pointWrapperDict = dict( pointWrapper )
 
-    EleTag = []
+    BrickTag = []
+    TetraTag = []
     for item in EleOut:
         if  len(item[1])  == 8:
-             EleTag.append([item[0], 48])
+             BrickTag.append([item[0], 48])
         elif  len(item[0])  == 'FourNodeTetrahedron':
-             EleTag.append([item[0], 24])
+             TetraTag.append([item[0], 24])
 
     #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
     ghFilePath = ghenv.LocalScope.ghdoc.Path
     workingDirectory = os.path.dirname(ghFilePath)
     outputFileBrick = os.path.join(workingDirectory, 'assembleData\\tensionBrick.out' )
     outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
-
+    #---------------------------------------------------#
+    
+    tensionDic = []
+    
     with open(outputFileBrick, 'r') as f:
         lines = f.readlines()
         if lines :
             tensionListBrick  = lines[0].split()
 
     #print(len(tensionList)/len(shellTag))
-
-    w = stressView
     #print(w + 24)
-    tensionDic = []
-
-    if lines :
-        for n,eleTag in enumerate(EleTag) :
-            tensionShell = []
-            for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
-                tensionShell.append( float(tensionListBrick[i]) )
-            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ], tensionShell[ w + 24 ], tensionShell[ w + 30 ], tensionShell[ w + 36 ], tensionShell[ w + 42 ] ]
-            tensionDic.append([ eleTag[0], tensionView ])
+    for n,eleTag in enumerate(BrickTag) :
+        tensionSolid = []
+        for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
+            tensionSolid.append( float(tensionListBrick[i]) )
+        tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ], tensionSolid[ stressView + 24 ], tensionSolid[ stressView + 30 ], tensionSolid[ stressView + 36 ], tensionSolid[ stressView + 42 ] ]
+        tensionDic.append([ eleTag[0], tensionView ])
 
     with open(outputFileTetra, 'r') as f:
         lines = f.readlines()
@@ -162,20 +191,20 @@ def brickStressView( AlpacaStaticOutput, stressView ):
     #print(len(tensionList)/len(shellTag))
     #print(w + 24)
     if lines :
-        for n,eleTag in enumerate(EleTag) :
-            tensionShell = []
+        for n,eleTag in enumerate(TetraTag) :
+            tensionSolid = []
             for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
-                tensionShell.append( float(tensionListTetra[i]) )
-            tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ]]
+                tensionSolid.append( float(tensionListTetra[i]) )
+            tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ]]
             tensionDic.append([ eleTag[0], tensionView ])
     
     stressDict = dict( tensionDic )
-    stressValue = th.list_to_tree( stressDict.values() )
+    stressValue =  stressDict.values() 
     #print( stressDict.get(2))
     #print( stressDict )
     #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
     #print( tensionDic[0] )
-    '''
+    
     maxValue = []
     minValue = []
     for value in stressDict.values():
@@ -184,8 +213,10 @@ def brickStressView( AlpacaStaticOutput, stressView ):
         
     maxValue = max( maxValue )
     minValue = min( minValue )
+    domainValues = [minValue, maxValue ] 
     print( maxValue, minValue )
-    '''
+
+
     brick = []
     for ele in EleOut :
         eleTag = ele[0]
@@ -193,12 +224,21 @@ def brickStressView( AlpacaStaticOutput, stressView ):
         if eleType == "bbarBrick" :
             brickModel = Solid( ele, pointWrapperDict )
             brick.append( brickModel )
-        elif eleType == "ShellDKGT" :
-            outputForce = forceWrapperDict.get( eleTag )
-            tetraModel = ShellTriangle( ele, pointWrapperDict )
+        elif eleType == "FourNodeTetrahedron" :
+            tetraModel = TetraSolid( ele, pointWrapperDict )
             brick.append( tetraModel )
 
-    return brick, stressValue
+        modelStress = []
+    for brickEle, value in zip(brick,stressValue) :
+        brickColor = brickEle.DuplicateMesh()
+        brickColor.VertexColors.Clear()
+        for j in range(0,brickEle.Vertices.Count):
+            #print( value[j] )
+            jetColor = gradient(value[j], minValue, maxValue, colorList )
+            brickColor.VertexColors.Add( jetColor )
+        modelStress.append( brickColor)
+
+    return modelStress, stressValue, domainValues
 
 checkData = True
 
@@ -214,4 +254,4 @@ if stressView is None :
 
 
 if checkData != False:
-    brick, stressValue = brickStressView( AlpacaStaticOutput, stressView )
+    brick, stressValue, domainValues = brickStressView( AlpacaStaticOutput, stressView )
