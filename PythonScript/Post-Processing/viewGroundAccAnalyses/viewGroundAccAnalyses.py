@@ -941,6 +941,8 @@ class MyComponent(component):
                     elif direction == 3:
                         valorVector.append( vectorTrasl.Length )     
             # POINT #
+            
+            PointPos = [row[1] for row in pointWrapper ]
             if len(pointDef[0][1]) == 3 :
                 PointDisp = [row[1] for row in pointDef ] 
             else:
@@ -1043,12 +1045,12 @@ class MyComponent(component):
             if modelExstrud == False or modelExstrud == None :
                 self.line = segment
                 self.colorLine = colorBeam
-                return modelDisp, domainValues
+                return modelDisp, PointPos, PointDisp, domainValues
                 
             else:
                 self.line = []
                 self.colorLine = []
-                return ExtrudedView, domainValues
+                return ExtrudedView, PointPos, PointDisp, domainValues
         
         
         
@@ -1061,8 +1063,8 @@ class MyComponent(component):
         
         
         if checkData != False:
-            modelDisp, domainValues = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExstrud, colorList )
-            return (modelDisp, domainValues)
+            modelDisp, PointPos, PointDisp, domainValues = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExstrud, colorList )
+            return (modelDisp, PointPos, PointDisp, domainValues)
             
     def DrawViewportWires(self,arg):
         

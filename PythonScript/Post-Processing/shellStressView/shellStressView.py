@@ -117,7 +117,7 @@ def shellStressView( AlpacaStaticOutput, stressView ):
 
     diplacementWrapper = AlpacaStaticOutput[0]
     EleOut = AlpacaStaticOutput[2]
-    ForceOut = AlpacaStaticOutput[4]
+    #ForceOut = AlpacaStaticOutput[4]
     #print( ForceOut[0] )
     #print( ForceOut[1] )
     #nodalForce = openSeesOutputWrapper[5]
