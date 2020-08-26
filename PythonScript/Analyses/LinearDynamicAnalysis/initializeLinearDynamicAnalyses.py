@@ -13,6 +13,7 @@ import System
 import os
 import Grasshopper as gh
 import ghpythonlib.treehelpers as th # per data tree
+import Rhino.Geometry as rg
 
 def linspace(a, b, n=100):
     if n < 2:
@@ -87,18 +88,18 @@ def InitializeModalAnalysis( AlpacaModel, numEigenvalues, ag, F0, S,n, Tb, Tc, T
     with open(outputFile, 'r') as f:
         lines = f.readlines()
         nodeModalDispWrapper = eval( lines[0].strip() )
-        elementModalWrapper = eval( lines[1].strip() )
-        period = eval( lines[2].strip() )
-        frequency = eval( lines[3].strip() )
-        massPart = eval( lines[4].strip() )
-        cPart = eval( lines[5].strip() )
-        nodeMass = eval( lines[6].strip() )
+        period = eval( lines[1].strip() )
+        frequency = eval( lines[2].strip() )
+        massPart = eval( lines[3].strip() )
+        cPart = eval( lines[4].strip() )
+        nodeMass = eval( lines[5].strip() )
 
     numberMode = numEigenvalues
 
     ForceX = []
     ForceY = []
     for nodeOutput, gamma, T in zip( nodeModalDispWrapper, cPart , period ):
+        possNode = [ row[0] for row in nodeOutput ]
         nodeDisp = [ row[1] for row in nodeOutput ]
         Sa = spectrum( ag, F0, S, n, Tb, Tc, Td, q, T )
         nodeDispX = [ row[0] for row in nodeDisp ]
@@ -113,16 +114,39 @@ def InitializeModalAnalysis( AlpacaModel, numEigenvalues, ag, F0, S,n, Tb, Tc, T
         ForceX.append( Fx )
         ForceY.append( Fy )
 
+    eta = 0.05
+    Ex = []
+    Ey = []
 
-        
+    for Ti, fxi, fyi in zip(period, ForceX, ForceY ):
+        for Tj, fxj, fyj in zip(period, ForceX, ForceY ):
+            Bij = Tj/Ti
+            delta_ij = ( 8*eta**2*Bij**(3/2))/( (1 + Bij)*((1 - Bij )**2 + 4*eta**2*Bij ))
+
+            Ex_node = []
+            Ey_node = []
+            for fxi_node, fyi_node, fxj_node, fyj_node in zip( fxi, fyi, fxj, fyj):
+
+                Ex_node.append( delta_ij*fxi_node*fxj_node )  
+                Ey_node.append( delta_ij*fyi_node*fyj_node )
+            Ex.append( Ex_node )
+            Ey.append( Ey_node )
+
+    #print( len(Ex ))
+    EX = []
+    EY = []
+    for i in range(0, len( Ex[0] )):
+        EX.append( sum( [ row[i] for row in Ex ] ) )
+        EY.append( sum( [ row[i] for row in Ey ] ) )
+#------------------------------------------------------------------------------#
+
+    possNodeForce = []
+    for nodeCoord in  possNode:
+        possNodeForce.append( rg.Point3d( nodeCoord[0], nodeCoord[1], nodeCoord[2], ) )
+
 
 
     #print(  [ row[1] for row in nodeModalDispWrapper[0] ] )
-
-    AlpacaModalOutputWrapper = ([nodeModalDispWrapper,
-                            elementModalWrapper,
-                            period,
-                            frequency])
 
     massPart = th.list_to_tree( massPart )
 
@@ -132,7 +156,7 @@ def InitializeModalAnalysis( AlpacaModel, numEigenvalues, ag, F0, S,n, Tb, Tc, T
         spectrumValor.append( spectrum( ag, F0, S, n, Tb, Tc, Td, q, T ) )
 
 
-    return [AlpacaModalOutputWrapper, period, frequency, massPart, spectrumValor, ForceX[2] ]
+    return [possNodeForce, period, frequency, massPart, spectrumValor, EX, EY ]
 
 checkData = True
 
@@ -148,4 +172,4 @@ if numVibrationModes is None:
 
 
 if checkData != False:
-    AlpacaModalOutput, period, frequency, massPart, spectrum, ForceX = InitializeModalAnalysis(AlpacaModel, numVibrationModes, ag, F0, S, n,  Tb, Tc, Td, q )
+    possNodeForce, period, frequency, massPart, spectrum, ForceX, ForceY = InitializeModalAnalysis(AlpacaModel, numVibrationModes, ag, F0, S, n,  Tb, Tc, Td, q )
