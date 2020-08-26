@@ -373,18 +373,19 @@ for i,j in zip(coefPartX,coefPartY) :
 
 
 
-openSeesModalOutputWrapper = ([nodeModalDispWrapper,
+openSeesLinearDynamicOutputWrapper = ([nodeModalDispWrapper,
                                elementOutputWrapper,
                                period,
                                frequency,
-                               percMassPart])
+                               percMassPart,
+                               cPart ])
 
 
 
 length = len(filename)-len(inputName)
 filefolder = filename[0:length]
-outputFileName = filefolder+'openSeesModalOutputWrapper.txt'
+outputFileName = filefolder+'openSeesLinearDynamicOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
-    for item in openSeesModalOutputWrapper:
+    for item in openSeesLinearDynamicOutputWrapper:
         f.write("%s\n" % item)
