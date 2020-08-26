@@ -25,7 +25,7 @@ import System
 import Rhino
 import rhinoscriptsyntax as rs
 
-class VisualiseModellll(component):
+class VisualiseModel(component):
     
     def RunScript(self, AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
