@@ -253,20 +253,9 @@ for eigenMode in range(1, numEigenvalues + 1):
 
     nodeModalDispWrapper.append( nodeModalDispWrapperTemp )
 
-#-----------------------------------------------------
-
-elementOutputWrapper = []
-
-elementTagList = ops.getEleTags()
-
-for elementTag in elementTagList:
-    elementOutputWrapper.append([ elementTag, ops.eleNodes(elementTag), elementPropertiesDict.setdefault(elementTag) ])
-
-#-----------------------------------------------------
+#----------------------------------------------------
 
 nodeModalDispWrapper = nodeModalDispWrapper
-elementOutputWrapper = elementOutputWrapper
-
 #-----calcolo massa partecipante ------ #
 
 def zerolistmaker(n):
@@ -289,12 +278,15 @@ def multiply(v, G):
 nodeTagList = ops.getNodeTags()
 lenMassMatrix = len( nodeTagList )
 R = onelistmaker(lenMassMatrix)
+nodeMass = []
 #-- Massa in X -- #
 massXMatrix = []
 autovectorX = []
 for i,nodeTag in enumerate(nodeTagList):
     listMassMatrix = zerolistmaker( lenMassMatrix )
-    listMassMatrix[i] = ops.nodeMass( nodeTag , 1)
+    mass = ops.nodeMass( nodeTag , 1)
+    listMassMatrix[i] = mass
+    nodeMass.append( mass )
     massXMatrix.append( listMassMatrix )
     autovector = []
     for eigenMode in range(1, numEigenvalues + 1):
@@ -373,12 +365,12 @@ for i,j in zip(coefPartX,coefPartY) :
 
 
 
-openSeesLinearDynamicOutputWrapper = ([nodeModalDispWrapper,
-                               elementOutputWrapper,
+openSeesModalOutputWrapper = ([nodeModalDispWrapper,
                                period,
                                frequency,
                                percMassPart,
-                               cPart ])
+                               cPart,
+                               nodeMass ])
 
 
 
@@ -387,5 +379,5 @@ filefolder = filename[0:length]
 outputFileName = filefolder+'openSeesLinearDynamicOutputWrapper.txt'
 
 with open(outputFileName, 'w') as f:
-    for item in openSeesLinearDynamicOutputWrapper:
+    for item in openSeesModalOutputWrapper:
         f.write("%s\n" % item)
