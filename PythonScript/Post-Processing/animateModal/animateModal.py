@@ -1,18 +1,20 @@
 ﻿"""Visualize the Modal Shapes
     Inputs:
-        AlpacaModalOutput:
-        numberMode:
-        speed:
-        Animate:
+        AlpacaModalOutput: Analysed Alpaca Model.
+        numberMode: number of mode to visualize.
+        speed: 
+        Animate: True - Animate the model.
         Reset:
-        scale:
-        ExtrudedModel:
+        scale: Factor to multiply the modal shapes.
+        direction : view relative color of the traslation:
+            '0' view traslation X.
+            '1' view traslation Y.
+            '2' view traslation Z.
+        modelExtrude: True - view extruded model.
+        colorList: optional color list to remap number to colors.
     Output:
-        ModelDisp:
-        ModelCurve:
-        ModelShell:
-        ModelSolid:
-       """
+        ModelDisp: Deformed model for the selected modal shape.
+"""
 
 from ghpythonlib.componentbase import executingcomponent as component
 import Grasshopper, GhPython
@@ -22,7 +24,7 @@ import rhinoscriptsyntax as rs
 
 class MyComponent(component):
     
-    def RunScript(self, AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction, modelExstrud, colorList):
+    def RunScript(self, AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction, modelExtrude, colorList):
         import Rhino as rc
         import Rhino.Geometry as rg
         import math as mt
@@ -700,16 +702,16 @@ class MyComponent(component):
             # Schedule this component to expire
             ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
                 
-        def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction, modelExstrud, colorList ):
+        def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction, modelExtrude, colorList ):
         
             global myCounter
             
             
             Animate = False if Animate is None else Animate
             numberMode = 1 if numberMode is None else numberMode
-            Reset = True if Reset is None else Reset
+            Reset = False if Reset is None else Reset
             speed = 1 if speed is None else speed
-            modelExstrud = True if modelExstrud is None else modelExstrud
+            modelExtrude = True if modelExtrude is None else modelExtrude
                     
                 
                 
@@ -982,15 +984,15 @@ class MyComponent(component):
                     #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
         
         
-            if modelExstrud == False or modelExstrud == None :
+            if modelExtrude == False or modelExtrude == None :
                 self.line = segment
                 self.colorLine = colorBeam
-                return modelDisp, domainValues
+                return modelDisp
                 
             else:
                 self.line = []
                 self.colorLine = []
-                return ExtrudedView, domainValues
+                return ExtrudedView
                 
                 
                 
@@ -1002,8 +1004,8 @@ class MyComponent(component):
             ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            modelDisp, domainValues = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction,modelExstrud, colorList )
-            return (modelDisp, domainValues)
+            modelDisp = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction,modelExtrude, colorList )
+            return (modelDisp)
             
     def DrawViewportWires(self,arg):
         

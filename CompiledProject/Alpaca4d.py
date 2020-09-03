@@ -3299,17 +3299,18 @@ class NodeDisplacement(component):
             Points, Trans, Rot = NodeDisp( AlpacaStaticOutput )
             return (Points, Trans, Rot)
 
+
 class ReactionForces(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Reaction Forces (Alpaca4d)", "Reaction Forces (Alpaca4d)", """Compute the reaction forces""", "Alpaca", "6|Numerical Output")
+            "Reaction Forces (Alpaca4d)", "Reaction Forces", """Compute the Reaction Forces""", "Alpaca", "6|Numerical Output")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.primary
 
     def get_ComponentGuid(self):
-        return System.Guid("0be5f38d-6134-4ff3-9702-d2898a4da0c4")
+        return System.Guid("119923f5-682c-43a9-aa18-53bc53b35d41")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -3318,29 +3319,47 @@ class ReactionForces(component):
         p.Optional = True
     
     def RegisterInputParams(self, pManager):
-        p = GhPython.Assemblies.MarshalParam()
-        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of static Analyses Solver.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Boolean()
+        self.SetUpParam(p, "reactionForcesView", "reactionForcesView", "True - view reaction Forces.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Boolean()
+        self.SetUpParam(p, "reactionMomentsView", "reactionMomentsView", "True - view reaction Moments.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Number()
+        self.SetUpParam(p, "scale", "scale", "number that multiplies the reaction.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "tagPoints", "tagPoints", "nodes tag of Model .")
+        self.SetUpParam(p, "tagPoints", "tagPoints", "nodes tag of Model.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ReactionForce", "ReactionForce", "Vector of reaction Forces { Rx, Ry, Rz }. [kN]")
+        self.SetUpParam(p, "ReactionForce", "ReactionForce", "Vector of reaction Forces { Rx, Ry, Rz }.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ReactionMoment", "ReactionMoment", "Vector of reaction Moments { Mx, My, Mz }. [kN]")
+        self.SetUpParam(p, "ReactionMoment", "ReactionMoment", "Vector of reaction Moments { Mx, My, Mz }.")
         self.Params.Output.Add(p)
         
     
     def SolveInstance(self, DA):
         p0 = self.marshal.GetInput(DA, 0)
-        result = self.RunScript(p0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        p3 = self.marshal.GetInput(DA, 3)
+        result = self.RunScript(p0, p1, p2, p3)
 
         if result is not None:
             if not hasattr(result, '__getitem__'):
@@ -3355,27 +3374,36 @@ class ReactionForces(component):
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaStaticOutput):
+    def RunScript(self, AlpacaStaticOutput, reactionForcesView, reactionMomentsView, scale):
         
         import Rhino.Geometry as rg
         import math
         import ghpythonlib.treehelpers as th # per data tree
         import Grasshopper as gh
+        import sys
         
         
-        def reaction(AlpacaStaticOutput):
-            
+        
+        #---------------------------------------------------------------------------------------#
+        def reaction(AlpacaStaticOutput, scale, reactionForceView = False, reactionMomentsView = False):
+        
+            # define output
+        
             global tagPoints
             global ReactionForce
             global ReactionMoment
             global view
         
-            scale = 1
+            reactionForceView = False if reactionForceView is None else reactionForceView
+            reactionMomentsView = False if reactionMomentsView is None else reactionMomentsView
+        
+            if scale is None :
+                scale = 1
         
         
             diplacementWrapper = AlpacaStaticOutput[0]
             reactionOut = AlpacaStaticOutput[1]
-
+            #print( len( reactionOut ) )
         
             pointWrapper = []
         
@@ -3433,7 +3461,24 @@ class ReactionForces(component):
             Mx = [row[4] for row in viewElement ]
             My = [row[5] for row in viewElement ]
             Mz = [row[6] for row in viewElement ]
+            
+            
+            self.point = point if reactionForcesView or reactionMomentsView == True else []
+            self.Rx = Rx if reactionForcesView == True else []
+            self.Ry = Ry if reactionForcesView == True else []
+            self.Rz = Rz if reactionForcesView == True else []
+            self.Mx = Mx if reactionMomentsView == True else []
+            self.My = My if reactionMomentsView == True else []
+            self.Mz = Mz if reactionMomentsView == True else []
+            
+            null = [rg.Vector3d( 0, 0, 0 )]*len(Rx)
         
+            if reactionForcesView == True and reactionMomentsView == False or reactionForcesView == None and reactionMomentsView == False :
+                view = th.list_to_tree( [ point, Rx, Ry, Rz, null, null, null ]  )
+            elif reactionForcesView == False and reactionMomentsView == True or reactionForcesView == False and reactionMomentsView == None :
+                view = th.list_to_tree( [ point, null, null, null, Mx, My, Mz ]   )
+            elif reactionForcesView == True and reactionMomentsView == True or reactionForcesView == None and reactionMomentsView == None :
+                view = th.list_to_tree( [ point, Rx, Ry, Rz,Mx, My, Mz ]  )
         
             return tagPoints, ReactionForce, ReactionMoment
         
@@ -3443,10 +3488,24 @@ class ReactionForces(component):
             checkData = False
             msg = "input 'AlpacaStaticOutput' failed to collect data"
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-
+        
         if checkData != False :
-            tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput )
+            tagPoints, ReactionForce, ReactionMoment = reaction( AlpacaStaticOutput, scale, reactionForcesView, reactionMomentsView  )
             return (tagPoints, ReactionForce, ReactionMoment)
+
+    def DrawViewportWires(self,arg):
+        
+        for ancor, forceX, forceY, forceZ in zip(self.point, self.Rx, self.Ry, self.Rz):
+            arg.Display.DrawArrow( rg.Line(ancor, forceX) ,  System.Drawing.Color.Black)
+            arg.Display.DrawArrow( rg.Line(ancor, forceY) ,  System.Drawing.Color.Black)
+            arg.Display.DrawArrow( rg.Line(ancor, forceZ) ,  System.Drawing.Color.Black)
+        
+        for ancor, momentX, momentY, momentZ in zip(self.point, self.Mx, self.My, self.Mz):
+            arg.Display.DrawArrow( rg.Line(ancor, momentX) ,  System.Drawing.Color.Red)
+            arg.Display.DrawArrow( rg.Line(ancor, momentY) ,  System.Drawing.Color.Red)
+            arg.Display.DrawArrow( rg.Line(ancor, momentZ) ,  System.Drawing.Color.Red)
+
+
 
 
 # Beam
@@ -4803,7 +4862,7 @@ class VisualiseModel(component):
         return instance
 
     def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.primary
+        return Grasshopper.Kernel.GH_Exposure.quarternary
 
     def get_ComponentGuid(self):
         return System.Guid("ff420cf3-828f-45ea-ad20-93458d7f5cd6")
@@ -5809,14 +5868,14 @@ class VisualiseModel(component):
 class StaticModelView(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Static Model View (Alpaca4d)", "Static Model View", """Generate Model view """, "Alpaca", "7|Visualisation")
+            "Static Model View (Alpaca4d)", "Static Model View", """Visualise a deformed shape""", "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.primary
 
     def get_ComponentGuid(self):
-        return System.Guid("804607bc-2994-4645-8c58-425c55a30ce2")
+        return System.Guid("9e73ede5-b1f8-4281-bbf2-e5e8f85754ca")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -5831,31 +5890,33 @@ class StaticModelView(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
-        self.SetUpParam(p, "scale", "scale", "number that multiplies the real displacements. ")
+        self.SetUpParam(p, "scale", "scale", "multiplication factor for displacement.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "modelExstrud", "modelExstrud", "'True' = view exstrude model, 'False' = view analitic model. ")
+        self.SetUpParam(p, "modelExtrud", "modelExtrud", "True - view extruded model.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Colour()
+        self.SetUpParam(p, "colorList", "colorList", "Script input colorList.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
         
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelDisp", "ModelDisp", "view deformed model :\nbeam --> polyline;\nshell --> mesh;\nbrick --> solid .")
+        self.SetUpParam(p, "modelDisp", "modelDisp", "view deformed model")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelCurve", "ModelCurve", "analitic line ( polyline) of the beam or truss Element .")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelShell", "ModelShell", "Script output ModelShell.")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelSolid", "ModelSolid", "Script output ModelSolid.")
+        self.SetUpParam(p, "domainValues", "domainValues", "max end min of displacement of the structure .")
         self.Params.Output.Add(p)
         
     
@@ -5863,7 +5924,9 @@ class StaticModelView(component):
         p0 = self.marshal.GetInput(DA, 0)
         p1 = self.marshal.GetInput(DA, 1)
         p2 = self.marshal.GetInput(DA, 2)
-        result = self.RunScript(p0, p1, p2)
+        p3 = self.marshal.GetInput(DA, 3)
+        p4 = self.marshal.GetInput(DA, 4)
+        result = self.RunScript(p0, p1, p2, p3, p4)
 
         if result is not None:
             if not hasattr(result, '__getitem__'):
@@ -5871,28 +5934,27 @@ class StaticModelView(component):
             else:
                 self.marshal.SetOutput(result[0], DA, 0, True)
                 self.marshal.SetOutput(result[1], DA, 1, True)
-                self.marshal.SetOutput(result[2], DA, 2, True)
-                self.marshal.SetOutput(result[3], DA, 3, True)
         
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMMSURBVEhLYxgewMDAQFVMTCySn18sRVxcKklaWjoIyLfg4uIyUlJSchYTU0i3sLCQhionDfDz8wsyMTn8ZmR0O8zA4D6TgcFzLgOD214GBqczDAy2ZxgZbbczMjod5+Iy74NqAYFOIPYH4hggjofiJBhmZmaeA6QZgRgCuLicVvLzW06DcjEAOzu7AhNT1GcJCRUtqFAllMYFqoAYYQEvL68qn8DSr/r6zg5QIQzAzt7dLqy89EJISAgnkAsyAB9AtQAEeBWq8iScVj3z8vKSgAqhAC0tLTYmm8XH9H07ZgO5NRBRnADTAiBgZAmdtUq6ZPbh0NBQNqgYCuDkFJJmrV3+XNTNDWQJPoDVAgYhISE+lsUrrit3lEyHCmEAjoAAe45pre+tra21oULYAHYLQEBeVV6TbVPpR81EK1AKwQqEk9zvCc0NuAJMuqD4wAZwWwACSolmkVxr9D+IiIiocXBw2AJpOzMzMy1g0DGD5CUkJLoMZ1qf4+3hnQrWgAnwWwACfH18c4T3Cv/X2KRxjWs11xnWOazPhWcI/5ZZIHOVv5//uVqX2gvWXaz/OV0424DKw4E4DogToXg1EOO3wNjYmEtoutAl6QbpbqgQg6SkpAgLC4sJGxvbDHV1dV2ZFJloni2s79V11XWhSmCAsA9AQFhYWMptIdNdvzKpIqgQDFRDaQbbOsnG1BV8T01MTJSgQiBAnAUgICrDp9K1mO1FTQ13PlQIBFDyQUqLQPfcJSIP7e3tFaBCxFsAAlZWpgarmzhfNShwlUKFMIqK3jKOSUuyxW9bWlqKAbmkWQACJpqahhtV2N+VSkhkAbnlEFEUwDRDjmv5XAmJY4KCgo1APmkWgIC/kZH7El7eb8DScj5UCB1wLOLlPefPxfUUyGaCCJEImtXVF5YzMh6CcjGAgbCwab+Q0F9giuOCCpEGfHx8UuIYGR+ZmppiLSrS0tI0EiUlX9jY2BTt37+fBSpMPEhJSVkcFxe3PjY2diFUCAX4+fllBwcHz/T19V26cuVKXEXJKIABBgYAGGytoQ16+eYAAAAASUVORK5CYII="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaStaticOutput, scale, modelExstrud):
+    def RunScript(self, AlpacaStaticOutput, scale, modelExtrud, direction, colorList):
         
+        import Rhino as rc
         import Rhino.Geometry as rg
-        import math as mt
-        import ghpythonlib.treehelpers as th
+        import math
+        import ghpythonlib.treehelpers as th # per data tree
         import Grasshopper as gh
         import sys
         import rhinoscriptsyntax as rs
         import Rhino.Display as rd
-        from scriptcontext import doc
+        from scriptcontext import sticky as st
+        import System.Drawing.Color
+        import scriptcontext as sc
         
         
-        #---------------------------------------------------------------------------------------#
-        ## -------------FUNZIONI DI FORMA PER TRAVE DI TYMOSHENKO------------------ ##
         
         def alphat( E, G, I, At ):
             return (E*I)/(G*At)
@@ -5950,11 +6012,11 @@ class StaticModelView(component):
             
         ## Funzione cerchio ##
         def AddCircleFromCenter( plane, radius):
-            t = linspace( 0 , 1.80*mt.pi, 16 )
+            t = linspace( 0 , 1.80*math.pi, 16 )
             a = []
             for ti in t:
-                x = radius*mt.cos(ti)
-                y = radius*mt.sin(ti)
+                x = radius*math.cos(ti)
+                y = radius*math.sin(ti)
                 a.append( plane.PointAt( x, y ) )
             #circle = rg.PolylineCurve( a )
             circle  = a 
@@ -5962,20 +6024,6 @@ class StaticModelView(component):
         
         def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
             #-------------------1---------2 #
-            '''
-            p1 = plane.PointAt(ta/2, -(yg - tinf) )
-            p2 = plane.PointAt( Binf/2,  -(yg - tinf) )
-            p3 = plane.PointAt( Binf/2,  -yg )
-            p4 = plane.PointAt( -Binf/2,  -yg )
-            p5 = plane.PointAt( -Binf/2, -(yg - tinf) ) 
-            p6 = plane.PointAt( -ta/2,  -(yg - tinf) )
-            p7 = plane.PointAt( -ta/2,  (H - yg - tsup))
-            p8 = plane.PointAt( -Bsup/2,  (H - yg - tsup) )
-            p9 = plane.PointAt( -Bsup/2,  (H - yg ) )
-            p10 = plane.PointAt( Bsup/2,  (H - yg ) )
-            p11 = plane.PointAt( Bsup/2,  (H - yg - tsup) )
-            p12 = plane.PointAt( ta/2,  (H - yg - tsup) )
-            '''
             p1 = plane.PointAt( -(yg - tinf), ta/2 )
             p2 = plane.PointAt( -(yg - tinf), Binf/2 )
             p3 = plane.PointAt( -yg, Binf/2 )
@@ -6560,41 +6608,29 @@ class StaticModelView(component):
             
             return meshElement
         
-        def gradientJet(value, valueMax, valueMin):
+        def gradient(value, valueMin, valueMax, colorList ):
         
-            listcolo = [[0, 0, 102 ],
-                        [0, 0, 255],
-                        [0, 64, 255],
-                        [0, 128, 255],
-                        [0, 191, 255],
-                        [0, 255, 255],
-                        [0, 255, 191],
-                        [0, 255, 128],
-                        [0, 255, 64],
-                        [0, 255, 0],
-                        [64, 255, 0],
-                        [128, 255, 0],
-                        [191, 255, 0],
-                        [255, 255, 0],
-                        [255, 191, 0],
-                        [255, 128, 0],
-                        [255, 64, 0],
-                        [255, 0, 0],
-                        [230, 0, 0],
-                        [204, 0, 0]]
+            if colorList == [] :
+                listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                            rs.CreateColor( 240, 69, 7),
+                            rs.CreateColor( 251, 255, 0 ),
+                            rs.CreateColor( 77, 255, 0 ),
+                            rs.CreateColor( 0, 255, 221 ),
+                            rs.CreateColor( 0, 81, 255 )]
+            else :
+                listcolor = colorList
         
-            #domain = linspace( valueMin,  valueMax, len( listcolo ) )
-            n = len( listcolo )
+            n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
+            #print( domain )
             
-            for i in range(1,n):
-                if  domain[i-1] <= value <= domain[i]:
-                    return listcolo[ i-1 ]
-                elif  valueMax <= value <= valueMax + 0.00001 :
-                    return listcolo[ -1 ]
-                elif  valueMin - 0.00000000001 <= value <= valueMin  :
-                    #print( value, valueMin)
-                    return listcolo[ 0 ]
+            for i in range(1,n+1):
+                if  domain[i-1] <= value <= domain[i] :
+                    return listcolor[ i-1 ]
+                elif  valueMax <= value <= valueMax + 0.0000000000001 :
+                    return listcolor[ -1 ]
+                elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+                    return listcolor[ 0 ]
         
         ## Mesh from close section eith gradient color ##
         def meshLoft4( point, value, valueMax, valueMin ):
@@ -6621,23 +6657,19 @@ class StaticModelView(component):
                     meshEle.Faces.AddFace(index1, index2, index3, index4)
             return meshEle
         
-        #----------------------------------------------------------------------#
-        def defModelView(AlpacaStaticOutput , scale, modelExstrud = False ):
         
-            global ModelDisp
-            global ModelCurve
-            global ModelShell
-            global ModelSolid
+        
+        def DeformedModelView(AlpacaStaticOutput, scale, modelExtrud, direction, colorList):
+            
+            
             global dimSection
-        
-            #modelExstrud = False if modelExstrud is None else modelExstrud
-        
+            
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
             nodeValue = []
             displacementValue = []
             #ShellOut = openSeesOutputWrapper[4]
-        
+            
             pointWrapper = []
             dispWrapper = []
             #print( diplacementWrapper )
@@ -6649,54 +6681,53 @@ class StaticModelView(component):
                     dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
                 elif len(item[1]) == 6:
                     dispWrapper.append( [index, [rg.Point3d(item[1][0],item[1][1],item[1][2] ), rg.Point3d(item[1][3],item[1][4],item[1][5]) ] ] )
-        
+            
             ## Dict. for point ##
             pointWrapperDict = dict( pointWrapper )
             pointDispWrapperDict = dict( dispWrapper )
             ####
-        
+            
             ## FOR scala automatica ##
-
+            ## nodeValue e' la lista delle cordinate
             rowX = [row[0] for row in nodeValue ]
             rowY = [row[1] for row in nodeValue ]
             rowZ = [row[2] for row in nodeValue ]
-        
+            
             scaleMax = max( max(rowX), max(rowY), max(rowZ) )
             scaleMin = min( min(rowX), min(rowY), min(rowZ) )
-            coordMax = max( mt.fabs(scaleMin),mt.fabs(scaleMax)) - mt.fabs(scaleMin)
-        
-        
+            coordMax = max( math.fabs(scaleMin),math.fabs(scaleMax)) - math.fabs(scaleMin)
+            
+            ## displacementValue e' la lista degli spostamenti
+            
             rowDefX = [row[0] for row in displacementValue ]
             rowDefY = [row[1] for row in displacementValue ]
             rowDefZ = [row[2] for row in displacementValue ]
-        
+            
             defMax = max( max(rowDefX), max(rowDefY), max(rowDefZ) )
             defMin = min( min(rowDefX), min(rowDefY), min(rowDefZ) )
-            DefMax = max( mt.fabs(defMax),mt.fabs(defMin))
-        
+            DefMax = max( math.fabs(defMax),math.fabs(defMin))
+            
             if scale == None:
                 scaleDef = scaleAutomatic( coordMax , DefMax )
-        
+            
             else :
                 scaleDef = scale
-        
-        
-        
+            
             ExtrudedView = []
             modelDisp = []
-        
+            
             modelCurve = []
             traslBeamValue = []
             rotBeamValue = []
-        
+            
             ShellDefModel = []
             traslShellValue = []
             rotShellValue = []
-        
+            
             SolidDefModel = []
             traslSolidValue = []
-        
-        
+            
+            
             for ele in EleOut :
                 eleType = ele[2][0]
                 nNode = len( ele[1] )
@@ -6713,6 +6744,7 @@ class StaticModelView(component):
                     traslBeamValue.append( globalTrans ) 
                     rotBeamValue.append( globalRot )
                     modelCurve.append( defpolyline )
+                    modelDisp.append( defpolyline )
                     # estrusione della beam #
                     ExtrudedView.append( meshdef )
                     #doc.Objects.AddMesh( meshdef )
@@ -6727,8 +6759,9 @@ class StaticModelView(component):
                     traslBeamValue.append( globalTrans ) 
                     modelCurve.append( defpolyline )
                     ExtrudedView.append( meshdef )
+                    modelDisp.append( defpolyline )
                     #doc.Objects.AddMesh( meshdef )
-        
+            
                 elif nNode == 4 and eleType != 'FourNodeTetrahedron':
                     shellDefModel = defShellQuad( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
                     ShellDefModel.append( shellDefModel[0] )
@@ -6761,23 +6794,121 @@ class StaticModelView(component):
                     SolidDefModel.append( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
                     ExtrudedView.append( solidDefModel[0] )
-
-        
-            if modelExstrud == False or modelExstrud == None:
-                ModelDisp = None
-                ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
-                ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
-                ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
-                #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
+                    
+                # MAX an MIN VALOR
+            valorVector = []
+            # beam valor #
+            for valuetrasl in traslBeamValue:
+                for valor in valuetrasl:
+                    vectorTrasl = rg.Vector3d( valor )
+                    if direction == 0:
+                        valorVector.append( vectorTrasl.X ) 
+                    elif direction == 1:
+                        valorVector.append( vectorTrasl.Y )
+                    elif direction == 2:
+                        valorVector.append( vectorTrasl.Z ) 
+                    elif direction == 3:
+                        valorVector.append( vectorTrasl.Length )     
+            # POINT #
+            if len(dispWrapper[0][1]) == 3 :
+                PointDisp = [row[1] for row in dispWrapper ] 
+            else:
+                PointDisp = [row[1][0] for row in dispWrapper ]
+            
+            for nodeDisp in PointDisp :
+                vectorNodeDisp = rg.Vector3d( nodeDisp )
+                if direction == 0:
+                    valorVector.append( vectorNodeDisp.X ) 
+                elif direction == 1:
+                    valorVector.append( vectorNodeDisp.Y )
+                elif direction == 2:
+                    valorVector.append( vectorNodeDisp.Z ) 
+                elif direction == 3:
+                    valorVector.append( vectorNodeDisp.Length )
+            # MAX end MIN on structures point #
+            lowerLimit = min( valorVector )
+            upperLimit = max( valorVector )
+            domainValues = [ lowerLimit, upperLimit ]
+            #print( lowerLimit, upperLimit )
+            #####################################################################################
+            colorBeam = []
+            numberDivide = []
+            for value in traslBeamValue :
+                colorValor = []
+                for valor in value:
+                    vectorTrasl = rg.Vector3d( valor )
+            
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+            
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    colorValor.append( color )
+                colorBeam.append( colorValor )
+                numberDivide.append( len(colorValor) )
+            segment = []
+            for curve, segmentCount in zip( modelCurve, numberDivide ):
+                parameter = curve.DivideByCount( segmentCount - 1, True )
+                segmentCurve = []
+                for i in range(1, len(parameter)) :
+                        p1 =  rg.Curve.PointAt( curve, parameter[i-1] ) 
+                        p2 = rg.Curve.PointAt( curve, parameter[i] )
+                        segmentCurve.append( rg.Line( p1, p2 ) )
+                segment.append( segmentCurve )
+            
+            
+            for shellEle, value in zip(ShellDefModel,traslShellValue) :
+                shellColor = shellEle.DuplicateMesh()
+                shellColor.VertexColors.Clear()
+                for j in range( 0,shellEle.Vertices.Count ):
+                    vectorTrasl = rg.Vector3d( value[j] )
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+            
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    shellColor.VertexColors.Add( color )
+                modelDisp.append( shellColor)
+             #dup.VertexColors.CreateMonotoneMesh(Color.Red)
+            #doc.Objects.AddMesh(dup)
+            for solidEle, value in zip(SolidDefModel,traslSolidValue) :
+                solidColor = solidEle.DuplicateMesh()
+                solidColor.VertexColors.Clear()
+                for j in range(0,solidEle.Vertices.Count):
+                    vectorTrasl = rg.Vector3d( value[j] )
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+            
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    solidColor.VertexColors.Add( color )
+                modelDisp.append( solidColor )
                 
-            else  :
-                ModelDisp = ExtrudedView
-                ModelCurve = None
-                ModelShell = None
-                ModelSolid = None
-        
-        
-            return ModelDisp, ModelCurve, ModelShell, ModelSolid
+            if modelExtrud == False or modelExtrud == None:
+                self.line = segment
+                self.colorLine = colorBeam
+                return modelDisp, domainValues
+            else:
+                self.line = []
+                self.colorLine = []
+                return ExtrudedView, domainValues
+
+
         
         checkData = True
         
@@ -6785,13 +6916,17 @@ class StaticModelView(component):
             checkData = False
             msg = "input 'AlpacaStaticOutput' failed to collect data"  
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
-
-
+        
         if checkData != False:
-            #print( type(AlpacaStaticOutput), type(direction), type(scale), type( modelExstrud) )
-            ModelDisp, ModelCurve, ModelShell, ModelSolid = defModelView( AlpacaStaticOutput, scale, modelExstrud  )
-            return (ModelDisp, ModelCurve, ModelShell, ModelSolid)
+            modelDisp, domainValues = DeformedModelView(AlpacaStaticOutput, scale, modelExtrud, direction, colorList)
+            return (modelDisp, domainValues)
 
+
+    def DrawViewportWires(self,arg):
+        
+        for crvs, colors in zip(self.line, self.colorLine):
+            for crv, color in zip(crvs, colors):
+                arg.Display.DrawLine(crv, color, 4)
 
 class ModalModelView(component):
     def __new__(cls):
@@ -6800,10 +6935,10 @@ class ModalModelView(component):
         return instance
 
     def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.primary
+        return Grasshopper.Kernel.GH_Exposure.secondary
 
     def get_ComponentGuid(self):
-        return System.Guid("9b607f72-8829-4429-99fd-be2b0f3ebe56")
+        return System.Guid("d83370a9-e3f2-4fe6-838a-3ac16befcdb3")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -6813,12 +6948,12 @@ class ModalModelView(component):
     
     def RegisterInputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "AlpacaModalOutput", "AlpacaModalOutput", "")
+        self.SetUpParam(p, "AlpacaModalOutput", "AlpacaModalOutput", "Analysed Alpaca Model.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "numberMode", "numberMode", "")
+        self.SetUpParam(p, "numberMode", "numberMode", "number of mode to visualize.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -6828,7 +6963,7 @@ class ModalModelView(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "Animate", "Animate", "")
+        self.SetUpParam(p, "Animate", "Animate", "True - Animate the model.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -6838,31 +6973,29 @@ class ModalModelView(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Number()
-        self.SetUpParam(p, "scale", "scale", "")
+        self.SetUpParam(p, "scale", "scale", "Factor to multiply the modal shapes.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "ExtrudedModel", "ExtrudedModel", "")
+        self.SetUpParam(p, "modelExtrud", "modelExtrude", "True - view extruded model.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Colour()
+        self.SetUpParam(p, "colorList", "colorList", "optional color list to remap number to colors.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
         
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelDisp", "ModelDisp", "")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelCurve", "ModelCurve", "")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelShell", "ModelShell", "")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelSolid", "ModelSolid", "")
+        self.SetUpParam(p, "modelDisp", "modelDisp", "Script output modelDisp.")
         self.Params.Output.Add(p)
         
     
@@ -6874,51 +7007,698 @@ class ModalModelView(component):
         p4 = self.marshal.GetInput(DA, 4)
         p5 = self.marshal.GetInput(DA, 5)
         p6 = self.marshal.GetInput(DA, 6)
-        result = self.RunScript(p0, p1, p2, p3, p4, p5, p6)
+        p7 = self.marshal.GetInput(DA, 7)
+        p8 = self.marshal.GetInput(DA, 8)
+        result = self.RunScript(p0, p1, p2, p3, p4, p5, p6, p7, p8)
 
         if result is not None:
-            if not hasattr(result, '__getitem__'):
-                self.marshal.SetOutput(result, DA, 0, True)
-            else:
-                self.marshal.SetOutput(result[0], DA, 0, True)
-                self.marshal.SetOutput(result[1], DA, 1, True)
-                self.marshal.SetOutput(result[2], DA, 2, True)
-                self.marshal.SetOutput(result[3], DA, 3, True)
+            self.marshal.SetOutput(result, DA, 0, True)
         
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAQxSURBVEhL5ZVrbBRVFIBnWd3WIK5QtNuZO3N3HltquzW2C/6xakwwNfwARWMCmigBbXwEEBJ0jUmtMSaYINoUxBAgUR7ble7stIXEGF15mDSptRbKdh+1hbIinZnWWhHbmDCeO3u7ddsS6x//+CUnvefcc++5e86ZU+b/i9qN79RSwkYtiYNq2lsb7i130a15g0HiTicT3xB023+JTmTDandc6+LHdzd5rF1Bj/VVqzAZTeEf1SS+jxwkjAnCYl0oK6HqnPhALm4MutdqKX7ywGl28oNI8fcftXuGWrvwSPeTYh/s3wNijSCx8uuIN9PzmhgzkLLeQPJ2g1XOmUj5hFx0M3iQIS2Ft2pJ/oCW5isgJc9Gk/iJ/kclv8FJA1k35veVKxe71ST/88Aqqd7glJDJKU0mJ+/UWSVCfeZkoXuJcwJeP6glhAeozWaUl2rIC6k6uDNUvAseEaO6jcH56iDIUarmE4mzReFzePv+GHcDithAzTajJZIAL+sdQfKmaB+/fEfTUlON48uRuFhKXZhRTrxXZ6WMjpSHqSlL8xC6DS78ENJiHr8ghMuqCsbBfEt2N/tyHUmXk+ukZkhXh5bA/U+/sujaY8/cXk5dGJPzrTVZ+YqOfOuoaRo4dCyawMdb+qW7qUkHuYsshjH2kIO9m8RtaoK/qqbw+rDFOGFrEMRLfAwkrrAvZ5Uqoueh9qFKOHgpNogLqYmQC0BSYiLpM3hEKJritxAbJRfARPI+KPBWsp4FFPN1kh6qTpELYCLfW8Ne+bDWx48N3S9//Lf85gLoSG4hKSLrWcDlh0kbUtXGVeDQn3vD/dORTj6jdeFrX3zjtfaf4KznF7qts8WC1eguzhQ6HH+Ca6HFMAtMVjoFv7Q2e3oG0IoHobi/RVPC0WhSeAFqse3gGXYCOqS5NS1Up2vE3edflL481oMugDuqLSjwQqs2dnqwBalpM1klDXLd4KXl2RtnoKaE9+DiPWrSWwdBDsF6b0XA7iKaIqX+4kNiFIo79YHZeJxOixR3vKR0KXxkZ3Te9yDdyocMLEjTd7HYdFsC0zVg5SNXFWULBDDaB7xkTk0B2YEOKlq2CB4xDEVGtnUmlsU4oDtOQmra1LRMxsQCEPMOhlkCKXiVpIAMMHjE2xDkbEtcIIOMdNwfY6ic+LSZnLQH9JtDRi5c0KAl+OFD33KbXQ7HdRhezfBxdRj8Mtb2gd4nQaBeV15qKNoRcLl06KhLMBbehJ/isC/6J6AG5ZEkHgiv5iwysKxA4Fa6laM1wdd83oN+7VzhvQFpeYqa5w9p2dOfeq1fhFKRmmYB/wMaT72Dz1P13xH6Afnbu3CGqnNCRnm4nVepOn8Cfn/ZqjVlL7+/V5qA9ePUnAfx2Vxfuu/doNxRXVHxCDXPjyq/v666srJ7Sqg5jxk+IWr+r2GYvwALzL5WwhjYSAAAAABJRU5ErkJggg=="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel):
+    def RunScript(self, AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction, modelExtrude, colorList):
+        import Rhino as rc
         import Rhino.Geometry as rg
         import math as mt
-        import ghpythonlib.treehelpers as th
+        import ghpythonlib.treehelpers as th # per data tree
         import Grasshopper as gh
         import sys
         import rhinoscriptsyntax as rs
         import Rhino.Display as rd
-        from scriptcontext import doc
-
-
-        def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel ):
+        from scriptcontext import sticky as st
+        import System.Drawing.Color
+        import scriptcontext as sc
+        #----------------------------------------------------------------------#
+                
+        def alphat( E, G, I, At ):
+            return (E*I)/(G*At)
+    
+        ## Spostamenti e rotazioni ##
+        def spostu( x, L, uI, uJ ):
+            return -(-L*uI + uI*x - uJ*x)/L
             
-            def updateComponent(interval):
+        def spostv( x, L, vI, vJ, thetaI, thetaJ, alphay ):
+            return (L**3*thetaI*x + L**3*vI - 2*L**2*thetaI*x**2 - L**2*thetaJ*x**2 + 6*L*alphay*thetaI*x - 6*L*alphay*thetaJ*x + 12*L*alphay*vI + L*thetaI*x**3 + L*thetaJ*x**3 - 3*L*vI*x**2 + 3*L*vJ*x**2 - 6*alphay*thetaI*x**2 + 6*alphay*thetaJ*x**2 - 12*alphay*vI*x + 12*alphay*vJ*x + 2*vI*x**3 - 2*vJ*x**3)/(L*(L**2 + 12*alphay))
+            
+        def spostw( x, L, wI, wJ, psiI, psiJ, alphaz ):
+            return -(L**3*psiI*x - L**3*wI - 2*L**2*psiI*x**2 - L**2*psiJ*x**2 - 6*L*alphaz*psiI*x + 6*L*alphaz*psiJ*x + 12*L*alphaz*wI + L*psiI*x**3 + L*psiJ*x**3 + 3*L*wI*x**2 - 3*L*wJ*x**2 + 6*alphaz*psiI*x**2 - 6*alphaz*psiJ*x**2 - 12*alphaz*wI*x + 12*alphaz*wJ*x - 2*wI*x**3 + 2*wJ*x**3)/(L*(L**2 - 12*alphaz))
+            
+        def thetaz(x, L, vI, vJ, thetaI, thetaJ, alphay): 
+            return (L**3*thetaI - 4*L**2*thetaI*x - 2*L**2*thetaJ*x + 12*L*alphay*thetaI + 3*L*thetaI*x**2 + 3*L*thetaJ*x**2 - 6*L*vI*x + 6*L*vJ*x - 12*alphay*thetaI*x + 12*alphay*thetaJ*x + 6*vI*x**2 - 6*vJ*x**2)/(L*(L**2 + 12*alphay))
+            
+        def phix(x, L, phiI, phiJ):
+            return -(-L*phiI + phiI*x - phiJ*x)/L
+    
+        def psiy(x, L, wI, wJ, psiI, psiJ, alphaz): 
+            return (L**3*psiI - 4*L**2*psiI*x - 2*L**2*psiJ*x - 12*L*alphaz*psiI + 3*L*psiI*x**2 + 3*L*psiJ*x**2 + 6*L*wI*x - 6*L*wJ*x + 12*alphaz*psiI*x - 12*alphaz*psiJ*x - 6*wI*x**2 + 6*wJ*x**2)/(L*(L**2 - 12*alphaz))
+            
+        def gammay( L, vI, vJ, thetaI, thetaJ, alphay): 
+    
+            return (L*thetaI + L*thetaJ + 2*vI - 2*vJ)/(L*(L**2 + 12*alphay))
+            
+        def gammaz( L, wI, wJ, psiI, psiJ, alphaz):
+    
+            return -(L*psiI + L*psiJ - 2*wI + 2*wJ)/(L*(L**2 - 12*alphaz))
+    
+        ##------------------------------------------------------------------------- --##
+    
+        def scaleAutomatic( Num , Den ):
+            if Den < 0.1 :
+                return Num
+            else :
+                return Num*1/Den
+    
+        def linspace(a, b, n=100):
+            if n < 2:
+                return b
+            diff = (float(b) - a)/(n - 1)
+            return [diff * i + a  for i in range(n)]
+    
+        ## Funzione rettangolo ##
+        def AddRectangleFromCenter(plane, width, height):
+            a = plane.PointAt(-width * 0.5, -height * 0.5 )
+            b = plane.PointAt(-width * 0.5,  height * 0.5 )
+            c = plane.PointAt( width * 0.5,  height * 0.5 )
+            d = plane.PointAt( width * 0.5,  -height * 0.5 )
+            #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
+            rectangle  = [a, b, c, d] 
+            return rectangle
+            
+        ## Funzione cerchio ##
+        def AddCircleFromCenter( plane, radius):
+            t = linspace( 0 , 1.80*mt.pi, 15 )
+            a = []
+            for ti in t:
+                x = radius*mt.cos(ti)
+                y = radius*mt.sin(ti)
+                a.append( plane.PointAt( x, y ) )
+            #circle = rg.PolylineCurve( a )
+            circle  = a 
+            return circle
+    
+        def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+    
+            p1 = plane.PointAt( -(yg - tinf), ta/2 )
+            p2 = plane.PointAt( -(yg - tinf), Binf/2 )
+            p3 = plane.PointAt( -yg, Binf/2 )
+            p4 = plane.PointAt( -yg, -Binf/2 )
+            p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
+            p6 = plane.PointAt( -(yg - tinf), -ta/2 )
+            p7 = plane.PointAt( (H - yg - tsup), -ta/2)
+            p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
+            p9 = plane.PointAt( (H - yg ), -Bsup/2 )
+            p10 = plane.PointAt( (H - yg ), Bsup/2 )
+            p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
+            p12 = plane.PointAt( (H - yg - tsup), ta/2 )
+    
+            wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
+            return wirframe
+            
+        def defShellQuad( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            thick = ele[2][1]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            
+            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
+            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            
+            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
+            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            
+            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
+            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            
+            trasl4 = nodeDisp.get( index4 -1 , "never")[0]
+            rotate4 = nodeDisp.get( index4 -1 , "never")[1]
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            
+            pointDef1 = rg.Vector3d.Clone( node.get( index1 -1 , "never") )
+            pointDef2 = rg.Vector3d.Clone( node.get( index2 -1 , "never") )
+            pointDef3 = rg.Vector3d.Clone( node.get( index3 -1 , "never") )
+            pointDef4 = rg.Vector3d.Clone( node.get( index4 -1 , "never") )
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
+            pointDef4.Transform( vectortrasl4 )
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            shellDefModel.Vertices.Add( pointDef4 ) #3
+            
+            
+            shellDefModel.Faces.AddFace(0, 1, 2, 3)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+    
+            vt = shellDefModel.Vertices
+            shellDefModel.FaceNormals.ComputeFaceNormals()
+            fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
+            normalFace = shellDefModel.FaceNormals[fid]
+            vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
+            trasl = rg.Transform.Translation( vectormoltiplicate )
+            moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
+            moveShell.Transform( trasl )
+            extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
+            return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4], [rotate1, rotate2, rotate3, rotate4], extrudeShell ]
+    
+        def defShellTriangle( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            thick = ele[2][1]
+            
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            
+            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
+            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            
+            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
+            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            
+            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
+            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            
+            shellDefModel.Faces.AddFace(0, 1, 2)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            vt = shellDefModel.Vertices
+            shellDefModel.FaceNormals.ComputeFaceNormals()
+            fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
+            normalFace = shellDefModel.FaceNormals[fid]
+            vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
+            trasl = rg.Transform.Translation( vectormoltiplicate )
+            moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
+            moveShell.Transform( trasl )
+            extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
+            return  [shellDefModel,[trasl1, trasl2, trasl3], [rotate1, rotate2, rotate3], extrudeShell ]
+    
+        def defSolid( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][1]
+            thick = ele[2][1]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            index5 = eleNodeTag[4]
+            index6 = eleNodeTag[5]
+            index7 = eleNodeTag[6]
+            index8 = eleNodeTag[7]
+            
+            trasl1 = nodeDisp.get( index1 -1 , "never")
+            trasl2 = nodeDisp.get( index2 -1 , "never")
+            trasl3 = nodeDisp.get( index3 -1 , "never")
+            trasl4 = nodeDisp.get( index4 -1 , "never")
+            trasl5 = nodeDisp.get( index5 -1 , "never")
+            trasl6 = nodeDisp.get( index6 -1 , "never")
+            trasl7 = nodeDisp.get( index7 -1 , "never")
+            trasl8 = nodeDisp.get( index8 -1 , "never")
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
+            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+            pointDef5 = rg.Point3d.Clone( node.get( index5 -1 , "never") )
+            pointDef6 = rg.Point3d.Clone( node.get( index6 -1 , "never") )
+            pointDef7 = rg.Point3d.Clone( node.get( index7 -1 , "never") )
+            pointDef8 = rg.Point3d.Clone( node.get( index8 -1 , "never") )
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
+            pointDef4.Transform( vectortrasl4 )
+            vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
+            pointDef5.Transform( vectortrasl1 )
+            vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
+            pointDef6.Transform( vectortrasl2 )
+            vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
+            pointDef7.Transform( vectortrasl3 )
+            vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
+            pointDef8.Transform( vectortrasl4 )
+            
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            shellDefModel.Vertices.Add( pointDef4 ) #3
+            shellDefModel.Vertices.Add( pointDef5 ) #4
+            shellDefModel.Vertices.Add( pointDef6 ) #5
+            shellDefModel.Vertices.Add( pointDef7 ) #6
+            shellDefModel.Vertices.Add( pointDef8 ) #7
+    
+            shellDefModel.Faces.AddFace(0, 1, 2, 3)
+            shellDefModel.Faces.AddFace(4, 5, 6, 7)
+            shellDefModel.Faces.AddFace(0, 1, 5, 4)
+            shellDefModel.Faces.AddFace(1, 2, 6, 5)
+            shellDefModel.Faces.AddFace(2, 3, 7, 6)
+            shellDefModel.Faces.AddFace(3, 0, 4, 7)
+            
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+            return  [shellDefModel,[trasl1, trasl2, trasl3,trasl4, trasl5, trasl6, trasl7, trasl8 ]]
+    
+        def defTetraSolid( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][1]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            
+            trasl1 = nodeDisp.get( index1 -1 , "never")
+            trasl2 = nodeDisp.get( index2 -1 , "never")
+            trasl3 = nodeDisp.get( index3 -1 , "never")
+            trasl4 = nodeDisp.get( index4 -1 , "never")
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
+            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+            
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
+            pointDef4.Transform( vectortrasl4 )
+    
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            shellDefModel.Vertices.Add( pointDef4 ) #3
+            
+            
+            shellDefModel.Faces.AddFace( 0, 1, 2 )
+            shellDefModel.Faces.AddFace( 0, 1, 3 )
+            shellDefModel.Faces.AddFace( 1, 2, 3 )
+            shellDefModel.Faces.AddFace( 0, 2, 3 )
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+            
+            return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4]]
+        ## node e nodeDisp son dictionary ##
+        def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
+            #---------------- WORLD PLANE ----------------------#
+            WorldPlane = rg.Plane.WorldXY
+            #--------- Propriety TimoshenkoBeam  ----------------#
+            TagEle = ele[0]
+            propSection = ele[2]
+            indexStart = ele[1][0]
+            indexEnd = ele[1][1]
+            color = propSection[12]
+            E = propSection[1]
+            G = propSection[2]
+            A = propSection[3]
+            Avz = propSection[4]
+            Avy = propSection[5]
+            Jxx = propSection[6]
+            Iy = propSection[7]
+            Iz = propSection[8]
+            #---- traslation and rotation index start & end ------- #
+            traslStart = nodeDisp.get( indexStart -1 , "never")[0]
+            rotateStart = nodeDisp.get( indexStart -1 , "never")[1]
+            traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
+            rotateEnd = nodeDisp.get( indexEnd -1 , "never")[1]
+            ##-------------------------------------------- ------------##
+            pointStart = node.get( indexStart -1 , "never")
+            pointEnd = node.get( indexEnd -1 , "never")
+            line = rg.LineCurve( pointStart, pointEnd )
+            #-------------------------versor ---------------------------#
+            axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+            axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+            axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
+            versor = [ axis1, axis2, axis3 ] 
+            #---------- WORLD PLANE on point start of line ---------------#
+            traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
+            WorldPlane.Transform( traslPlane )
+            #-------------------------------------------------------------#
+            planeStart = rg.Plane(pointStart, axis1, axis2 )
+            #planeStart = rg.Plane(pointStart, axis3 )
+            localPlane = planeStart
+            xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
+            localTraslStart = rg.Vector3d( traslStart )
+            vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
+            #print( vectorTrasform[0] )
+            localTraslStart = vectorTrasform[0]
+            uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
+            uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
+            uI3 = localTraslStart.Z # spostamento linea d'asse
+            localRotStart = vectorTrasform[1]
+            rI1 = localRotStart.X # 
+            rI2 = localRotStart.Y # 
+            rI3 = localRotStart.Z # 
+            localTraslEnd = vectorTrasform[2]
+            uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
+            uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
+            uJ3 = localTraslEnd.Z # spostamento linea d'asse
+            localRotEnd = vectorTrasform[3]
+            rJ1 = localRotEnd[0] #  
+            rJ2 = localRotEnd[1]  # 
+            rJ3 = localRotEnd[2]  # 
+            ##------------------ displacement value -------------------------##
+            Length = rg.Curve.GetLength( line )
+            segmentCount = Length/0.5
+            DivCurve = line.DivideByCount( segmentCount, True )
+            if DivCurve == None:
+                DivCurve = [ 0, Length]
                 
-                ## Updates this component, similar to using a grasshopper timer 
+            #s = dg.linspace(0,Length, len(PointsDivLength))
+            AlphaY = alphat( E, G, Iy, Avz )
+            AlphaZ = alphat( E, G, Iz, Avy )
+            
+            globalTransVector = []
+            globalRotVector = []
+            defPoint = []
+            defSection = []
+            #----------------------- local to global-------------------------#
+            xform2 = xform.TryGetInverse()
+            #----------------------------------------------------------------#
+            for index, x in enumerate(DivCurve):
+                beamPoint = line.PointAt(DivCurve[index]) 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
+                u3 = spostu(x, Length, uI3, uJ3)
+                u3Vector = u3*axis3
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
+                v1 =  spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+                v1Vector = v1*axis1 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
+                v2 =  spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+                v2Vector = v2*axis2 
                 
-                # Define callback action
-                def callBack(e):
-                    self.ExpireSolution(False)
+                ## RISULTANTE SPOSTAMENTI ##
+                transResult = v1Vector + v2Vector + u3Vector
+                
+                r2x =  thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+                r1x =  psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+                r3x = phix(x, Length, rI3, rJ3)
+                
+                rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
+                
+                trasl = rg.Transform.Translation( transResult*scaleDef )
+                beamPoint.Transform( trasl )
+                defPoint.append( beamPoint )
+                
+                sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
+                sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
+                sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
+                sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
+                if dimSection[0] == 'rectangular' :
+                    width, height = dimSection[1], dimSection[2]
+                    section = AddRectangleFromCenter( sectionPlane, width, height )
+                    defSection.append( section )
+                elif dimSection[0] == 'circular' :
+                    radius1  = dimSection[1]/2
+                    radius2  = dimSection[1]/2 - dimSection[2]
+                    section1 = AddCircleFromCenter( sectionPlane, radius1 )
+                    if (radius1 - radius2 ) == 0 :
+                        defSection.append( section1 )
+                    else :
+                        section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                        defSection.append( [ section1, section2 ] )
+                elif dimSection[0] == 'doubleT' :
+                    Bsup = dimSection[1]
+                    tsup = dimSection[2]
+                    Binf = dimSection[3]
+                    tinf = dimSection[4]
+                    H =  dimSection[5]
+                    ta =  dimSection[6]
+                    yg =  dimSection[7]
+                    section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
+                    defSection.append( section )
+                elif dimSection[0] == 'Generic' :
+                    radius  = dimSection[1]
+                    section = AddCircleFromCenter( sectionPlane, radius )
+                    defSection.append( section )
+            
+                globalTrasl = rg.Vector3d( transResult ) 
+                globalTrasl.Transform(xform2[1]) 
+                globalTrasl.Transform(xform)
+                globalTransVector.append( globalTrasl )
+    
+           
+            defpolyline = rg.PolylineCurve( defPoint )
+    
+            if dimSection[0] == 'circular' :
+                radius1  = dimSection[1]/2
+                radius2  = dimSection[1]/2 - dimSection[2]
+                if (radius1 - radius2 ) == 0:
+                    meshdef = meshLoft3( defSection,  color )
+    
+                else :
+                    defSection1 = [row[0] for row in defSection ]
+                    defSection2 = [row[1] for row in defSection ]
+                    meshdef = meshLoft3( defSection1,  color )
+                    meshdef.Append( meshLoft3( defSection2,  color ) )
+                    print( meshdef )
+    
+            else  :
+                meshdef = meshLoft3( defSection,  color )
+            return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
+    
+        ## node e nodeDisp son dictionary ##
+        def defTruss( ele, node, nodeDisp, scale ):
+            WorldPlane = rg.Plane.WorldXY
+            TagEle = ele[0]
+            propSection = ele[2]
+            color = propSection[12]
+            indexStart = ele[1][0]
+            indexEnd = ele[1][1]
+            E = propSection[1]
+            A = propSection[3]
+            
+            traslStart = nodeDisp.get( indexStart -1 , "never")
+            traslEnd = nodeDisp.get( indexEnd -1 , "never")
+            if len( traslStart ) == 2:
+                traslStart = nodeDisp.get( indexStart -1 , "never")[0]
+                traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
+            pointStart = node.get( indexStart -1 , "never")
+            pointEnd = node.get( indexEnd -1 , "never")
+            #print( traslStart[1] )
+            line = rg.LineCurve( pointStart,  pointEnd )
+    
+            axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+            axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+            axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
+            versor = [ axis1, axis2, axis3 ] 
+            #---------- WORLD PLANE on point start of line ---------------#
+            traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
+            WorldPlane.Transform( traslPlane )
+            #-------------------------------------------------------------#
+            planeStart = rg.Plane(pointStart, axis1, axis2 )
+            #planeStart = rg.Plane(pointStart, axis3 )
+            localPlane = planeStart
+            xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
+            localTraslStart = rg.Vector3d( traslStart )
+            vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
+            #print( vectorTrasform[0] )
+            localTraslStart = vectorTrasform[0]
+            uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
+            uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
+            uI3 = localTraslStart.Z # spostamento linea d'asse
+            localTraslEnd = vectorTrasform[1]
+            uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
+            uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
+            uJ3 = localTraslEnd.Z # spostamento linea d'asse
+            ##-------------- displacement value -------------------------##
+            Length = rg.Curve.GetLength( line )
+            segmentCount = Length/0.5
+            DivCurve = line.DivideByCount( segmentCount, True )
+            if DivCurve == None:
+                DivCurve = [ 0, Length]
+            defPoint = []
+            defSection = []
+            globalTransVector = []
+            #----------------------- local to global-------------------------#
+            xform2 = xform.TryGetInverse()
+            #----------------------------------------------------------------#
+            for index, x in enumerate(DivCurve):
+                beamPoint = line.PointAt(DivCurve[index]) 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
+                u3 = spostu(x, Length, uI3, uJ3)
+                u3Vector = u3*axis3
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
+                v1 =  x*( uJ1 - uI1 )/Length + uI1
+                v1Vector = v1*axis1 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
+                v2 =  x*( uJ2 - uI2 )/Length + uI2
+                v2Vector = v2*axis2 
+                ## RISULTANTE SPOSTAMENTI ##
+                transResult = v1Vector + v2Vector + u3Vector
+                trasl = rg.Transform.Translation( transResult*scale )
+                beamPoint.Transform( trasl )
+                defPoint.append( beamPoint )
+                sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
+                if dimSection[0] == 'rectangular' :
+                    width, height = dimSection[1], dimSection[2]
+                    section = AddRectangleFromCenter( sectionPlane, width, height )
+                    defSection.append( section )
+                elif dimSection[0] == 'circular' :
+                    radius1  = dimSection[1]/2
+                    radius2  = dimSection[1]/2 - dimSection[2]
+                    section1 = AddCircleFromCenter( sectionPlane, radius1 )
+                    if (radius1 - radius2 ) == 0 :
+                        defSection.append( section1 )
+                    else :
+                        section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                        defSection.append( [ section1, section2 ] )
+                elif dimSection[0] == 'doubleT' :
+                    Bsup = dimSection[1]
+                    tsup = dimSection[2]
+                    Binf = dimSection[3]
+                    tinf = dimSection[4]
+                    H =  dimSection[5]
+                    ta =  dimSection[6]
+                    yg =  dimSection[7]
+                    section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
+                    defSection.append( section )
+                elif dimSection[0] == 'Generic' :
+                    radius  = dimSection[1]
+                    section = AddCircleFromCenter( sectionPlane, radius )
+                    defSection.append( section )
+            
+                globalTrasl = rg.Vector3d( transResult ) 
+                globalTrasl.Transform(xform2[1]) 
+                globalTrasl.Transform(xform)
+                globalTransVector.append( globalTrasl )
+    
+           
+            defpolyline = rg.PolylineCurve( defPoint )
+    
+            if dimSection[0] == 'circular' :
+                radius1  = dimSection[1]/2
+                radius2  = dimSection[1]/2 - dimSection[2]
+                if (radius1 - radius2 ) == 0:
+                    meshdef = meshLoft3( defSection,  color )
+    
+                else :
+                    defSection1 = [row[0] for row in defSection ]
+                    defSection2 = [row[1] for row in defSection ]
+                    meshdef = meshLoft3( defSection1,  color )
+                    meshdef.Append( meshLoft3( defSection2,  color ) )
+                    #print( meshdef )
+    
+            else  :
+                meshdef = meshLoft3( defSection,  color )
+            return  [ defpolyline, meshdef, globalTransVector] 
+        ## Mesh from close section eith gradient color ##
+        def meshLoft3( point, color ):
+            #print( point )
+            meshEle = rg.Mesh()
+            pointSection1 = point
+            for i in range(0,len(pointSection1)):
+                for j in range(0, len(pointSection1[0])):
+                    vertix = pointSection1[i][j]
+                    #print( type(vertix) )
+                    meshEle.Vertices.Add( vertix ) 
+                    #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+            k = len(pointSection1[0])
+            for i in range(0,len(pointSection1)-1):
+                for j in range(0, len(pointSection1[0])):
+                    if j < k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = index2 + 1
+                        index4 = index1 + 1
+                    elif j == k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = (i+1)*k
+                        index4 = i*k
+                    meshEle.Faces.AddFace(index1, index2, index3, index4)
+                    #rs.ObjectColor(scyl,(255,0,0))
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            meshEle.VertexColors.CreateMonotoneMesh( colour )
+            meshElement = meshEle
+            #meshdElement.IsClosed(True)
+            
+            return meshElement
+    
+        def gradient(value, valueMin, valueMax, colorList ):
+    
+            if colorList == [] :
+                listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                            rs.CreateColor( 240, 69, 7),
+                            rs.CreateColor( 251, 255, 0 ),
+                            rs.CreateColor( 77, 255, 0 ),
+                            rs.CreateColor( 0, 255, 221 ),
+                            rs.CreateColor( 0, 81, 255 )]
+            else :
+                listcolor = colorList
+    
+            n = len( listcolor )
+            domain = linspace( valueMin, valueMax, n)
+            #print( domain )
+            
+            for i in range(1,n+1):
+                if  domain[i-1] <= value <= domain[i] :
+                    return listcolor[ i-1 ]
+                elif  valueMax <= value <= valueMax + 0.0000000000001 :
+                    return listcolor[ -1 ]
+                elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+                    return listcolor[ 0 ]
                     
-                # Get grasshopper document
-                ghDoc = self.OnPingDocument()
+        def updateComponent(interval):
+            
+            ## Updates this component, similar to using a grasshopper timer 
+            
+            # Define callback action
+            def callBack(e):
+                self.ExpireSolution(False)
+            
+            # Get grasshopper document
+            ghDoc = self.OnPingDocument()
+            
+            # Schedule this component to expire
+            ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
                 
-                # Schedule this component to expire
-                ghDoc.ScheduleSolution(interval,Grasshopper.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
-
-
-
+        def ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction, modelExtrude, colorList ):
+        
             global myCounter
             
             
@@ -6926,634 +7706,16 @@ class ModalModelView(component):
             numberMode = 1 if numberMode is None else numberMode
             Reset = False if Reset is None else Reset
             speed = 1 if speed is None else speed
-            
-            ExtrudedModel = True if ExtrudedModel is None else ExtrudedModel
-            
-            def alphat( E, G, I, At ):
-                return (E*I)/(G*At)
-        
-            ## Spostamenti e rotazioni ##
-            def spostu( x, L, uI, uJ ):
-                return -(-L*uI + uI*x - uJ*x)/L
-                
-            def spostv( x, L, vI, vJ, thetaI, thetaJ, alphay ):
-                return (L**3*thetaI*x + L**3*vI - 2*L**2*thetaI*x**2 - L**2*thetaJ*x**2 + 6*L*alphay*thetaI*x - 6*L*alphay*thetaJ*x + 12*L*alphay*vI + L*thetaI*x**3 + L*thetaJ*x**3 - 3*L*vI*x**2 + 3*L*vJ*x**2 - 6*alphay*thetaI*x**2 + 6*alphay*thetaJ*x**2 - 12*alphay*vI*x + 12*alphay*vJ*x + 2*vI*x**3 - 2*vJ*x**3)/(L*(L**2 + 12*alphay))
-                
-            def spostw( x, L, wI, wJ, psiI, psiJ, alphaz ):
-                return -(L**3*psiI*x - L**3*wI - 2*L**2*psiI*x**2 - L**2*psiJ*x**2 - 6*L*alphaz*psiI*x + 6*L*alphaz*psiJ*x + 12*L*alphaz*wI + L*psiI*x**3 + L*psiJ*x**3 + 3*L*wI*x**2 - 3*L*wJ*x**2 + 6*alphaz*psiI*x**2 - 6*alphaz*psiJ*x**2 - 12*alphaz*wI*x + 12*alphaz*wJ*x - 2*wI*x**3 + 2*wJ*x**3)/(L*(L**2 - 12*alphaz))
-                
-            def thetaz(x, L, vI, vJ, thetaI, thetaJ, alphay): 
-                return (L**3*thetaI - 4*L**2*thetaI*x - 2*L**2*thetaJ*x + 12*L*alphay*thetaI + 3*L*thetaI*x**2 + 3*L*thetaJ*x**2 - 6*L*vI*x + 6*L*vJ*x - 12*alphay*thetaI*x + 12*alphay*thetaJ*x + 6*vI*x**2 - 6*vJ*x**2)/(L*(L**2 + 12*alphay))
-                
-            def phix(x, L, phiI, phiJ):
-                return -(-L*phiI + phiI*x - phiJ*x)/L
-        
-            def psiy(x, L, wI, wJ, psiI, psiJ, alphaz): 
-                return (L**3*psiI - 4*L**2*psiI*x - 2*L**2*psiJ*x - 12*L*alphaz*psiI + 3*L*psiI*x**2 + 3*L*psiJ*x**2 + 6*L*wI*x - 6*L*wJ*x + 12*alphaz*psiI*x - 12*alphaz*psiJ*x - 6*wI*x**2 + 6*wJ*x**2)/(L*(L**2 - 12*alphaz))
-                
-            def gammay( L, vI, vJ, thetaI, thetaJ, alphay): 
-        
-                return (L*thetaI + L*thetaJ + 2*vI - 2*vJ)/(L*(L**2 + 12*alphay))
-                
-            def gammaz( L, wI, wJ, psiI, psiJ, alphaz):
-        
-                return -(L*psiI + L*psiJ - 2*wI + 2*wJ)/(L*(L**2 - 12*alphaz))
-        
-            ##------------------------------------------------------------------------- --##
-        
-            def scaleAutomatic( Num , Den ):
-                if Den < 0.1 :
-                    return Num
-                else :
-                    return Num*1/Den
-        
-            def linspace(a, b, n=100):
-                if n < 2:
-                    return b
-                diff = (float(b) - a)/(n - 1)
-                return [diff * i + a  for i in range(n)]
-        
-            ## Funzione rettangolo ##
-            def AddRectangleFromCenter(plane, width, height):
-                a = plane.PointAt(-width * 0.5, -height * 0.5 )
-                b = plane.PointAt(-width * 0.5,  height * 0.5 )
-                c = plane.PointAt( width * 0.5,  height * 0.5 )
-                d = plane.PointAt( width * 0.5,  -height * 0.5 )
-                #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
-                rectangle  = [a, b, c, d] 
-                return rectangle
-                
-            ## Funzione cerchio ##
-            def AddCircleFromCenter( plane, radius):
-                t = linspace( 0 , 1.80*mt.pi, 15 )
-                a = []
-                for ti in t:
-                    x = radius*mt.cos(ti)
-                    y = radius*mt.sin(ti)
-                    a.append( plane.PointAt( x, y ) )
-                #circle = rg.PolylineCurve( a )
-                circle  = a 
-                return circle
-        
-            def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
-        
-                p1 = plane.PointAt( -(yg - tinf), ta/2 )
-                p2 = plane.PointAt( -(yg - tinf), Binf/2 )
-                p3 = plane.PointAt( -yg, Binf/2 )
-                p4 = plane.PointAt( -yg, -Binf/2 )
-                p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
-                p6 = plane.PointAt( -(yg - tinf), -ta/2 )
-                p7 = plane.PointAt( (H - yg - tsup), -ta/2)
-                p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
-                p9 = plane.PointAt( (H - yg ), -Bsup/2 )
-                p10 = plane.PointAt( (H - yg ), Bsup/2 )
-                p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
-                p12 = plane.PointAt( (H - yg - tsup), ta/2 )
-        
-                wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
-                return wirframe
-                
-            def defShellQuad( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][2]
-                thick = ele[2][1]
-                index1 = eleNodeTag[0]
-                index2 = eleNodeTag[1]
-                index3 = eleNodeTag[2]
-                index4 = eleNodeTag[3]
-                
-                trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-                rotate1 = nodeDisp.get( index1 -1 , "never")[1]
-                
-                trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-                rotate2 = nodeDisp.get( index2 -1 , "never")[1]
-                
-                trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-                rotate3 = nodeDisp.get( index3 -1 , "never")[1]
-                
-                trasl4 = nodeDisp.get( index4 -1 , "never")[0]
-                rotate4 = nodeDisp.get( index4 -1 , "never")[1]
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                
-                pointDef1 = rg.Vector3d.Clone( node.get( index1 -1 , "never") )
-                pointDef2 = rg.Vector3d.Clone( node.get( index2 -1 , "never") )
-                pointDef3 = rg.Vector3d.Clone( node.get( index3 -1 , "never") )
-                pointDef4 = rg.Vector3d.Clone( node.get( index4 -1 , "never") )
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-                pointDef4.Transform( vectortrasl4 )
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                shellDefModel.Vertices.Add( pointDef4 ) #3
-                
-                
-                shellDefModel.Faces.AddFace(0, 1, 2, 3)
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                shellDefModel.VertexColors.CreateMonotoneMesh( colour )
-        
-                vt = shellDefModel.Vertices
-                shellDefModel.FaceNormals.ComputeFaceNormals()
-                fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
-                normalFace = shellDefModel.FaceNormals[fid]
-                vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
-                trasl = rg.Transform.Translation( vectormoltiplicate )
-                moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
-                moveShell.Transform( trasl )
-                extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
-                return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4], [rotate1, rotate2, rotate3, rotate4], extrudeShell ]
-        
-            def defShellTriangle( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][2]
-                thick = ele[2][1]
-                
-                index1 = eleNodeTag[0]
-                index2 = eleNodeTag[1]
-                index3 = eleNodeTag[2]
-                
-                trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-                rotate1 = nodeDisp.get( index1 -1 , "never")[1]
-                
-                trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-                rotate2 = nodeDisp.get( index2 -1 , "never")[1]
-                
-                trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-                rotate3 = nodeDisp.get( index3 -1 , "never")[1]
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                
-                shellDefModel.Faces.AddFace(0, 1, 2)
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                vt = shellDefModel.Vertices
-                shellDefModel.FaceNormals.ComputeFaceNormals()
-                fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
-                normalFace = shellDefModel.FaceNormals[fid]
-                vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
-                trasl = rg.Transform.Translation( vectormoltiplicate )
-                moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
-                moveShell.Transform( trasl )
-                extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
-                return  [shellDefModel,[trasl1, trasl2, trasl3], [rotate1, rotate2, rotate3], extrudeShell ]
-        
-            def defSolid( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][1]
-                thick = ele[2][1]
-                #print( eleNodeTag )
-                index1 = eleNodeTag[0]
-                index2 = eleNodeTag[1]
-                index3 = eleNodeTag[2]
-                index4 = eleNodeTag[3]
-                index5 = eleNodeTag[4]
-                index6 = eleNodeTag[5]
-                index7 = eleNodeTag[6]
-                index8 = eleNodeTag[7]
-                
-                trasl1 = nodeDisp.get( index1 -1 , "never")
-                trasl2 = nodeDisp.get( index2 -1 , "never")
-                trasl3 = nodeDisp.get( index3 -1 , "never")
-                trasl4 = nodeDisp.get( index4 -1 , "never")
-                trasl5 = nodeDisp.get( index5 -1 , "never")
-                trasl6 = nodeDisp.get( index6 -1 , "never")
-                trasl7 = nodeDisp.get( index7 -1 , "never")
-                trasl8 = nodeDisp.get( index8 -1 , "never")
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-                pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-                pointDef5 = rg.Point3d.Clone( node.get( index5 -1 , "never") )
-                pointDef6 = rg.Point3d.Clone( node.get( index6 -1 , "never") )
-                pointDef7 = rg.Point3d.Clone( node.get( index7 -1 , "never") )
-                pointDef8 = rg.Point3d.Clone( node.get( index8 -1 , "never") )
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-                pointDef4.Transform( vectortrasl4 )
-                vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
-                pointDef5.Transform( vectortrasl1 )
-                vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
-                pointDef6.Transform( vectortrasl2 )
-                vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
-                pointDef7.Transform( vectortrasl3 )
-                vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
-                pointDef8.Transform( vectortrasl4 )
-                
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                shellDefModel.Vertices.Add( pointDef4 ) #3
-                shellDefModel.Vertices.Add( pointDef5 ) #4
-                shellDefModel.Vertices.Add( pointDef6 ) #5
-                shellDefModel.Vertices.Add( pointDef7 ) #6
-                shellDefModel.Vertices.Add( pointDef8 ) #7
-        
-                shellDefModel.Faces.AddFace(0, 1, 2, 3)
-                shellDefModel.Faces.AddFace(4, 5, 6, 7)
-                shellDefModel.Faces.AddFace(0, 1, 5, 4)
-                shellDefModel.Faces.AddFace(1, 2, 6, 5)
-                shellDefModel.Faces.AddFace(2, 3, 7, 6)
-                shellDefModel.Faces.AddFace(3, 0, 4, 7)
-                
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                shellDefModel.VertexColors.CreateMonotoneMesh( colour )
-                return  [shellDefModel,[trasl1, trasl2, trasl3,trasl4, trasl5, trasl6, trasl7, trasl8 ]]
-        
-            def defTetraSolid( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][1]
-                #print( eleNodeTag )
-                index1 = eleNodeTag[0]
-                index2 = eleNodeTag[1]
-                index3 = eleNodeTag[2]
-                index4 = eleNodeTag[3]
-                
-                trasl1 = nodeDisp.get( index1 -1 , "never")
-                trasl2 = nodeDisp.get( index2 -1 , "never")
-                trasl3 = nodeDisp.get( index3 -1 , "never")
-                trasl4 = nodeDisp.get( index4 -1 , "never")
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-                pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-                
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-                pointDef4.Transform( vectortrasl4 )
-        
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                shellDefModel.Vertices.Add( pointDef4 ) #3
-                
-                
-                shellDefModel.Faces.AddFace( 0, 1, 2 )
-                shellDefModel.Faces.AddFace( 0, 1, 3 )
-                shellDefModel.Faces.AddFace( 1, 2, 3 )
-                shellDefModel.Faces.AddFace( 0, 2, 3 )
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                shellDefModel.VertexColors.CreateMonotoneMesh( colour )
-                
-                return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4]]
-            ## node e nodeDisp son dictionary ##
-            def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
-                #---------------- WORLD PLANE ----------------------#
-                WorldPlane = rg.Plane.WorldXY
-                #--------- Propriety TimoshenkoBeam  ----------------#
-                TagEle = ele[0]
-                propSection = ele[2]
-                indexStart = ele[1][0]
-                indexEnd = ele[1][1]
-                color = propSection[12]
-                E = propSection[1]
-                G = propSection[2]
-                A = propSection[3]
-                Avz = propSection[4]
-                Avy = propSection[5]
-                Jxx = propSection[6]
-                Iy = propSection[7]
-                Iz = propSection[8]
-                #---- traslation and rotation index start & end ------- #
-                traslStart = nodeDisp.get( indexStart -1 , "never")[0]
-                rotateStart = nodeDisp.get( indexStart -1 , "never")[1]
-                traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
-                rotateEnd = nodeDisp.get( indexEnd -1 , "never")[1]
-                ##-------------------------------------------- ------------##
-                pointStart = node.get( indexStart -1 , "never")
-                pointEnd = node.get( indexEnd -1 , "never")
-                line = rg.LineCurve( pointStart, pointEnd )
-                #-------------------------versor ---------------------------#
-                axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
-                axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
-                axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
-                versor = [ axis1, axis2, axis3 ] 
-                #---------- WORLD PLANE on point start of line ---------------#
-                traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
-                WorldPlane.Transform( traslPlane )
-                #-------------------------------------------------------------#
-                planeStart = rg.Plane(pointStart, axis1, axis2 )
-                #planeStart = rg.Plane(pointStart, axis3 )
-                localPlane = planeStart
-                xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
-                localTraslStart = rg.Vector3d( traslStart )
-                vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
-                #print( vectorTrasform[0] )
-                localTraslStart = vectorTrasform[0]
-                uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
-                uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
-                uI3 = localTraslStart.Z # spostamento linea d'asse
-                localRotStart = vectorTrasform[1]
-                rI1 = localRotStart.X # 
-                rI2 = localRotStart.Y # 
-                rI3 = localRotStart.Z # 
-                localTraslEnd = vectorTrasform[2]
-                uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
-                uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
-                uJ3 = localTraslEnd.Z # spostamento linea d'asse
-                localRotEnd = vectorTrasform[3]
-                rJ1 = localRotEnd[0] #  
-                rJ2 = localRotEnd[1]  # 
-                rJ3 = localRotEnd[2]  # 
-                ##------------------ displacement value -------------------------##
-                Length = rg.Curve.GetLength( line )
-                segmentCount = Length/0.5
-                DivCurve = line.DivideByCount( segmentCount, True )
-                if DivCurve == None:
-                    DivCurve = [ 0, Length]
+            modelExtrude = True if modelExtrude is None else modelExtrude
                     
-                #s = dg.linspace(0,Length, len(PointsDivLength))
-                AlphaY = alphat( E, G, Iy, Avz )
-                AlphaZ = alphat( E, G, Iz, Avy )
                 
-                globalTransVector = []
-                globalRotVector = []
-                defPoint = []
-                defSection = []
-                #----------------------- local to global-------------------------#
-                xform2 = xform.TryGetInverse()
-                #----------------------------------------------------------------#
-                for index, x in enumerate(DivCurve):
-                    beamPoint = line.PointAt(DivCurve[index]) 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-                    u3 = spostu(x, Length, uI3, uJ3)
-                    u3Vector = u3*axis3
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
-                    v1 =  spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
-                    v1Vector = v1*axis1 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
-                    v2 =  spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
-                    v2Vector = v2*axis2 
-                    
-                    ## RISULTANTE SPOSTAMENTI ##
-                    transResult = v1Vector + v2Vector + u3Vector
-                    
-                    r2x =  thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
-                    r1x =  psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
-                    r3x = phix(x, Length, rI3, rJ3)
-                    
-                    rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
-                    
-                    trasl = rg.Transform.Translation( transResult*scaleDef )
-                    beamPoint.Transform( trasl )
-                    defPoint.append( beamPoint )
-                    
-                    sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
-                    sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
-                    sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
-                    sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
-                    if dimSection[0] == 'rectangular' :
-                        width, height = dimSection[1], dimSection[2]
-                        section = AddRectangleFromCenter( sectionPlane, width, height )
-                        defSection.append( section )
-                    elif dimSection[0] == 'circular' :
-                        radius1  = dimSection[1]/2
-                        radius2  = dimSection[1]/2 - dimSection[2]
-                        section1 = AddCircleFromCenter( sectionPlane, radius1 )
-                        if (radius1 - radius2 ) == 0 :
-                            defSection.append( section1 )
-                        else :
-                            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-                            defSection.append( [ section1, section2 ] )
-                    elif dimSection[0] == 'doubleT' :
-                        Bsup = dimSection[1]
-                        tsup = dimSection[2]
-                        Binf = dimSection[3]
-                        tinf = dimSection[4]
-                        H =  dimSection[5]
-                        ta =  dimSection[6]
-                        yg =  dimSection[7]
-                        section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
-                        defSection.append( section )
-                    elif dimSection[0] == 'Generic' :
-                        radius  = dimSection[1]
-                        section = AddCircleFromCenter( sectionPlane, radius )
-                        defSection.append( section )
                 
-                    globalTrasl = rg.Vector3d( transResult ) 
-                    globalTrasl.Transform(xform2[1]) 
-                    globalTrasl.Transform(xform)
-                    globalTransVector.append( globalTrasl )
-        
-               
-                defpolyline = rg.PolylineCurve( defPoint )
-        
-                if dimSection[0] == 'circular' :
-                    radius1  = dimSection[1]/2
-                    radius2  = dimSection[1]/2 - dimSection[2]
-                    if (radius1 - radius2 ) == 0:
-                        meshdef = meshLoft3( defSection,  color )
-        
-                    else :
-                        defSection1 = [row[0] for row in defSection ]
-                        defSection2 = [row[1] for row in defSection ]
-                        meshdef = meshLoft3( defSection1,  color )
-                        meshdef.Append( meshLoft3( defSection2,  color ) )
-                        print( meshdef )
-        
-                else  :
-                    meshdef = meshLoft3( defSection,  color )
-                return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
-        
-            ## node e nodeDisp son dictionary ##
-            def defTruss( ele, node, nodeDisp, scale ):
-                WorldPlane = rg.Plane.WorldXY
-                TagEle = ele[0]
-                propSection = ele[2]
-                color = propSection[12]
-                indexStart = ele[1][0]
-                indexEnd = ele[1][1]
-                E = propSection[1]
-                A = propSection[3]
-                
-                traslStart = pointDispWrapperDict.get( indexStart -1 , "never")
-                traslEnd = pointDispWrapperDict.get( indexEnd -1 , "never")
-                if len( traslStart ) == 2:
-                    traslStart = pointDispWrapperDict.get( indexStart -1 , "never")[0]
-                    traslEnd = pointDispWrapperDict.get( indexEnd -1 , "never")[0]
-                pointStart = pointWrapperDict.get( indexStart -1 , "never")
-                pointEnd = pointWrapperDict.get( indexEnd -1 , "never")
-                #print( traslStart[1] )
-                line = rg.LineCurve( pointStart,  pointEnd )
-        
-                axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
-                axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
-                axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
-                versor = [ axis1, axis2, axis3 ] 
-                #---------- WORLD PLANE on point start of line ---------------#
-                traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
-                WorldPlane.Transform( traslPlane )
-                #-------------------------------------------------------------#
-                planeStart = rg.Plane(pointStart, axis1, axis2 )
-                #planeStart = rg.Plane(pointStart, axis3 )
-                localPlane = planeStart
-                xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
-                localTraslStart = rg.Vector3d( traslStart )
-                vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
-                #print( vectorTrasform[0] )
-                localTraslStart = vectorTrasform[0]
-                uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
-                uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
-                uI3 = localTraslStart.Z # spostamento linea d'asse
-                localTraslEnd = vectorTrasform[1]
-                uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
-                uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
-                uJ3 = localTraslEnd.Z # spostamento linea d'asse
-                ##-------------- displacement value -------------------------##
-                Length = rg.Curve.GetLength( line )
-                segmentCount = Length/0.5
-                DivCurve = line.DivideByCount( segmentCount, True )
-                if DivCurve == None:
-                    DivCurve = [ 0, Length]
-                defPoint = []
-                defSection = []
-                globalTransVector = []
-                #----------------------- local to global-------------------------#
-                xform2 = xform.TryGetInverse()
-                #----------------------------------------------------------------#
-                for index, x in enumerate(DivCurve):
-                    beamPoint = line.PointAt(DivCurve[index]) 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-                    u3 = spostu(x, Length, uI3, uJ3)
-                    u3Vector = u3*axis3
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
-                    v1 =  x*( uJ1 - uI1 )/Length + uI1
-                    v1Vector = v1*axis1 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
-                    v2 =  x*( uJ2 - uI2 )/Length + uI2
-                    v2Vector = v2*axis2 
-                    ## RISULTANTE SPOSTAMENTI ##
-                    transResult = v1Vector + v2Vector + u3Vector
-                    trasl = rg.Transform.Translation( transResult*scale )
-                    beamPoint.Transform( trasl )
-                    defPoint.append( beamPoint )
-                    sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
-                    if dimSection[0] == 'rectangular' :
-                        width, height = dimSection[1], dimSection[2]
-                        section = AddRectangleFromCenter( sectionPlane, width, height )
-                        defSection.append( section )
-                    elif dimSection[0] == 'circular' :
-                        radius1  = dimSection[1]/2
-                        radius2  = dimSection[1]/2 - dimSection[2]
-                        section1 = AddCircleFromCenter( sectionPlane, radius1 )
-                        if (radius1 - radius2 ) == 0 :
-                            defSection.append( section1 )
-                        else :
-                            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-                            defSection.append( [ section1, section2 ] )
-                    elif dimSection[0] == 'doubleT' :
-                        Bsup = dimSection[1]
-                        tsup = dimSection[2]
-                        Binf = dimSection[3]
-                        tinf = dimSection[4]
-                        H =  dimSection[5]
-                        ta =  dimSection[6]
-                        yg =  dimSection[7]
-                        section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
-                        defSection.append( section )
-                    elif dimSection[0] == 'Generic' :
-                        radius  = dimSection[1]
-                        section = AddCircleFromCenter( sectionPlane, radius )
-                        defSection.append( section )
-                
-                    globalTrasl = rg.Vector3d( transResult ) 
-                    globalTrasl.Transform(xform2[1]) 
-                    globalTrasl.Transform(xform)
-                    globalTransVector.append( globalTrasl )
-        
-               
-                defpolyline = rg.PolylineCurve( defPoint )
-        
-                if dimSection[0] == 'circular' :
-                    radius1  = dimSection[1]/2
-                    radius2  = dimSection[1]/2 - dimSection[2]
-                    if (radius1 - radius2 ) == 0:
-                        meshdef = meshLoft3( defSection,  color )
-        
-                    else :
-                        defSection1 = [row[0] for row in defSection ]
-                        defSection2 = [row[1] for row in defSection ]
-                        meshdef = meshLoft3( defSection1,  color )
-                        meshdef.Append( meshLoft3( defSection2,  color ) )
-                        print( meshdef )
-        
-                else  :
-                    meshdef = meshLoft3( defSection,  color )
-                return  [ defpolyline, meshdef, globalTransVector] 
-            ## Mesh from close section eith gradient color ##
-            def meshLoft3( point, color ):
-                #print( point )
-                meshEle = rg.Mesh()
-                pointSection1 = point
-                for i in range(0,len(pointSection1)):
-                    for j in range(0, len(pointSection1[0])):
-                        vertix = pointSection1[i][j]
-                        #print( type(vertix) )
-                        meshEle.Vertices.Add( vertix ) 
-                        #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-                k = len(pointSection1[0])
-                for i in range(0,len(pointSection1)-1):
-                    for j in range(0, len(pointSection1[0])):
-                        if j < k-1:
-                            index1 = i*k + j
-                            index2 = (i+1)*k + j
-                            index3 = index2 + 1
-                            index4 = index1 + 1
-                        elif j == k-1:
-                            index1 = i*k + j
-                            index2 = (i+1)*k + j
-                            index3 = (i+1)*k
-                            index4 = i*k
-                        meshEle.Faces.AddFace(index1, index2, index3, index4)
-                        #rs.ObjectColor(scyl,(255,0,0))
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                meshEle.VertexColors.CreateMonotoneMesh( colour )
-                meshElement = meshEle
-                #meshdElement.IsClosed(True)
-                
-                return meshElement
+            global ModelDisp
+            global ModelCurve
+            global ModelShell
+            global ModelSolid
+            global dimSection
+            #global ExtrudedModel
         
             diplacementWrapper = AlpacaModalOutput[0][numberMode-1] # number of mode will start from 1. First, Second, Third ect ect
             EleOut = AlpacaModalOutput[1]
@@ -7566,7 +7728,7 @@ class ModalModelView(component):
         
             # Update the variable and component
             if Animate and not Reset:
-                myCounter += 1.0/ ( (speed) * 10.0 )
+                myCounter += 1/ ( (speed) * 10 )
                 updateComponent(1)
         
             # Output counter
@@ -7624,9 +7786,10 @@ class ModalModelView(component):
             else :
                 scaleDef = scale
         
+            modelDisp = []
             modelCurve = []
             ShellDefModel = []
-            ExtrudedView = rg.Mesh()
+            ExtrudedView = []
         
             traslBeamValue = []
             rotBeamValue = []
@@ -7655,9 +7818,9 @@ class ModalModelView(component):
                     traslBeamValue.append( globalTrans ) 
                     rotBeamValue.append( globalRot )
                     modelCurve.append( defpolyline )
+                    modelDisp.append( defpolyline )
                     # estrusione della beam #
-                    ExtrudedView.Append( meshdef )
-                    #doc.Objects.AddMesh( meshdef )
+                    ExtrudedView.append( meshdef )
                 elif eleType == 'Truss' :
                     dimSection = ele[2][10]
                     color = ele[2][12]
@@ -7668,8 +7831,8 @@ class ModalModelView(component):
                     globalTrans = valueTruss[2]
                     traslBeamValue.append( globalTrans ) 
                     modelCurve.append( defpolyline )
-                    ExtrudedView.Append( meshdef )
-                    #doc.Objects.AddMesh( meshdef )
+                    ExtrudedView.append( meshdef )
+                    modelDisp.append( defpolyline )
         
                 elif nNode == 4 and eleType != 'FourNodeTetrahedron':
                     shellDefModel = defShellQuad( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
@@ -7677,8 +7840,7 @@ class ModalModelView(component):
                     traslShellValue.append( shellDefModel[1] )
                     rotShellValue.append( shellDefModel[2] )
                     extrudeShell = shellDefModel[3]
-                    ExtrudedView.Append( extrudeShell )
-                    doc.Objects.AddMesh( extrudeShell)
+                    ExtrudedView.append( extrudeShell )
                     
                 elif nNode == 3:
                     #print( nNode )
@@ -7687,41 +7849,148 @@ class ModalModelView(component):
                     traslShellValue.append( shellDefModel[1] )
                     rotShellValue.append( shellDefModel[2] )
                     extrudeShell = shellDefModel[3]
-                    ExtrudedView.Append( extrudeShell )
-                    doc.Objects.AddMesh( extrudeShell)
+                    ExtrudedView.append( extrudeShell )
+        
                     
                 elif nNode == 8:
                     solidDefModel = defSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
                     SolidDefModel.append( solidDefModel[0] )
                     doc.Objects.AddMesh( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
-                    ExtrudedView.Append( solidDefModel[0] )
+                    ExtrudedView.append( solidDefModel[0] )
                     
                 elif  eleType == 'FourNodeTetrahedron' :
                     #print(ele)
                     solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
                     SolidDefModel.append( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
-                    ExtrudedView.Append( solidDefModel[0] )
+                    ExtrudedView.append( solidDefModel[0] )
+        
+            ########################################################################################################################
+            # MAX an MIN VALOR
+            valorVector = []
+            # beam valor #
+            for valuetrasl in traslBeamValue:
+                for valor in valuetrasl:
+                    vectorTrasl = rg.Vector3d( valor )
+                    if direction == 0:
+                        valorVector.append( vectorTrasl.X ) 
+                    elif direction == 1:
+                        valorVector.append( vectorTrasl.Y )
+                    elif direction == 2:
+                        valorVector.append( vectorTrasl.Z ) 
+                    elif direction == 3:
+                        valorVector.append( vectorTrasl.Length )     
+            # POINT #
+            if len(dispWrapper[0][1]) == 3 :
+                PointDisp = [row[1] for row in dispWrapper ] 
+            else:
+                PointDisp = [row[1][0] for row in dispWrapper ]
+        
+            for nodeDisp in PointDisp :
+                vectorNodeDisp = rg.Vector3d( nodeDisp )
+                if direction == 0:
+                    valorVector.append( vectorNodeDisp.X ) 
+                elif direction == 1:
+                    valorVector.append( vectorNodeDisp.Y )
+                elif direction == 2:
+                    valorVector.append( vectorNodeDisp.Z ) 
+                elif direction == 3:
+                    valorVector.append( vectorNodeDisp.Length )
+            # MAX end MIN on structures point #
+            lowerLimit = min( valorVector )
+            upperLimit = max( valorVector )
+            domainValues = [ lowerLimit, upperLimit ]
+            print( lowerLimit, upperLimit )
+        #####################################################################################
+            colorBeam = []
+            numberDivide = []
+            for value in traslBeamValue :
+                colorValor = []
+                for valor in value:
+                    vectorTrasl = rg.Vector3d( valor )
+        
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+        
+                    #print( valorVector )
+        
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    colorValor.append( color )
+                colorBeam.append( colorValor )
+                numberDivide.append( len(colorValor) )
+            #print( modelCurve[0])
+            segment = []
+            for curve, segmentCount in zip( modelCurve, numberDivide ):
+                #print(segmentCount)
+                parameter = curve.DivideByCount( segmentCount - 1, True )
+                segmentCurve = []
+                for i in range(1, len(parameter)) :
+                        p1 =  rg.Curve.PointAt( curve, parameter[i-1] ) 
+                        p2 = rg.Curve.PointAt( curve, parameter[i] )
+                        segmentCurve.append( rg.Line( p1, p2 ) )
+                segment.append( segmentCurve )
+        
+                #print( segment )
+        
+            
+            for shellEle, value in zip(ShellDefModel,traslShellValue) :
+                shellColor = shellEle.DuplicateMesh()
+                shellColor.VertexColors.Clear()
+                for j in range( 0,shellEle.Vertices.Count ):
+                    vectorTrasl = rg.Vector3d( value[j] )
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+        
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    shellColor.VertexColors.Add( color )
+                modelDisp.append( shellColor)
+            #dup.VertexColors.CreateMonotoneMesh(Color.Red)
+            #doc.Objects.AddMesh(dup)
+            for solidEle, value in zip(SolidDefModel,traslSolidValue) :
+                solidColor = solidEle.DuplicateMesh()
+                solidColor.VertexColors.Clear()
+                for j in range(0,solidEle.Vertices.Count):
+                    vectorTrasl = rg.Vector3d( value[j] )
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+        
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    solidColor.VertexColors.Add( color )
+                modelDisp.append( solidColor )
+                    #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
         
         
-            if ExtrudedModel == False or ExtrudedModel == None :
-                ModelDisp  = None
-                #ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
-                ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
-                ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
-                ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
-                #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
+            if modelExtrude == False or modelExtrude == None :
+                self.line = segment
+                self.colorLine = colorBeam
+                return modelDisp
                 
             else:
-                ModelDisp = ExtrudedView
-                ModelCurve = None
-                ModelShell = None
-                ModelSolid = None
-        
-            return ModelDisp, ModelCurve, ModelShell, ModelSolid
-        
-        
+                self.line = []
+                self.colorLine = []
+                return ExtrudedView
+                
+                
+                
         checkData = True
         
         if not AlpacaModalOutput:
@@ -7730,21 +7999,26 @@ class ModalModelView(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            ModelDisp, ModelCurve, ModelShell, ModelSolid = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, ExtrudedModel )
-            return (ModelDisp, ModelCurve, ModelShell, ModelSolid)
-
+            modelDisp = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction,modelExtrude, colorList )
+            return (modelDisp)
+            
+    def DrawViewportWires(self,arg):
+        
+        for crvs, colors in zip(self.line, self.colorLine):
+            for crv, color in zip(crvs, colors):
+                arg.Display.DrawLine(crv, color, 4)
 
 class GroundMotionModelView(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Ground Motion Model View (Alpaca4d)", "Ground Motion Model View", """Visualize the Ground Motion Response of a Structure""", "Alpaca", "7|Visualisation")
+            "Ground Motion Model View (Alpaca4d)", "Ground Motion Model View", """Visualize the Ground Motion Response""", "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.primary
+        return Grasshopper.Kernel.GH_Exposure.tertiary
 
     def get_ComponentGuid(self):
-        return System.Guid("689c9f2f-988b-49fb-981b-aaa0e2a05f05")
+        return System.Guid("48501d2c-4c5f-44d2-82c1-4b4390260903")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -7753,7 +8027,7 @@ class GroundMotionModelView(component):
         p.Optional = True
     
     def RegisterInputParams(self, pManager):
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "AlpacaGroundmotionOutput", "AlpacaGroundmotionOutput", "Ground Motion Analyses Output.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
@@ -7763,46 +8037,56 @@ class GroundMotionModelView(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_Boolean()
+        p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "Animate", "Animate", "True to see the deformed shape during the time.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_Boolean()
+        p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "Reset", "Reset", "")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_Number()
+        p = GhPython.Assemblies.MarshalParam()
         self.SetUpParam(p, "scale", "scale", "Amplitude value for deformation. Default is 10.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "ExtrudedModel", "ExtrudedModel", "True - Visualise Extruded Model")
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "direction", "direction", "")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "modelExtrude", "modelExtrude", "True - Visualise Extruded Model")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Colour()
+        self.SetUpParam(p, "colorList", "colorList", "")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
         
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelDisp", "ModelDisp", "")
+        self.SetUpParam(p, "modelDisp", "modelDisp", "Script output modelDisp.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelCurve", "ModelCurve", "")
+        self.SetUpParam(p, "PointPos", "PointPos", "Point representing the model.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelShell", "ModelShell", "")
+        self.SetUpParam(p, "PointDisp", "PointDisp", "Displacement vector of each node. The value change along the visualisation.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ModelSolid", "ModelSolid", "")
+        self.SetUpParam(p, "domainValues", "domainValues", "max and min displacement of the structure.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "trans", "trans", "Displacement vector during the time.")
+        self.SetUpParam(p, "a", "trans", "list of Displacement vector during the time.")
         self.Params.Output.Add(p)
         
     
@@ -7813,7 +8097,9 @@ class GroundMotionModelView(component):
         p3 = self.marshal.GetInput(DA, 3)
         p4 = self.marshal.GetInput(DA, 4)
         p5 = self.marshal.GetInput(DA, 5)
-        result = self.RunScript(p0, p1, p2, p3, p4, p5)
+        p6 = self.marshal.GetInput(DA, 6)
+        p7 = self.marshal.GetInput(DA, 7)
+        result = self.RunScript(p0, p1, p2, p3, p4, p5, p6, p7)
 
         if result is not None:
             if not hasattr(result, '__getitem__'):
@@ -7830,9 +8116,9 @@ class GroundMotionModelView(component):
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaGroundmotionOutput, speed, Animate, Reset, scale, ExtrudedModel):
-        
-        
+    def RunScript(self, AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExtrude, colorList ):
+
+        import Rhino as rc
         import Rhino.Geometry as rg
         import math as mt
         import ghpythonlib.treehelpers as th # per data tree
@@ -7840,13 +8126,710 @@ class GroundMotionModelView(component):
         import sys
         import rhinoscriptsyntax as rs
         import Rhino.Display as rd
-        from scriptcontext import doc
+        from scriptcontext import sticky as st
+        import System.Drawing.Color
+        import scriptcontext as sc
         import time
         
+        #---------------------------#
+        def alphat( E, G, I, At ):
+            return (E*I)/(G*At)
         
-        #---------------------------------------------------------------------------------------#
-        ## -------------FUNZIONI DI FORMA PER TRAVE DI TYMOSHENKO------------------ ##
-        def GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, ExtrudedModel):
+        ## Spostamenti e rotazioni ##
+        def spostu( x, L, uI, uJ ):
+            return -(-L*uI + uI*x - uJ*x)/L
+            
+        def spostv( x, L, vI, vJ, thetaI, thetaJ, alphay ):
+            return (L**3*thetaI*x + L**3*vI - 2*L**2*thetaI*x**2 - L**2*thetaJ*x**2 + 6*L*alphay*thetaI*x - 6*L*alphay*thetaJ*x + 12*L*alphay*vI + L*thetaI*x**3 + L*thetaJ*x**3 - 3*L*vI*x**2 + 3*L*vJ*x**2 - 6*alphay*thetaI*x**2 + 6*alphay*thetaJ*x**2 - 12*alphay*vI*x + 12*alphay*vJ*x + 2*vI*x**3 - 2*vJ*x**3)/(L*(L**2 + 12*alphay))
+            
+        def spostw( x, L, wI, wJ, psiI, psiJ, alphaz ):
+            return -(L**3*psiI*x - L**3*wI - 2*L**2*psiI*x**2 - L**2*psiJ*x**2 - 6*L*alphaz*psiI*x + 6*L*alphaz*psiJ*x + 12*L*alphaz*wI + L*psiI*x**3 + L*psiJ*x**3 + 3*L*wI*x**2 - 3*L*wJ*x**2 + 6*alphaz*psiI*x**2 - 6*alphaz*psiJ*x**2 - 12*alphaz*wI*x + 12*alphaz*wJ*x - 2*wI*x**3 + 2*wJ*x**3)/(L*(L**2 - 12*alphaz))
+            
+        def thetaz(x, L, vI, vJ, thetaI, thetaJ, alphay): 
+            return (L**3*thetaI - 4*L**2*thetaI*x - 2*L**2*thetaJ*x + 12*L*alphay*thetaI + 3*L*thetaI*x**2 + 3*L*thetaJ*x**2 - 6*L*vI*x + 6*L*vJ*x - 12*alphay*thetaI*x + 12*alphay*thetaJ*x + 6*vI*x**2 - 6*vJ*x**2)/(L*(L**2 + 12*alphay))
+            
+        def phix(x, L, phiI, phiJ):
+            return -(-L*phiI + phiI*x - phiJ*x)/L
+        
+        def psiy(x, L, wI, wJ, psiI, psiJ, alphaz): 
+            return (L**3*psiI - 4*L**2*psiI*x - 2*L**2*psiJ*x - 12*L*alphaz*psiI + 3*L*psiI*x**2 + 3*L*psiJ*x**2 + 6*L*wI*x - 6*L*wJ*x + 12*alphaz*psiI*x - 12*alphaz*psiJ*x - 6*wI*x**2 + 6*wJ*x**2)/(L*(L**2 - 12*alphaz))
+            
+        def gammay( L, vI, vJ, thetaI, thetaJ, alphay): 
+        
+            return (L*thetaI + L*thetaJ + 2*vI - 2*vJ)/(L*(L**2 + 12*alphay))
+            
+        def gammaz( L, wI, wJ, psiI, psiJ, alphaz):
+        
+            return -(L*psiI + L*psiJ - 2*wI + 2*wJ)/(L*(L**2 - 12*alphaz))
+        
+        ##------------------------------------------------------------------------- --##
+        
+        def scaleAutomatic( Num , Den ):
+            if Den < 0.1 :
+                return Num
+            else :
+                return Num*1/Den
+        
+        def linspace(a, b, n=100):
+            if n < 2:
+                return b
+            diff = (float(b) - a)/(n - 1)
+            return [diff * i + a  for i in range(n)]
+        
+        ## Funzione rettangolo ##
+        def AddRectangleFromCenter(plane, width, height):
+            a = plane.PointAt(-width * 0.5, -height * 0.5 )
+            b = plane.PointAt(-width * 0.5,  height * 0.5 )
+            c = plane.PointAt( width * 0.5,  height * 0.5 )
+            d = plane.PointAt( width * 0.5,  -height * 0.5 )
+            #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
+            rectangle  = [a, b, c, d] 
+            return rectangle
+        
+        ## Funzione cerchio ##
+        def AddCircleFromCenter( plane, radius):
+            t = linspace( 0 , 1.80*mt.pi, 15 )
+            a = []
+            for ti in t:
+                x = radius*mt.cos(ti)
+                y = radius*mt.sin(ti)
+                a.append( plane.PointAt( x, y ) )
+            #circle = rg.PolylineCurve( a )
+            circle  = a 
+            return circle
+        
+        def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
+            #-------------------1---------2 #
+            p1 = plane.PointAt( -(yg - tinf), ta/2 )
+            p2 = plane.PointAt( -(yg - tinf), Binf/2 )
+            p3 = plane.PointAt( -yg, Binf/2 )
+            p4 = plane.PointAt( -yg, -Binf/2 )
+            p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
+            p6 = plane.PointAt( -(yg - tinf), -ta/2 )
+            p7 = plane.PointAt( (H - yg - tsup), -ta/2)
+            p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
+            p9 = plane.PointAt( (H - yg ), -Bsup/2 )
+            p10 = plane.PointAt( (H - yg ), Bsup/2 )
+            p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
+            p12 = plane.PointAt( (H - yg - tsup), ta/2 )
+        
+            wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
+            return wirframe
+        
+        def defShellQuad( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            thick = ele[2][1]
+            #print( eleNodeTag )
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] 
+            index2 = eleNodeTag[1] 
+            index3 = eleNodeTag[2] 
+            index4 = eleNodeTag[3] 
+            
+            trasl1 = nodeDisp.get( index1 , "never")[0]
+            rotate1 = nodeDisp.get( index1 , "never")[1]
+            
+            trasl2 = nodeDisp.get( index2 , "never")[0]
+            rotate2 = nodeDisp.get( index2 , "never")[1]
+            
+            trasl3 = nodeDisp.get( index3 , "never")[0]
+            rotate3 = nodeDisp.get( index3 , "never")[1]
+            
+            trasl4 = nodeDisp.get( index4 , "never")[0]
+            rotate4 = nodeDisp.get( index4 , "never")[1]
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            
+            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+            pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
+            #print( index1 - 1)
+            #print( nodeDisp )
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
+            pointDef4.Transform( vectortrasl4 )
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            shellDefModel.Vertices.Add( pointDef4 ) #3
+            
+            
+            shellDefModel.Faces.AddFace(0, 1, 2, 3)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+        
+            vt = shellDefModel.Vertices
+            shellDefModel.FaceNormals.ComputeFaceNormals()
+            fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
+            normalFace = shellDefModel.FaceNormals[fid]
+            vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
+            trasl = rg.Transform.Translation( vectormoltiplicate )
+            moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
+            moveShell.Transform( trasl )
+            extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
+            return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4], [rotate1, rotate2, rotate3, rotate4], extrudeShell ]
+        
+        def defShellTriangle( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][1]
+            index1 = eleNodeTag[0] - 1
+            index2 = eleNodeTag[1] - 1
+            index3 = eleNodeTag[2] - 1
+            
+            trasl1 = nodeDisp.get( index1 , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
+            
+            trasl2 = nodeDisp.get( index2 , "never")[0]
+            rotate2 = nodeDisp.get( index2 , "never")[1]
+            
+            trasl3 = nodeDisp.get( index3 , "never")[0]
+            rotate3 = nodeDisp.get( index3 , "never")[1]
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            
+            shellDefModel.Faces.AddFace(0, 1, 2)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            vt = shellDefModel.Vertices
+            shellDefModel.FaceNormals.ComputeFaceNormals()
+            fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
+            normalFace = shellDefModel.FaceNormals[fid]
+            vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
+            trasl = rg.Transform.Translation( vectormoltiplicate )
+            moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
+            moveShell.Transform( trasl )
+            extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
+            return  [shellDefModel,[trasl1, trasl2, trasl3], [rotate1, rotate2, rotate3], extrudeShell ]
+        
+        def defSolid( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][1]
+            thick = ele[2][1]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] - 1
+            index2 = eleNodeTag[1] - 1
+            index3 = eleNodeTag[2] - 1
+            index4 = eleNodeTag[3] - 1
+            index5 = eleNodeTag[4] - 1
+            index6 = eleNodeTag[5] - 1
+            index7 = eleNodeTag[6] - 1
+            index8 = eleNodeTag[7] - 1
+            
+            trasl1 = nodeDisp.get( index1 , "never")
+            trasl2 = nodeDisp.get( index2 , "never")
+            trasl3 = nodeDisp.get( index3 , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
+            trasl5 = nodeDisp.get( index5 , "never")
+            trasl6 = nodeDisp.get( index6 , "never")
+            trasl7 = nodeDisp.get( index7 , "never")
+            trasl8 = nodeDisp.get( index8 , "never")
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+            pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
+            pointDef5 = rg.Point3d.Clone( node.get( index5 , "never") )
+            pointDef6 = rg.Point3d.Clone( node.get( index6 , "never") )
+            pointDef7 = rg.Point3d.Clone( node.get( index7 , "never") )
+            pointDef8 = rg.Point3d.Clone( node.get( index8 , "never") )
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
+            pointDef4.Transform( vectortrasl4 )
+            vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
+            pointDef5.Transform( vectortrasl1 )
+            vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
+            pointDef6.Transform( vectortrasl2 )
+            vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
+            pointDef7.Transform( vectortrasl3 )
+            vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
+            pointDef8.Transform( vectortrasl4 )
+            
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            shellDefModel.Vertices.Add( pointDef4 ) #3
+            shellDefModel.Vertices.Add( pointDef5 ) #4
+            shellDefModel.Vertices.Add( pointDef6 ) #5
+            shellDefModel.Vertices.Add( pointDef7 ) #6
+            shellDefModel.Vertices.Add( pointDef8 ) #7
+        
+            shellDefModel.Faces.AddFace(0, 1, 2, 3)
+            shellDefModel.Faces.AddFace(4, 5, 6, 7)
+            shellDefModel.Faces.AddFace(0, 1, 5, 4)
+            shellDefModel.Faces.AddFace(1, 2, 6, 5)
+            shellDefModel.Faces.AddFace(2, 3, 7, 6)
+            shellDefModel.Faces.AddFace(3, 0, 4, 7)
+            
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+            return  [shellDefModel,[trasl1, trasl2, trasl3,trasl4, trasl5, trasl6, trasl7, trasl8 ]]
+        
+        def defTetraSolid( ele, node, nodeDisp, scaleDef ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][1]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] - 1
+            index2 = eleNodeTag[1] - 1
+            index3 = eleNodeTag[2] - 1
+            index4 = eleNodeTag[3] - 1
+            
+            trasl1 = nodeDisp.get( index1 , "never")
+            trasl2 = nodeDisp.get( index2 , "never")
+            trasl3 = nodeDisp.get( index3 , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
+            
+            ## CREO IL MODELLO DEFORMATO  ##
+            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
+            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
+            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
+            pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
+            
+            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
+            pointDef1.Transform( vectortrasl1 )
+            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
+            pointDef2.Transform( vectortrasl2 )
+            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
+            pointDef3.Transform( vectortrasl3 )
+            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
+            pointDef4.Transform( vectortrasl4 )
+        
+            shellDefModel = rg.Mesh()
+            shellDefModel.Vertices.Add( pointDef1 ) #0
+            shellDefModel.Vertices.Add( pointDef2 ) #1
+            shellDefModel.Vertices.Add( pointDef3 ) #2
+            shellDefModel.Vertices.Add( pointDef4 ) #3
+            
+            
+            shellDefModel.Faces.AddFace( 0, 1, 2 )
+            shellDefModel.Faces.AddFace( 0, 1, 3 )
+            shellDefModel.Faces.AddFace( 1, 2, 3 )
+            shellDefModel.Faces.AddFace( 0, 2, 3 )
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellDefModel.VertexColors.CreateMonotoneMesh( colour )
+            
+            return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4]]
+        ## node e nodeDisp son dictionary ##
+        def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
+            #---------------- WORLD PLANE ----------------------#
+            WorldPlane = rg.Plane.WorldXY
+            #--------- Propriety TimoshenkoBeam  ----------------#
+            TagEle = ele[0]
+            propSection = ele[2]
+            indexStart = ele[1][0]
+            indexEnd = ele[1][1]
+            #print( indexStart, indexEnd )
+            color = propSection[12]
+            E = propSection[1]
+            G = propSection[2]
+            A = propSection[3]
+            Avz = propSection[4]
+            Avy = propSection[5]
+            Jxx = propSection[6]
+            Iy = propSection[7]
+            Iz = propSection[8]
+            #---- traslation and rotation index start & end ------- #
+            traslStart = nodeDisp.get( indexStart , "never")[0]
+            rotateStart = nodeDisp.get( indexStart , "never")[1]
+            traslEnd = nodeDisp.get( indexEnd , "never")[0]
+            rotateEnd = nodeDisp.get( indexEnd , "never")[1]
+            ##-------------------------------------------- ------------##
+            pointStart = node.get( indexStart  , "never")
+            pointEnd = node.get( indexEnd  , "never")
+            line = rg.LineCurve( pointStart, pointEnd )
+            #-------------------------versor ---------------------------#
+            axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+            axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+            axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
+            versor = [ axis1, axis2, axis3 ] 
+            #---------- WORLD PLANE on point start of line ---------------#
+            traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
+            WorldPlane.Transform( traslPlane )
+            #-------------------------------------------------------------#
+            planeStart = rg.Plane(pointStart, axis1, axis2 )
+            #planeStart = rg.Plane(pointStart, axis3 )
+            localPlane = planeStart
+            xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
+            localTraslStart = rg.Point3d( traslStart )
+            vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
+            #print( vectorTrasform[0] )
+            localTraslStart = vectorTrasform[0]
+            uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
+            uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
+            uI3 = localTraslStart.Z # spostamento linea d'asse
+            localRotStart = vectorTrasform[1]
+            rI1 = localRotStart.X # 
+            rI2 = localRotStart.Y # 
+            rI3 = localRotStart.Z # 
+            localTraslEnd = vectorTrasform[2]
+            uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
+            uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
+            uJ3 = localTraslEnd.Z # spostamento linea d'asse
+            localRotEnd = vectorTrasform[3]
+            rJ1 = localRotEnd[0] #  
+            rJ2 = localRotEnd[1]  # 
+            rJ3 = localRotEnd[2]  # 
+            ##------------------ displacement value -------------------------##
+            Length = rg.Curve.GetLength( line )
+            divideDistance = 0.5
+            DivCurve = line.DivideByLength( divideDistance, True )
+            if DivCurve == None:
+                DivCurve = [ 0, Length]
+                
+            #s = linspace(0,Length, len(PointsDivLength))
+            AlphaY = alphat( E, G, Iy, Avz )
+            AlphaZ = alphat( E, G, Iz, Avy )
+            
+            globalTransVector = []
+            globalRotVector = []
+            defPoint = []
+            defSection = []
+            #----------------------- local to global-------------------------#
+            xform2 = xform.TryGetInverse()
+            #----------------------------------------------------------------#
+            for index, x in enumerate(DivCurve):
+                beamPoint = line.PointAt(DivCurve[index]) 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
+                u3 = spostu(x, Length, uI3, uJ3)
+                u3Vector = u3*axis3
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
+                v1 =  spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+                v1Vector = v1*axis1 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
+                v2 =  spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+                v2Vector = v2*axis2 
+                
+                ## RISULTANTE SPOSTAMENTI ##
+                transResult = v1Vector + v2Vector + u3Vector
+                
+                r2x =  thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
+                r1x =  psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
+                r3x = phix(x, Length, rI3, rJ3)
+                
+                rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
+                
+                trasl = rg.Transform.Translation( transResult*scaleDef )
+                beamPoint.Transform( trasl )
+                defPoint.append( beamPoint )
+                
+                sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
+                sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
+                sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
+                sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
+                if dimSection[0] == 'rectangular' :
+                    width, height = dimSection[1], dimSection[2]
+                    section = AddRectangleFromCenter( sectionPlane, width, height )
+                    defSection.append( section )
+                elif dimSection[0] == 'circular' :
+                    radius1  = dimSection[1]/2
+                    radius2  = dimSection[1]/2 - dimSection[2]
+                    section1 = AddCircleFromCenter( sectionPlane, radius1 )
+                    if (radius1 - radius2 ) == 0 :
+                        defSection.append( section1 )
+                    else :
+                        section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                        defSection.append( [ section1, section2 ] )
+                elif dimSection[0] == 'doubleT' :
+                    Bsup = dimSection[1]
+                    tsup = dimSection[2]
+                    Binf = dimSection[3]
+                    tinf = dimSection[4]
+                    H =  dimSection[5]
+                    ta =  dimSection[6]
+                    yg =  dimSection[7]
+                    section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
+                    defSection.append( section )
+                elif dimSection[0] == 'Generic' :
+                    radius  = dimSection[1]
+                    section = AddCircleFromCenter( sectionPlane, radius )
+                    defSection.append( section )
+            
+                globalTrasl = rg.Point3d( transResult ) 
+                globalTrasl.Transform(xform2[1]) 
+                globalTrasl.Transform(xform)
+                globalTransVector.append( globalTrasl )
+        
+           
+            defpolyline = rg.PolylineCurve( defPoint )
+        
+            if dimSection[0] == 'circular' :
+                radius1  = dimSection[1]/2
+                radius2  = dimSection[1]/2 - dimSection[2]
+                if (radius1 - radius2 ) == 0:
+                    meshdef = meshLoft3( defSection,  color )
+        
+                else :
+                    defSection1 = [row[0] for row in defSection ]
+                    defSection2 = [row[1] for row in defSection ]
+                    meshdef = meshLoft3( defSection1,  color )
+                    meshdef.Append( meshLoft3( defSection2,  color ) )
+                    #print( meshdef )
+        
+            else  :
+                meshdef = meshLoft3( defSection,  color )
+            return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
+        
+        ## node e nodeDisp son dictionary ##
+        def defTruss( ele, node, nodeDisp, scale ):
+            WorldPlane = rg.Plane.WorldXY
+            TagEle = ele[0]
+            propSection = ele[2]
+            color = propSection[12]
+            indexStart = ele[1][0]
+            indexEnd = ele[1][1]
+            #print( indexStart, indexEnd )
+            E = propSection[1]
+            A = propSection[3]
+            
+            traslStart = nodeDisp.get( indexStart , "never")
+            traslEnd = nodeDisp.get( indexEnd  , "never")
+            if len( traslStart ) == 2:
+                traslStart = nodeDisp.get( indexStart  , "never")[0]
+                traslEnd = nodeDisp.get( indexEnd  , "never")[0]
+            pointStart = node.get( indexStart  , "never")
+            pointEnd = node.get( indexEnd  , "never")
+            #print( traslStart[1] )
+            line = rg.LineCurve( pointStart,  pointEnd )
+        
+            axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
+            axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
+            axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
+            versor = [ axis1, axis2, axis3 ] 
+            #---------- WORLD PLANE on point start of line ---------------#
+            traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
+            WorldPlane.Transform( traslPlane )
+            #-------------------------------------------------------------#
+            planeStart = rg.Plane(pointStart, axis1, axis2 )
+            #planeStart = rg.Plane(pointStart, axis3 )
+            localPlane = planeStart
+            xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
+            localTraslStart = rg.Point3d( traslStart )
+            vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
+            #print( vectorTrasform[0] )
+            localTraslStart = vectorTrasform[0]
+            uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
+            uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
+            uI3 = localTraslStart.Z # spostamento linea d'asse
+            localTraslEnd = vectorTrasform[1]
+            uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
+            uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
+            uJ3 = localTraslEnd.Z # spostamento linea d'asse
+            ##-------------- displacement value -------------------------##
+            Length = rg.Curve.GetLength( line )
+            divideDistance = 0.5
+            DivCurve = line.DivideByLength( divideDistance, True )
+            if DivCurve == None:
+                DivCurve = [ 0, Length]
+            defPoint = []
+            defSection = []
+            globalTransVector = []
+            #----------------------- local to global-------------------------#
+            xform2 = xform.TryGetInverse()
+            #----------------------------------------------------------------#
+            for index, x in enumerate(DivCurve):
+                beamPoint = line.PointAt(DivCurve[index]) 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
+                u3 = spostu(x, Length, uI3, uJ3)
+                u3Vector = u3*axis3
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
+                v1 =  x*( uJ1 - uI1 )/Length + uI1
+                v1Vector = v1*axis1 
+                ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
+                v2 =  x*( uJ2 - uI2 )/Length + uI2
+                v2Vector = v2*axis2 
+                ## RISULTANTE SPOSTAMENTI ##
+                transResult = v1Vector + v2Vector + u3Vector
+                trasl = rg.Transform.Translation( transResult*scale )
+                beamPoint.Transform( trasl )
+                defPoint.append( beamPoint )
+                
+                sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
+                if dimSection[0] == 'rectangular' :
+                    width, height = dimSection[1], dimSection[2]
+                    section = AddRectangleFromCenter( sectionPlane, width, height )
+                    defSection.append( section )
+                elif dimSection[0] == 'circular' :
+                    radius1  = dimSection[1]/2
+                    radius2  = dimSection[1]/2 - dimSection[2]
+                    section1 = AddCircleFromCenter( sectionPlane, radius1 )
+                    if (radius1 - radius2 ) == 0 :
+                        defSection.append( section1 )
+                    else :
+                        section2 = AddCircleFromCenter( sectionPlane, radius2 )
+                        defSection.append( [ section1, section2 ] )
+                elif dimSection[0] == 'doubleT' :
+                    Bsup = dimSection[1]
+                    tsup = dimSection[2]
+                    Binf = dimSection[3]
+                    tinf = dimSection[4]
+                    H =  dimSection[5]
+                    ta =  dimSection[6]
+                    yg =  dimSection[7]
+                    section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
+                    defSection.append( section )
+                elif dimSection[0] == 'Generic' :
+                    radius  = dimSection[1]
+                    section = AddCircleFromCenter( sectionPlane, radius )
+                    defSection.append( section )
+            
+                globalTrasl = rg.Point3d( transResult ) 
+                globalTrasl.Transform(xform2[1]) 
+                globalTrasl.Transform(xform)
+                globalTransVector.append( globalTrasl )
+        
+           
+            defpolyline = rg.PolylineCurve( defPoint )
+        
+            if dimSection[0] == 'circular' :
+                radius1  = dimSection[1]/2
+                radius2  = dimSection[1]/2 - dimSection[2]
+                if (radius1 - radius2 ) == 0:
+                    meshdef = meshLoft3( defSection,  color )
+        
+                else :
+                    defSection1 = [row[0] for row in defSection ]
+                    defSection2 = [row[1] for row in defSection ]
+                    meshdef = meshLoft3( defSection1,  color )
+                    meshdef.Append( meshLoft3( defSection2,  color ) )
+                    #print( meshdef )
+        
+            else  :
+                meshdef = meshLoft3( defSection,  color )
+            return  [ defpolyline, meshdef, globalTransVector] 
+        ## Mesh from close section eith gradient color ##
+        
+        def meshLoft3( point, color ):
+            meshElement = rg.Mesh()
+            meshEle = rg.Mesh()
+            pointSection1 = point
+            #print( point )
+            for i in range(0,len(pointSection1)):
+                for j in range(0, len(pointSection1[0])):
+                    vertix = pointSection1[i][j]
+                    #print( type(vertix) )
+                    meshEle.Vertices.Add( vertix ) 
+                    #meshEle.VertexColors.Add( color[0],color[1],color[2] );
+            k = len(pointSection1[0])
+            for i in range(0,len(pointSection1)-1):
+                for j in range(0, len(pointSection1[0])):
+                    if j < k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = index2 + 1
+                        index4 = index1 + 1
+                    elif j == k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = (i+1)*k
+                        index4 = i*k
+                    meshEle.Faces.AddFace(index1, index2, index3, index4)
+                    #rs.ObjectColor(scyl,(255,0,0))
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            meshEle.VertexColors.CreateMonotoneMesh( colour )
+            meshElement = meshEle
+            
+            return meshElement
+        
+        def gradient(value, valueMin, valueMax, colorList ):
+    
+            if colorList == [] :
+                listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                            rs.CreateColor( 240, 69, 7),
+                            rs.CreateColor( 251, 255, 0 ),
+                            rs.CreateColor( 77, 255, 0 ),
+                            rs.CreateColor( 0, 255, 221 ),
+                            rs.CreateColor( 0, 81, 255 )]
+            else :
+                listcolor = colorList
+    
+            n = len( listcolor )
+            domain = linspace( valueMin, valueMax, n)
+            #print( domain )
+            
+            for i in range(1,n+1):
+                if  domain[i-1] <= value <= domain[i] :
+                    return listcolor[ i-1 ]
+                elif  valueMax <= value <= valueMax + 0.0000000000001 :
+                    return listcolor[ -1 ]
+                elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+                    return listcolor[ 0 ]
+        
+        ## Mesh from close section eith gradient color ##
+        def meshLoft4( point, value, valueMax, valueMin ):
+            meshEle = rg.Mesh()
+            for i in range(0,len(point)):
+                color = gradientJet( value[i], valueMax, valueMin )
+                for j in range(0, len(point[0])):
+                    vertix = point[i][j]
+                    meshEle.Vertices.Add( vertix ) 
+                    meshEle.VertexColors.Add( color[0],color[1],color[2] );
+            k = len(point[0])
+            for i in range(0,len(point)-1):
+                for j in range(0, len(point[0])):
+                    if j < k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = index2 + 1
+                        index4 = index1 + 1
+                    elif j == k-1:
+                        index1 = i*k + j
+                        index2 = (i+1)*k + j
+                        index3 = (i+1)*k
+                        index4 = i*k
+                    meshEle.Faces.AddFace(index1, index2, index3, index4)
+            return meshEle
+        
+        
+        def updateComponent(interval):
+            
+            ## Updates this component, similar to using a grasshopper timer 
+            
+            # Define callback action
+            def callBack(e):
+                self.ExpireSolution(False)
+                
+            # Get grasshopper document
+            ghDoc = self.OnPingDocument()
+            
+            # Schedule this component to expire
+            ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
+            
+        #----------------------------------#
+        def GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale,direction, modelExtrude, colorList):
             
             
             global myCounter
@@ -7856,719 +8839,13 @@ class GroundMotionModelView(component):
             Reset = False if Reset is None else Reset
             speed = 50 if speed is None else speed
             scale = 10 if scale is None else scale
+            modelExtrude = True if modelExtrude is None else modelExtrude
             
-            ExtrudedModel = True if ExtrudedModel is None else ExtrudedModel
-            
-            
-            def alphat( E, G, I, At ):
-                return (E*I)/(G*At)
-            
-            ## Spostamenti e rotazioni ##
-            def spostu( x, L, uI, uJ ):
-                return -(-L*uI + uI*x - uJ*x)/L
-                
-            def spostv( x, L, vI, vJ, thetaI, thetaJ, alphay ):
-                return (L**3*thetaI*x + L**3*vI - 2*L**2*thetaI*x**2 - L**2*thetaJ*x**2 + 6*L*alphay*thetaI*x - 6*L*alphay*thetaJ*x + 12*L*alphay*vI + L*thetaI*x**3 + L*thetaJ*x**3 - 3*L*vI*x**2 + 3*L*vJ*x**2 - 6*alphay*thetaI*x**2 + 6*alphay*thetaJ*x**2 - 12*alphay*vI*x + 12*alphay*vJ*x + 2*vI*x**3 - 2*vJ*x**3)/(L*(L**2 + 12*alphay))
-                
-            def spostw( x, L, wI, wJ, psiI, psiJ, alphaz ):
-                return -(L**3*psiI*x - L**3*wI - 2*L**2*psiI*x**2 - L**2*psiJ*x**2 - 6*L*alphaz*psiI*x + 6*L*alphaz*psiJ*x + 12*L*alphaz*wI + L*psiI*x**3 + L*psiJ*x**3 + 3*L*wI*x**2 - 3*L*wJ*x**2 + 6*alphaz*psiI*x**2 - 6*alphaz*psiJ*x**2 - 12*alphaz*wI*x + 12*alphaz*wJ*x - 2*wI*x**3 + 2*wJ*x**3)/(L*(L**2 - 12*alphaz))
-                
-            def thetaz(x, L, vI, vJ, thetaI, thetaJ, alphay): 
-                return (L**3*thetaI - 4*L**2*thetaI*x - 2*L**2*thetaJ*x + 12*L*alphay*thetaI + 3*L*thetaI*x**2 + 3*L*thetaJ*x**2 - 6*L*vI*x + 6*L*vJ*x - 12*alphay*thetaI*x + 12*alphay*thetaJ*x + 6*vI*x**2 - 6*vJ*x**2)/(L*(L**2 + 12*alphay))
-                
-            def phix(x, L, phiI, phiJ):
-                return -(-L*phiI + phiI*x - phiJ*x)/L
-            
-            def psiy(x, L, wI, wJ, psiI, psiJ, alphaz): 
-                return (L**3*psiI - 4*L**2*psiI*x - 2*L**2*psiJ*x - 12*L*alphaz*psiI + 3*L*psiI*x**2 + 3*L*psiJ*x**2 + 6*L*wI*x - 6*L*wJ*x + 12*alphaz*psiI*x - 12*alphaz*psiJ*x - 6*wI*x**2 + 6*wJ*x**2)/(L*(L**2 - 12*alphaz))
-                
-            def gammay( L, vI, vJ, thetaI, thetaJ, alphay): 
-            
-                return (L*thetaI + L*thetaJ + 2*vI - 2*vJ)/(L*(L**2 + 12*alphay))
-                
-            def gammaz( L, wI, wJ, psiI, psiJ, alphaz):
-            
-                return -(L*psiI + L*psiJ - 2*wI + 2*wJ)/(L*(L**2 - 12*alphaz))
-            
-            ##------------------------------------------------------------------------- --##
-            
-            def scaleAutomatic( Num , Den ):
-                if Den < 0.1 :
-                    return Num
-                else :
-                    return Num*1/Den
-            
-            def linspace(a, b, n=100):
-                if n < 2:
-                    return b
-                diff = (float(b) - a)/(n - 1)
-                return [diff * i + a  for i in range(n)]
-            
-            ## Funzione rettangolo ##
-            def AddRectangleFromCenter(plane, width, height):
-                a = plane.PointAt(-width * 0.5, -height * 0.5 )
-                b = plane.PointAt(-width * 0.5,  height * 0.5 )
-                c = plane.PointAt( width * 0.5,  height * 0.5 )
-                d = plane.PointAt( width * 0.5,  -height * 0.5 )
-                #rectangle = rg.PolylineCurve( [a, b, c, d, a] )
-                rectangle  = [a, b, c, d] 
-                return rectangle
-            
-            ## Funzione cerchio ##
-            def AddCircleFromCenter( plane, radius):
-                t = linspace( 0 , 1.80*mt.pi, 15 )
-                a = []
-                for ti in t:
-                    x = radius*mt.cos(ti)
-                    y = radius*mt.sin(ti)
-                    a.append( plane.PointAt( x, y ) )
-                #circle = rg.PolylineCurve( a )
-                circle  = a 
-                return circle
-            
-            def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
-                #-------------------1---------2 #
-                p1 = plane.PointAt( -(yg - tinf), ta/2 )
-                p2 = plane.PointAt( -(yg - tinf), Binf/2 )
-                p3 = plane.PointAt( -yg, Binf/2 )
-                p4 = plane.PointAt( -yg, -Binf/2 )
-                p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
-                p6 = plane.PointAt( -(yg - tinf), -ta/2 )
-                p7 = plane.PointAt( (H - yg - tsup), -ta/2)
-                p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
-                p9 = plane.PointAt( (H - yg ), -Bsup/2 )
-                p10 = plane.PointAt( (H - yg ), Bsup/2 )
-                p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
-                p12 = plane.PointAt( (H - yg - tsup), ta/2 )
-            
-                wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
-                return wirframe
-            
-            def defShellQuad( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][2]
-                thick = ele[2][1]
-                #print( eleNodeTag )
-                #print( eleNodeTag )
-                index1 = eleNodeTag[0] 
-                index2 = eleNodeTag[1] 
-                index3 = eleNodeTag[2] 
-                index4 = eleNodeTag[3] 
-                
-                trasl1 = nodeDisp.get( index1 , "never")[0]
-                rotate1 = nodeDisp.get( index1 , "never")[1]
-                
-                trasl2 = nodeDisp.get( index2 , "never")[0]
-                rotate2 = nodeDisp.get( index2 , "never")[1]
-                
-                trasl3 = nodeDisp.get( index3 , "never")[0]
-                rotate3 = nodeDisp.get( index3 , "never")[1]
-                
-                trasl4 = nodeDisp.get( index4 , "never")[0]
-                rotate4 = nodeDisp.get( index4 , "never")[1]
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                
-                pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-                pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
-                #print( index1 - 1)
-                #print( nodeDisp )
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-                pointDef4.Transform( vectortrasl4 )
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                shellDefModel.Vertices.Add( pointDef4 ) #3
-                
-                
-                shellDefModel.Faces.AddFace(0, 1, 2, 3)
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                shellDefModel.VertexColors.CreateMonotoneMesh( colour )
-            
-                vt = shellDefModel.Vertices
-                shellDefModel.FaceNormals.ComputeFaceNormals()
-                fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
-                normalFace = shellDefModel.FaceNormals[fid]
-                vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
-                trasl = rg.Transform.Translation( vectormoltiplicate )
-                moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
-                moveShell.Transform( trasl )
-                extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
-                return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4], [rotate1, rotate2, rotate3, rotate4], extrudeShell ]
-            
-            def defShellTriangle( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][1]
-                index1 = eleNodeTag[0] - 1
-                index2 = eleNodeTag[1] - 1
-                index3 = eleNodeTag[2] - 1
-                
-                trasl1 = nodeDisp.get( index1 , "never")[0]
-                rotate1 = nodeDisp.get( index1  , "never")[1]
-                
-                trasl2 = nodeDisp.get( index2 , "never")[0]
-                rotate2 = nodeDisp.get( index2 , "never")[1]
-                
-                trasl3 = nodeDisp.get( index3 , "never")[0]
-                rotate3 = nodeDisp.get( index3 , "never")[1]
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                
-                shellDefModel.Faces.AddFace(0, 1, 2)
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                vt = shellDefModel.Vertices
-                shellDefModel.FaceNormals.ComputeFaceNormals()
-                fid,MPt = shellDefModel.ClosestPoint(vt[0],0.01)
-                normalFace = shellDefModel.FaceNormals[fid]
-                vectormoltiplicate = rg.Vector3d.Multiply( -normalFace, thick/2 )
-                trasl = rg.Transform.Translation( vectormoltiplicate )
-                moveShell = rg.Mesh.DuplicateMesh(shellDefModel)
-                moveShell.Transform( trasl )
-                extrudeShell = rg.Mesh.Offset( moveShell, thick, True, normalFace)
-                return  [shellDefModel,[trasl1, trasl2, trasl3], [rotate1, rotate2, rotate3], extrudeShell ]
-            
-            def defSolid( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][1]
-                thick = ele[2][1]
-                #print( eleNodeTag )
-                index1 = eleNodeTag[0] - 1
-                index2 = eleNodeTag[1] - 1
-                index3 = eleNodeTag[2] - 1
-                index4 = eleNodeTag[3] - 1
-                index5 = eleNodeTag[4] - 1
-                index6 = eleNodeTag[5] - 1
-                index7 = eleNodeTag[6] - 1
-                index8 = eleNodeTag[7] - 1
-                
-                trasl1 = nodeDisp.get( index1 , "never")
-                trasl2 = nodeDisp.get( index2 , "never")
-                trasl3 = nodeDisp.get( index3 , "never")
-                trasl4 = nodeDisp.get( index4 , "never")
-                trasl5 = nodeDisp.get( index5 , "never")
-                trasl6 = nodeDisp.get( index6 , "never")
-                trasl7 = nodeDisp.get( index7 , "never")
-                trasl8 = nodeDisp.get( index8 , "never")
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-                pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
-                pointDef5 = rg.Point3d.Clone( node.get( index5 , "never") )
-                pointDef6 = rg.Point3d.Clone( node.get( index6 , "never") )
-                pointDef7 = rg.Point3d.Clone( node.get( index7 , "never") )
-                pointDef8 = rg.Point3d.Clone( node.get( index8 , "never") )
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-                pointDef4.Transform( vectortrasl4 )
-                vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
-                pointDef5.Transform( vectortrasl1 )
-                vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
-                pointDef6.Transform( vectortrasl2 )
-                vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
-                pointDef7.Transform( vectortrasl3 )
-                vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
-                pointDef8.Transform( vectortrasl4 )
-                
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                shellDefModel.Vertices.Add( pointDef4 ) #3
-                shellDefModel.Vertices.Add( pointDef5 ) #4
-                shellDefModel.Vertices.Add( pointDef6 ) #5
-                shellDefModel.Vertices.Add( pointDef7 ) #6
-                shellDefModel.Vertices.Add( pointDef8 ) #7
-            
-                shellDefModel.Faces.AddFace(0, 1, 2, 3)
-                shellDefModel.Faces.AddFace(4, 5, 6, 7)
-                shellDefModel.Faces.AddFace(0, 1, 5, 4)
-                shellDefModel.Faces.AddFace(1, 2, 6, 5)
-                shellDefModel.Faces.AddFace(2, 3, 7, 6)
-                shellDefModel.Faces.AddFace(3, 0, 4, 7)
-                
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                shellDefModel.VertexColors.CreateMonotoneMesh( colour )
-                return  [shellDefModel,[trasl1, trasl2, trasl3,trasl4, trasl5, trasl6, trasl7, trasl8 ]]
-            
-            def defTetraSolid( ele, node, nodeDisp, scaleDef ):
-                
-                eleTag = ele[0]
-                eleNodeTag = ele[1]
-                color = ele[2][1]
-                #print( eleNodeTag )
-                index1 = eleNodeTag[0] - 1
-                index2 = eleNodeTag[1] - 1
-                index3 = eleNodeTag[2] - 1
-                index4 = eleNodeTag[3] - 1
-                
-                trasl1 = nodeDisp.get( index1 , "never")
-                trasl2 = nodeDisp.get( index2 , "never")
-                trasl3 = nodeDisp.get( index3 , "never")
-                trasl4 = nodeDisp.get( index4 , "never")
-                
-                ## CREO IL MODELLO DEFORMATO  ##
-                pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-                pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-                pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-                pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
-                
-                vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-                pointDef1.Transform( vectortrasl1 )
-                vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-                pointDef2.Transform( vectortrasl2 )
-                vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-                pointDef3.Transform( vectortrasl3 )
-                vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-                pointDef4.Transform( vectortrasl4 )
-            
-                shellDefModel = rg.Mesh()
-                shellDefModel.Vertices.Add( pointDef1 ) #0
-                shellDefModel.Vertices.Add( pointDef2 ) #1
-                shellDefModel.Vertices.Add( pointDef3 ) #2
-                shellDefModel.Vertices.Add( pointDef4 ) #3
-                
-                
-                shellDefModel.Faces.AddFace( 0, 1, 2 )
-                shellDefModel.Faces.AddFace( 0, 1, 3 )
-                shellDefModel.Faces.AddFace( 1, 2, 3 )
-                shellDefModel.Faces.AddFace( 0, 2, 3 )
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                shellDefModel.VertexColors.CreateMonotoneMesh( colour )
-                
-                return  [shellDefModel,[trasl1, trasl2, trasl3, trasl4]]
-            ## node e nodeDisp son dictionary ##
-            def defValueTimoshenkoBeam( ele, node, nodeDisp, scaleDef ):
-                #---------------- WORLD PLANE ----------------------#
-                WorldPlane = rg.Plane.WorldXY
-                #--------- Propriety TimoshenkoBeam  ----------------#
-                TagEle = ele[0]
-                propSection = ele[2]
-                indexStart = ele[1][0]
-                indexEnd = ele[1][1]
-                #print( indexStart, indexEnd )
-                color = propSection[12]
-                E = propSection[1]
-                G = propSection[2]
-                A = propSection[3]
-                Avz = propSection[4]
-                Avy = propSection[5]
-                Jxx = propSection[6]
-                Iy = propSection[7]
-                Iz = propSection[8]
-                #---- traslation and rotation index start & end ------- #
-                traslStart = nodeDisp.get( indexStart , "never")[0]
-                rotateStart = nodeDisp.get( indexStart , "never")[1]
-                traslEnd = nodeDisp.get( indexEnd , "never")[0]
-                rotateEnd = nodeDisp.get( indexEnd , "never")[1]
-                ##-------------------------------------------- ------------##
-                pointStart = node.get( indexStart  , "never")
-                pointEnd = node.get( indexEnd  , "never")
-                line = rg.LineCurve( pointStart, pointEnd )
-                #-------------------------versor ---------------------------#
-                axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
-                axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
-                axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
-                versor = [ axis1, axis2, axis3 ] 
-                #---------- WORLD PLANE on point start of line ---------------#
-                traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
-                WorldPlane.Transform( traslPlane )
-                #-------------------------------------------------------------#
-                planeStart = rg.Plane(pointStart, axis1, axis2 )
-                #planeStart = rg.Plane(pointStart, axis3 )
-                localPlane = planeStart
-                xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
-                localTraslStart = rg.Point3d( traslStart )
-                vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
-                #print( vectorTrasform[0] )
-                localTraslStart = vectorTrasform[0]
-                uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
-                uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
-                uI3 = localTraslStart.Z # spostamento linea d'asse
-                localRotStart = vectorTrasform[1]
-                rI1 = localRotStart.X # 
-                rI2 = localRotStart.Y # 
-                rI3 = localRotStart.Z # 
-                localTraslEnd = vectorTrasform[2]
-                uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
-                uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
-                uJ3 = localTraslEnd.Z # spostamento linea d'asse
-                localRotEnd = vectorTrasform[3]
-                rJ1 = localRotEnd[0] #  
-                rJ2 = localRotEnd[1]  # 
-                rJ3 = localRotEnd[2]  # 
-                ##------------------ displacement value -------------------------##
-                Length = rg.Curve.GetLength( line )
-                divideDistance = 0.5
-                DivCurve = line.DivideByLength( divideDistance, True )
-                if DivCurve == None:
-                    DivCurve = [ 0, Length]
-                    
-                #s = linspace(0,Length, len(PointsDivLength))
-                AlphaY = alphat( E, G, Iy, Avz )
-                AlphaZ = alphat( E, G, Iz, Avy )
-                
-                globalTransVector = []
-                globalRotVector = []
-                defPoint = []
-                defSection = []
-                #----------------------- local to global-------------------------#
-                xform2 = xform.TryGetInverse()
-                #----------------------------------------------------------------#
-                for index, x in enumerate(DivCurve):
-                    beamPoint = line.PointAt(DivCurve[index]) 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-                    u3 = spostu(x, Length, uI3, uJ3)
-                    u3Vector = u3*axis3
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
-                    v1 =  spostv(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
-                    v1Vector = v1*axis1 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
-                    v2 =  spostw(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
-                    v2Vector = v2*axis2 
-                    
-                    ## RISULTANTE SPOSTAMENTI ##
-                    transResult = v1Vector + v2Vector + u3Vector
-                    
-                    r2x =  thetaz(x, Length, uI1, uJ1, rI2, rJ2, AlphaY)
-                    r1x =  psiy(x, Length, uI2, uJ2, rI1, rJ1, AlphaZ)
-                    r3x = phix(x, Length, rI3, rJ3)
-                    
-                    rotResult = r1x*axis1 + r2x*axis2 + r3x*axis3
-                    
-                    trasl = rg.Transform.Translation( transResult*scaleDef )
-                    beamPoint.Transform( trasl )
-                    defPoint.append( beamPoint )
-                    
-                    sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
-                    sectionPlane.Rotate( scaleDef*r1x, axis1, beamPoint )
-                    sectionPlane.Rotate( scaleDef*r2x, axis2, beamPoint )
-                    sectionPlane.Rotate( scaleDef*r3x, axis3, beamPoint )
-                    if dimSection[0] == 'rectangular' :
-                        width, height = dimSection[1], dimSection[2]
-                        section = AddRectangleFromCenter( sectionPlane, width, height )
-                        defSection.append( section )
-                    elif dimSection[0] == 'circular' :
-                        radius1  = dimSection[1]/2
-                        radius2  = dimSection[1]/2 - dimSection[2]
-                        section1 = AddCircleFromCenter( sectionPlane, radius1 )
-                        if (radius1 - radius2 ) == 0 :
-                            defSection.append( section1 )
-                        else :
-                            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-                            defSection.append( [ section1, section2 ] )
-                    elif dimSection[0] == 'doubleT' :
-                        Bsup = dimSection[1]
-                        tsup = dimSection[2]
-                        Binf = dimSection[3]
-                        tinf = dimSection[4]
-                        H =  dimSection[5]
-                        ta =  dimSection[6]
-                        yg =  dimSection[7]
-                        section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
-                        defSection.append( section )
-                    elif dimSection[0] == 'Generic' :
-                        radius  = dimSection[1]
-                        section = AddCircleFromCenter( sectionPlane, radius )
-                        defSection.append( section )
-                
-                    globalTrasl = rg.Point3d( transResult ) 
-                    globalTrasl.Transform(xform2[1]) 
-                    globalTrasl.Transform(xform)
-                    globalTransVector.append( globalTrasl )
-            
-               
-                defpolyline = rg.PolylineCurve( defPoint )
-            
-                if dimSection[0] == 'circular' :
-                    radius1  = dimSection[1]/2
-                    radius2  = dimSection[1]/2 - dimSection[2]
-                    if (radius1 - radius2 ) == 0:
-                        meshdef = meshLoft3( defSection,  color )
-            
-                    else :
-                        defSection1 = [row[0] for row in defSection ]
-                        defSection2 = [row[1] for row in defSection ]
-                        meshdef = meshLoft3( defSection1,  color )
-                        meshdef.Append( meshLoft3( defSection2,  color ) )
-                        #print( meshdef )
-            
-                else  :
-                    meshdef = meshLoft3( defSection,  color )
-                return  [  defpolyline, meshdef ,  globalTransVector, globalRotVector ] 
-            
-            ## node e nodeDisp son dictionary ##
-            def defTruss( ele, node, nodeDisp, scale ):
-                WorldPlane = rg.Plane.WorldXY
-                TagEle = ele[0]
-                propSection = ele[2]
-                color = propSection[12]
-                indexStart = ele[1][0]
-                indexEnd = ele[1][1]
-                #print( indexStart, indexEnd )
-                E = propSection[1]
-                A = propSection[3]
-                
-                traslStart = nodeDisp.get( indexStart , "never")
-                traslEnd = nodeDisp.get( indexEnd  , "never")
-                if len( traslStart ) == 2:
-                    traslStart = nodeDisp.get( indexStart  , "never")[0]
-                    traslEnd = nodeDisp.get( indexEnd  , "never")[0]
-                pointStart = node.get( indexStart  , "never")
-                pointEnd = node.get( indexEnd  , "never")
-                #print( traslStart[1] )
-                line = rg.LineCurve( pointStart,  pointEnd )
-            
-                axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
-                axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
-                axis3 =  rg.Vector3d( propSection[9][2][0], propSection[9][2][1], propSection[9][2][2]  )
-                versor = [ axis1, axis2, axis3 ] 
-                #---------- WORLD PLANE on point start of line ---------------#
-                traslPlane = rg.Transform.Translation( pointStart.X, pointStart.Y, pointStart.Z )
-                WorldPlane.Transform( traslPlane )
-                #-------------------------------------------------------------#
-                planeStart = rg.Plane(pointStart, axis1, axis2 )
-                #planeStart = rg.Plane(pointStart, axis3 )
-                localPlane = planeStart
-                xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
-                localTraslStart = rg.Point3d( traslStart )
-                vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
-                #print( vectorTrasform[0] )
-                localTraslStart = vectorTrasform[0]
-                uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
-                uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
-                uI3 = localTraslStart.Z # spostamento linea d'asse
-                localTraslEnd = vectorTrasform[1]
-                uJ1 = localTraslEnd.X # spostamento in direzione dell'asse rosso 
-                uJ2 = localTraslEnd.Y # spostamento in direzione dell'asse verde
-                uJ3 = localTraslEnd.Z # spostamento linea d'asse
-                ##-------------- displacement value -------------------------##
-                Length = rg.Curve.GetLength( line )
-                divideDistance = 0.5
-                DivCurve = line.DivideByLength( divideDistance, True )
-                if DivCurve == None:
-                    DivCurve = [ 0, Length]
-                defPoint = []
-                defSection = []
-                globalTransVector = []
-                #----------------------- local to global-------------------------#
-                xform2 = xform.TryGetInverse()
-                #----------------------------------------------------------------#
-                for index, x in enumerate(DivCurve):
-                    beamPoint = line.PointAt(DivCurve[index]) 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 3 ##
-                    u3 = spostu(x, Length, uI3, uJ3)
-                    u3Vector = u3*axis3
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 1 ##
-                    v1 =  x*( uJ1 - uI1 )/Length + uI1
-                    v1Vector = v1*axis1 
-                    ## SPOSTAMENTO IN DIREZIONE DELL' ASSE 2 ##
-                    v2 =  x*( uJ2 - uI2 )/Length + uI2
-                    v2Vector = v2*axis2 
-                    ## RISULTANTE SPOSTAMENTI ##
-                    transResult = v1Vector + v2Vector + u3Vector
-                    trasl = rg.Transform.Translation( transResult*scale )
-                    beamPoint.Transform( trasl )
-                    defPoint.append( beamPoint )
-                    
-                    sectionPlane = rg.Plane( beamPoint, axis1, axis2 )
-                    if dimSection[0] == 'rectangular' :
-                        width, height = dimSection[1], dimSection[2]
-                        section = AddRectangleFromCenter( sectionPlane, width, height )
-                        defSection.append( section )
-                    elif dimSection[0] == 'circular' :
-                        radius1  = dimSection[1]/2
-                        radius2  = dimSection[1]/2 - dimSection[2]
-                        section1 = AddCircleFromCenter( sectionPlane, radius1 )
-                        if (radius1 - radius2 ) == 0 :
-                            defSection.append( section1 )
-                        else :
-                            section2 = AddCircleFromCenter( sectionPlane, radius2 )
-                            defSection.append( [ section1, section2 ] )
-                    elif dimSection[0] == 'doubleT' :
-                        Bsup = dimSection[1]
-                        tsup = dimSection[2]
-                        Binf = dimSection[3]
-                        tinf = dimSection[4]
-                        H =  dimSection[5]
-                        ta =  dimSection[6]
-                        yg =  dimSection[7]
-                        section = AddIFromCenter( sectionPlane, Bsup, tsup, Binf, tinf, H, ta, yg )
-                        defSection.append( section )
-                    elif dimSection[0] == 'Generic' :
-                        radius  = dimSection[1]
-                        section = AddCircleFromCenter( sectionPlane, radius )
-                        defSection.append( section )
-                
-                    globalTrasl = rg.Point3d( transResult ) 
-                    globalTrasl.Transform(xform2[1]) 
-                    globalTrasl.Transform(xform)
-                    globalTransVector.append( globalTrasl )
-            
-               
-                defpolyline = rg.PolylineCurve( defPoint )
-            
-                if dimSection[0] == 'circular' :
-                    radius1  = dimSection[1]/2
-                    radius2  = dimSection[1]/2 - dimSection[2]
-                    if (radius1 - radius2 ) == 0:
-                        meshdef = meshLoft3( defSection,  color )
-            
-                    else :
-                        defSection1 = [row[0] for row in defSection ]
-                        defSection2 = [row[1] for row in defSection ]
-                        meshdef = meshLoft3( defSection1,  color )
-                        meshdef.Append( meshLoft3( defSection2,  color ) )
-                        #print( meshdef )
-            
-                else  :
-                    meshdef = meshLoft3( defSection,  color )
-                return  [ defpolyline, meshdef, globalTransVector] 
-            ## Mesh from close section eith gradient color ##
-            
-            def meshLoft3( point, color ):
-                meshElement = rg.Mesh()
-                meshEle = rg.Mesh()
-                pointSection1 = point
-                #print( point )
-                for i in range(0,len(pointSection1)):
-                    for j in range(0, len(pointSection1[0])):
-                        vertix = pointSection1[i][j]
-                        #print( type(vertix) )
-                        meshEle.Vertices.Add( vertix ) 
-                        #meshEle.VertexColors.Add( color[0],color[1],color[2] );
-                k = len(pointSection1[0])
-                for i in range(0,len(pointSection1)-1):
-                    for j in range(0, len(pointSection1[0])):
-                        if j < k-1:
-                            index1 = i*k + j
-                            index2 = (i+1)*k + j
-                            index3 = index2 + 1
-                            index4 = index1 + 1
-                        elif j == k-1:
-                            index1 = i*k + j
-                            index2 = (i+1)*k + j
-                            index3 = (i+1)*k
-                            index4 = i*k
-                        meshEle.Faces.AddFace(index1, index2, index3, index4)
-                        #rs.ObjectColor(scyl,(255,0,0))
-                colour = rs.CreateColor( color[0], color[1], color[2] )
-                meshEle.VertexColors.CreateMonotoneMesh( colour )
-                meshElement = meshEle
-                
-                return meshElement
-            
-            
-            
-            def gradientJet(value, valueMax, valueMin):
-            
-                listcolo = [[0, 0, 102 ],
-                            [0, 0, 255],
-                            [0, 64, 255],
-                            [0, 128, 255],
-                            [0, 191, 255],
-                            [0, 255, 255],
-                            [0, 255, 191],
-                            [0, 255, 128],
-                            [0, 255, 64],
-                            [0, 255, 0],
-                            [64, 255, 0],
-                            [128, 255, 0],
-                            [191, 255, 0],
-                            [255, 255, 0],
-                            [255, 191, 0],
-                            [255, 128, 0],
-                            [255, 64, 0],
-                            [255, 0, 0],
-                            [230, 0, 0],
-                            [204, 0, 0]]
-            
-                #domain = linspace( valueMin,  valueMax, len( listcolo ) )
-                n = len( listcolo )
-                domain = linspace( valueMin, valueMax, n)
-                
-                for i in range(1,n):
-                    if  domain[i-1] <= value <= domain[i]:
-                        return listcolo[ i-1 ]
-                    elif  valueMax <= value <= valueMax + 0.00001 :
-                        return listcolo[ -1 ]
-                    elif  valueMin - 0.00000000001 <= value <= valueMin  :
-                        return listcolo[ 0 ]
-            
-            ## Mesh from close section eith gradient color ##
-            def meshLoft4( point, value, valueMax, valueMin ):
-                meshEle = rg.Mesh()
-                for i in range(0,len(point)):
-                    color = gradientJet( value[i], valueMax, valueMin )
-                    for j in range(0, len(point[0])):
-                        vertix = point[i][j]
-                        meshEle.Vertices.Add( vertix ) 
-                        meshEle.VertexColors.Add( color[0],color[1],color[2] );
-                k = len(point[0])
-                for i in range(0,len(point)-1):
-                    for j in range(0, len(point[0])):
-                        if j < k-1:
-                            index1 = i*k + j
-                            index2 = (i+1)*k + j
-                            index3 = index2 + 1
-                            index4 = index1 + 1
-                        elif j == k-1:
-                            index1 = i*k + j
-                            index2 = (i+1)*k + j
-                            index3 = (i+1)*k
-                            index4 = i*k
-                        meshEle.Faces.AddFace(index1, index2, index3, index4)
-                return meshEle
-            
-            
-            def updateComponent(interval):
-                
-                ## Updates this component, similar to using a grasshopper timer 
-                
-                # Define callback action
-                def callBack(e):
-                    self.ExpireSolution(False)
-                    
-                # Get grasshopper document
-                ghDoc = self.OnPingDocument()
-                
-                # Schedule this component to expire
-                ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
-            
+            global ModelDisp
+            global ModelCurve
+            global ModelShell
+            global ModelSolid
+            global dimSection
             
             #-------------------------------------------------------------------------------------#
             path = AlpacaGroundmotionOutput[0].strip()
@@ -8665,7 +8942,7 @@ class GroundMotionModelView(component):
             
             modelCurve = []
             ShellDefModel = []
-            ExtrudedView = rg.Mesh()
+            ExtrudedView = []
             modelDisp = []
             
             traslBeamValue = []
@@ -8696,7 +8973,7 @@ class GroundMotionModelView(component):
                     modelCurve.append( defpolyline )
                     modelDisp.append( defpolyline )
                     # estrusione della beam #
-                    ExtrudedView.Append( meshdef )
+                    ExtrudedView.append( meshdef )
                     #doc.Objects.AddMesh( meshdef )
                 elif eleType == 'Truss' :
                     dimSection = ele[2][10]
@@ -8708,7 +8985,7 @@ class GroundMotionModelView(component):
                     traslBeamValue.append( globalTrans ) 
                     modelCurve.append( defpolyline )
                     modelDisp.append( defpolyline )
-                    ExtrudedView.Append( meshdef )
+                    ExtrudedView.append( meshdef )
                     #doc.Objects.AddMesh( meshdef )
             
                 elif nNode == 4 and eleType != 'FourNodeTetrahedron':
@@ -8717,7 +8994,7 @@ class GroundMotionModelView(component):
                     traslShellValue.append( shellDefModel[1] )
                     rotShellValue.append( shellDefModel[2] )
                     extrudeShell = shellDefModel[3]
-                    ExtrudedView.Append( extrudeShell )
+                    ExtrudedView.append( extrudeShell )
             
                     
                 elif nNode == 3:
@@ -8727,52 +9004,147 @@ class GroundMotionModelView(component):
                     traslShellValue.append( shellDefModel[1] )
                     rotShellValue.append( shellDefModel[2] )
                     extrudeShell = shellDefModel[3]
-                    ExtrudedView.Append( extrudeShell )
+                    ExtrudedView.append( extrudeShell )
                     
                 elif nNode == 8:
                     solidDefModel = defSolid( ele, pointWrapperDict, timePointDef, scaleDef)
                     SolidDefModel.append( solidDefModel[0] )
-                    doc.Objects.AddMesh( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
-                    ExtrudedView.Append( solidDefModel[0] )
+                    ExtrudedView.append( solidDefModel[0] )
                     
                 elif  eleType == 'FourNodeTetrahedron' :
                     #print(ele)
                     solidDefModel = defTetraSolid( ele, pointWrapperDict, timePointDef, scaleDef )
                     SolidDefModel.append( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
-                    ExtrudedView.Append( solidDefModel[0] )
+                    ExtrudedView.append( solidDefModel[0] )
             
-            # Max Beam #
-            flattenTrasl = []
+         ########################################################################################################################
+            # MAX an MIN VALOR
+            valorVector = []
+            # beam valor #
             for valuetrasl in traslBeamValue:
-                for value in valuetrasl:
-                    flattenTrasl.append( value )
+                for valor in valuetrasl:
+                    vectorTrasl = rg.Vector3d( valor )
+                    if direction == 0:
+                        valorVector.append( vectorTrasl.X ) 
+                    elif direction == 1:
+                        valorVector.append( vectorTrasl.Y )
+                    elif direction == 2:
+                        valorVector.append( vectorTrasl.Z ) 
+                    elif direction == 3:
+                        valorVector.append( vectorTrasl.Length )     
+            # POINT #
             
-            TraslX = [row[0] for row in flattenTrasl ]
-            TraslY = [row[1] for row in flattenTrasl ]
-            TraslZ = [row[2] for row in flattenTrasl ]
+            PointPos = [row[1] for row in pointWrapper ]
+            if len(pointDef[0][1]) == 3 :
+                PointDisp = [row[1] for row in pointDef ] 
+            else:
+                PointDisp = [row[1][0] for row in pointDef ]
+        
+            for nodeDisp in PointDisp :
+                vectorNodeDisp = rg.Vector3d( nodeDisp )
+                if direction == 0:
+                    valorVector.append( vectorNodeDisp.X ) 
+                elif direction == 1:
+                    valorVector.append( vectorNodeDisp.Y )
+                elif direction == 2:
+                    valorVector.append( vectorNodeDisp.Z ) 
+                elif direction == 3:
+                    valorVector.append( vectorNodeDisp.Length )
+                    
+            # MAX end MIN on structures point #
+            lowerLimit = min( valorVector )
+            upperLimit = max( valorVector )
+            domainValues = [ lowerLimit, upperLimit ]
+            print( lowerLimit, upperLimit )
+        #####################################################################################
+            colorBeam = []
+            numberDivide = []
+            for value in traslBeamValue :
+                colorValor = []
+                for valor in value:
+                    vectorTrasl = rg.Vector3d( valor )
+        
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+        
+                    #print( valorVector )
+        
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    colorValor.append( color )
+                colorBeam.append( colorValor )
+                numberDivide.append( len(colorValor) )
+            #print( modelCurve[0])
+            segment = []
+            for curve, segmentCount in zip( modelCurve, numberDivide ):
+                #print(segmentCount)
+                parameter = curve.DivideByCount( segmentCount - 1, True )
+                segmentCurve = []
+                for i in range(1, len(parameter)) :
+                        p1 =  rg.Curve.PointAt( curve, parameter[i-1] ) 
+                        p2 = rg.Curve.PointAt( curve, parameter[i] )
+                        segmentCurve.append( rg.Line( p1, p2 ) )
+                segment.append( segmentCurve )
+        
+                #print( segment )
+        
             
-            #              txMax          tyMax         tzMax
-            tMax = [  max(TraslX)  ,  max(TraslY) ,  max(TraslZ)  ]
-            #              txMin          tyMin         tzMin
-            tMin = [   min(TraslX) ,  min(TraslY) , min(TraslZ)  ]
+            for shellEle, value in zip(ShellDefModel,traslShellValue) :
+                shellColor = shellEle.DuplicateMesh()
+                shellColor.VertexColors.Clear()
+                for j in range( 0,shellEle.Vertices.Count ):
+                    vectorTrasl = rg.Vector3d( value[j] )
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+        
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    shellColor.VertexColors.Add( color )
+                modelDisp.append( shellColor)
+            #dup.VertexColors.CreateMonotoneMesh(Color.Red)
+            #doc.Objects.AddMesh(dup)
+            for solidEle, value in zip(SolidDefModel,traslSolidValue) :
+                solidColor = solidEle.DuplicateMesh()
+                solidColor.VertexColors.Clear()
+                for j in range(0,solidEle.Vertices.Count):
+                    vectorTrasl = rg.Vector3d( value[j] )
+                    if direction == 0:
+                        valorVector = vectorTrasl.X  
+                    elif direction == 1:
+                        valorVector = vectorTrasl.Y 
+                    elif direction == 2:
+                        valorVector = vectorTrasl.Z  
+                    elif direction == 3:
+                        valorVector = vectorTrasl.Length
+        
+                    color = gradient( valorVector, lowerLimit, upperLimit, colorList )
+                    solidColor.VertexColors.Add( color )
+                modelDisp.append( solidColor )
+                    #rg.Collections.MeshVertexColorList.SetColor( solidEle,j, color[0], color[1], color[2] )
+        
+        
             
-            
-            
-            if ExtrudedModel == False or ExtrudedModel == None :
-                ModelDisp  = None
-                #ModelCurve = th.list_to_tree([ modelCurve ,numberDivide, colorValor ])
-                ModelCurve = th.list_to_tree([ modelCurve , traslBeamValue ])
-                ModelShell = th.list_to_tree([ ShellDefModel , traslShellValue ])
-                ModelSolid = th.list_to_tree([ SolidDefModel , traslSolidValue ])
-                #max_min = th.list_to_tree([ tMax[i], tMin[i] ])
-            else  :
-                ModelDisp = ExtrudedView
-                ModelCurve = None
-                ModelShell = None
-                ModelSolid = None
-            return ModelDisp, ModelCurve, ModelShell, ModelSolid, trans
+            if modelExtrude == False or modelExtrude == None :
+                self.line = segment
+                self.colorLine = colorBeam
+                return modelDisp, PointPos, PointDisp, domainValues, trans
+                
+            else:
+                self.line = []
+                self.colorLine = []
+                return ExtrudedView, PointPos, PointDisp, domainValues, trans
         
         
         
@@ -8785,8 +9157,16 @@ class GroundMotionModelView(component):
         
         
         if checkData != False:
-            ModelDisp, ModelCurve, ModelShell, ModelSolid, trans = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, ExtrudedModel)
-            return (ModelDisp, ModelCurve, ModelShell, ModelSolid, trans)
+            modelDisp, PointPos, PointDisp, domainValues, trans = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExtrude, colorList )
+            return (modelDisp, PointPos, PointDisp, domainValues, trans)
+            
+    def DrawViewportWires(self,arg):
+        
+        for crvs, colors in zip(self.line, self.colorLine):
+            for crv, color in zip(crvs, colors):
+                arg.Display.DrawLine(crv, color, 4)
+
+
 
 
 
@@ -8798,7 +9178,7 @@ class BeamForceDiagram(component):
         return instance
 
     def get_Exposure(self): #override Exposure property
-        return Grasshopper.Kernel.GH_Exposure.secondary
+        return Grasshopper.Kernel.GH_Exposure.quarternary
 
     def get_ComponentGuid(self):
         return System.Guid("72ae4248-1eb4-4843-bf92-64abcf0c311c")

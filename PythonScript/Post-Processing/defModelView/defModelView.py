@@ -1,19 +1,18 @@
 ﻿"""Generate Model view 
     Inputs:
         AlpacaStaticOutput: Output of solver on static Analyses.
+        scale: multiplication factor for displacement.
+        modelExtrud: True - view extruded model.
         direction : view relative color of the traslation:
             '0' view traslation X.
             '1' view traslation Y.
             '2' view traslation Z.
 
-        scale: number that multiplies the real displacements. 
-        modelExtrud : 'True' = view exstrude model, 'False' = view analitic model. 
 
     Output:
-       modelDisp: view deformed model :
-       ModelCurve : analitic line ( polyline) of the beam or truss Element .
-       max_min : max end min of displacement of the structure .
-       """
+       modelDisp: view deformed model
+       domainValues: max end min of displacement of the structure .
+"""
 
 
 from ghpythonlib.componentbase import executingcomponent as component

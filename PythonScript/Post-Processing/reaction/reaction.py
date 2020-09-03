@@ -10,9 +10,6 @@
                ReactionMoment : Vector of reaction Moments { Mx, My, Mz }.
 """
 
-"""
-This component works in SDK mode only!!!
-"""
 
 from ghpythonlib.componentbase import executingcomponent as component
 import Grasshopper, GhPython
@@ -139,7 +136,7 @@ class MyComponent(component):
             ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False :
-            tagPoints, ReactionForce, ReactionMoments = reaction( AlpacaStaticOutput, scale, reactionForcesView, reactionMomentsView  )
+            tagPoints, ReactionForce, ReactionMoment = reaction( AlpacaStaticOutput, scale, reactionForcesView, reactionMomentsView  )
             return (tagPoints, ReactionForce, ReactionMoment)
 
     def DrawViewportWires(self,arg):

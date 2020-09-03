@@ -5,15 +5,18 @@
         Animate: True to see the deformed shape during the time.
         Reset: 
         scale: Amplitude value for deformation. Default is 10.
-        ExtrudedModel: True - Visualise Extruded Model
+        direction:
+        ExtrudedModel: True - Visualise Extruded Model.
+        colorList:
     Output:
         ModelDisp:
-        ModelCurve:
-        ModelShell:
-        ModelSolid:
-        trans: Displacement vector during the time.
-       """
-       
+        PointPos: Point representing the model.
+        PointDisp: Displacement vector of each node. The value change along the visualisation.
+        domainValues: max and min displacement of the structure.
+        trans: list of Displacement vector during the time.
+"""
+
+
 from ghpythonlib.componentbase import executingcomponent as component
 import Grasshopper, GhPython
 import System
@@ -22,7 +25,7 @@ import rhinoscriptsyntax as rs
 
 class MyComponent(component):
     
-    def RunScript(self, AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExstrud, colorList ):
+    def RunScript(self, AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExtrude, colorList ):
 
         import Rhino as rc
         import Rhino.Geometry as rg
@@ -735,7 +738,7 @@ class MyComponent(component):
             ghDoc.ScheduleSolution(interval,gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack)) # Note that the first input here is how often to update the component (in milliseconds)
             
         #----------------------------------#
-        def GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale,direction, modelExstrud, colorList):
+        def GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale,direction, modelExtrude, colorList):
             
             
             global myCounter
@@ -745,7 +748,7 @@ class MyComponent(component):
             Reset = False if Reset is None else Reset
             speed = 50 if speed is None else speed
             scale = 10 if scale is None else scale
-            modelExstrud = True if modelExstrud is None else modelExstrud
+            modelExtrude = True if modelExtrude is None else modelExtrude
             
             global ModelDisp
             global ModelCurve
@@ -1042,15 +1045,15 @@ class MyComponent(component):
         
         
             
-            if modelExstrud == False or modelExstrud == None :
+            if modelExtrude == False or modelExtrude == None :
                 self.line = segment
                 self.colorLine = colorBeam
-                return modelDisp, PointPos, PointDisp, domainValues
+                return modelDisp, PointPos, PointDisp, domainValues, trans
                 
             else:
                 self.line = []
                 self.colorLine = []
-                return ExtrudedView, PointPos, PointDisp, domainValues
+                return ExtrudedView, PointPos, PointDisp, domainValues, trans
         
         
         
@@ -1063,8 +1066,8 @@ class MyComponent(component):
         
         
         if checkData != False:
-            modelDisp, PointPos, PointDisp, domainValues = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExstrud, colorList )
-            return (modelDisp, PointPos, PointDisp, domainValues)
+            modelDisp, PointPos, PointDisp, domainValues, trans = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExtrude, colorList )
+            return (modelDisp, PointPos, PointDisp, domainValues, trans)
             
     def DrawViewportWires(self,arg):
         
