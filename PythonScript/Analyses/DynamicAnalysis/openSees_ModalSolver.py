@@ -268,7 +268,7 @@ nodeModalDispWrapper = nodeModalDispWrapper
 elementOutputWrapper = elementOutputWrapper
 
 #-----calcolo massa partecipante ------ #
-
+"""
 def zerolistmaker(n):
     listofzeros = [0] * n
     return listofzeros
@@ -378,7 +378,12 @@ openSeesModalOutputWrapper = ([nodeModalDispWrapper,
                                period,
                                frequency,
                                percMassPart])
+"""
 
+openSeesModalOutputWrapper = ([nodeModalDispWrapper,
+                               elementOutputWrapper,
+                               period,
+                               frequency])
 
 
 length = len(filename)-len(inputName)

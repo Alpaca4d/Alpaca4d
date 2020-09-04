@@ -2728,7 +2728,7 @@ class StaticAnalyses(component):
             outputFolder = os.path.join(ghFolderPath,'assembleData')
             wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
         
-            userObjectFolder = gh.Folders.DefaultUserObjectFolder
+            userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
             fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
             
@@ -2877,7 +2877,7 @@ class ModalAnalyses(component):
         
         
         
-            userObjectFolder = gh.Folders.DefaultUserObjectFolder
+            userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
             fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\DynamicAnalysis\openSees_ModalSolver.py')
             
@@ -3102,7 +3102,7 @@ class GroundMotionAnalyses(component):
                     f.write("%s\n" % item)
         
         
-            userObjectFolder = gh.Folders.DefaultUserObjectFolder
+            userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\python-3.7.7.amd64\python.exe')
             #pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
             fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')
@@ -3471,14 +3471,6 @@ class ReactionForces(component):
             self.My = My if reactionMomentsView == True else []
             self.Mz = Mz if reactionMomentsView == True else []
             
-            null = [rg.Vector3d( 0, 0, 0 )]*len(Rx)
-        
-            if reactionForcesView == True and reactionMomentsView == False or reactionForcesView == None and reactionMomentsView == False :
-                view = th.list_to_tree( [ point, Rx, Ry, Rz, null, null, null ]  )
-            elif reactionForcesView == False and reactionMomentsView == True or reactionForcesView == False and reactionMomentsView == None :
-                view = th.list_to_tree( [ point, null, null, null, Mx, My, Mz ]   )
-            elif reactionForcesView == True and reactionMomentsView == True or reactionForcesView == None and reactionMomentsView == None :
-                view = th.list_to_tree( [ point, Rx, Ry, Rz,Mx, My, Mz ]  )
         
             return tagPoints, ReactionForce, ReactionMoment
         

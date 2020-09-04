@@ -1,4 +1,4 @@
-﻿import System
+import System
 import os
 import Grasshopper as gh
 
@@ -23,7 +23,8 @@ outputFolder = os.path.join(ghFolderPath,'assembleData')
 wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
 
-userObjectFolder = gh.Folders.DefaultUserObjectFolder
+#userObjectFolder = gh.Folders.DefaultUserObjectFolder
+userObjectFolder = gh.Folders.DefaultAssemblyFolder
 pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
 fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\openSees_StaticSolver_3ndf\openSees_StaticSolver_3ndf.py')
     

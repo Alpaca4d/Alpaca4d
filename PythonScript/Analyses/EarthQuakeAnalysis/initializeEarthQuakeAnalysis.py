@@ -69,7 +69,8 @@ def InitializeGroundMotionAnalysis(AlpacaModel, TmaxAnalyses, GroundMotionDirect
             f.write("%s\n" % item)
 
 
-    userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    #userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    userObjectFolder = gh.Folders.DefaultAssemblyFolder
     pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\python-3.7.7.amd64\python.exe')
     #pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')

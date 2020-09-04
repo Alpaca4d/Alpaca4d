@@ -35,7 +35,8 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
 
 
 
-    userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    #userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    userObjectFolder = gh.Folders.DefaultAssemblyFolder
     pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\DynamicAnalysis\openSees_ModalSolver.py')
     

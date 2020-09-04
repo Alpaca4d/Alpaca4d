@@ -1,4 +1,4 @@
-﻿"""Calculate the Static Response of the structure
+"""Calculate the Static Response of the structure
     Inputs:
         AlpacaModel: Assemble model to perform Static Analyses.
     Output:
@@ -29,7 +29,8 @@ def InitializeStaticAnalysis(AlpacaModel):
     outputFolder = os.path.join(ghFolderPath,'assembleData')
     wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
 
-    userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    #userObjectFolder = gh.Folders.DefaultUserObjectFolder
+    userObjectFolder = gh.Folders.DefaultAssemblyFolder
     pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
     fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
     
