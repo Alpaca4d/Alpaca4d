@@ -10,6 +10,7 @@
             '0' view traslation X.
             '1' view traslation Y.
             '2' view traslation Z.
+            '3' view total translation
         modelExtrude: True - view extruded model.
         colorList: optional color list to remap number to colors.
     Output:
@@ -712,6 +713,7 @@ class MyComponent(component):
             Reset = False if Reset is None else Reset
             speed = 1 if speed is None else speed
             modelExtrude = True if modelExtrude is None else modelExtrude
+            direction = 3 if direction is None else direction
                     
                 
                 

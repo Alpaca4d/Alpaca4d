@@ -70,16 +70,14 @@ def InitializeModalAnalysis(AlpacaModel, numEigenvalues):
         elementModalWrapper = eval( lines[1].strip() )
         period = eval( lines[2].strip() )
         frequency = eval( lines[3].strip() )
-        massPart = eval( lines[4].strip() )
 
 
     AlpacaModalOutputWrapper = ([nodeModalDispWrapper,
                             elementModalWrapper,
                             period,
-                            frequency,
-                            massPart])
+                            frequency])
 
-    return [AlpacaModalOutputWrapper, period, frequency, massPart]
+    return [AlpacaModalOutputWrapper, period, frequency]
 
 checkData = True
 
@@ -95,5 +93,4 @@ if numVibrationModes is None:
 
 
 if checkData != False:
-    AlpacaModalOutput, period, frequency, massPart = InitializeModalAnalysis(AlpacaModel, numVibrationModes)
-    massPart = th.list_to_tree( massPart )
+    AlpacaModalOutput, period, frequency = InitializeModalAnalysis(AlpacaModel, numVibrationModes)
