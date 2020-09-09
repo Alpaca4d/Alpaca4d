@@ -94,22 +94,22 @@ def forceTimoshenkoBeam( ele, node, force, loadDict, numberResults ):
     #----------------------------------------------------------------#
     for index, x in enumerate(DivCurve):
         ## forza normale 3 ##
-        Nx = F3I - q3*x
+        Nx = -(F3I - q3*x)
         N.append( Nx )
         ## Taglio in direzione 1 ##
-        V1x = F1I + q1*x
+        V1x = -(F1I + q1*x)
         V1.append( V1x )
         ## Taglio in direzione 2 ##
-        V2x = F2I - q2*x
+        V2x = -(F2I - q2*x)
         V2.append( V2x )
         ## momento torcente ##
         Mtx = M3I
         Mt.append( Mtx )
         ## Taglio in direzione 1 ##
-        M1x = M1I + F2I*x - q2*x**2/2
+        M1x = -(M1I + F2I*x - q2*x**2/2)
         M1.append( M1x )
         ## Taglio in direzione 2 ##
-        M2x = M2I - F1I*x - q1*x**2/2
+        M2x = -(M2I - F1I*x - q1*x**2/2)
         M2.append( M2x )
         
     eleForceValue = [ N, V1, V2, Mt, M1, M2 ]
@@ -181,7 +181,7 @@ def forceTrussValue(  ele, node, force, loadDict, numberResults ):
     #----------------------------------------------------------------#
     for index, x in enumerate(DivCurve):
         ## forza normale 3 ##
-        Nx = F3I - q3*x
+        Nx = -(F3I - q3*x)
         N.append( Nx )
         ## Taglio in direzione 1 ##
         V1x = F1I 

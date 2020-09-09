@@ -10,7 +10,7 @@
             '0' view traslation X.
             '1' view traslation Y.
             '2' view traslation Z.
-            '3' view total translation
+            '3' view resulting displacement.
         modelExtrude: True - view extruded model.
         colorList: optional color list to remap number to colors.
     Output:

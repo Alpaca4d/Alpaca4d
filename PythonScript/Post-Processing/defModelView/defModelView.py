@@ -7,6 +7,7 @@
             '0' view traslation X.
             '1' view traslation Y.
             '2' view traslation Z.
+            '3' view resulting displacement.
 
 
     Output:
@@ -746,6 +747,8 @@ class MyComponent(component):
             
             
             global dimSection
+            
+            direction = 3 if direction is None else direction
             
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]

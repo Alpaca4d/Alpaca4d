@@ -29,11 +29,11 @@ def scaleAutomatic( valueMax, valueMin):
         return 2/(max( valueMax,mt.fabs(valueMin)))
 
 ## colore ##
-def color( value, color1, color2 ):
+def color( value, negativeColor , positiveColor ):
     if value <= 0 :
-        return color1
+        return negativeColor
     else :
-        return color2
+        return positiveColor
 
 ## funzione che fa le mesh ##
 def cdsMesh( strucPoint , cdsValue, cdsPoint, color1, color2):
@@ -52,10 +52,10 @@ def cdsMesh( strucPoint , cdsValue, cdsPoint, color1, color2):
         mesh.Vertices.Add( corner3 )
         mesh.Vertices.Add( corner4 )
         
-        mesh.VertexColors.Add(color(cdsValue[ value-1 ], color1, color2))
-        mesh.VertexColors.Add(color(cdsValue[ value-1 ], color1, color2))
-        mesh.VertexColors.Add(color(cdsValue[ value ], color1, color2))
-        mesh.VertexColors.Add(color(cdsValue[ value ], color1, color2))
+        mesh.VertexColors.Add(color(-cdsValue[ value-1 ], color1, color2))
+        mesh.VertexColors.Add(color(-cdsValue[ value-1 ], color1, color2))
+        mesh.VertexColors.Add(color(-cdsValue[ value ], color1, color2))
+        mesh.VertexColors.Add(color(-cdsValue[ value ], color1, color2))
         
         mesh.Faces.AddFace( 0, 1, 2,3)
         mesh.Normals.ComputeNormals()
@@ -391,7 +391,8 @@ def cdsView( AlpacaStaticOutput, Cds, scale ):
             M2Point.append(scaleM2*versor1*M2val[value])
             V1Point.append(scaleV1*versor1*V1val[value])
             MtPoint.append(scaleMt*versor1*Mtval[value])
-        Nmesh = cdsMesh( PointsDivLength , Nval, NPoint, blu, rosa)
+
+        Nmesh = cdsMesh( PointsDivLength , Nval, NPoint, rosa, blu)
         
         M2mesh = cdsMesh( PointsDivLength , M2val, M2Point, rosso, blu)
         
