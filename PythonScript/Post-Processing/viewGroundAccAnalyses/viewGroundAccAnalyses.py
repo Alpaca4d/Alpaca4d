@@ -5,7 +5,11 @@
         Animate: True to see the deformed shape during the time.
         Reset: 
         scale: Amplitude value for deformation. Default is 10.
-        direction:
+        direction : view relative color of the traslation:
+            '0' view traslation X.
+            '1' view traslation Y.
+            '2' view traslation Z.
+            '3' view resulting displacement.
         ExtrudedModel: True - Visualise Extruded Model.
         colorList:
     Output:
@@ -748,6 +752,7 @@ class MyComponent(component):
             Reset = False if Reset is None else Reset
             speed = 50 if speed is None else speed
             scale = 10 if scale is None else scale
+            direction = 3 if direction is None else direction
             modelExtrude = True if modelExtrude is None else modelExtrude
             
             global ModelDisp
