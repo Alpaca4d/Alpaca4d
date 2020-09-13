@@ -3299,7 +3299,6 @@ class NodeDisplacement(component):
             Points, Trans, Rot = NodeDisp( AlpacaStaticOutput )
             return (Points, Trans, Rot)
 
-
 class ReactionForces(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -3496,7 +3495,6 @@ class ReactionForces(component):
             arg.Display.DrawArrow( rg.Line(ancor, momentX) ,  System.Drawing.Color.Red)
             arg.Display.DrawArrow( rg.Line(ancor, momentY) ,  System.Drawing.Color.Red)
             arg.Display.DrawArrow( rg.Line(ancor, momentZ) ,  System.Drawing.Color.Red)
-
 
 
 
@@ -3883,14 +3881,14 @@ class BeamDisplacement(component):
 class BeamForces(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Beam Forces (Alpaca4d)", "Beam Forces", """Compute the internal forces of a beam""", "Alpaca", "6|Numerical Output")
+            "Beam Forces (Alpaca4d)", "BeamForces", """Compute the internal Forces""", "Alpaca", "6|Numerical Output")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.secondary
-    
+
     def get_ComponentGuid(self):
-        return System.Guid("a1593306-5f65-4c4d-af95-270566d05a89")
+        return System.Guid("94913e4f-ddc7-4efd-80df-5cc4033afacc")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -3905,7 +3903,7 @@ class BeamForces(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "numberResults", "numberResults", "number of discretizations for beam. Defauls is 2.")
+        self.SetUpParam(p, "numberResults", "numberResults", "number of discretizations for beam.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -3965,7 +3963,7 @@ class BeamForces(component):
     def RunScript(self, AlpacaStaticOutput, numberResults):
         
         import Rhino.Geometry as rg
-        import math
+        import math as mt
         import ghpythonlib.treehelpers as th # per data tree
         import Grasshopper as gh
         import ghpythonlib.components as ghcomp
@@ -3973,13 +3971,13 @@ class BeamForces(component):
         import rhinoscriptsyntax as rs
         from scriptcontext import doc
         
-        
+        #---------------------------------------------------------------------------------------#
         def linspace(a, b, n=100):
             if n < 2:
                 return b
             diff = (float(b) - a)/(n - 1)
             return [diff * i + a  for i in range(n)]
-        
+        ## node e nodeDisp son dictionary ##
         def forceTimoshenkoBeam( ele, node, force, loadDict, numberResults ):
             #---------------- WORLD PLANE ----------------------#
             WorldPlane = rg.Plane.WorldXY
@@ -4045,28 +4043,28 @@ class BeamForces(component):
             #----------------------------------------------------------------#
             for index, x in enumerate(DivCurve):
                 ## forza normale 3 ##
-                Nx = F3I - q3*x
+                Nx = -(F3I - q3*x)
                 N.append( Nx )
                 ## Taglio in direzione 1 ##
-                V1x = F1I + q1*x
+                V1x = -(F1I + q1*x)
                 V1.append( V1x )
                 ## Taglio in direzione 2 ##
-                V2x = F2I - q2*x
+                V2x = -(F2I - q2*x)
                 V2.append( V2x )
                 ## momento torcente ##
                 Mtx = M3I
                 Mt.append( Mtx )
                 ## Taglio in direzione 1 ##
-                M1x = M1I + F2I*x - q2*x**2/2
+                M1x = -(M1I + F2I*x - q2*x**2/2)
                 M1.append( M1x )
                 ## Taglio in direzione 2 ##
-                M2x = M2I - F1I*x - q1*x**2/2
+                M2x = -(M2I - F1I*x - q1*x**2/2)
                 M2.append( M2x )
                 
             eleForceValue = [ N, V1, V2, Mt, M1, M2 ]
             return   eleForceValue 
         
-        
+        ## node e nodeDisp son dictionary ##
         def forceTrussValue(  ele, node, force, loadDict, numberResults ):
             #---------------- WORLD PLANE ----------------------#
             WorldPlane = rg.Plane.WorldXY
@@ -4132,7 +4130,7 @@ class BeamForces(component):
             #----------------------------------------------------------------#
             for index, x in enumerate(DivCurve):
                 ## forza normale 3 ##
-                Nx = F3I - q3*x
+                Nx = -(F3I - q3*x)
                 N.append( Nx )
                 ## Taglio in direzione 1 ##
                 V1x = F1I 
@@ -4153,7 +4151,7 @@ class BeamForces(component):
             eleForceValue = [ N, V1, V2, Mt, M1, M2 ]
             return  eleForceValue
         
-        
+        #--------------------------------------------------------------------------
         def beamForces( AlpacaStaticOutput, numberResults ):
         
             # define output
@@ -4249,6 +4247,8 @@ class BeamForces(component):
         if checkData != False:
             tagElement, N, V1, V2, Mt, M1, M2 = beamForces( AlpacaStaticOutput, numberResults )
             return (tagElement, N, V1, V2, Mt, M1, M2)
+
+
 
 
 # Shell
@@ -4608,19 +4608,315 @@ class ShellForces(component):
             tagElement, Fx, Fy, Fz, Mx, My, Mz = shellForces( AlpacaStaticOutput )
             return (tagElement, Fx, Fy, Fz, Mx, My, Mz)
 
-
-# Brick
-class BrickStress(component):
+class ShellStresses(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Brick Stress (Alpaca4d)", "Brick Stress", """Compute the internal stress in a Brick Element""", "Alpaca", "6|Numerical Output")
+            "Shell Stress (Alpaca4d)", "Shell Stress", """Compute the shell internal stress""", "Alpaca", "6|Numerical Output")
+        return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.tertiary
+  
+    def get_ComponentGuid(self):
+        return System.Guid("cd1b7204-98f4-4411-8b5f-cd6f36afffd6")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Output of solver on static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "stressView", "stressView", "stress acting on the shell nodes.\n'0' - sigmaX (membrane stress X);\n'1' - sigmaY  (membrane stress Y);\n'2' - sigmaXY (membrane stress XY);\n'3' - tauX  (transverse shear forces X);\n'4' - tauY (transverse shear forces Y).\n'5' - mX (bending moment X);\n'6' - my  (bending moment Y);\n'7' - mxy (bending moment XY);")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        self.Params.Input.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_Colour()
+        self.SetUpParam(p, "colorList", "colorList", "Script input colorList.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "shell", "shell", "mesh that represent the shell.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "stressValue", "stressValue", "valor of stress acting on the shell nodes.")
+        self.Params.Output.Add(p)
+        
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "stressRange", "stressRange", "Script output stressRange.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        p1 = self.marshal.GetInput(DA, 1)
+        p2 = self.marshal.GetInput(DA, 2)
+        result = self.RunScript(p0, p1, p2)
+
+        if result is not None:
+            if not hasattr(result, '__getitem__'):
+                self.marshal.SetOutput(result, DA, 0, True)
+            else:
+                self.marshal.SetOutput(result[0], DA, 0, True)
+                self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAANISURBVEhL7ZNbSJNhGMf3uVPDwumWUzc3Uxse0jnX3CgPM8uVYUZnKVQyCgKTDoTYCS3MDqbkxTxVM1uxaVq2UuwiL5IkguiiA4GQ0OkiIrrpcOG/531X0kV09CKoP/z43vd53uf/Pe/7vZ/on5WcSAsMp1aRxAGJRHhqMEpB4wFCxxJ/KjvhCQkTv19boETHsBaXHxuw5UAY5Iqg15TbwFf9ohRECXF7dooMlfUqXLyvR99dAzwt0ei+roe3Tw/XUBSMJjnbTTcRTvxQ0cQhiVR46VgWjIb6SG7EOv4Cm7trouG7Foj3PtRj/SYlpFLhBdUWcZdvKFsQiXpiwmQfi7cp4R7RTRq6/TrU7YzD5ooMbC1ywplXgaKSbSh0rsfu8mxUVxpReyIKh7o0iE2Ssd24CSV3JSUSdxPMcuxqVON8fzQ8bXpcvKfH/vZ4LC8rhzXrDArm96AkqQaF87zIWXxnkpVzO7DG3Iy8HD8sGa0oTCuZUIc7IAjicfINZS/YNTtVjq7RQMfsnHccmYNlqVtRYHMjN38UqywtWJLt54b5uUNYne7CwrxhirdiwaKbPL7c1oWyhH18bJnnQVCQ9Dl5s+sskhF7QpTid8UVamTm70dW/q3PRWexKW47md3gcxa32E5hQXoTqnSlWJdci4WWZlitLhSZGuB0DGKp/RyCZ8RPkGchM/9aScSIKjwHdsc1buh0DPDnkpR6FCdUo5ZMejIuoDulEYNZQ7hi88KXfAy+OQ1oM7eg2nQcMer57Bu4uOM3JCYqxBLFW2PyHthy+rHGdBQuSwf89l5cSDgIb+Jhbv6FntRm/oI+czvqqBGqf0QEM7PvKYYYjFToJk7NPc2N+qnz3rQW9Jrb+A681H1rYg3OUOcs70lvh0qm+kB1Vu7wE6JbKyqVi+WvNsaU45L1PK5mDuBk8j50RtnROV2LYZUBIxq6cZp4GBUadu57eeUvKoLwGWcYUTXThHFtLB5rYvEkIg5jxD31LDSFhrOjuUlIWMHvaoVEEJ5VTg/FA80svNLFc+5EGBAsBL2hfGxg2Z+J/TgdRolswj9Ti5faOFhk01j3pTw7hVokFglj1oC5LxCaerGr2Emo+Oy//lKJRJ8AAgSWcEbrIvgAAAAASUVORK5CYII="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaStaticOutput, stressView, colorList):
+        
+        import Rhino.Geometry as rg
+        import ghpythonlib.treehelpers as th
+        import Grasshopper as gh
+        import sys
+        import os
+        import rhinoscriptsyntax as rs
+        from scriptcontext import doc
+        
+         
+        
+        #---------------------------------------------------------------------------------------#
+        def linspace(a, b, n=100):
+            if n < 2:
+                return b
+            diff = (float(b) - a)/(n - 1)
+            return [diff * i + a  for i in range(n)]
+        
+        def gradient(value, valueMin, valueMax, colorList ):
+        
+            if colorList == [] :
+                listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                            rs.CreateColor( 240, 69, 7),
+                            rs.CreateColor( 251, 255, 0 ),
+                            rs.CreateColor( 77, 255, 0 ),
+                            rs.CreateColor( 0, 255, 221 ),
+                            rs.CreateColor( 0, 81, 255 )]
+            else :
+                listcolor = colorList
+        
+            n = len( listcolor )
+            domain = linspace( valueMin, valueMax, n)
+            #print( domain )
+            
+            for i in range(1,n+1):
+                if  domain[i-1] <= value <= domain[i] :
+                    return listcolor[ i-1 ]
+                elif  valueMax <= value <= valueMax + 0.0000000000001 :
+                    return listcolor[ -1 ]
+                elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+                    return listcolor[ 0 ]
+        
+        def ShellStressQuad( ele, node ):
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            index4 = eleNodeTag[3]
+            
+            ## CREO IL MODELLO  ##
+            point1 = node.get( index1 -1 , "never")
+            point2 = node.get( index2 -1 , "never")
+            point3 = node.get( index3 -1 , "never")
+            point4 =  node.get( index4 -1 , "never")
+            
+            shellModel = rg.Mesh()
+            shellModel.Vertices.Add( point1 ) #0
+            shellModel.Vertices.Add( point2 ) #1
+            shellModel.Vertices.Add( point3 ) #2
+            shellModel.Vertices.Add( point4 ) #3
+            
+            shellModel.Faces.AddFace(0, 1, 2, 3)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellModel.VertexColors.CreateMonotoneMesh( colour )
+        
+            return  shellModel 
+        
+        def ShellStressTriangle( ele, node ):
+            
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            index1 = eleNodeTag[0]
+            index2 = eleNodeTag[1]
+            index3 = eleNodeTag[2]
+            
+            
+            ## CREO IL MODELLO  ##
+            point1 =  node.get( index1 -1 , "never")
+            point2 =  node.get( index2 -1 , "never")
+            point3 =  node.get( index3 -1 , "never")
+            
+            shellModel = rg.Mesh()
+            shellModel.Vertices.Add( point1 ) #0
+            shellModel.Vertices.Add( point2 ) #1
+            shellModel.Vertices.Add( point3 ) #2
+            
+            shellModel.Faces.AddFace(0, 1, 2)
+            colour = rs.CreateColor( color[0], color[1], color[2] )
+            shellModel.VertexColors.CreateMonotoneMesh( colour )
+            
+            return  shellModel
+        
+        #--------------------------------------------------------------------------
+        def shellStressView( AlpacaStaticOutput, stressView ):
+        
+            global shell
+            global stressValue
+        
+            diplacementWrapper = AlpacaStaticOutput[0]
+            EleOut = AlpacaStaticOutput[2]
+            #ForceOut = AlpacaStaticOutput[4]
+            #print( ForceOut[0] )
+            #print( ForceOut[1] )
+            #nodalForce = openSeesOutputWrapper[5]
+        
+            #nodalForcerDict = dict( nodalForce )
+        
+            pointWrapper = []
+            for index,item in enumerate(diplacementWrapper):
+                pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
+            ## Dict. for point ##
+            pointWrapperDict = dict( pointWrapper )
+        
+            shell4Tag = []
+            shell3Tag = []
+            for item in EleOut:
+                if  len(item[1])  == 4:
+                     shell4Tag.append(item[0])
+        
+                if  len(item[1])  == 3:
+                     shell3Tag.append(item[0])
+        
+            ## Dict. for force ##
+            #forceWrapperDict = dict( forceWrapper )
+            #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+            workingDirectory = os.path.dirname( ghFilePath )
+            outputFile4 = os.path.join(workingDirectory, 'assembleData\\tensionShell4.out' )
+            outputFile3 = os.path.join(workingDirectory, 'assembleData\\tensionShell3.out' )
+            #---------------------------------------------------#
+            tensionDic = []
+              
+            #print(len(tensionList)/len(shellTag))
+        
+            #print(stressView + 24)
+        
+            with open(outputFile4, 'r') as f:
+                lines = f.readlines()
+                if lines :
+                    tension4List = lines[0].split()
+        
+            #print( len( shell4Tag  ), len( tension4List ))
+        
+            for n,eleTag in enumerate(shell4Tag) :
+                tensionShell = []
+                for i in range( (n)*32, ( n + 1 )*32  ):
+                    tensionShell.append( float(tension4List[i]) )
+                tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ], tensionShell[ stressView + 24 ] ]
+                tensionDic.append([ eleTag, tensionView ])
+        
+            with open(outputFile3, 'r') as f:
+                lines = f.readlines()
+                if lines :
+                    tension3List = lines[0].split()
+        
+            #print( len( shell3Tag  ), len( tension3List ))
+        
+            for n,eleTag in enumerate(shell3Tag) :
+                tensionShell = []
+                for i in range( (n)*32, ( n + 1 )*32  ): # invece di 32 dovrebbe essere
+                    tensionShell.append( float(tension3List[i]) )
+                tensionView = [ tensionShell[ stressView ], tensionShell[ stressView + 8 ], tensionShell[ stressView + 16 ] ]
+                tensionDic.append([ eleTag, tensionView ])
+        
+            stressDict = dict( tensionDic )
+            stressValue = stressDict.values() 
+            #print( stressDict.get(2))
+            #print( stressDict )
+            #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+            #print( tensionDic[0] )
+            
+            maxValue = []
+            minValue = []
+            for value in stressDict.values():
+                maxValue.append( max( value ))
+                minValue.append( min( value ))
+                
+            maxValue = max( maxValue )
+            minValue = min( minValue )
+            stressRange = [minValue, maxValue ] 
+        
+            shell = []
+            for ele in EleOut :
+                eleTag = ele[0]
+                eleType = ele[2][0]
+                if eleType == "ShellMITC4" :
+                    shellModel = ShellStressQuad( ele, pointWrapperDict )
+                    shell.append( shellModel )
+                elif eleType == "shellDKGT" :
+                    #outputForce = forceWrapperDict.get( eleTag )
+                    shellModel = ShellStressTriangle( ele, pointWrapperDict )
+                    shell.append( shellModel )
+        
+            modelStress = []
+            for shellEle, value in zip(shell,stressValue) :
+                shellColor = shellEle.DuplicateMesh()
+                shellColor.VertexColors.Clear()
+                for j in range(0,shellEle.Vertices.Count):
+                    #print( value[j] )
+                    jetColor = gradient(value[j], minValue, maxValue, colorList )
+                    shellColor.VertexColors.Add( jetColor )
+                modelStress.append( shellColor)
+                
+            stressValue = th.list_to_tree(stressValue)
+            return modelStress, stressValue, stressRange
+        
+        checkData = True
+        
+        if not AlpacaStaticOutput :
+            checkData = False
+            msg = "input 'AlpacaStaticOutput' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if stressView is None :
+            checkData = False
+            msg = " input 'stressView' failed to collect data"  
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        if checkData != False:
+            shell, stressValue, stressRange = shellStressView( AlpacaStaticOutput, stressView )
+            return (shell, stressValue, stressRange)
+
+
+
+# Brick
+
+class BrickStresses(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Brick Stress (Alpaca4d)", "Brick Stress", """Compute the brick stress""", "Alpaca", "6|Numerical Output")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.quarternary
 
     def get_ComponentGuid(self):
-        return System.Guid("2fa8329f-04d2-4e26-9f95-70938b1033f7")
+        return System.Guid("d8e87bb1-943a-4cd4-a11a-452a8e004a86")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -4639,6 +4935,11 @@ class BrickStress(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
+        p = Grasshopper.Kernel.Parameters.Param_Colour()
+        self.SetUpParam(p, "colorList", "colorList", "Script input colorList.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
     
     def RegisterOutputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
@@ -4649,11 +4950,16 @@ class BrickStress(component):
         self.SetUpParam(p, "stressValue", "stressValue", "values of stress acting on the brick nodes.")
         self.Params.Output.Add(p)
         
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "stressRange", "stressRange", "")
+        self.Params.Output.Add(p)
+        
     
     def SolveInstance(self, DA):
         p0 = self.marshal.GetInput(DA, 0)
         p1 = self.marshal.GetInput(DA, 1)
-        result = self.RunScript(p0, p1)
+        p2 = self.marshal.GetInput(DA, 2)
+        result = self.RunScript(p0, p1, p2)
 
         if result is not None:
             if not hasattr(result, '__getitem__'):
@@ -4661,22 +4967,55 @@ class BrickStress(component):
             else:
                 self.marshal.SetOutput(result[0], DA, 0, True)
                 self.marshal.SetOutput(result[1], DA, 1, True)
+                self.marshal.SetOutput(result[2], DA, 2, True)
         
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAATMSURBVEhLzZVbbBRVHMYboybGGGPUGI3R+NTSnZmd2ZnZHWbbbrt0W8q2XXuDXqClhW7Z7S6FXrZsqV0o3QqlUARLi9Q2xIrcpOAFKlFDQINoRHjACyGhiTEx8cUHjdLuzOc506EECYGAD37Jye7OnvP7zv9yziT97+RyuR5WFOUx8+d/KzU5+Qkby54WGeYX8tkhiuIz5l8PLgJ7kmeYs6ulEN5zHkBYakQBb/tDYJhBiWWTzWn3J5Zln+ItlnMUPpl+yhj9Sr920LkDPYIws5BhEjaGOS6wbIa55N4lp6Q8TdLxTUgKajfg6+0dGHeO42T6JI7M92k/KwrelyRUWK2gc3mWrUhNTX3URNxZPM8/62Bt3zXLYW27M4Qeb+d0zO3Xh53xuUg+SJ/Q31E79QmHE1PE6Iwso5HnIbPsFDFTTNTtcjDMcyrHXWpRq/Ro+G294q0LcJU0aJ6VXahd0jhzKG1Yv2ESs3fhsPMQiSqqXSEmNKI8jtNJfdpN3K2ypaQ8XyQIlwOBTVg2dB4VY5exKLAp0eirSVSOXETx1kk0ruxGX0YYW9KDeD0thI/Tjxtm42oErTYbVJa9TuoSNZE3RQr6os1i+cldtdYAG/DWQfiL6v4a6VXQFOjV1hJj+rxs5xlklq2Ct3EzdjnDRo3a5BbUCAKaSJqIQZeJnZUwb97LgtV6NSe8XfN1H0ZuaAuy/bFEdaAHnSVV2uGzCnatULR4sRc0kpxAHOV7Lxpm68te0yk8jVMQk3yJdmJCDGImOimJ47hXRJa/5m0bmtu5lxg1qbLW5ZfRPyrj+BXFGAdOKmgpWoLivhNzc+Pl27RCfhEiciu67Z7pEtJRpG03GnB6/ElarrmXtc4tCESG0Fs2Hwc/nYWOfG5HdLuI/gMyRk/b0bzYOzeXjtq8Us1tzdCrbVXXY3Y/3f0RQRBeMAyoSO9eVbMLIagerM4v0seGZsH/HmNn7PCVWvWOUp9ePnLJgJdsO4UCMQNRuR3tcgQiK/xKz4+JnpVgsfxY17JD7+tSExV1PHLzrIjtlnD0ewXHflBw6DMFtAbr3xDx7tcO7AgpekF125/5nfum6caaM6v0lWKdJliYacJaYmJvihqEAnxi6IQde07ZER+VtPpmATnEaE2lhKC/W4usiGCgz25EcvSCgrXBHmTXrJvJKKxGxBdGUFoFkupjJvJWUYN9XzhADQJRm0bzTXc/ft4Bf7lLU1wL4anfgGBTXN8WL8dgk4rq+i44nFlQ3QVasGB5QrKwv9M2N5G3ilxm35Yt5TFwRDYKunW/jA3DkjE6on5t8e5zyHi1Fkq6B+6lzSja/CEcaQuQS85A5uKgnunKBTm5DSbudtHLiURRTK7kr7I9VnQMiJgguadRRBoqkRPeksgJ9IIWNm/NgAF3lfp1T0M3HFneGbJukmAemqXdRWSyi/TwRwuyrfrGTTLqN+w3uiW7NqpTeH7HGNzLo5rqKZzOj46SruGv0feFufzeJXEc47Ja9zkcaX9nLW3R8tftNYzK3vzSSFduqA+kNjopbI655P4kpqa+RCLqFzjrb+7KNSjp/wQe/0aIsjpDarfHnPbgItfJ4+SObxJZbkq2qxr5PnVfqbmbCPQR+tYSOK7AfHQHJSX9A3eam9wiOH2kAAAAAElFTkSuQmCC"
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
 
     
-    def RunScript(self, AlpacaStaticOutput, stressView):
+    def RunScript(self, AlpacaStaticOutput, stressView, colorList):
         
         import Rhino.Geometry as rg
+        import math as mt
         import ghpythonlib.treehelpers as th # per data tree
         import Grasshopper as gh
         import sys
+        import os
         import rhinoscriptsyntax as rs
         from scriptcontext import doc
         
         #---------------------------------------------------------------------------------------#
+        def linspace(a, b, n=100):
+            if n < 2:
+                return b
+            diff = (float(b) - a)/(n - 1)
+            return [diff * i + a  for i in range(n)]
+        
+        def gradient(value, valueMin, valueMax, colorList ):
+        
+            if colorList == [] :
+                listcolor = [ rs.CreateColor( 201, 0, 0 ),
+                            rs.CreateColor( 240, 69, 7),
+                            rs.CreateColor( 251, 255, 0 ),
+                            rs.CreateColor( 77, 255, 0 ),
+                            rs.CreateColor( 0, 255, 221 ),
+                            rs.CreateColor( 0, 81, 255 )]
+            else :
+                listcolor = colorList
+        
+            n = len( listcolor )
+            domain = linspace( valueMin, valueMax, n)
+            #print( domain )
+            
+            for i in range(1,n+1):
+                if  domain[i-1] <= value <= domain[i] :
+                    return listcolor[ i-1 ]
+                elif  valueMax <= value <= valueMax + 0.0000000000001 :
+                    return listcolor[ -1 ]
+                elif  valueMin - 0.0000000000001 <= value <= valueMin  :
+                    return listcolor[ 0 ]
+        
         def Solid( ele, node ):
             
             eleTag = ele[0]
@@ -4761,6 +5100,7 @@ class BrickStress(component):
         #--------------------------------------------------------------------------
         def brickStressView( AlpacaStaticOutput, stressView ):
         
+        
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
             #print( ForceOut[0] )
@@ -4775,42 +5115,70 @@ class BrickStress(component):
             ## Dict. for point ##
             pointWrapperDict = dict( pointWrapper )
         
-            EleTag = []
+            BrickTag = []
+            TetraTag = []
             for item in EleOut:
                 if  len(item[1])  == 8:
-                     EleTag.append([item[0], 48])
+                     BrickTag.append([item[0], 48])
                 elif  len(item[0])  == 'FourNodeTetrahedron':
-                     EleTag.append([item[0], 24])
+                     TetraTag.append([item[0], 24])
         
+            #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
             ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
             workingDirectory = os.path.dirname(ghFilePath)
-            outputFile = os.path.join(workingDirectory, 'assembleData\\tensionShell.out' )
-        
-            with open(outputFile, 'r') as f:
+            outputFileBrick = os.path.join(workingDirectory, 'assembleData\\tensionBrick.out' )
+            outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
+            #---------------------------------------------------#
+            
+            tensionDic = []
+            
+            with open(outputFileBrick, 'r') as f:
                 lines = f.readlines()
-                tensionList = lines[0].split()
+                if lines :
+                    tensionListBrick  = lines[0].split()
         
             #print(len(tensionList)/len(shellTag))
-        
-            w = stressView
             #print(w + 24)
-            tensionDic = []
-            for n,eleTag in enumerate(EleTag) :
-                tensionShell = []
+            for n,eleTag in enumerate(BrickTag) :
+                tensionSolid = []
                 for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
-                    tensionShell.append( float(tensionList[i]) )
-                if eleTag[1] == 48:
-                    tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ], tensionShell[ w + 24 ], tensionShell[ w + 30 ], tensionShell[ w + 36 ], tensionShell[ w + 42 ] ]
-                elif eleTag[1] == 24:
-                    tensionView = [ tensionShell[ w ], tensionShell[ w + 6 ], tensionShell[ w + 12 ], tensionShell[ w + 18 ]]
-                tensionDic.append([ eleTag[0], tensionView ])
+                    tensionSolid.append( float(tensionListBrick[i]) )
+                tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ], tensionSolid[ stressView + 24 ], tensionSolid[ stressView + 30 ], tensionSolid[ stressView + 36 ], tensionSolid[ stressView + 42 ] ]
+                tensionDic.append([ eleTag, tensionView ])
         
+            with open(outputFileTetra, 'r') as f:
+                lines = f.readlines()
+                if lines :
+                    tensionListTetra  = lines[0].split()
+            
+            #print(len(tensionList)/len(shellTag))
+            #print(w + 24)
+            if lines :
+                for n,eleTag in enumerate(TetraTag) :
+                    tensionSolid = []
+                    for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
+                        tensionSolid.append( float(tensionListTetra[i]) )
+                    tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ]]
+                    tensionDic.append([ eleTag[0], tensionView ])
+            
             stressDict = dict( tensionDic )
-            stressValue = th.list_to_tree( stressDict.values() )
+            stressValue =  stressDict.values() 
             #print( stressDict.get(2))
             #print( stressDict )
             #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
             #print( tensionDic[0] )
+            
+            maxValue = []
+            minValue = []
+            for value in stressDict.values():
+                maxValue.append( max( value ))
+                minValue.append( min( value ))
+                
+            maxValue = max( maxValue )
+            minValue = min( minValue )
+            stressRange = [minValue, maxValue ] 
+            print( maxValue, minValue )
+        
         
             brick = []
             for ele in EleOut :
@@ -4819,12 +5187,21 @@ class BrickStress(component):
                 if eleType == "bbarBrick" :
                     brickModel = Solid( ele, pointWrapperDict )
                     brick.append( brickModel )
-                elif eleType == "ShellDKGT" :
-                    outputForce = forceWrapperDict.get( eleTag )
-                    tetraModel = ShellTriangle( ele, pointWrapperDict )
+                elif eleType == "FourNodeTetrahedron" :
+                    tetraModel = TetraSolid( ele, pointWrapperDict )
                     brick.append( tetraModel )
+                    
+                modelStress = []
+            for brickEle, value in zip(brick,stressValue) :
+                brickColor = brickEle.DuplicateMesh()
+                brickColor.VertexColors.Clear()
+                for j in range(0,bricklEle.Vertices.Count):
+                    #print( value[j] )
+                    jetColor = gradient(value[j], minValue, maxValue, colorList )
+                    brickColor.VertexColors.Add( jetColor )
+                modelStress.append( brickColor)
         
-            return brick, stressValue
+            return modelStress, stressValue, stressRange
         
         checkData = True
         
@@ -4840,8 +5217,9 @@ class BrickStress(component):
         
         
         if checkData != False:
-            brick, stressValue = brickStressView( AlpacaStaticOutput, stressView )
-            return (brick, stressValue)
+            brick, stressValue, stressRange = brickStressView( AlpacaStaticOutput, stressView )
+            return (brick, stressValue, stressRange)
+
 
 
 # 7|Visualisation
@@ -5856,7 +6234,6 @@ class VisualiseModel(component):
         for brep in self.supportBrep:
             arg.Display.DrawBrepShaded(brep,self.material)
 
-
 class StaticModelView(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -5908,7 +6285,7 @@ class StaticModelView(component):
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "domainValues", "domainValues", "max end min of displacement of the structure .")
+        self.SetUpParam(p, "stressRange", "stressRange", "max end min of displacement of the structure .")
         self.Params.Output.Add(p)
         
     
@@ -6820,7 +7197,7 @@ class StaticModelView(component):
             # MAX end MIN on structures point #
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
-            domainValues = [ lowerLimit, upperLimit ]
+            stressRange = [ lowerLimit, upperLimit ]
             #print( lowerLimit, upperLimit )
             #####################################################################################
             colorBeam = []
@@ -6894,11 +7271,11 @@ class StaticModelView(component):
             if modelExtrud == False or modelExtrud == None:
                 self.line = segment
                 self.colorLine = colorBeam
-                return modelDisp, domainValues
+                return modelDisp, stressRange
             else:
                 self.line = []
                 self.colorLine = []
-                return ExtrudedView, domainValues
+                return ExtrudedView, stressRange
 
 
         
@@ -6910,8 +7287,8 @@ class StaticModelView(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            modelDisp, domainValues = DeformedModelView(AlpacaStaticOutput, scale, modelExtrud, direction, colorList)
-            return (modelDisp, domainValues)
+            modelDisp, stressRange = DeformedModelView(AlpacaStaticOutput, scale, modelExtrud, direction, colorList)
+            return (modelDisp, stressRange)
 
 
     def DrawViewportWires(self,arg):
@@ -6919,8 +7296,6 @@ class StaticModelView(component):
         for crvs, colors in zip(self.line, self.colorLine):
             for crv, color in zip(crvs, colors):
                 arg.Display.DrawLine(crv, color, 4)
-
-
 
 class ModalModelView(component):
     def __new__(cls):
@@ -7895,7 +8270,7 @@ class ModalModelView(component):
             # MAX end MIN on structures point #
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
-            domainValues = [ lowerLimit, upperLimit ]
+            stressRange = [ lowerLimit, upperLimit ]
             print( lowerLimit, upperLimit )
         #####################################################################################
             colorBeam = []
@@ -8003,9 +8378,6 @@ class ModalModelView(component):
             for crv, color in zip(crvs, colors):
                 arg.Display.DrawLine(crv, color, 4)
 
-
-
-
 class GroundMotionModelView(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -8016,7 +8388,7 @@ class GroundMotionModelView(component):
         return Grasshopper.Kernel.GH_Exposure.tertiary
 
     def get_ComponentGuid(self):
-        return System.Guid("48501d2c-4c5f-44d2-82c1-4b4390260903")
+        return System.Guid("00a277ed-14fe-4a85-8e34-4347b8dfb590")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -8035,27 +8407,27 @@ class GroundMotionModelView(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        p = Grasshopper.Kernel.Parameters.Param_Boolean()
         self.SetUpParam(p, "Animate", "Animate", "True to see the deformed shape during the time.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        p = Grasshopper.Kernel.Parameters.Param_Boolean()
         self.SetUpParam(p, "Reset", "Reset", "")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        p = Grasshopper.Kernel.Parameters.Param_Number()
         self.SetUpParam(p, "scale", "scale", "Amplitude value for deformation. Default is 10.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "direction", "direction", "")
+        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.\n'3' view resulting displacement.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        p = Grasshopper.Kernel.Parameters.Param_Boolean()
         self.SetUpParam(p, "modelExtrude", "modelExtrude", "True - Visualise Extruded Model")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
@@ -8076,15 +8448,11 @@ class GroundMotionModelView(component):
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "PointDisp", "PointDisp", "Displacement vector of each node. The value change along the visualisation.")
+        self.SetUpParam(p, "PointDisp", "PointDisp", "Displacement vector of each node. The values change within the visualisation.")
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "domainValues", "domainValues", "max and min displacement of the structure.")
-        self.Params.Output.Add(p)
-        
-        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "a", "trans", "list of Displacement vector during the time.")
+        self.SetUpParam(p, "trans", "trans", "Displacement vector of each node for the entire analyses.")
         self.Params.Output.Add(p)
         
     
@@ -8107,7 +8475,6 @@ class GroundMotionModelView(component):
                 self.marshal.SetOutput(result[1], DA, 1, True)
                 self.marshal.SetOutput(result[2], DA, 2, True)
                 self.marshal.SetOutput(result[3], DA, 3, True)
-                self.marshal.SetOutput(result[4], DA, 4, True)
         
     def get_Internal_Icon_24x24(self):
         o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAANuSURBVEhLvZVbSBRRGMdHDSxTyUyymTMz7c7UVtu2ldiLRDeiCxFRVA8m6W71EEUPhVhIvRV0z4KgksAusy7l7iwVFFFoQReyG2qzs8RQkObOmPVgULAzfWc8LmrqCkk/+LPf/ztnzvfNOYdZ6r9i3vTRVtBfRezYYl4rzU3U+9+aAf9+khpbEgF/XULyX8KxdXX7eDs5VpiBncXQvWbWbZtoSr4VUKjDDPtyyPAAIh+dXERBxSGNn0RSqYHFa8yAr9oK7s5OBCraLcm/lAwlCcf4ZbLKNYaibIcc5V+FVF4Pq3xN+MN0V9CiMuQYEiNR7kBI4Zsb2hwzyWO9JOp9TWb9juWmVLEGij0k6ROgN7bSqDe1jfSv9eW5iYxxaa04N6Uw40t5ZZ5V24RM+QP/M6Swn8JR/gou3KCyAl4gCWyJYt3aNcsMVHitgH8zSQdB90HlWNefMR2L12XhG2b7PqWlU3re1PQtlgVtALLCdte3oMk4TpKQKmLm7R2I2D4k0Bkc3FPFTOjwB/zmYj8IDbQBB/h8ZJVvx/EArOD2QhL2J1kgonKbYL+f4HgIkgXgbA7BNtXheDTYBRqijkW4K1nhlvem/8IuEIlxZfYFgMPuTadGWlua8w625mtE4e0Oh0GrPJv/FG5PTFYc80guNS5vphRsQd2pHipekaXJKqtElGlTSGp0HL5cIN18yV4mdlgOns/Xwiq7j9jRc+05K0ER+5BH4niwUIPD3Ujs0LhcrpwFbvfs/jp2g2/acwSdHZwfrKoapqf6nOjrn/N6vQM/I0Vud8kCj+fxSFro8bxdOHduC/y2gd71ab7b/b7I42mFhd/301aydC86JxQZaEY1sWOPQQvX40g0deQoxr5rmrNEZ4Ta7xyXZ0/4V+K02GIg4Q4UOYq9gcTmOC28MBjxAvadrCjgccj7sO8DvP8bk+LuWxSVDhN7upCw2kDO193cTIdBix0666J15NTbC8UCGL+rM+KpOONshfhSFyu48TwdiaVx2vkbGjmp57uG/P+gPiM0Ic4IDyxqyTiY+BUWPQ2L2N8T6PpiHAm3Ddr5ReP58d08P0mnxRrIK7CFGsxTQRboEX5Le8GRwJ3gs4C3WWV7NIPB2wcN7LQnDAIK7YVCZbAL9qc6JZ0Fc7INVlxJbEpUUcwk4TBQ1B+YK37jtPNuKgAAAABJRU5ErkJggg=="
@@ -8837,6 +9204,7 @@ class GroundMotionModelView(component):
             Reset = False if Reset is None else Reset
             speed = 50 if speed is None else speed
             scale = 10 if scale is None else scale
+            direction = 3 if direction is None else direction
             modelExtrude = True if modelExtrude is None else modelExtrude
             
             global ModelDisp
@@ -9054,7 +9422,7 @@ class GroundMotionModelView(component):
             # MAX end MIN on structures point #
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
-            domainValues = [ lowerLimit, upperLimit ]
+            stressRange = [ lowerLimit, upperLimit ]
             print( lowerLimit, upperLimit )
         #####################################################################################
             colorBeam = []
@@ -9137,12 +9505,12 @@ class GroundMotionModelView(component):
             if modelExtrude == False or modelExtrude == None :
                 self.line = segment
                 self.colorLine = colorBeam
-                return modelDisp, PointPos, PointDisp, domainValues, trans
+                return modelDisp, PointPos, PointDisp, trans
                 
             else:
                 self.line = []
                 self.colorLine = []
-                return ExtrudedView, PointPos, PointDisp, domainValues, trans
+                return ExtrudedView, PointPos, PointDisp, trans
         
         
         
@@ -9155,8 +9523,8 @@ class GroundMotionModelView(component):
         
         
         if checkData != False:
-            modelDisp, PointPos, PointDisp, domainValues, trans = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExtrude, colorList )
-            return (modelDisp, PointPos, PointDisp, domainValues, trans)
+            modelDisp, PointPos, PointDisp, trans = GroundMotionModelView(AlpacaGroundmotionOutput, speed, Animate, Reset, scale, direction, modelExtrude, colorList )
+            return (modelDisp, PointPos, PointDisp, trans)
             
     def DrawViewportWires(self,arg):
         
@@ -9167,17 +9535,18 @@ class GroundMotionModelView(component):
 
 
 
-class BeamForceDiagram(component):
+
+class BeamForcesDiagram(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Beam Forces Diagram (Alpaca4d)", "Beam Forces Diagram", """Visualize Section Forces""", "Alpaca", "7|Visualisation")
+            "Beam Force Diagram (Alpaca4d)", "Beam Force Diagram", """Visualize Section Forces """, "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.quarternary
 
     def get_ComponentGuid(self):
-        return System.Guid("72ae4248-1eb4-4843-bf92-64abcf0c311c")
+        return System.Guid("0e06b77d-6bcc-4b2c-ba7d-066ccdbdcaef")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -9192,7 +9561,7 @@ class BeamForceDiagram(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_String()
-        self.SetUpParam(p, "SectionForces", "SectionForces", "Cross section forces.\n'N' (forces in direction 3).\n'V1' (forces in direction 1).\n'V2' (forces in direction 2).\n'M2' (Moments around axis 2).\n'M1' (Moments around axis 1).\n'Mt' (Moments around axis 3).")
+        self.SetUpParam(p, "SectionForces", "SectionForces", "Cross section forces.\nN (forces in direction 3).\nV1 (forces in direction 1).\nV2 (forces in direction 2).\nM2 (Moments around axis 2).\nM1 (Moments around axis 1).\nMt (Moments around axis 3).")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -9240,11 +9609,11 @@ class BeamForceDiagram(component):
                 return 2/(max( valueMax,mt.fabs(valueMin)))
         
         ## colore ##
-        def color( value, color1, color2 ):
+        def color( value, negativeColor , positiveColor ):
             if value <= 0 :
-                return color1
+                return negativeColor
             else :
-                return color2
+                return positiveColor
         
         ## funzione che fa le mesh ##
         def cdsMesh( strucPoint , cdsValue, cdsPoint, color1, color2):
@@ -9263,10 +9632,10 @@ class BeamForceDiagram(component):
                 mesh.Vertices.Add( corner3 )
                 mesh.Vertices.Add( corner4 )
                 
-                mesh.VertexColors.Add(color(cdsValue[ value-1 ], color1, color2))
-                mesh.VertexColors.Add(color(cdsValue[ value-1 ], color1, color2))
-                mesh.VertexColors.Add(color(cdsValue[ value ], color1, color2))
-                mesh.VertexColors.Add(color(cdsValue[ value ], color1, color2))
+                mesh.VertexColors.Add(color(-cdsValue[ value-1 ], color1, color2))
+                mesh.VertexColors.Add(color(-cdsValue[ value-1 ], color1, color2))
+                mesh.VertexColors.Add(color(-cdsValue[ value ], color1, color2))
+                mesh.VertexColors.Add(color(-cdsValue[ value ], color1, color2))
                 
                 mesh.Faces.AddFace( 0, 1, 2,3)
                 mesh.Normals.ComputeNormals()
@@ -9602,7 +9971,8 @@ class BeamForceDiagram(component):
                     M2Point.append(scaleM2*versor1*M2val[value])
                     V1Point.append(scaleV1*versor1*V1val[value])
                     MtPoint.append(scaleMt*versor1*Mtval[value])
-                Nmesh = cdsMesh( PointsDivLength , Nval, NPoint, blu, rosa)
+        
+                Nmesh = cdsMesh( PointsDivLength , Nval, NPoint, rosa, blu)
                 
                 M2mesh = cdsMesh( PointsDivLength , M2val, M2Point, rosso, blu)
                 
@@ -9658,6 +10028,7 @@ class BeamForceDiagram(component):
         if checkData != False:
             diagram = cdsView( AlpacaStaticOutput, SectionForces, scale  )
             return diagram
+
 
 
 # General Info
