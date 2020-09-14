@@ -7306,14 +7306,14 @@ class StaticModelView(component):
 class ModalModelView(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Modal Model View (Alpaca4d)", "Modal Model View ", """Visualize the Modal Shapes""", "Alpaca", "7|Visualisation")
+            "Modal Model View (Alpaca4d)", "Modal Model View", """Visualize the Modal Shapes""", "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.secondary
 
     def get_ComponentGuid(self):
-        return System.Guid("28fdbcb3-ba49-404a-9133-8ac1cc8a167b")
+        return System.Guid("6faf8f79-cc1e-4aae-b3c9-76556e7e9084")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -7353,7 +7353,7 @@ class ModalModelView(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.")
+        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.\n'3' view resulting displacement.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -8276,7 +8276,7 @@ class ModalModelView(component):
             # MAX end MIN on structures point #
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
-            stressRange = [ lowerLimit, upperLimit ]
+            domainValues = [ lowerLimit, upperLimit ]
             print( lowerLimit, upperLimit )
         #####################################################################################
             colorBeam = []
@@ -8383,6 +8383,9 @@ class ModalModelView(component):
         for crvs, colors in zip(self.line, self.colorLine):
             for crv, color in zip(crvs, colors):
                 arg.Display.DrawLine(crv, color, 4)
+
+
+
 
 class GroundMotionModelView(component):
     def __new__(cls):
