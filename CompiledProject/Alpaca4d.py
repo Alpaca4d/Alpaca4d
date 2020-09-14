@@ -6234,17 +6234,20 @@ class VisualiseModel(component):
         for brep in self.supportBrep:
             arg.Display.DrawBrepShaded(brep,self.material)
 
+
+
 class StaticModelView(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Static Model View (Alpaca4d)", "Static Model View", """Visualise a deformed shape""", "Alpaca", "7|Visualisation")
+            "Static Model View (Alpaca4d)", "Static Model View", """Generate Model view """, "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.primary
 
+
     def get_ComponentGuid(self):
-        return System.Guid("9e73ede5-b1f8-4281-bbf2-e5e8f85754ca")
+        return System.Guid("23298279-a8cf-4ae5-be44-44a9133dcf96")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -6264,12 +6267,12 @@ class StaticModelView(component):
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "modelExtrud", "modelExtrud", "True - view extruded model.")
+        self.SetUpParam(p, "modelExtrude", "modelExtrude", "True - view extruded model.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_Integer()
-        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.")
+        self.SetUpParam(p, "direction", "direction", "view relative color of the traslation:\n'0' view traslation X.\n'1' view traslation Y.\n'2' view traslation Z.\n'3' view resulting displacement.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
         
@@ -6285,7 +6288,7 @@ class StaticModelView(component):
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "stressRange", "stressRange", "max end min of displacement of the structure .")
+        self.SetUpParam(p, "displacementRange", "displacementRange", "max end min of displacement of the structure .")
         self.Params.Output.Add(p)
         
     
@@ -7033,6 +7036,8 @@ class StaticModelView(component):
             
             global dimSection
             
+            direction = 3 if direction is None else direction
+            
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
             nodeValue = []
@@ -7197,7 +7202,7 @@ class StaticModelView(component):
             # MAX end MIN on structures point #
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
-            stressRange = [ lowerLimit, upperLimit ]
+            displacementRange = [ lowerLimit, upperLimit ]
             #print( lowerLimit, upperLimit )
             #####################################################################################
             colorBeam = []
@@ -7271,11 +7276,11 @@ class StaticModelView(component):
             if modelExtrud == False or modelExtrud == None:
                 self.line = segment
                 self.colorLine = colorBeam
-                return modelDisp, stressRange
+                return modelDisp, displacementRange
             else:
                 self.line = []
                 self.colorLine = []
-                return ExtrudedView, stressRange
+                return ExtrudedView, displacementRange
 
 
         
@@ -7287,8 +7292,8 @@ class StaticModelView(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if checkData != False:
-            modelDisp, stressRange = DeformedModelView(AlpacaStaticOutput, scale, modelExtrud, direction, colorList)
-            return (modelDisp, stressRange)
+            modelDisp, displacementRange = DeformedModelView(AlpacaStaticOutput, scale, modelExtrud, direction, colorList)
+            return (modelDisp, displacementRange)
 
 
     def DrawViewportWires(self,arg):
@@ -7296,6 +7301,7 @@ class StaticModelView(component):
         for crvs, colors in zip(self.line, self.colorLine):
             for crv, color in zip(crvs, colors):
                 arg.Display.DrawLine(crv, color, 4)
+
 
 class ModalModelView(component):
     def __new__(cls):
@@ -9531,9 +9537,6 @@ class GroundMotionModelView(component):
         for crvs, colors in zip(self.line, self.colorLine):
             for crv, color in zip(crvs, colors):
                 arg.Display.DrawLine(crv, color, 4)
-
-
-
 
 
 class BeamForcesDiagram(component):
