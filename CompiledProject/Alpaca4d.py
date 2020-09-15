@@ -744,7 +744,7 @@ class doubleTCrossSection(component):
             J = 1/3*( Bsup*tsup**3 + Binf*tinf**3 + ( H - tsup - tinf )*ta**3 ) # Prandt per sezioni sottile aperte
         
             material = uniaxialMaterial
-            print( Iyy, Izz, yg )
+            #print( Iyy, Izz, yg )
         
             return [[ Area, Ay, Az, Iyy, Izz, J, material, [shape, Bsup, tsup, Binf, tinf, H, ta, yg], sectionName ]]
         
@@ -1785,7 +1785,7 @@ class AssembleModel(component):
             secTagWrapper = []
             
             for element in Element:
-                print(element[1])
+                #print(element[1])
                 if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
                     
                     startPoint = element[0].PointAt(element[0].Domain[0])
@@ -1848,7 +1848,7 @@ class AssembleModel(component):
             openSeesSecTag = openSeesSecTag
             secTagDict = dict(openSeesSecTag)
             
-            #print(secTagDict)
+            ##print(secTagDict)
             
             # create GeomTransf
             geomTransf = [row[0] for row in geomTransf ]
@@ -1912,7 +1912,7 @@ class AssembleModel(component):
                     orientVector = [ axis1, axis2, axis3 ]
             
                     massDens = element[5]
-                    #print(massDens)
+                    ##print(massDens)
                     sectionGeomProperties = element[2][7]
                     color = [element[4][0], element[4][1], element[4][2], element[4][3] ]
                     matTag = matNameDict.setdefault(element[2][6][0])[0]
@@ -2291,7 +2291,7 @@ class DisassembleModel(component):
             eleTag = ele[1]
             eleNodeTag = ele[2]
             color = ele[5]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -2310,7 +2310,7 @@ class DisassembleModel(component):
             point6 =  node.get( index6 -1 , "never")
             point7 =  node.get( index7 -1 , "never")
             point8 =  node.get( index8 -1 , "never")
-            #print( type(pointDef1) ) 
+            ##print( type(pointDef1) ) 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( point1 ) #0
             shellDefModel.Vertices.Add( point2 ) #1
@@ -2337,7 +2337,7 @@ class DisassembleModel(component):
             eleTag = ele[1]
             eleNodeTag = ele[2]
             color = ele[5]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -2349,7 +2349,7 @@ class DisassembleModel(component):
             point3 =  node.get( index3 -1 , "never")
             point4 =  node.get( index4 -1 , "never")
             
-            #print( type(pointDef1) )
+            ##print( type(pointDef1) )
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( point1 ) #0
@@ -2418,7 +2418,7 @@ class DisassembleModel(component):
                     radius  = dimSection[1]
                     section = AddCircleFromCenter( sectionPlane, radius )
                     sectionForm.append( section )
-                #print(sectionForm)
+                ##print(sectionForm)
         
             colour = rs.CreateColor( color[0], color[1], color[2] )
         
@@ -2498,13 +2498,13 @@ class DisassembleModel(component):
         
         ## Mesh from close section eith gradient color ##
         def meshLoft3( point, color ):
-            #print( point )
+            ##print( point )
             meshEle = rg.Mesh()
             pointSection1 = point
             for i in range(0,len(pointSection1)):
                 for j in range(0, len(pointSection1[0])):
                     vertix = pointSection1[i][j]
-                    #print( type(vertix) )
+                    ##print( type(vertix) )
                     meshEle.Vertices.Add( vertix ) 
                     #meshEle.VertexColors.Add( color[0],color[1],color[2] );
             k = len(pointSection1[0])
@@ -2580,7 +2580,7 @@ class DisassembleModel(component):
                     model.append([ eleTag, solidModel ])
                     extrudedModel.append([ eleTag, solidModel ])
                 elif  eleType == 'FourNodeTetrahedron' :
-                    #print(ele)
+                    ##print(ele)
                     solidModel = TetraSolid( ele, pointWrapperDict )
                     model.append([ eleTag, solidModel ])
                     extrudedModel.append([ eleTag, solidModel ])
@@ -3063,7 +3063,7 @@ class GroundMotionAnalyses(component):
         
             for dirpath, dirnames, filenames in os.walk(workingDirectory):
                 for filename in filenames:
-                    print(filename)
+                    #print(filename)
                     if filename == outputFileName:
                         file = os.path.join(dirpath,outputFileName)
                         os.remove(file)
@@ -3128,7 +3128,7 @@ class GroundMotionAnalyses(component):
             #msg = p.StandardError.ReadToEnd()
             #self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
         
-            print("I have finished")
+            #print("I have finished")
         
             ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
             ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
@@ -3270,7 +3270,7 @@ class NodeDisplacement(component):
             pointWrapper = []
             transWrapper = []
             rotWrapper = []
-            #print(diplacementWrapper[0])
+            ##print(diplacementWrapper[0])
             for index,item in enumerate(diplacementWrapper):
                 pointWrapper.append(  rg.Point3d(item[0][0],item[0][1],item[0][2])  )
                 if len(item[1]) == 3:
@@ -3402,7 +3402,7 @@ class ReactionForces(component):
         
             diplacementWrapper = AlpacaStaticOutput[0]
             reactionOut = AlpacaStaticOutput[1]
-            #print( len( reactionOut ) )
+            ##print( len( reactionOut ) )
         
             pointWrapper = []
         
@@ -3663,7 +3663,7 @@ class BeamDisplacement(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Point3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -3749,7 +3749,7 @@ class BeamDisplacement(component):
         
             pointStart = node.get( indexStart -1 , "never")
             pointEnd = node.get( indexEnd -1 , "never")
-            #print( traslStart[1] )
+            ##print( traslStart[1] )
             line = rg.LineCurve( pointStart,  pointEnd )
         
             axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
@@ -3766,7 +3766,7 @@ class BeamDisplacement(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Point3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -3823,7 +3823,7 @@ class BeamDisplacement(component):
             for index,item in enumerate(diplacementWrapper):
                 nodeValue.append( item[0] )
                 displacementValue.append( item[1] )
-                print( item[0] )
+                #print( item[0] )
                 pointWrapper.append( [index, rg.Point3d(item[0][0],item[0][1],item[0][2]) ] )
                 if len(item[1]) == 3:
                     dispWrapper.append( [index, rg.Point3d( item[1][0], item[1][1], item[1][2] ) ] )
@@ -4009,7 +4009,7 @@ class BeamForces(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localForceStart = rg.Point3d( forceStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ forceStart, momentStart, forceEnd, momentEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localForceStart = vectorTrasform[0]
             F1I = localForceStart.X # spostamento in direzione dell'asse rosso 
             F2I = localForceStart.Y # spostamento in direzione dell'asse verde
@@ -4096,7 +4096,7 @@ class BeamForces(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localForceStart = rg.Point3d( forceStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ forceStart, momentStart, forceEnd, momentEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localForceStart = vectorTrasform[0]
             F1I = localForceStart.X # spostamento in direzione dell'asse rosso 
             F2I = localForceStart.Y # spostamento in direzione dell'asse verde
@@ -4709,7 +4709,7 @@ class ShellStresses(component):
         
             n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
-            #print( domain )
+            ##print( domain )
             
             for i in range(1,n+1):
                 if  domain[i-1] <= value <= domain[i] :
@@ -4781,8 +4781,8 @@ class ShellStresses(component):
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
             #ForceOut = AlpacaStaticOutput[4]
-            #print( ForceOut[0] )
-            #print( ForceOut[1] )
+            ##print( ForceOut[0] )
+            ##print( ForceOut[1] )
             #nodalForce = openSeesOutputWrapper[5]
         
             #nodalForcerDict = dict( nodalForce )
@@ -4812,16 +4812,16 @@ class ShellStresses(component):
             #---------------------------------------------------#
             tensionDic = []
               
-            #print(len(tensionList)/len(shellTag))
+            ##print(len(tensionList)/len(shellTag))
         
-            #print(stressView + 24)
+            ##print(stressView + 24)
         
             with open(outputFile4, 'r') as f:
                 lines = f.readlines()
                 if lines :
                     tension4List = lines[0].split()
         
-            #print( len( shell4Tag  ), len( tension4List ))
+            ##print( len( shell4Tag  ), len( tension4List ))
         
             for n,eleTag in enumerate(shell4Tag) :
                 tensionShell = []
@@ -4835,7 +4835,7 @@ class ShellStresses(component):
                 if lines :
                     tension3List = lines[0].split()
         
-            #print( len( shell3Tag  ), len( tension3List ))
+            ##print( len( shell3Tag  ), len( tension3List ))
         
             for n,eleTag in enumerate(shell3Tag) :
                 tensionShell = []
@@ -4846,10 +4846,10 @@ class ShellStresses(component):
         
             stressDict = dict( tensionDic )
             stressValue = stressDict.values() 
-            #print( stressDict.get(2))
-            #print( stressDict )
-            #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
-            #print( tensionDic[0] )
+            ##print( stressDict.get(2))
+            ##print( stressDict )
+            ##print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+            ##print( tensionDic[0] )
             
             maxValue = []
             minValue = []
@@ -4878,7 +4878,7 @@ class ShellStresses(component):
                 shellColor = shellEle.DuplicateMesh()
                 shellColor.VertexColors.Clear()
                 for j in range(0,shellEle.Vertices.Count):
-                    #print( value[j] )
+                    ##print( value[j] )
                     jetColor = gradient(value[j], minValue, maxValue, colorList )
                     shellColor.VertexColors.Add( jetColor )
                 modelStress.append( shellColor)
@@ -5006,7 +5006,7 @@ class BrickStresses(component):
         
             n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
-            #print( domain )
+            ##print( domain )
             
             for i in range(1,n+1):
                 if  domain[i-1] <= value <= domain[i] :
@@ -5021,7 +5021,7 @@ class BrickStresses(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -5040,7 +5040,7 @@ class BrickStresses(component):
             point6 =  node.get( index6 -1 , "never")
             point7 =  node.get( index7 -1 , "never")
             point8 =  node.get( index8 -1 , "never")
-            #print( type(pointDef1) ) 
+            ##print( type(pointDef1) ) 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( point1 ) #0
             shellDefModel.Vertices.Add( point2 ) #1
@@ -5067,7 +5067,7 @@ class BrickStresses(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -5079,7 +5079,7 @@ class BrickStresses(component):
             point3 =  node.get( index3 -1 , "never")
             point4 =  node.get( index4 -1 , "never")
             
-            #print( type(pointDef1) )
+            ##print( type(pointDef1) )
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( point1 ) #0
@@ -5103,8 +5103,8 @@ class BrickStresses(component):
         
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
-            #print( ForceOut[0] )
-            #print( ForceOut[1] )
+            ##print( ForceOut[0] )
+            ##print( ForceOut[1] )
             #nodalForce = AlpacaStaticOutput[5]
         
             #nodalForcerDict = dict( nodalForce )
@@ -5137,8 +5137,8 @@ class BrickStresses(component):
                 if lines :
                     tensionListBrick  = lines[0].split()
         
-            #print(len(tensionList)/len(shellTag))
-            #print(w + 24)
+            ##print(len(tensionList)/len(shellTag))
+            ##print(w + 24)
             for n,eleTag in enumerate(BrickTag) :
                 tensionSolid = []
                 for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
@@ -5151,8 +5151,8 @@ class BrickStresses(component):
                 if lines :
                     tensionListTetra  = lines[0].split()
             
-            #print(len(tensionList)/len(shellTag))
-            #print(w + 24)
+            ##print(len(tensionList)/len(shellTag))
+            ##print(w + 24)
             if lines :
                 for n,eleTag in enumerate(TetraTag) :
                     tensionSolid = []
@@ -5163,10 +5163,10 @@ class BrickStresses(component):
             
             stressDict = dict( tensionDic )
             stressValue =  stressDict.values() 
-            #print( stressDict.get(2))
-            #print( stressDict )
-            #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
-            #print( tensionDic[0] )
+            ##print( stressDict.get(2))
+            ##print( stressDict )
+            ##print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+            ##print( tensionDic[0] )
             
             maxValue = []
             minValue = []
@@ -5177,7 +5177,7 @@ class BrickStresses(component):
             maxValue = max( maxValue )
             minValue = min( minValue )
             stressRange = [minValue, maxValue ] 
-            print( maxValue, minValue )
+            #print( maxValue, minValue )
         
         
             brick = []
@@ -5196,7 +5196,7 @@ class BrickStresses(component):
                 brickColor = brickEle.DuplicateMesh()
                 brickColor.VertexColors.Clear()
                 for j in range(0,bricklEle.Vertices.Count):
-                    #print( value[j] )
+                    ##print( value[j] )
                     jetColor = gradient(value[j], minValue, maxValue, colorList )
                     brickColor.VertexColors.Add( jetColor )
                 modelStress.append( brickColor)
@@ -5467,7 +5467,7 @@ class VisualiseModel(component):
                 eleTag = ele[1]
                 eleNodeTag = ele[2]
                 color = ele[5]
-                #print( eleNodeTag )
+                ##print( eleNodeTag )
                 index1 = eleNodeTag[0]
                 index2 = eleNodeTag[1]
                 index3 = eleNodeTag[2]
@@ -5486,7 +5486,7 @@ class VisualiseModel(component):
                 point6 =  node.get( index6 -1 , "never")
                 point7 =  node.get( index7 -1 , "never")
                 point8 =  node.get( index8 -1 , "never")
-                #print( type(pointDef1) ) 
+                ##print( type(pointDef1) ) 
                 shellDefModel = rg.Mesh()
                 shellDefModel.Vertices.Add( point1 ) #0
                 shellDefModel.Vertices.Add( point2 ) #1
@@ -5513,7 +5513,7 @@ class VisualiseModel(component):
                 eleTag = ele[1]
                 eleNodeTag = ele[2]
                 color = ele[5]
-                #print( eleNodeTag )
+                ##print( eleNodeTag )
                 index1 = eleNodeTag[0]
                 index2 = eleNodeTag[1]
                 index3 = eleNodeTag[2]
@@ -5525,7 +5525,7 @@ class VisualiseModel(component):
                 point3 =  node.get( index3 -1 , "never")
                 point4 =  node.get( index4 -1 , "never")
                 
-                #print( type(pointDef1) )
+                ##print( type(pointDef1) )
                 
                 shellDefModel = rg.Mesh()
                 shellDefModel.Vertices.Add( point1 ) #0
@@ -5594,7 +5594,7 @@ class VisualiseModel(component):
                         radius  = dimSection[1]
                         section = AddCircleFromCenter( sectionPlane, radius )
                         sectionForm.append( section )
-                    #print(sectionForm)
+                    ##print(sectionForm)
             
                 colour = rs.CreateColor( color[0], color[1], color[2] )
             
@@ -5673,13 +5673,13 @@ class VisualiseModel(component):
                 return [ line, meshExtr, colour ]
             
             def meshLoft3( point, color ):
-                #print( point )
+                ##print( point )
                 meshEle = rg.Mesh()
                 pointSection1 = point
                 for i in range(0,len(pointSection1)):
                     for j in range(0, len(pointSection1[0])):
                         vertix = pointSection1[i][j]
-                        #print( type(vertix) )
+                        ##print( type(vertix) )
                         meshEle.Vertices.Add( vertix ) 
                         #meshEle.VertexColors.Add( color[0],color[1],color[2] );
                 k = len(pointSection1[0])
@@ -5845,7 +5845,7 @@ class VisualiseModel(component):
                     centroid = calcPropSection.Centroid
                     posEleTag.append( centroid )
                 elif nNode == 3:
-                    #print( nNode )
+                    ##print( nNode )
                     shellModel = ShellTriangle( ele, pointWrapperDict )
                     calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
                     centroid = calcPropSection.Centroid
@@ -5868,7 +5868,7 @@ class VisualiseModel(component):
                     centroid = calcPropSection.Centroid
                     posEleTag.append( centroid )
                 elif  eleType == 'FourNodeTetrahedron' :
-                    #print(ele)
+                    ##print(ele)
                     solidModel = TetraSolid( ele, pointWrapperDict )
                     calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
                     centroid = calcPropSection.Centroid
@@ -5971,7 +5971,7 @@ class VisualiseModel(component):
                 fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
                 forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
             
-            #print( forceMax )
+            ##print( forceMax )
             forceMin = min( forceMax )
             
             
@@ -6527,7 +6527,7 @@ class StaticModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             thick = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -6545,7 +6545,7 @@ class StaticModelView(component):
             trasl6 = nodeDisp.get( index6 -1 , "never")
             trasl7 = nodeDisp.get( index7 -1 , "never")
             trasl8 = nodeDisp.get( index8 -1 , "never")
-            #print( trasl1 )
+            ##print( trasl1 )
             ## CREO IL MODELLO DEFORMATO  ##
             pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
             pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
@@ -6598,7 +6598,7 @@ class StaticModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -6681,7 +6681,7 @@ class StaticModelView(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Point3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -6702,10 +6702,10 @@ class StaticModelView(component):
             Length = rg.Curve.GetLength( line )
             #divideDistance = 0.5
             segmentCount = Length/0.5
-            #print( segmentCount )
+            ##print( segmentCount )
             DivCurve = line.DivideByCount( segmentCount, True )
             #DivCurve = line.DivideEquidistant(divideDistance)
-            #print( DivCurve )
+            ##print( DivCurve )
             if DivCurve == None:
                 DivCurve = [ 0, Length]
                 
@@ -6827,7 +6827,7 @@ class StaticModelView(component):
                 traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
             pointStart = node.get( indexStart -1 , "never")
             pointEnd = node.get( indexEnd -1 , "never")
-            #print( traslStart[1] )
+            ##print( traslStart[1] )
             line = rg.LineCurve( pointStart,  pointEnd )
             axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
             axis2 =  rg.Vector3d( propSection[9][1][0], propSection[9][1][1], propSection[9][1][2]  )
@@ -6843,7 +6843,7 @@ class StaticModelView(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Point3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -6856,10 +6856,10 @@ class StaticModelView(component):
             Length = rg.Curve.GetLength( line )
             #divideDistance = 0.5
             segmentCount = Length/0.5
-            #print( segmentCount )
+            ##print( segmentCount )
             DivCurve = line.DivideByCount( segmentCount, True )
             #DivCurve = line.DivideEquidistant(divideDistance)
-            #print( DivCurve )
+            ##print( DivCurve )
             if DivCurve == None:
                 DivCurve = [ 0, Length]
             defPoint = []
@@ -6949,13 +6949,13 @@ class StaticModelView(component):
         
         ## Mesh from close section eith gradient color ##
         def meshLoft3( point, color ):
-            #print( point )
+            ##print( point )
             meshEle = rg.Mesh()
             pointSection1 = point
             for i in range(0,len(pointSection1)):
                 for j in range(0, len(pointSection1[0])):
                     vertix = pointSection1[i][j]
-                    #print( type(vertix) )
+                    ##print( type(vertix) )
                     meshEle.Vertices.Add( vertix ) 
                     #meshEle.VertexColors.Add( color[0],color[1],color[2] );
             k = len(pointSection1[0])
@@ -6994,7 +6994,7 @@ class StaticModelView(component):
         
             n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
-            #print( domain )
+            ##print( domain )
             
             for i in range(1,n+1):
                 if  domain[i-1] <= value <= domain[i] :
@@ -7046,7 +7046,7 @@ class StaticModelView(component):
             
             pointWrapper = []
             dispWrapper = []
-            #print( diplacementWrapper )
+            ##print( diplacementWrapper )
             for index,item in enumerate(diplacementWrapper):
                 nodeValue.append( item[0] )
                 displacementValue.append( item[1] )
@@ -7125,7 +7125,7 @@ class StaticModelView(component):
                 elif eleType == 'Truss' :
                     dimSection = ele[2][10]
                     color = ele[2][12]
-                    #print( color )
+                    ##print( color )
                     valueTruss = defTruss( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
                     defpolyline = valueTruss[0]
                     meshdef = valueTruss[1]
@@ -7146,7 +7146,7 @@ class StaticModelView(component):
                     #doc.Objects.AddMesh( extrudeShell)
                     
                 elif nNode == 3:
-                    #print( nNode )
+                    ##print( nNode )
                     shellDefModel = defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
                     ShellDefModel.append( shellDefModel[0] )
                     traslShellValue.append( shellDefModel[1] )
@@ -7163,7 +7163,7 @@ class StaticModelView(component):
                     ExtrudedView.append( solidDefModel[0] )
                     
                 elif  eleType == 'FourNodeTetrahedron' :
-                    #print(ele)
+                    ##print(ele)
                     solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef )
                     SolidDefModel.append( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
@@ -7203,7 +7203,7 @@ class StaticModelView(component):
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
             displacementRange = [ lowerLimit, upperLimit ]
-            #print( lowerLimit, upperLimit )
+            ##print( lowerLimit, upperLimit )
             #####################################################################################
             colorBeam = []
             numberDivide = []
@@ -7605,7 +7605,7 @@ class ModalModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             thick = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -7676,7 +7676,7 @@ class ModalModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -7759,7 +7759,7 @@ class ModalModelView(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Vector3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -7870,7 +7870,7 @@ class ModalModelView(component):
                     defSection2 = [row[1] for row in defSection ]
                     meshdef = meshLoft3( defSection1,  color )
                     meshdef.Append( meshLoft3( defSection2,  color ) )
-                    print( meshdef )
+                    #print( meshdef )
     
             else  :
                 meshdef = meshLoft3( defSection,  color )
@@ -7894,7 +7894,7 @@ class ModalModelView(component):
                 traslEnd = nodeDisp.get( indexEnd -1 , "never")[0]
             pointStart = node.get( indexStart -1 , "never")
             pointEnd = node.get( indexEnd -1 , "never")
-            #print( traslStart[1] )
+            ##print( traslStart[1] )
             line = rg.LineCurve( pointStart,  pointEnd )
     
             axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
@@ -7911,7 +7911,7 @@ class ModalModelView(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Vector3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -7996,20 +7996,20 @@ class ModalModelView(component):
                     defSection2 = [row[1] for row in defSection ]
                     meshdef = meshLoft3( defSection1,  color )
                     meshdef.Append( meshLoft3( defSection2,  color ) )
-                    #print( meshdef )
+                    ##print( meshdef )
     
             else  :
                 meshdef = meshLoft3( defSection,  color )
             return  [ defpolyline, meshdef, globalTransVector] 
         ## Mesh from close section eith gradient color ##
         def meshLoft3( point, color ):
-            #print( point )
+            ##print( point )
             meshEle = rg.Mesh()
             pointSection1 = point
             for i in range(0,len(pointSection1)):
                 for j in range(0, len(pointSection1[0])):
                     vertix = pointSection1[i][j]
-                    #print( type(vertix) )
+                    ##print( type(vertix) )
                     meshEle.Vertices.Add( vertix ) 
                     #meshEle.VertexColors.Add( color[0],color[1],color[2] );
             k = len(pointSection1[0])
@@ -8048,7 +8048,7 @@ class ModalModelView(component):
     
             n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
-            #print( domain )
+            ##print( domain )
             
             for i in range(1,n+1):
                 if  domain[i-1] <= value <= domain[i] :
@@ -8200,7 +8200,7 @@ class ModalModelView(component):
                 elif eleType == 'Truss' :
                     dimSection = ele[2][10]
                     color = ele[2][12]
-                    #print( color )
+                    ##print( color )
                     valueTruss = defTruss( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
                     defpolyline = valueTruss[0]
                     meshdef = valueTruss[1]
@@ -8219,7 +8219,7 @@ class ModalModelView(component):
                     ExtrudedView.append( extrudeShell )
                     
                 elif nNode == 3:
-                    #print( nNode )
+                    ##print( nNode )
                     shellDefModel = defShellTriangle( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
                     ShellDefModel.append( shellDefModel[0] )
                     traslShellValue.append( shellDefModel[1] )
@@ -8236,7 +8236,7 @@ class ModalModelView(component):
                     ExtrudedView.append( solidDefModel[0] )
                     
                 elif  eleType == 'FourNodeTetrahedron' :
-                    #print(ele)
+                    ##print(ele)
                     solidDefModel = defTetraSolid( ele, pointWrapperDict, pointDispWrapperDict, scaleDef*At )
                     SolidDefModel.append( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
@@ -8277,7 +8277,7 @@ class ModalModelView(component):
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
             domainValues = [ lowerLimit, upperLimit ]
-            print( lowerLimit, upperLimit )
+
         #####################################################################################
             colorBeam = []
             numberDivide = []
@@ -8295,16 +8295,16 @@ class ModalModelView(component):
                     elif direction == 3:
                         valorVector = vectorTrasl.Length
         
-                    #print( valorVector )
+                    ##print( valorVector )
         
                     color = gradient( valorVector, lowerLimit, upperLimit, colorList )
                     colorValor.append( color )
                 colorBeam.append( colorValor )
                 numberDivide.append( len(colorValor) )
-            #print( modelCurve[0])
+            ##print( modelCurve[0])
             segment = []
             for curve, segmentCount in zip( modelCurve, numberDivide ):
-                #print(segmentCount)
+                ##print(segmentCount)
                 parameter = curve.DivideByCount( segmentCount - 1, True )
                 segmentCurve = []
                 for i in range(1, len(parameter)) :
@@ -8313,7 +8313,7 @@ class ModalModelView(component):
                         segmentCurve.append( rg.Line( p1, p2 ) )
                 segment.append( segmentCurve )
         
-                #print( segment )
+                ##print( segment )
         
             
             for shellEle, value in zip(ShellDefModel,traslShellValue) :
@@ -8377,14 +8377,14 @@ class ModalModelView(component):
         if checkData != False:
             modelDisp = ModalView(AlpacaModalOutput, numberMode, speed, Animate, Reset, scale, direction,modelExtrude, colorList )
             return (modelDisp)
+    
             
     def DrawViewportWires(self,arg):
         
         for crvs, colors in zip(self.line, self.colorLine):
             for crv, color in zip(crvs, colors):
                 arg.Display.DrawLine(crv, color, 4)
-
-
+    
 
 
 class GroundMotionModelView(component):
@@ -8596,8 +8596,8 @@ class GroundMotionModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][2]
             thick = ele[2][1]
-            #print( eleNodeTag )
-            #print( eleNodeTag )
+            ###print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0] 
             index2 = eleNodeTag[1] 
             index3 = eleNodeTag[2] 
@@ -8621,8 +8621,8 @@ class GroundMotionModelView(component):
             pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
             pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
             pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
-            #print( index1 - 1)
-            #print( nodeDisp )
+            ##print( index1 - 1)
+            ##print( nodeDisp )
             vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
             pointDef1.Transform( vectortrasl1 )
             vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
@@ -8705,7 +8705,7 @@ class GroundMotionModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             thick = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0] - 1
             index2 = eleNodeTag[1] - 1
             index3 = eleNodeTag[2] - 1
@@ -8776,7 +8776,7 @@ class GroundMotionModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            #print( eleNodeTag )
+            ##print( eleNodeTag )
             index1 = eleNodeTag[0] - 1
             index2 = eleNodeTag[1] - 1
             index3 = eleNodeTag[2] - 1
@@ -8826,7 +8826,7 @@ class GroundMotionModelView(component):
             propSection = ele[2]
             indexStart = ele[1][0]
             indexEnd = ele[1][1]
-            #print( indexStart, indexEnd )
+            ##print( indexStart, indexEnd )
             color = propSection[12]
             E = propSection[1]
             G = propSection[2]
@@ -8860,7 +8860,7 @@ class GroundMotionModelView(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Point3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart, rotateStart, traslEnd, rotateEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -8971,7 +8971,7 @@ class GroundMotionModelView(component):
                     defSection2 = [row[1] for row in defSection ]
                     meshdef = meshLoft3( defSection1,  color )
                     meshdef.Append( meshLoft3( defSection2,  color ) )
-                    #print( meshdef )
+                    ##print( meshdef )
         
             else  :
                 meshdef = meshLoft3( defSection,  color )
@@ -8985,7 +8985,7 @@ class GroundMotionModelView(component):
             color = propSection[12]
             indexStart = ele[1][0]
             indexEnd = ele[1][1]
-            #print( indexStart, indexEnd )
+            ##print( indexStart, indexEnd )
             E = propSection[1]
             A = propSection[3]
             
@@ -8996,7 +8996,7 @@ class GroundMotionModelView(component):
                 traslEnd = nodeDisp.get( indexEnd  , "never")[0]
             pointStart = node.get( indexStart  , "never")
             pointEnd = node.get( indexEnd  , "never")
-            #print( traslStart[1] )
+            ##print( traslStart[1] )
             line = rg.LineCurve( pointStart,  pointEnd )
         
             axis1 =  rg.Vector3d( propSection[9][0][0], propSection[9][0][1], propSection[9][0][2]  )
@@ -9013,7 +9013,7 @@ class GroundMotionModelView(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localTraslStart = rg.Point3d( traslStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ traslStart , traslEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localTraslStart = vectorTrasform[0]
             uI1 = localTraslStart.X # spostamento in direzione dell'asse rosso 
             uI2 = localTraslStart.Y # spostamento in direzione dell'asse verde
@@ -9099,7 +9099,7 @@ class GroundMotionModelView(component):
                     defSection2 = [row[1] for row in defSection ]
                     meshdef = meshLoft3( defSection1,  color )
                     meshdef.Append( meshLoft3( defSection2,  color ) )
-                    #print( meshdef )
+                    ##print( meshdef )
         
             else  :
                 meshdef = meshLoft3( defSection,  color )
@@ -9110,11 +9110,11 @@ class GroundMotionModelView(component):
             meshElement = rg.Mesh()
             meshEle = rg.Mesh()
             pointSection1 = point
-            #print( point )
+            ##print( point )
             for i in range(0,len(pointSection1)):
                 for j in range(0, len(pointSection1[0])):
                     vertix = pointSection1[i][j]
-                    #print( type(vertix) )
+                    ##print( type(vertix) )
                     meshEle.Vertices.Add( vertix ) 
                     #meshEle.VertexColors.Add( color[0],color[1],color[2] );
             k = len(pointSection1[0])
@@ -9152,7 +9152,7 @@ class GroundMotionModelView(component):
     
             n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
-            #print( domain )
+            ##print( domain )
             
             for i in range(1,n+1):
                 if  domain[i-1] <= value <= domain[i] :
@@ -9238,7 +9238,7 @@ class GroundMotionModelView(component):
                 lines = f.readlines()
                 for n, line in enumerate(lines):
                     if (n % speed) == 0:
-                        #print( n % speed )
+                        ##print( n % speed )
                         line = line.strip().split(" ")
                         timeStep.append( line[0] )
                         displacementTemp = line[1:]
@@ -9271,7 +9271,7 @@ class GroundMotionModelView(component):
             
             
             
-            #print(time.clock() - start)
+            ##print(time.clock() - start)
             
             if "myCounter" not in globals() or Reset:
                 myCounter = 0
@@ -9289,7 +9289,7 @@ class GroundMotionModelView(component):
             pointDef = []
             for indexPoint, value in enumerate(stepValue):
                 tagPoint = indexPoint  + 1
-                #print( tagPoint )
+                ##print( tagPoint )
                 traslX = float(value[0])
                 traslY = float(value[1])
                 traslZ = float(value[2])
@@ -9307,7 +9307,7 @@ class GroundMotionModelView(component):
             
             for value in point:
                 index = value[0] 
-                #print( index )
+                ##print( index )
                 pointWrapper.append( [index, rg.Point3d(value[1][0],value[1][1],value[1][2]) ] )
             
             ## Dict. for point ##
@@ -9330,7 +9330,7 @@ class GroundMotionModelView(component):
             SolidDefModel = []
             traslSolidValue = []
             
-            #print( timePointDef[A] )
+            ##print( timePointDef[A] )
             for ele in EleOut :
                 eleType = ele[2][0]
                 nNode = len( ele[1] )
@@ -9352,7 +9352,7 @@ class GroundMotionModelView(component):
                     #doc.Objects.AddMesh( meshdef )
                 elif eleType == 'Truss' :
                     dimSection = ele[2][10]
-                    #print( color )
+                    ##print( color )
                     valueTruss = defTruss( ele, pointWrapperDict, timePointDef, scaleDef )
                     defpolyline = valueTruss[0]
                     meshdef = valueTruss[1]
@@ -9373,7 +9373,7 @@ class GroundMotionModelView(component):
             
                     
                 elif nNode == 3:
-                    #print( nNode )
+                    ##print( nNode )
                     shellDefModel = defShellTriangle( ele, pointWrapperDict, timePointDef, scaleDef )
                     ShellDefModel.append( shellDefModel[0] )
                     traslShellValue.append( shellDefModel[1] )
@@ -9388,7 +9388,7 @@ class GroundMotionModelView(component):
                     ExtrudedView.append( solidDefModel[0] )
                     
                 elif  eleType == 'FourNodeTetrahedron' :
-                    #print(ele)
+                    ##print(ele)
                     solidDefModel = defTetraSolid( ele, pointWrapperDict, timePointDef, scaleDef )
                     SolidDefModel.append( solidDefModel[0] )
                     traslSolidValue.append( solidDefModel[1] )
@@ -9432,7 +9432,6 @@ class GroundMotionModelView(component):
             lowerLimit = min( valorVector )
             upperLimit = max( valorVector )
             stressRange = [ lowerLimit, upperLimit ]
-            print( lowerLimit, upperLimit )
         #####################################################################################
             colorBeam = []
             numberDivide = []
@@ -9450,16 +9449,16 @@ class GroundMotionModelView(component):
                     elif direction == 3:
                         valorVector = vectorTrasl.Length
         
-                    #print( valorVector )
+                    ##print( valorVector )
         
                     color = gradient( valorVector, lowerLimit, upperLimit, colorList )
                     colorValor.append( color )
                 colorBeam.append( colorValor )
                 numberDivide.append( len(colorValor) )
-            #print( modelCurve[0])
+            ##print( modelCurve[0])
             segment = []
             for curve, segmentCount in zip( modelCurve, numberDivide ):
-                #print(segmentCount)
+                ##print(segmentCount)
                 parameter = curve.DivideByCount( segmentCount - 1, True )
                 segmentCurve = []
                 for i in range(1, len(parameter)) :
@@ -9468,7 +9467,7 @@ class GroundMotionModelView(component):
                         segmentCurve.append( rg.Line( p1, p2 ) )
                 segment.append( segmentCurve )
         
-                #print( segment )
+                ##print( segment )
         
             
             for shellEle, value in zip(ShellDefModel,traslShellValue) :
@@ -9682,7 +9681,7 @@ class BeamForcesDiagram(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localForceStart = rg.Point3d( forceStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ forceStart, momentStart, forceEnd, momentEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localForceStart = vectorTrasform[0]
             F1I = localForceStart.X # spostamento in direzione dell'asse rosso 
             F2I = localForceStart.Y # spostamento in direzione dell'asse verde
@@ -9773,7 +9772,7 @@ class BeamForcesDiagram(component):
             xform = rg.Transform.ChangeBasis( WorldPlane, localPlane )
             localForceStart = rg.Point3d( forceStart )
             vectorTrasform = rg.Transform.TransformList( xform, [ forceStart, momentStart, forceEnd, momentEnd ] )
-            #print( vectorTrasform[0] )
+            ##print( vectorTrasform[0] )
             localForceStart = vectorTrasform[0]
             F1I = localForceStart.X # spostamento in direzione dell'asse rosso 
             F2I = localForceStart.Y # spostamento in direzione dell'asse verde
@@ -9954,7 +9953,7 @@ class BeamForcesDiagram(component):
                 versor2 = vector[1]
                 versor3 = vector[2]
                 PointsDivLength = pointDiv
-                #print( force )
+                ##print( force )
                 Nval = f3
                 V1val = f1
                 V2val = f2
