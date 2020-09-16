@@ -3191,6 +3191,138 @@ class GroundMotionAnalyses(component):
             return (AlpacaGroundmotionOutput, maxDisplacement, minDisplacement)
 
 
+class NDFAnalyses(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "NDFAnalyses (Alpaca4d)", "NDFAnalyses", """Calculate the Static Response of the structure. It works ONLY with bricks and truss element. WIP""", "Alpaca", "5|Analyses")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("4deb0ee2-e2fa-4250-a453-2ef54b6f9df9")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = GhPython.Assemblies.MarshalParam()
+        self.SetUpParam(p, "AlpacaModel", "AlpacaModel", "Assembled model to perform Static Analyses.")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "AlpacaStaticOutput", "AlpacaStaticOutput", "Analysed Alpaca model.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAKbSURBVEhL7dRfSFNRHAfwe+82d73TnG5LbdqmbolrlcKUiJAgn7IosKCHon9UD2JRgUo9WYH9AcNWyvqDDz1IQYZYkmEtNKGggh586kVKESGhsjRN9+v7u3fGgrtwUVDQFz5w/uycc8/dPUf4G7MM2iBdrf2BnISDMAAF3PA744WjWlHIhyat+ENSwK0VE89eWKEV1bSAUSuq4b6HQODjhkSzB+YH8utpBbNaE4QKq2h4d8zkII9kjqA+DrybhDK/AxNcASdwrEmCONQuu76OW5ZTh+zmHbyG2N3FDT9FOSyF09G6PVqeT+0W4yLiyVmXtsBzrUs/EhyAm/DK7zeQoog8aBiqgXdwHjgbHaLx/UCyJzKkFFHInENbjWn825DWrZ9dTqc0W18vzzU3KxQOp1JfXyo1NiZTIGDgwVMwBi+9knn6rpxHPHmZpHBfGBrBAbqpglt2u0j9/am6urtTKHhRmXqUnK9OzK8laHby5PchiSfRiwHWQAMUZmdLupPHGg541MlHLT4q1Z6+EuJmHxwBG1RkFJbQic5T1PM4V3dyNlibPcMLXNKe/hnIEDd8aMqA75inuTsvU0kbkb/pLVVu9840tJROPAjnzMUu8OReWqTX7vqCP/kDxqyDn0aB23DIWrqN/BdGyF1zZ0LO8c2ircugWKn4+izVdFyjGz3lEV4gGFTIZhM/oZ8P4IKyGcYy1u6mpHTXZ5TfwAuwiZJxclVoUt3VytaP5K/aQRaLOIq+TbDgWKEbRuAwHIcs6DRZs6aLr06Tty5MslPdVS8kfKkVwX7IBL5nFgOn3bG+mjI31JJokAdR56+Fv7qEw1dAPdRBHjdEc9ZSsJpEo4lP8hKt6ddzBs5pxe/hV8dHnz/j//mnIgjfAFbfBYlCcDTMAAAAAElFTkSuQmCC"
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, AlpacaModel):
+        
+        import System
+        import os
+        import Grasshopper as gh
+        
+        
+        self.Message = str("3NDF-WIP")
+        
+        
+        def Initialize3NDFStaticAnalysis(AlpacaModel):
+        
+            ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
+        
+            workingDirectory = os.path.dirname(ghFilePath) 
+            outputFileName = 'openSeesOutputWrapper.txt'
+        
+            for dirpath, dirnames, filenames in os.walk(workingDirectory):
+                for filename in filenames:
+                    if filename == outputFileName:
+                        file = os.path.join(dirpath,outputFileName)
+                        os.remove(file)
+        
+        
+        
+        
+            ghFolderPath = os.path.dirname(ghFilePath)
+            outputFolder = os.path.join(ghFolderPath,'assembleData')
+            wrapperFile = os.path.join( outputFolder,'openSeesModel.txt' )
+        
+        
+            #userObjectFolder = gh.Folders.DefaultUserObjectFolder
+            userObjectFolder = gh.Folders.DefaultAssemblyFolder
+            pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\openSees_StaticSolver_3ndf\openSees_StaticSolver_3ndf.py')
+                
+            fileName = '"' + fileName + '"'
+            wrapperFile = '"' + wrapperFile + '"'
+        
+        
+            p = System.Diagnostics.Process()
+            p.StartInfo.RedirectStandardOutput = True
+            p.StartInfo.RedirectStandardError = True
+        
+            p.StartInfo.UseShellExecute = False
+            p.StartInfo.CreateNoWindow = True
+        
+            p.StartInfo.FileName = pythonInterpreter
+            p.StartInfo.Arguments = fileName + " " + wrapperFile
+            p.Start()
+            p.WaitForExit()
+        
+            msg = p.StandardError.ReadToEnd()
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
+        
+        
+            ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+        
+            outputFile = os.path.join(outputFolder, outputFileName)
+        
+        
+        
+            with open(outputFile, 'r') as f:
+                lines = f.readlines()
+                nodeDisplacementWrapper = eval( lines[0].strip() )
+                reactionWrapper = eval( lines[1].strip() )
+                elementOutputWrapper = eval( lines[2].strip() )
+                elementLoadWrapper = eval( lines[3].strip() )
+                #shellOutputWrapper = eval( lines[4].strip() )
+        
+        
+        
+            AlpacaStaticOutput = ([nodeDisplacementWrapper,
+                                    reactionWrapper,
+                                    elementOutputWrapper,
+                                    elementLoadWrapper ])
+        
+            return AlpacaStaticOutput
+        
+        checkData = True
+        
+        if not AlpacaModel:
+            checkData = False
+            msg = "input 'AlpacaModel' failed to collect data"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+        
+        
+        if checkData != False:
+            AlpacaStaticOutput = Initialize3NDFStaticAnalysis(AlpacaModel)
+            return AlpacaStaticOutput
+
 
 # 6|Numerical Output
 
