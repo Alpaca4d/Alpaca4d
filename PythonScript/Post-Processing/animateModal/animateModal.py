@@ -37,6 +37,11 @@ class MyComponent(component):
         from scriptcontext import sticky as st
         import System.Drawing.Color
         import scriptcontext as sc
+
+
+
+        self.line = []
+        self.colorLine = []
         #----------------------------------------------------------------------#
                 
         def alphat( E, G, I, At ):
@@ -735,16 +740,16 @@ class MyComponent(component):
         
             # Update the variable and component
             if Animate and not Reset:
-                myCounter += 1/ ( (speed) * 10 )
+                myCounter += 1.0/ ( (speed) * 10 )
                 updateComponent(1)
         
             # Output counter
         
             T = Period[numberMode-1]
-            w = 2 * mt.pi/T
+            w = 2.0 * mt.pi/T
             #At = math.sin(myCounter)
         
-            At = mt.sin(myCounter * w + mt.pi/2)
+            At = mt.sin(myCounter * w + mt.pi/2.0)
         
             nodeValue = []
             displacementValue = []

@@ -44,6 +44,9 @@ class MyComponent(component):
         import scriptcontext as sc
         import time
         
+
+        self.line = []
+        self.colorLine = []
         #---------------------------#
         def alphat( E, G, I, At ):
             return (E*I)/(G*At)
@@ -933,7 +936,7 @@ class MyComponent(component):
                     traslSolidValue.append( solidDefModel[1] )
                     ExtrudedView.append( solidDefModel[0] )
             
-         ########################################################################################################################
+
             # MAX an MIN VALOR
             valorVector = []
             # beam valor #
@@ -972,7 +975,7 @@ class MyComponent(component):
             upperLimit = max( valorVector )
             domainValues = [ lowerLimit, upperLimit ]
             print( lowerLimit, upperLimit )
-        #####################################################################################
+
             colorBeam = []
             numberDivide = []
             for value in traslBeamValue :

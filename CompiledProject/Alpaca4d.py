@@ -5329,6 +5329,32 @@ class VisualiseModel(component):
         import Rhino as rc
         import System.Drawing.Color
         import scriptcontext as sc
+
+
+        self.line = []
+        self.colorLine = []
+
+
+        self.ancorPoint = []
+        self.forceDisplay = []
+
+
+        self.posTag = []
+        self.nodeTag = []
+
+
+        self.posEleTag = []
+        self.eleTag = []
+
+
+        self.supportBrep = []
+        self.material = []
+
+
+        self.midPoint = []
+        self.v1Display = []
+        self.v2Display = []
+        self.v3Display = []
         
         
         def VisualiseModel(AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
@@ -6326,7 +6352,8 @@ class StaticModelView(component):
         import System.Drawing.Color
         import scriptcontext as sc
         
-        
+        self.line = []
+        self.colorLine = []
         
         def alphat( E, G, I, At ):
             return (E*I)/(G*At)
@@ -7407,7 +7434,12 @@ class ModalModelView(component):
         import System.Drawing.Color
         import scriptcontext as sc
         #----------------------------------------------------------------------#
-                
+        
+        self.line = []
+        self.colorLine = []
+
+
+
         def alphat( E, G, I, At ):
             return (E*I)/(G*At)
     
@@ -8104,16 +8136,16 @@ class ModalModelView(component):
         
             # Update the variable and component
             if Animate and not Reset:
-                myCounter += 1/ ( (speed) * 10 )
+                myCounter += 1.0/ ( (speed) * 10.0 )
                 updateComponent(1)
         
             # Output counter
         
             T = Period[numberMode-1]
-            w = 2 * mt.pi/T
+            w = 2.0 * mt.pi/T
             #At = math.sin(myCounter)
         
-            At = mt.sin(myCounter * w + mt.pi/2)
+            At = mt.sin(myCounter * w + mt.pi/2.0)
         
             nodeValue = []
             displacementValue = []
@@ -8278,7 +8310,7 @@ class ModalModelView(component):
             upperLimit = max( valorVector )
             domainValues = [ lowerLimit, upperLimit ]
 
-        #####################################################################################
+
             colorBeam = []
             numberDivide = []
             for value in traslBeamValue :
@@ -8504,6 +8536,10 @@ class GroundMotionModelView(component):
         import System.Drawing.Color
         import scriptcontext as sc
         import time
+
+        
+        self.line = []
+        self.colorLine = []
         
         #---------------------------#
         def alphat( E, G, I, At ):
