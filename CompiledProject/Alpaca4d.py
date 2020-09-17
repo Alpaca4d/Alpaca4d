@@ -3196,7 +3196,10 @@ class NDFAnalyses(component):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
             "NDFAnalyses (Alpaca4d)", "NDFAnalyses", """Calculate the Static Response of the structure. It works ONLY with bricks and truss element. WIP""", "Alpaca", "5|Analyses")
         return instance
-    
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.quarternary
+ 
     def get_ComponentGuid(self):
         return System.Guid("4deb0ee2-e2fa-4250-a453-2ef54b6f9df9")
     
@@ -3227,8 +3230,9 @@ class NDFAnalyses(component):
             self.marshal.SetOutput(result, DA, 0, True)
         
     def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAKbSURBVEhL7dRfSFNRHAfwe+82d73TnG5LbdqmbolrlcKUiJAgn7IosKCHon9UD2JRgUo9WYH9AcNWyvqDDz1IQYZYkmEtNKGggh586kVKESGhsjRN9+v7u3fGgrtwUVDQFz5w/uycc8/dPUf4G7MM2iBdrf2BnISDMAAF3PA744WjWlHIhyat+ENSwK0VE89eWKEV1bSAUSuq4b6HQODjhkSzB+YH8utpBbNaE4QKq2h4d8zkII9kjqA+DrybhDK/AxNcASdwrEmCONQuu76OW5ZTh+zmHbyG2N3FDT9FOSyF09G6PVqeT+0W4yLiyVmXtsBzrUs/EhyAm/DK7zeQoog8aBiqgXdwHjgbHaLx/UCyJzKkFFHInENbjWn825DWrZ9dTqc0W18vzzU3KxQOp1JfXyo1NiZTIGDgwVMwBi+9knn6rpxHPHmZpHBfGBrBAbqpglt2u0j9/am6urtTKHhRmXqUnK9OzK8laHby5PchiSfRiwHWQAMUZmdLupPHGg541MlHLT4q1Z6+EuJmHxwBG1RkFJbQic5T1PM4V3dyNlibPcMLXNKe/hnIEDd8aMqA75inuTsvU0kbkb/pLVVu9840tJROPAjnzMUu8OReWqTX7vqCP/kDxqyDn0aB23DIWrqN/BdGyF1zZ0LO8c2ircugWKn4+izVdFyjGz3lEV4gGFTIZhM/oZ8P4IKyGcYy1u6mpHTXZ5TfwAuwiZJxclVoUt3VytaP5K/aQRaLOIq+TbDgWKEbRuAwHIcs6DRZs6aLr06Tty5MslPdVS8kfKkVwX7IBL5nFgOn3bG+mjI31JJokAdR56+Fv7qEw1dAPdRBHjdEc9ZSsJpEo4lP8hKt6ddzBs5pxe/hV8dHnz/j//mnIgjfAFbfBYlCcDTMAAAAAElFTkSuQmCC"
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAUESURBVEhLtZULUJRVFMfZEgtFSdFVHkahRjXCBtiojAoxioA8JhRkeYkDqIMYAyqhVAw5ARLaiFbDlJiZBIqIDxolCQURXFhlQUFFfKASGrAL7coisP/O+XZntBknB8f+M7+Zc86395z7ne/cvUYjlCkxRW/+P9pIXCUiCQkHXqaMiZ8JF+ILIo14qVpEbNCbRq8Qx4nJgvdvWRMZhI3gGbSamK43BfFDjokET68UYhnBCfgtfIgsYg7hTHDLFhDNBIh8Qq+ZM2eUyGTnKw0uK8LFZS6amxtSDT7r++XLP65NT0+LtbF5s7ew8EAcxcqsrCzh7+8LHx8veHouhttH7phiKeECzA5eaCQWi7MGBnqh0XRZCQHa2d69ubr+/l6NwWcdPXToAIqK8n9dutQLDx60d1Jshb39LB2vfRq1WoWFru5cIEJYSVp5924rPVQ6GfwTcnl1r1rdjf5+5VuGWPuVKxeHs7Mzs3x9vfm33ApvJ6cP0NFxEz5+wUhMlSM++TDk8vOQyc5xgShhJcmztraSFqlCyBaZmo6909p6eVAmq0Ji4idbKPahmdn44e7uDh21Itrf34cKq5oo7jtv3lzdtWuNmGYXhbne5Zjl8i0kEgdotSpMnTqZv5mgKXl5uRzcTPa7Dg6zdDU1Z3U7d2Zj07p4oZ8SiT3u3299RPYy+hZUoPci225uC3Gj7SZmLy4hjsLc0h0mJiZCq1paFHb0G0GitLSUfpWqcw/ZB8PCpCjZl8+7x9V9VYh82xcR4aEoPXGEiz2WSoNQW3tOS3aLh8ci3Lz9EHO8yjDe3FHYjLW19SUu8OhRz5NRjY5e2VBeXtpFJnZ9nY2L6aWIDgzH3YpGuIqdsTszG9fzqyG1WYLw8BBcqGuCeJo3vLyWQKGowyjjcZRcxAVUubm7f6Q37AYwSkjOCglZUdTZeesvMhuLiwtQFZsPbwc39LS1430zW5w+ehyylCPY9F6EUKBN3oYZkmQaUR+eKFBS5OTs0FVUnFJotcourbY3V59ZLysLC4sL9OG4x3euNzfi5NLvEDTdAxplF8SvT8S9G634IywPiXahQoGOmhbMtk9AYGAAjWUX+voe8sQNcg5qT4VarbbQp9afwiKRSLRDqeyEs7PjsPrWZciCP8Wamf5oapLD3Xk++v7sxG8euxBvJ0V0dCTunW1ChF2YLjg4CDQQ3BoFbXIMtWU08fQ/gFESwcd8cV3dOcTHx2Gw6Qh0Oa44ttoBJ08eQ/qmzUNdzbdwfOE3iH9HivXrY9F+WoE1MwJArUV9fXU/rffjZM9SAHGWEBcW7kdDfSWGKnPQlz1/IHaBJbKyvkJ1dQUGG4txOyFkONnRD0lJG9D+ewNCbDwRGhpMLeqpFjL9h0KJjIyML4X5zUyQPhaPMe6j2N+pqVsaNBo60WWZwluVx0mwa9vnOHO4FGbGpkNRUat6aM0pIctz1BIZGS6cQFtbm2vknyFykpOT9nDR1h/WCgVUWfOhKN4+VFBwQEnPYzSanlj6ByjhBM9TLn3gXxIS4i6RHUPEEqJJkybUbd2a+rgmxRVVCY46e8uxiIlZVU9jmMiLaHLcaFOfsf08/USMJfj0HSTeIFjrxr32Kuo2OmHimFE8LXzazYUnI9R+gk/edsKWAwb5mVKBRXYTODlvYrQQfQGtJfjWyhO8J+K7mC8jFRHIgRcV37MrCb4OnyUuNEIZGf0DWlK7lGZ5O+UAAAAASUVORK5CYII="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
 
     
     def RunScript(self, AlpacaModel):
