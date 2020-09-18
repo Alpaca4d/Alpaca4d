@@ -164,7 +164,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
     ghFilePath = ghenv.LocalScope.ghdoc.Path
     workingDirectory = os.path.dirname(ghFilePath)
     outputFileBrick = os.path.join(workingDirectory, 'assembleData\\tensionBrick.out' )
-    outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
+    #outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
     #---------------------------------------------------#
     
     tensionDic = []
@@ -182,7 +182,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
             tensionSolid.append( float(tensionListBrick[i]) )
         tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ], tensionSolid[ stressView + 24 ], tensionSolid[ stressView + 30 ], tensionSolid[ stressView + 36 ], tensionSolid[ stressView + 42 ] ]
         tensionDic.append([ eleTag[0], tensionView ])
-
+    """
     with open(outputFileTetra, 'r') as f:
         lines = f.readlines()
         if lines :
@@ -197,7 +197,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
                 tensionSolid.append( float(tensionListTetra[i]) )
             tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ]]
             tensionDic.append([ eleTag[0], tensionView ])
-    
+    """
     stressDict = dict( tensionDic )
     stressValue =  stressDict.values() 
     #print( stressDict.get(2))
@@ -214,7 +214,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
     maxValue = max( maxValue )
     minValue = min( minValue )
     domainValues = [minValue, maxValue ] 
-    print( maxValue, minValue )
+    #print( maxValue, minValue )
 
 
     brick = []
