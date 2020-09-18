@@ -13,6 +13,9 @@ import Grasshopper as gh
 from System.Drawing import Color
 
 def Solid( Brick, Colour, nDMaterial):
+
+    #if Colour is None:
+        #colour = Color.FromArgb(219, 33, 207)
     
     if Brick.Vertices.Count == 8:
         elementType = "bbarBrick"

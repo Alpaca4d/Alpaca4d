@@ -25,7 +25,7 @@ def Assemble(Element, Support, Load, Mass):
     secTagWrapper = []
     
     for element in Element:
-        print(element[0])
+        #print(element[0])
         if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"): # element[1] retrieve the type of the beam
             
             startPoint = element[0].PointAt(element[0].Domain[0])

@@ -22,6 +22,7 @@ import System
 import Rhino
 import rhinoscriptsyntax as rs
 
+
 class MyComponent(component):
     
     def RunScript(self, AlpacaStaticOutput, scale, modelExtrud, direction, colorList):
@@ -127,40 +128,33 @@ class MyComponent(component):
         def defShellQuad( ele, node, nodeDisp, scaleDef ):
             
             eleTag = ele[0]
-            eleNodeTag = ele[1]
+            eleNodeTag = ele[1] 
             color = ele[2][2]
             thick = ele[2][1]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            trasl3 = nodeDisp.get( index3 , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
-            trasl4 = nodeDisp.get( index4 -1 , "never")[0]
-            rotate4 = nodeDisp.get( index4 -1 , "never")[1]
+            trasl4 = nodeDisp.get( index4  , "never")[0]
+            rotate4 = nodeDisp.get( index4  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
             
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
+            pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -189,29 +183,24 @@ class MyComponent(component):
             eleNodeTag = ele[1]
             color = ele[2][2]
             thick = ele[2][1]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            trasl3 = nodeDisp.get( index3  , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
+            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -240,50 +229,35 @@ class MyComponent(component):
             color = ele[2][1]
             thick = ele[2][1]
             #print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
-            index5 = eleNodeTag[4]
-            index6 = eleNodeTag[5]
-            index7 = eleNodeTag[6]
-            index8 = eleNodeTag[7]
-            
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
-            trasl5 = nodeDisp.get( index5 -1 , "never")
-            trasl6 = nodeDisp.get( index6 -1 , "never")
-            trasl7 = nodeDisp.get( index7 -1 , "never")
-            trasl8 = nodeDisp.get( index8 -1 , "never")
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1 
+            index5 = eleNodeTag[4] -1
+            index6 = eleNodeTag[5] -1
+            index7 = eleNodeTag[6] -1
+            index8 = eleNodeTag[7] -1
+            #print( index1, index2, index3, index4, index5, index6, index7, index8 )
+            trasl1 = nodeDisp.get( index1 , "never")
+            trasl2 = nodeDisp.get( index2 , "never")
+            trasl3 = nodeDisp.get( index3 , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
+            trasl5 = nodeDisp.get( index5 , "never")
+            trasl6 = nodeDisp.get( index6 , "never")
+            trasl7 = nodeDisp.get( index7 , "never")
+            trasl8 = nodeDisp.get( index8 , "never")
+            #print( trasl1, trasl2, trasl3, trasl4, trasl5, trasl6, trasl7, trasl8 )
             #print( trasl1 )
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-            pointDef5 = rg.Point3d.Clone( node.get( index5 -1 , "never") )
-            pointDef6 = rg.Point3d.Clone( node.get( index6 -1 , "never") )
-            pointDef7 = rg.Point3d.Clone( node.get( index7 -1 , "never") )
-            pointDef8 = rg.Point3d.Clone( node.get( index8 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-            vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
-            pointDef5.Transform( vectortrasl1 )
-            vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
-            pointDef6.Transform( vectortrasl2 )
-            vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
-            pointDef7.Transform( vectortrasl3 )
-            vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
-            pointDef8.Transform( vectortrasl4 )
-            
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
+            pointDef5 = rg.Point3d.Add( node.get( index5 , "never"), trasl5*scaleDef  )
+            pointDef6 = rg.Point3d.Add( node.get( index6 , "never"), trasl6*scaleDef  )
+            pointDef7 = rg.Point3d.Add( node.get( index7 , "never"), trasl7*scaleDef  )
+            pointDef8 = rg.Point3d.Add( node.get( index8 , "never"), trasl8*scaleDef  )
+
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -311,31 +285,22 @@ class MyComponent(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             #print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
+            trasl1 = nodeDisp.get( index1  , "never")
+            trasl2 = nodeDisp.get( index2  , "never")
+            trasl3 = nodeDisp.get( index3  , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
             
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-        
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1

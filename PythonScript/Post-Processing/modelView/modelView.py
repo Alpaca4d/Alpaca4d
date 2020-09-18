@@ -1,4 +1,4 @@
-"""Generate Model view 
+﻿"""Generate Model view 
     Inputs:
         AlpacaModel: Output of Assemble Model.
         Model: True: Visualise the stick Model. Default is False
@@ -10,14 +10,8 @@
         NodeTag: True: Visualise the NodeTag. Default is False
         ElementTag: True: Visualise the ElementTag. Default is False
     Output:
-        AlpacaModel: Output of Assemble Model.
-        Model: Geometrical Model.
+        out:
 """
-
-"""
-This component works in SDK mode only!!!
-"""
-
 
 from ghpythonlib.componentbase import executingcomponent as component
 import Grasshopper, GhPython
@@ -25,7 +19,7 @@ import System
 import Rhino
 import rhinoscriptsyntax as rs
 
-class VisualiseModel(component):
+class VisualiseModellll(component):
     
     def RunScript(self, AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
@@ -676,6 +670,7 @@ class VisualiseModel(component):
             #######
             
             forceMax = []
+            
             for force in openSeesNodeLoad :
                 forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
                 fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
@@ -690,15 +685,17 @@ class VisualiseModel(component):
                 forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
             
             #print( forceMax )
-            forceMin = min( forceMax )
-            
-            
+            #print(  forceMax )
+            if  forceMax:
+                forceMin = min( forceMax )
             #scale = forceMax*0.1/coordMax 
-            if forceMin > 0 :
-                scale = 1/forceMin 
-            else :
-                scale = 0.2
+                if forceMin > 0 :
+                    scale = 1/forceMin 
+                else :
+                    scale = 0.1
             
+            
+
             forceDisplay = []
             ancorPoint = []
             
@@ -708,6 +705,8 @@ class VisualiseModel(component):
                 forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
                 ancorPoint.append( pos )
                 forceDisplay.append(  forceVector*scale  )
+                #print(ancorPoint)
+                #print(forceDisplay)
                 
             for linearLoad in openSeesBeamLoad :
                 tag =  linearLoad[0]
@@ -936,7 +935,7 @@ class VisualiseModel(component):
             arg.Display.DrawCurve(crv, color, 4)
         
         for ancor, force in zip(self.ancorPoint, self.forceDisplay):
-            arg.Display.DrawMarker(ancor, force, System.Drawing.Color.Black)
+            arg.Display.DrawArrow( Rhino.Geometry.Line(ancor, force) ,  System.Drawing.Color.LightBlue)
         
         for pos, tag in zip(self.posTag, self.nodeTag):
             arg.Display.Draw2dText(str(tag), System.Drawing.Color.Blue, pos, True, 20)
