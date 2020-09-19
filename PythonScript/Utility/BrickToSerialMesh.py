@@ -1,4 +1,13 @@
-﻿import Rhino.Geometry as rg
+﻿"""Generate a Brick element from a list of mesh .
+    the faces of the mesh '0' will be connected with the faces of the meshes '1' generating a brick element ( cube ).
+    Attention : Each mesh in the list must have the same number of faces.
+    Inputs:
+        MeshSeries: quadMesh list with the same number of subdivisions .
+    Output:
+        Brick: Brick element --> Mesh with 6 faces and 8 nodes.
+       """
+import Rhino.Geometry as rg
+import Grasshopper as gh
 
 def MeshToShell(Mesh):
     
@@ -212,9 +221,16 @@ def brick( MeshList ):
             solid.append(ele)
             Vertix.append( vertix )
             '''
-    return solid, elementType
+    return solid
 
-Brick, type = brick( MeshSeries )
+checkData = True
 
+if not MeshSeries or len(MeshSeries) == 1 :  #is not None:
+    checkData = False
+    msg = "input 'MeshSeries' failed to collect data"
+    ghenv.Component.AddRuntimeMessage( gh.Kernel.GH_RuntimeMessageLevel.Warning, msg )
+
+if checkData != False:
+    Brick= brick( MeshSeries )
 
 
