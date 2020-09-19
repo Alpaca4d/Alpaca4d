@@ -5042,17 +5042,17 @@ class ShellStresses(component):
 
 # Brick
 
-class BrickStresses(component):
+class BrickStress(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Brick Stress (Alpaca4d)", "Brick Stress", """Compute the brick stress""", "Alpaca", "6|Numerical Output")
+            "Brick Stress (Alpaca4d)", "Brick Stress", """Compute the Brick stress""", "Alpaca", "6|Numerical Output")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.quarternary
 
     def get_ComponentGuid(self):
-        return System.Guid("d8e87bb1-943a-4cd4-a11a-452a8e004a86")
+        return System.Guid("e4cc8436-3140-40f1-b566-50e577057062")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -5142,7 +5142,7 @@ class BrickStresses(component):
         
             n = len( listcolor )
             domain = linspace( valueMin, valueMax, n)
-            ##print( domain )
+            #print( domain )
             
             for i in range(1,n+1):
                 if  domain[i-1] <= value <= domain[i] :
@@ -5157,7 +5157,7 @@ class BrickStresses(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            ##print( eleNodeTag )
+            #print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -5176,7 +5176,7 @@ class BrickStresses(component):
             point6 =  node.get( index6 -1 , "never")
             point7 =  node.get( index7 -1 , "never")
             point8 =  node.get( index8 -1 , "never")
-            ##print( type(pointDef1) ) 
+            #print( type(pointDef1) ) 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( point1 ) #0
             shellDefModel.Vertices.Add( point2 ) #1
@@ -5203,7 +5203,7 @@ class BrickStresses(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            ##print( eleNodeTag )
+            #print( eleNodeTag )
             index1 = eleNodeTag[0]
             index2 = eleNodeTag[1]
             index3 = eleNodeTag[2]
@@ -5215,7 +5215,7 @@ class BrickStresses(component):
             point3 =  node.get( index3 -1 , "never")
             point4 =  node.get( index4 -1 , "never")
             
-            ##print( type(pointDef1) )
+            #print( type(pointDef1) )
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( point1 ) #0
@@ -5239,8 +5239,8 @@ class BrickStresses(component):
         
             diplacementWrapper = AlpacaStaticOutput[0]
             EleOut = AlpacaStaticOutput[2]
-            ##print( ForceOut[0] )
-            ##print( ForceOut[1] )
+            #print( ForceOut[0] )
+            #print( ForceOut[1] )
             #nodalForce = AlpacaStaticOutput[5]
         
             #nodalForcerDict = dict( nodalForce )
@@ -5259,11 +5259,10 @@ class BrickStresses(component):
                 elif  len(item[0])  == 'FourNodeTetrahedron':
                      TetraTag.append([item[0], 24])
         
-            #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
             ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
             workingDirectory = os.path.dirname(ghFilePath)
             outputFileBrick = os.path.join(workingDirectory, 'assembleData\\tensionBrick.out' )
-            outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
+            #outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
             #---------------------------------------------------#
             
             tensionDic = []
@@ -5273,22 +5272,22 @@ class BrickStresses(component):
                 if lines :
                     tensionListBrick  = lines[0].split()
         
-            ##print(len(tensionList)/len(shellTag))
-            ##print(w + 24)
+            #print(len(tensionList)/len(shellTag))
+            #print(w + 24)
             for n,eleTag in enumerate(BrickTag) :
                 tensionSolid = []
                 for i in range( (n)*eleTag[1] , ( n + 1 )*eleTag[1]  ):
                     tensionSolid.append( float(tensionListBrick[i]) )
                 tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ], tensionSolid[ stressView + 24 ], tensionSolid[ stressView + 30 ], tensionSolid[ stressView + 36 ], tensionSolid[ stressView + 42 ] ]
-                tensionDic.append([ eleTag, tensionView ])
-        
+                tensionDic.append([ eleTag[0], tensionView ])
+            """
             with open(outputFileTetra, 'r') as f:
                 lines = f.readlines()
                 if lines :
                     tensionListTetra  = lines[0].split()
             
-            ##print(len(tensionList)/len(shellTag))
-            ##print(w + 24)
+            #print(len(tensionList)/len(shellTag))
+            #print(w + 24)
             if lines :
                 for n,eleTag in enumerate(TetraTag) :
                     tensionSolid = []
@@ -5296,13 +5295,13 @@ class BrickStresses(component):
                         tensionSolid.append( float(tensionListTetra[i]) )
                     tensionView = [ tensionSolid[ stressView ], tensionSolid[ stressView + 6 ], tensionSolid[ stressView + 12 ], tensionSolid[ stressView + 18 ]]
                     tensionDic.append([ eleTag[0], tensionView ])
-            
+            """
             stressDict = dict( tensionDic )
-            stressValue =  stressDict.values() 
-            ##print( stressDict.get(2))
-            ##print( stressDict )
-            ##print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
-            ##print( tensionDic[0] )
+            stressValue = stressDict.values() 
+            #print( stressDict.get(2))
+            #print( stressDict )
+            #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
+            #print( tensionDic[0] )
             
             maxValue = []
             minValue = []
@@ -5326,17 +5325,18 @@ class BrickStresses(component):
                 elif eleType == "FourNodeTetrahedron" :
                     tetraModel = TetraSolid( ele, pointWrapperDict )
                     brick.append( tetraModel )
-                    
+        
                 modelStress = []
             for brickEle, value in zip(brick,stressValue) :
                 brickColor = brickEle.DuplicateMesh()
                 brickColor.VertexColors.Clear()
-                for j in range(0,bricklEle.Vertices.Count):
-                    ##print( value[j] )
+                for j in range(0,brickEle.Vertices.Count):
+                    #print( value[j] )
                     jetColor = gradient(value[j], minValue, maxValue, colorList )
                     brickColor.VertexColors.Add( jetColor )
                 modelStress.append( brickColor)
-        
+            
+            stressValue = th.list_to_tree(stressValue)
             return modelStress, stressValue, stressRange
         
         checkData = True
@@ -6578,40 +6578,33 @@ class StaticModelView(component):
         def defShellQuad( ele, node, nodeDisp, scaleDef ):
             
             eleTag = ele[0]
-            eleNodeTag = ele[1]
+            eleNodeTag = ele[1] 
             color = ele[2][2]
             thick = ele[2][1]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            trasl3 = nodeDisp.get( index3 , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
-            trasl4 = nodeDisp.get( index4 -1 , "never")[0]
-            rotate4 = nodeDisp.get( index4 -1 , "never")[1]
+            trasl4 = nodeDisp.get( index4  , "never")[0]
+            rotate4 = nodeDisp.get( index4  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
             
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
+            pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -6640,29 +6633,24 @@ class StaticModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][2]
             thick = ele[2][1]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            trasl3 = nodeDisp.get( index3  , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
+            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -6690,51 +6678,36 @@ class StaticModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             thick = ele[2][1]
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
-            index5 = eleNodeTag[4]
-            index6 = eleNodeTag[5]
-            index7 = eleNodeTag[6]
-            index8 = eleNodeTag[7]
-            
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
-            trasl5 = nodeDisp.get( index5 -1 , "never")
-            trasl6 = nodeDisp.get( index6 -1 , "never")
-            trasl7 = nodeDisp.get( index7 -1 , "never")
-            trasl8 = nodeDisp.get( index8 -1 , "never")
-            ##print( trasl1 )
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1 
+            index5 = eleNodeTag[4] -1
+            index6 = eleNodeTag[5] -1
+            index7 = eleNodeTag[6] -1
+            index8 = eleNodeTag[7] -1
+            #print( index1, index2, index3, index4, index5, index6, index7, index8 )
+            trasl1 = nodeDisp.get( index1 , "never")
+            trasl2 = nodeDisp.get( index2 , "never")
+            trasl3 = nodeDisp.get( index3 , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
+            trasl5 = nodeDisp.get( index5 , "never")
+            trasl6 = nodeDisp.get( index6 , "never")
+            trasl7 = nodeDisp.get( index7 , "never")
+            trasl8 = nodeDisp.get( index8 , "never")
+            #print( trasl1, trasl2, trasl3, trasl4, trasl5, trasl6, trasl7, trasl8 )
+            #print( trasl1 )
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-            pointDef5 = rg.Point3d.Clone( node.get( index5 -1 , "never") )
-            pointDef6 = rg.Point3d.Clone( node.get( index6 -1 , "never") )
-            pointDef7 = rg.Point3d.Clone( node.get( index7 -1 , "never") )
-            pointDef8 = rg.Point3d.Clone( node.get( index8 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-            vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
-            pointDef5.Transform( vectortrasl1 )
-            vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
-            pointDef6.Transform( vectortrasl2 )
-            vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
-            pointDef7.Transform( vectortrasl3 )
-            vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
-            pointDef8.Transform( vectortrasl4 )
-            
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
+            pointDef5 = rg.Point3d.Add( node.get( index5 , "never"), trasl5*scaleDef  )
+            pointDef6 = rg.Point3d.Add( node.get( index6 , "never"), trasl6*scaleDef  )
+            pointDef7 = rg.Point3d.Add( node.get( index7 , "never"), trasl7*scaleDef  )
+            pointDef8 = rg.Point3d.Add( node.get( index8 , "never"), trasl8*scaleDef  )
+
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -6761,32 +6734,23 @@ class StaticModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
+            trasl1 = nodeDisp.get( index1  , "never")
+            trasl2 = nodeDisp.get( index2  , "never")
+            trasl3 = nodeDisp.get( index3  , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
             
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-        
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -7666,37 +7630,30 @@ class ModalModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][2]
             thick = ele[2][1]
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            trasl3 = nodeDisp.get( index3 , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
-            trasl4 = nodeDisp.get( index4 -1 , "never")[0]
-            rotate4 = nodeDisp.get( index4 -1 , "never")[1]
+            trasl4 = nodeDisp.get( index4  , "never")[0]
+            rotate4 = nodeDisp.get( index4  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
             
-            pointDef1 = rg.Vector3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Vector3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Vector3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Vector3d.Clone( node.get( index4 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
+            pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -7726,29 +7683,24 @@ class ModalModelView(component):
             color = ele[2][2]
             thick = ele[2][1]
             
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 -1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 -1 , "never")[0]
-            rotate2 = nodeDisp.get( index2 -1 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 -1 , "never")[0]
-            rotate3 = nodeDisp.get( index3 -1 , "never")[1]
+            trasl3 = nodeDisp.get( index3  , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
+            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -7773,50 +7725,36 @@ class ModalModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             thick = ele[2][1]
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
-            index5 = eleNodeTag[4]
-            index6 = eleNodeTag[5]
-            index7 = eleNodeTag[6]
-            index8 = eleNodeTag[7]
-            
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
-            trasl5 = nodeDisp.get( index5 -1 , "never")
-            trasl6 = nodeDisp.get( index6 -1 , "never")
-            trasl7 = nodeDisp.get( index7 -1 , "never")
-            trasl8 = nodeDisp.get( index8 -1 , "never")
-            
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1 
+            index5 = eleNodeTag[4] -1
+            index6 = eleNodeTag[5] -1
+            index7 = eleNodeTag[6] -1
+            index8 = eleNodeTag[7] -1
+            #print( index1, index2, index3, index4, index5, index6, index7, index8 )
+            trasl1 = nodeDisp.get( index1 , "never")
+            trasl2 = nodeDisp.get( index2 , "never")
+            trasl3 = nodeDisp.get( index3 , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
+            trasl5 = nodeDisp.get( index5 , "never")
+            trasl6 = nodeDisp.get( index6 , "never")
+            trasl7 = nodeDisp.get( index7 , "never")
+            trasl8 = nodeDisp.get( index8 , "never")
+            #print( trasl1, trasl2, trasl3, trasl4, trasl5, trasl6, trasl7, trasl8 )
+            #print( trasl1 )
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
-            pointDef5 = rg.Point3d.Clone( node.get( index5 -1 , "never") )
-            pointDef6 = rg.Point3d.Clone( node.get( index6 -1 , "never") )
-            pointDef7 = rg.Point3d.Clone( node.get( index7 -1 , "never") )
-            pointDef8 = rg.Point3d.Clone( node.get( index8 -1 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-            vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
-            pointDef5.Transform( vectortrasl1 )
-            vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
-            pointDef6.Transform( vectortrasl2 )
-            vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
-            pointDef7.Transform( vectortrasl3 )
-            vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
-            pointDef8.Transform( vectortrasl4 )
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
+            pointDef5 = rg.Point3d.Add( node.get( index5 , "never"), trasl5*scaleDef  )
+            pointDef6 = rg.Point3d.Add( node.get( index6 , "never"), trasl6*scaleDef  )
+            pointDef7 = rg.Point3d.Add( node.get( index7 , "never"), trasl7*scaleDef  )
+            pointDef8 = rg.Point3d.Add( node.get( index8 , "never"), trasl8*scaleDef  )
+
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
@@ -7844,32 +7782,23 @@ class ModalModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0]
-            index2 = eleNodeTag[1]
-            index3 = eleNodeTag[2]
-            index4 = eleNodeTag[3]
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 -1 , "never")
-            trasl2 = nodeDisp.get( index2 -1 , "never")
-            trasl3 = nodeDisp.get( index3 -1 , "never")
-            trasl4 = nodeDisp.get( index4 -1 , "never")
+            trasl1 = nodeDisp.get( index1  , "never")
+            trasl2 = nodeDisp.get( index2  , "never")
+            trasl3 = nodeDisp.get( index3  , "never")
+            trasl4 = nodeDisp.get( index4 , "never")
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 -1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 -1 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 -1 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 -1 , "never") )
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
             
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-    
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -8768,41 +8697,32 @@ class GroundMotionModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][2]
             thick = ele[2][1]
-            ###print( eleNodeTag )
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0] 
-            index2 = eleNodeTag[1] 
-            index3 = eleNodeTag[2] 
-            index4 = eleNodeTag[3] 
+            #print( eleNodeTag )
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 , "never")[0]
-            rotate1 = nodeDisp.get( index1 , "never")[1]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
+            rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 , "never")[0]
-            rotate2 = nodeDisp.get( index2 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
             trasl3 = nodeDisp.get( index3 , "never")[0]
-            rotate3 = nodeDisp.get( index3 , "never")[1]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
-            trasl4 = nodeDisp.get( index4 , "never")[0]
-            rotate4 = nodeDisp.get( index4 , "never")[1]
+            trasl4 = nodeDisp.get( index4  , "never")[0]
+            rotate4 = nodeDisp.get( index4  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
             
-            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
-            ##print( index1 - 1)
-            ##print( nodeDisp )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
+            pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -8830,29 +8750,28 @@ class GroundMotionModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            index1 = eleNodeTag[0] - 1
-            index2 = eleNodeTag[1] - 1
-            index3 = eleNodeTag[2] - 1
+            eleTag = ele[0]
+            eleNodeTag = ele[1]
+            color = ele[2][2]
+            thick = ele[2][1]
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
             
-            trasl1 = nodeDisp.get( index1 , "never")[0]
+            trasl1 = nodeDisp.get( index1  , "never")[0]
             rotate1 = nodeDisp.get( index1  , "never")[1]
             
-            trasl2 = nodeDisp.get( index2 , "never")[0]
-            rotate2 = nodeDisp.get( index2 , "never")[1]
+            trasl2 = nodeDisp.get( index2  , "never")[0]
+            rotate2 = nodeDisp.get( index2  , "never")[1]
             
-            trasl3 = nodeDisp.get( index3 , "never")[0]
-            rotate3 = nodeDisp.get( index3 , "never")[1]
+            trasl3 = nodeDisp.get( index3  , "never")[0]
+            rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
+            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -8877,16 +8796,16 @@ class GroundMotionModelView(component):
             eleNodeTag = ele[1]
             color = ele[2][1]
             thick = ele[2][1]
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0] - 1
-            index2 = eleNodeTag[1] - 1
-            index3 = eleNodeTag[2] - 1
-            index4 = eleNodeTag[3] - 1
-            index5 = eleNodeTag[4] - 1
-            index6 = eleNodeTag[5] - 1
-            index7 = eleNodeTag[6] - 1
-            index8 = eleNodeTag[7] - 1
-            
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1 
+            index5 = eleNodeTag[4] -1
+            index6 = eleNodeTag[5] -1
+            index7 = eleNodeTag[6] -1
+            index8 = eleNodeTag[7] -1
+            #print( index1, index2, index3, index4, index5, index6, index7, index8 )
             trasl1 = nodeDisp.get( index1 , "never")
             trasl2 = nodeDisp.get( index2 , "never")
             trasl3 = nodeDisp.get( index3 , "never")
@@ -8895,32 +8814,17 @@ class GroundMotionModelView(component):
             trasl6 = nodeDisp.get( index6 , "never")
             trasl7 = nodeDisp.get( index7 , "never")
             trasl8 = nodeDisp.get( index8 , "never")
-            
+            #print( trasl1, trasl2, trasl3, trasl4, trasl5, trasl6, trasl7, trasl8 )
+            #print( trasl1 )
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
-            pointDef5 = rg.Point3d.Clone( node.get( index5 , "never") )
-            pointDef6 = rg.Point3d.Clone( node.get( index6 , "never") )
-            pointDef7 = rg.Point3d.Clone( node.get( index7 , "never") )
-            pointDef8 = rg.Point3d.Clone( node.get( index8 , "never") )
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-            vectortrasl5 = rg.Transform.Translation( rg.Vector3d(trasl5.X, trasl5.Y, trasl5.Z)*scaleDef )
-            pointDef5.Transform( vectortrasl1 )
-            vectortrasl6 = rg.Transform.Translation( rg.Vector3d(trasl6.X, trasl6.Y, trasl6.Z)*scaleDef )
-            pointDef6.Transform( vectortrasl2 )
-            vectortrasl7 = rg.Transform.Translation( rg.Vector3d(trasl7.X, trasl7.Y, trasl7.Z)*scaleDef )
-            pointDef7.Transform( vectortrasl3 )
-            vectortrasl8 = rg.Transform.Translation( rg.Vector3d(trasl8.X, trasl8.Y, trasl8.Z)*scaleDef )
-            pointDef8.Transform( vectortrasl4 )
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
+            pointDef5 = rg.Point3d.Add( node.get( index5 , "never"), trasl5*scaleDef  )
+            pointDef6 = rg.Point3d.Add( node.get( index6 , "never"), trasl6*scaleDef  )
+            pointDef7 = rg.Point3d.Add( node.get( index7 , "never"), trasl7*scaleDef  )
+            pointDef8 = rg.Point3d.Add( node.get( index8 , "never"), trasl8*scaleDef  )
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
@@ -8948,32 +8852,23 @@ class GroundMotionModelView(component):
             eleTag = ele[0]
             eleNodeTag = ele[1]
             color = ele[2][1]
-            ##print( eleNodeTag )
-            index1 = eleNodeTag[0] - 1
-            index2 = eleNodeTag[1] - 1
-            index3 = eleNodeTag[2] - 1
-            index4 = eleNodeTag[3] - 1
+            #print( eleNodeTag )
+            index1 = eleNodeTag[0] -1
+            index2 = eleNodeTag[1] -1
+            index3 = eleNodeTag[2] -1
+            index4 = eleNodeTag[3] -1
             
-            trasl1 = nodeDisp.get( index1 , "never")
-            trasl2 = nodeDisp.get( index2 , "never")
-            trasl3 = nodeDisp.get( index3 , "never")
+            trasl1 = nodeDisp.get( index1  , "never")
+            trasl2 = nodeDisp.get( index2  , "never")
+            trasl3 = nodeDisp.get( index3  , "never")
             trasl4 = nodeDisp.get( index4 , "never")
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Clone( node.get( index1 , "never") )
-            pointDef2 = rg.Point3d.Clone( node.get( index2 , "never") )
-            pointDef3 = rg.Point3d.Clone( node.get( index3 , "never") )
-            pointDef4 = rg.Point3d.Clone( node.get( index4 , "never") )
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef  )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef  )
+            pointDef3 = rg.Point3d.Add( node.get( index3 , "never"), trasl3*scaleDef  )
+            pointDef4 = rg.Point3d.Add( node.get( index4 , "never"), trasl4*scaleDef  )
             
-            vectortrasl1 = rg.Transform.Translation( rg.Vector3d(trasl1.X, trasl1.Y, trasl1.Z)*scaleDef )
-            pointDef1.Transform( vectortrasl1 )
-            vectortrasl2 = rg.Transform.Translation( rg.Vector3d(trasl2.X, trasl2.Y, trasl2.Z)*scaleDef )
-            pointDef2.Transform( vectortrasl2 )
-            vectortrasl3 = rg.Transform.Translation( rg.Vector3d(trasl3.X, trasl3.Y, trasl3.Z)*scaleDef )
-            pointDef3.Transform( vectortrasl3 )
-            vectortrasl4 = rg.Transform.Translation( rg.Vector3d(trasl4.X, trasl4.Y, trasl4.Z)*scaleDef )
-            pointDef4.Transform( vectortrasl4 )
-        
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
             shellDefModel.Vertices.Add( pointDef2 ) #1
@@ -10205,6 +10100,79 @@ class BeamForcesDiagram(component):
         if checkData != False:
             diagram = cdsView( AlpacaStaticOutput, SectionForces, scale  )
             return diagram
+
+#8|Visualisation
+
+class GradientLibrary(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "GradientLibrary (Alpaca4d)", "GradientLibrary", """Preset of gradient colors perfect for Data Visualisation. The script comes from Ladybug and it has been "reshape" for our plug-in""", "Alpaca", "8|Visualisation")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("39db3081-3926-42dc-8cf9-7b90a152e272")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_Integer()
+        self.SetUpParam(p, "gradientIndex", "gradientIndex", "An index refering to one of the following possible gradients:\n0 - Orignal Ladybug\n1 - Nuanced Ladybug\n2 - Multi-colored Ladybug\n3 - Ecotect\n4 - Thermal Comfort Percentage\n5 - Thermal Comfort Colors\n6 - Shade Benefit/Harm\n7 - Shade Harm\n8 - Shade Benefit\n9 - CFD Colors \n10 - Radiation Benefit\n11 - Gsa10 Colour\n12 - Gsa9 Colour")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.SetPersistentData(Grasshopper.Kernel.Types.GH_Number(11))
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "colorsList", "colorsList", "A series of colors.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAQMSURBVEhLlZVdTFtlGMf/1YJwiBGhJGIMjphNYxYVmswPWrqL3blkhsV44RaniXqzZA4oczFLZZNQaO0ik7IySOjChUuMFzNaoy5OobBIvRgyJmYqcXbAAcYkHigf8vg8pz2lLWXBh/ySty/v+f3f93mbU9ytLkagBH9Ezb934FudQ5j+RkSQsczFRlFDvCaxfOuliwfgPD8IlaF5FcTiNNZmQEujoNgI1Ng1OLcc1HMF1p5BjIvYYOyPuHTlNiaZGRmvRuMBSX7G2PJ1WBOa7PXO57Cf74eWlPO4J4yOgWE4EITtswGMLH/HuGFb+Q17uEUdC6PQjBAZL4dgT+jSy9IDa1E3tIYv4vLgIELBPpTd14ny/G70VgXjrVqbAi22gbRW9C56UL54Hdu4TZclIBYC/eOFpnkzTlIagGI5i/GSbpDQcBEB/lMKukwfKF3QGPr2p/X+r1zhEG9cttiKJuK1LA/InD7fgjFypdxJSSechry4C1/d340DBZ2YELFw8BPQ8u2UC+Zx7FxcptOCWwtevBrz4LIxt/AhnLpcdl/UCVXk0iKlE98bYoPhX9blBqsjKQHr9OunkrEHqpwMJQHsN3ZvOYcODhhKlTd/uVFusPRpRoAHQ7xzv/FZ86AGOHPNd+/HfVRwtpse6Di1OzPg9xtPZpULq7+aNgTMH4dj/m3Q3Iug6Ur4JCDMkA5XakCO6xA59p2m8KU3aS1Vfod7/HUOTe/Op/kj5rQAccxWgAQOCHPASCQRMJkWEHiITHtOE6ztOkfqWunG1Zdo6aqZZg7n0xTiqE/k00JLesBMBSb1kKcR2TQgp/ZoUp6KmhCnMncoJ/MEqQEbW5Tf5iDT82e2HDBVmEdaI99HZouekhZ9NOyDO0Ko+4bw+gWHBJjfOJFVLmQNYGb35eoB6iNmx8xjZprdaaJZ/ZIr2muSgoo2f27jy0Opwkw2CxDmj94zpELxTyOPBJ7jr6k1oPCDqi54pk17eJe3f/vjLbQZl7B3U4bLnutjsRYPyFWjKE28LirbnOu79IdsqD/wApwTdn7NbwVZK8+opryQsXsm/qrQS05R2T6WDNnRGtgLl1KF+iY7arVs0jjyv/omK6+dwMGAIec2jkf5+5KwJ6rSb5UWYYeXYDlJKG4MofDUo3YcLufd9WbKZW4X6sqjcJeNwx26CTdN4DUJ4BYpm/zwbPfZ8eBJTQ8QZFzk8m8rbHRUw2m3o25EqMIx2w9ocvyJ5g6WayIXZBzFK9l/cJJlabayeCwZwuwseM/Y9STzl4wvwKVLDThs/Bb42S1VqUtB8ftO3r0qAc+a301rj3AMx41dqyx3RvkeEk//jyp9S0HRif12NPhsqB1gcUSoRn24muduoqnm7mLgP41Vq5Rc/Gb5AAAAAElFTkSuQmCC"
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, gradientIndex):
+        
+        import Grasshopper.Kernel as gh
+        import System
+        
+        gradientIndex = 11 if gradientIndex is None else gradientIndex
+        
+        def gradientColor(gradientIndex):
+            
+            gradientLibrary = {
+                    0: [System.Drawing.Color.FromArgb(75, 107, 169), System.Drawing.Color.FromArgb(115, 147, 202), System.Drawing.Color.FromArgb(170, 200, 247), System.Drawing.Color.FromArgb(193, 213, 208), System.Drawing.Color.FromArgb(245, 239, 103), System.Drawing.Color.FromArgb(252, 230, 74), System.Drawing.Color.FromArgb(239, 156, 21), System.Drawing.Color.FromArgb(234, 123, 0), System.Drawing.Color.FromArgb(234, 74, 0), System.Drawing.Color.FromArgb(234, 38, 0)],
+                    1: [System.Drawing.Color.FromArgb(49,54,149), System.Drawing.Color.FromArgb(69,117,180), System.Drawing.Color.FromArgb(116,173,209), System.Drawing.Color.FromArgb(171,217,233), System.Drawing.Color.FromArgb(224,243,248), System.Drawing.Color.FromArgb(255,255,191), System.Drawing.Color.FromArgb(254,224,144), System.Drawing.Color.FromArgb(253,174,97), System.Drawing.Color.FromArgb(244,109,67), System.Drawing.Color.FromArgb(215,48,39), System.Drawing.Color.FromArgb(165,0,38)],
+                    2: [System.Drawing.Color.FromArgb(4,25,145), System.Drawing.Color.FromArgb(7,48,224), System.Drawing.Color.FromArgb(7,88,255), System.Drawing.Color.FromArgb(1,232,255), System.Drawing.Color.FromArgb(97,246,156), System.Drawing.Color.FromArgb(166,249,86), System.Drawing.Color.FromArgb(254,244,1), System.Drawing.Color.FromArgb(255,121,0), System.Drawing.Color.FromArgb(239,39,0), System.Drawing.Color.FromArgb(138,17,0)],
+                    3: [System.Drawing.Color.FromArgb(0,0,255), System.Drawing.Color.FromArgb(53,0,202), System.Drawing.Color.FromArgb(107,0,148), System.Drawing.Color.FromArgb(160,0,95), System.Drawing.Color.FromArgb(214,0,41), System.Drawing.Color.FromArgb(255,12,0), System.Drawing.Color.FromArgb(255,66,0), System.Drawing.Color.FromArgb(255,119,0), System.Drawing.Color.FromArgb(255,173,0), System.Drawing.Color.FromArgb(255,226,0), System.Drawing.Color.FromArgb(255,255,0)],
+                    4: [System.Drawing.Color.FromArgb(0,0,0), System.Drawing.Color.FromArgb(110,0,153), System.Drawing.Color.FromArgb(255,0,0), System.Drawing.Color.FromArgb(255,255,102), System.Drawing.Color.FromArgb(255,255,255)],
+                    5: [System.Drawing.Color.FromArgb(0,136,255), System.Drawing.Color.FromArgb(200,225,255), System.Drawing.Color.FromArgb(255,255,255), System.Drawing.Color.FromArgb(255,230,230), System.Drawing.Color.FromArgb(255,0,0)],
+                    6: [System.Drawing.Color.FromArgb(5,48,97), System.Drawing.Color.FromArgb(33,102,172), System.Drawing.Color.FromArgb(67,147,195), System.Drawing.Color.FromArgb(146,197,222), System.Drawing.Color.FromArgb(209,229,240), System.Drawing.Color.FromArgb(255,255,255), System.Drawing.Color.FromArgb(253,219,199), System.Drawing.Color.FromArgb(244,165,130), System.Drawing.Color.FromArgb(214,96,77), System.Drawing.Color.FromArgb(178,24,43), System.Drawing.Color.FromArgb(103,0,31)],
+                    7: [System.Drawing.Color.FromArgb(255,255,255), System.Drawing.Color.FromArgb(253,219,199), System.Drawing.Color.FromArgb(244,165,130), System.Drawing.Color.FromArgb(214,96,77), System.Drawing.Color.FromArgb(178,24,43), System.Drawing.Color.FromArgb(103,0,31)],
+                    8: [System.Drawing.Color.FromArgb(255,255,255), System.Drawing.Color.FromArgb(209,229,240), System.Drawing.Color.FromArgb(146,197,222), System.Drawing.Color.FromArgb(67,147,195), System.Drawing.Color.FromArgb(33,102,172), System.Drawing.Color.FromArgb(5,48,97)],
+                    9: [System.Drawing.Color.FromArgb(0,16,120), System.Drawing.Color.FromArgb(38,70,160), System.Drawing.Color.FromArgb(5,180,222), System.Drawing.Color.FromArgb(16,180,109), System.Drawing.Color.FromArgb(59,183,35), System.Drawing.Color.FromArgb(143,209,19), System.Drawing.Color.FromArgb(228,215,29), System.Drawing.Color.FromArgb(246,147,17), System.Drawing.Color.FromArgb(243,74,0), System.Drawing.Color.FromArgb(255,0,0)],
+                    10: [System.Drawing.Color.FromArgb(0,191,48), System.Drawing.Color.FromArgb(255,238,184), System.Drawing.Color.FromArgb(255,0,0)],
+                    11: [System.Drawing.Color.FromArgb(204,0,71), System.Drawing.Color.FromArgb(255,182,71), System.Drawing.Color.FromArgb(206,255,115), System.Drawing.Color.FromArgb(26,180, 214),System.Drawing.Color.FromArgb(0,0,207)],
+                    12: [System.Drawing.Color.FromArgb(255, 51, 51), System.Drawing.Color.FromArgb(255, 170, 51), System.Drawing.Color.FromArgb(255, 255, 51), System.Drawing.Color.FromArgb(170, 255, 125), System.Drawing.Color.FromArgb(51, 255, 231), System.Drawing.Color.FromArgb(51, 170, 255), System.Drawing.Color.FromArgb(51,51, 255)]}
+            
+            return gradientLibrary[gradientIndex]
+        
+        
+        colorsList = gradientColor(gradientIndex)
+        return colorsList
 
 
 

@@ -11,6 +11,7 @@
     Output:
         brick:  mesh representing the brick.
         stressValue: values of stress acting on the brick nodes.
+        stressRange:
         """
 
 import Rhino.Geometry as rg
@@ -160,8 +161,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
         elif  len(item[0])  == 'FourNodeTetrahedron':
              TetraTag.append([item[0], 24])
 
-    #ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
-    ghFilePath = ghenv.LocalScope.ghdoc.Path
+    ghFilePath = self.Attributes.Owner.OnPingDocument().FilePath
     workingDirectory = os.path.dirname(ghFilePath)
     outputFileBrick = os.path.join(workingDirectory, 'assembleData\\tensionBrick.out' )
     #outputFileTetra = os.path.join(workingDirectory, 'assembleData\\tensionTetra.out' )
@@ -199,7 +199,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
             tensionDic.append([ eleTag[0], tensionView ])
     """
     stressDict = dict( tensionDic )
-    stressValue =  stressDict.values() 
+    stressValue = stressDict.values() 
     #print( stressDict.get(2))
     #print( stressDict )
     #print( tensionList[0], tensionList[8], tensionList[16], tensionList[24] )
@@ -213,7 +213,7 @@ def brickStressView( AlpacaStaticOutput, stressView ):
         
     maxValue = max( maxValue )
     minValue = min( minValue )
-    domainValues = [minValue, maxValue ] 
+    stressRange = [minValue, maxValue ] 
     #print( maxValue, minValue )
 
 
@@ -237,8 +237,9 @@ def brickStressView( AlpacaStaticOutput, stressView ):
             jetColor = gradient(value[j], minValue, maxValue, colorList )
             brickColor.VertexColors.Add( jetColor )
         modelStress.append( brickColor)
-
-    return modelStress, stressValue, domainValues
+    
+    stressValue = th.list_to_tree(stressValue)
+    return modelStress, stressValue, stressRange
 
 checkData = True
 
@@ -254,4 +255,4 @@ if stressView is None :
 
 
 if checkData != False:
-    brick, stressValue, domainValues = brickStressView( AlpacaStaticOutput, stressView )
+    brick, stressValue, stressRange = brickStressView( AlpacaStaticOutput, stressView )
