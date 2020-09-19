@@ -10087,7 +10087,7 @@ class BeamForcesDiagram(component):
             diagram = cdsView( AlpacaStaticOutput, SectionForces, scale  )
             return diagram
 
-#8|Visualisation
+#8|Utility
 
 class GradientLibrary(component):
     def __new__(cls):
@@ -10133,7 +10133,6 @@ class GradientLibrary(component):
     
     def RunScript(self, gradientIndex):
         
-        import Grasshopper.Kernel as gh
         import System
         
         
@@ -10159,6 +10158,163 @@ class GradientLibrary(component):
         
         colorsList = gradientColor(gradientIndex)
         return colorsList
+
+class MeshSeriesToBrick(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Mesh Series to Brick (Alpaca4d)", "Mesh Series to Brick", """Generate a Brick element from a list of mesh . The faces of the mesh[i] will be connected with the faces of the mesh[i+1] generating a brick element. Each mesh in the list must have the same number of faces""", "Alpaca", "8|Utility")
+        return instance
+    
+    def get_ComponentGuid(self):
+        return System.Guid("96551dd4-3eef-43ab-9df7-a1341541e942")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_Mesh()
+        self.SetUpParam(p, "MeshSeries", "MeshSeries", "quadMesh list with the same number of faces .")
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
+        self.Params.Input.Add(p)
+        
+    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "Brick", "Brick", "Script output Brick.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        p0 = self.marshal.GetInput(DA, 0)
+        result = self.RunScript(p0)
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAQ8SURBVEhLYxgFQwOkp6frB/gGxNtY2vR7e/rlQ4UpAyBDtdW112vL6p7XFzD+HyQT+b9Uo/5/tVbb/2it5PtZsVn+UKXkAXNz81ohbqGZ7mJeq0s16v6vtd7z/4Djhf8HnS7+32F/4n+f4az/iaap+wtzCvWhWkgDenp68w0EDGrrtBrq4xWS5kXKxbwCGboTaDjIEhDebHvof4NO9/9kx4z5xcXF8lCtRIPzifIpk6cZTbtXpV51LlYm7oUJv9n1INmYt3NMV/7f63AWbtEKy23/c1RL/ycEJBEXP2lpaayMDIyvSjUqZvTo9T6Ml0+4Eicf/9lMyPwyBzPHbGUutUOpSrn/JxjO+d+pP/V/mnLefxsRp/8yAorvWRhZ/peXl/NDjcIOmlN8FVlYuB45KCZ0OcuEPxDjUH7Ly630R5pX72OwTPBNXX7dLUwMTAVczFy3FTgVr4ZKh06t1qxt6tTpDGBlZX0CciDUKFSwv96e5WGmnGCXq2iCKCfnJ15+3f+yyun/dc3m/Td3OvTfzGHffxXthv8WMsGPeFh4aoFanpSqltYsNV+6c5nZst15ynkT1dXV10NMQwP/6xmYnhapiZxNkTMutODf0mArvD3TWm+rmU7qKxO77f8dfB7+d/J79t/R9/F/E7tt/8Xkwl6zsfJ+mW00u2Ox+ZJHQAs67ITtVtjZ2WVBjUQFZ9KMWR/kyCkeSZKLbrYXeboqRP5yR2DgvWq/pLvx5i6flTQr/1s4Hfnv6PPov4XzMaBP6v9LyoX/15WL/NphMOkE0AJvUXbRa6D8AzUSFYCC5262otquaOmCPlfhr0cSpZ/viDX9Ojki/meJR9zfJv+Iq87GcVfV9Nr/65jM+i+vmv9fUb34v4pW3X9hMaf/piL2u4Dh/yA0NJQZaiQq+M/AwPigQE5yeZBEdY2NwPdFvqJvqyyF/uRZCP2LMxD6l2Cq/z3NtfCit239KjUlvwPsnNL/OdjF36uqOy9yc04NdjKzzsYZ/jBwv16eY0GApJuWGMtjS1nO/60uov8Ppsj/f16p9v9Bqer/2QGS/xPsfa9FWAXVS/NzXmsMynZP8Z4QGOM1PcFIyWijr69vPNQo3GBnjB738mAp52JLgV2TvCX+P61Q+/+/QxuM/7Rq/T+cqvA/3pD3c7gu/9Yj6Xb9qxOCQbhKS4T/NTD8taDG4AczfSS58s15zQvNBcvLbIQu70qU+/+9SfP/v3at/8B0+b/VVey/hyrP/y434RdP8pWXXkiTn2ypwHMfqp04YG/PwBKhwy1eZi2oXWsv3NDsIvT5Sr7y/8u5yv/bgBbM9Jf8vzxM+n+eBd/HbBOBM4a6GqugWkkD9fX1TDuL9bj3RinIT/YUnROlx/ffWo7zv4EE+39zafb3JnK8F5NslJtwJk9iASiVgfLK7HhzY1BqcXd3zydY5gwDwMAAABlyp//WShWTAAAAAElFTkSuQmCC"
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, MeshSeries):
+        
+        import Rhino.Geometry as rg
+        import Grasshopper as gh
+        
+        def MeshToShell(Mesh):
+            
+            Mesh.Unweld(0, True)
+            mesh = Mesh.ExplodeAtUnweldedEdges()
+            #print( len(mesh) )
+            newMesh = []
+            elementType = []
+            for explodedMesh in mesh:
+                newMesh.append(explodedMesh)
+            return newMesh 
+        
+        def brick( MeshList ):
+            meshExpl = []
+            Vertix = []
+            elementType = []
+            solid = []
+            a = rg.Mesh.DuplicateMesh( MeshList[0] ) #.Unweld(0, True)
+            a.Unweld(0, True)
+            b = a.ExplodeAtUnweldedEdges()
+            if len( b ) > 0 :
+                for Mesh in MeshList:
+                    shellWrapper = MeshToShell(Mesh)
+                    meshExpl.append( shellWrapper )
+                for index1 in range(0, len(MeshList)-1):
+                    for index2 in range(0, len(meshExpl[0])):
+                        if meshExpl[ index1 ][ index2 ].Vertices.Count == 4:
+                            
+                            elementType.append("stdBrick")
+                            vertix1 = meshExpl[ index1 ][ index2 ].Vertices[0]
+                            vertix2 = meshExpl[ index1 ][ index2 ].Vertices[1]
+                            vertix3 = meshExpl[ index1 ][ index2 ].Vertices[2]
+                            vertix4 = meshExpl[ index1 ][ index2 ].Vertices[3]
+                            vertix5 = meshExpl[index1 + 1 ][ index2].Vertices[0]
+                            vertix6 = meshExpl[index1 + 1 ][ index2].Vertices[1]
+                            vertix7 = meshExpl[index1 + 1 ][ index2].Vertices[2]
+                            vertix8 = meshExpl[index1 + 1 ][ index2].Vertices[3]
+                            
+                            vertix = [ vertix1, vertix2, vertix3, vertix4,
+                            vertix5, vertix6, vertix7, vertix8 ]
+                            
+                            ele = rg.Mesh()
+                            
+                            ele.Vertices.Add( vertix1 ) # 0 
+                            ele.Vertices.Add( vertix2 ) # 1
+                            ele.Vertices.Add( vertix3 ) # 2
+                            ele.Vertices.Add( vertix4 ) # 3
+                            ele.Vertices.Add( vertix5 ) # 4
+                            ele.Vertices.Add( vertix6 ) # 5
+                            ele.Vertices.Add( vertix7 ) # 6
+                            ele.Vertices.Add( vertix8 ) # 7
+                            
+                            ele.Faces.AddFace(0, 1, 2, 3) # 0
+                            ele.Faces.AddFace(4, 5, 6, 7) # 1
+                            ele.Faces.AddFace(0, 1, 5, 4) # 2
+                            ele.Faces.AddFace(3, 2, 6, 7) # 3
+                            ele.Faces.AddFace(1, 5, 6, 2) # 4
+                            ele.Faces.AddFace(0, 4, 7, 3) # 5
+                        solid.append(ele)
+                        #ele.IsClosed()
+                            
+            else:
+                for index1 in range(0, len(MeshList)-1):
+                    elementType.append("stdBrick")
+                    vertix1 = MeshList[ index1 ].Vertices[0]
+                    vertix2 = MeshList[ index1 ].Vertices[1]
+                    vertix3 = MeshList[ index1 ].Vertices[2]
+                    vertix4 = MeshList[ index1 ].Vertices[3]
+                    vertix5 = MeshList[index1 + 1 ].Vertices[0]
+                    vertix6 = MeshList[index1 + 1 ].Vertices[1]
+                    vertix7 = MeshList[index1 + 1 ].Vertices[2]
+                    vertix8 = MeshList[index1 + 1 ].Vertices[3]
+                    
+                    vertix = [ vertix1, vertix2, vertix3, vertix4,
+                    vertix5, vertix6, vertix7, vertix8 ]
+                    
+                    ele = rg.Mesh()
+                    
+                    ele.Vertices.Add( vertix1 ) # 0 
+                    ele.Vertices.Add( vertix2 ) # 1
+                    ele.Vertices.Add( vertix3 ) # 2
+                    ele.Vertices.Add( vertix4 ) # 3
+                    ele.Vertices.Add( vertix5 ) # 4
+                    ele.Vertices.Add( vertix6 ) # 5
+                    ele.Vertices.Add( vertix7 ) # 6
+                    ele.Vertices.Add( vertix8 ) # 7
+                    
+                    ele.Faces.AddFace(0, 1, 2, 3) # 0
+                    ele.Faces.AddFace(4, 5, 6, 7) # 1
+                    ele.Faces.AddFace(0, 1, 5, 4) # 2
+                    ele.Faces.AddFace(3, 2, 6, 7) # 3
+                    ele.Faces.AddFace(1, 5, 6, 2) # 4
+                    ele.Faces.AddFace(0, 4, 7, 3) # 5
+                    
+                    solid.append(ele)
+            return solid
+        
+        checkData = True
+        
+        if not MeshSeries or len(MeshSeries) == 1 :  #is not None:
+            checkData = False
+            msg = "input 'MeshSeries' failed to collect data"
+            self.AddRuntimeMessage( gh.Kernel.GH_RuntimeMessageLevel.Warning, msg )
+
+        if len(MeshSeries) == 1 :
+            checkData = False
+            msg = "Provide at least 2 meshes"
+            self.AddRuntimeMessage( gh.Kernel.GH_RuntimeMessageLevel.Warning, msg )
+            
+        if checkData != False:
+            Brick= brick(MeshSeries)
+            return Brick
 
 
 
