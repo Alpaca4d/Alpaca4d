@@ -618,7 +618,7 @@ class VisualiseModellll(component):
             #--------------------------------#
             
             
-            lineModel = th.list_to_tree( [ line, colorLine ]  )
+            #lineModel = th.list_to_tree( [ line, colorLine ]  )
             
             #######
             ####### LocalAxis
@@ -747,7 +747,12 @@ class VisualiseModellll(component):
                 massPos.append(pointWrapperDict.get( index  , "never"))
                 massValue.append(mass[1][0]/scaleMass)
             
-            Mass = th.list_to_tree( [ massPos , massValue ] )
+            MassSphere = [] 
+            for center,diameter in zip( massPos, massValue ) :
+                Sphere = rg.Sphere( center, diameter/2 ) 
+                MassSphere.append( rg.Brep.CreateFromSphere( Sphere ) )
+            #Rhino.Geometry.Brep.CreateFromSphere( 
+            #print( MassSphere[0] )
             
             #######
             #######Support
@@ -910,7 +915,13 @@ class VisualiseModellll(component):
                 self.supportBrep = []
                 self.material = []
                 
-            
+            if Mass == True:
+                self.MassSphere = MassSphere
+                self.materialMass = rc.Display.DisplayMaterial(System.Drawing.Color.Violet, 0.0)
+            else:
+                self.MassSphere = []
+                self.materialMass = []
+                
             if Model == True:
                 return AlpacaModel, ModelView
             else:
@@ -950,3 +961,6 @@ class VisualiseModellll(component):
             
         for brep in self.supportBrep:
             arg.Display.DrawBrepShaded(brep,self.material)
+            
+        for brep2 in self.MassSphere:
+            arg.Display.DrawBrepShaded(brep2,self.materialMass)
