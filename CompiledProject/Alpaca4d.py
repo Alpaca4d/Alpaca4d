@@ -2180,20 +2180,6 @@ class DisassembleModel(component):
         
         def AddIFromCenter(plane, Bsup, tsup, Binf, tinf, H, ta, yg):
             #-------------------1---------2 #
-            '''
-            p1 = plane.PointAt(ta/2, -(yg - tinf) )
-            p2 = plane.PointAt( Binf/2,  -(yg - tinf) )
-            p3 = plane.PointAt( Binf/2,  -yg )
-            p4 = plane.PointAt( -Binf/2,  -yg )
-            p5 = plane.PointAt( -Binf/2, -(yg - tinf) ) 
-            p6 = plane.PointAt( -ta/2,  -(yg - tinf) )
-            p7 = plane.PointAt( -ta/2,  (H - yg - tsup))
-            p8 = plane.PointAt( -Bsup/2,  (H - yg - tsup) )
-            p9 = plane.PointAt( -Bsup/2,  (H - yg ) )
-            p10 = plane.PointAt( Bsup/2,  (H - yg ) )
-            p11 = plane.PointAt( Bsup/2,  (H - yg - tsup) )
-            p12 = plane.PointAt( ta/2,  (H - yg - tsup) )
-            '''
             p1 = plane.PointAt( -(yg - tinf), ta/2 )
             p2 = plane.PointAt( -(yg - tinf), Binf/2 )
             p3 = plane.PointAt( -yg, Binf/2 )
@@ -10106,7 +10092,7 @@ class BeamForcesDiagram(component):
 class GradientLibrary(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "GradientLibrary (Alpaca4d)", "GradientLibrary", """Preset of gradient colors perfect for Data Visualisation. The script comes from Ladybug and it has been "reshape" for our plug-in""", "Alpaca", "8|Visualisation")
+            "GradientLibrary (Alpaca4d)", "GradientLibrary", """Preset of gradient colors perfect for Data Visualisation. The script comes from Ladybug and it has been "reshape" for our plug-in""", "Alpaca", "8|Utility")
         return instance
     
     def get_ComponentGuid(self):
@@ -10140,8 +10126,9 @@ class GradientLibrary(component):
             self.marshal.SetOutput(result, DA, 0, True)
         
     def get_Internal_Icon_24x24(self):
-        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAQMSURBVEhLlZVdTFtlGMf/1YJwiBGhJGIMjphNYxYVmswPWrqL3blkhsV44RaniXqzZA4oczFLZZNQaO0ik7IySOjChUuMFzNaoy5OobBIvRgyJmYqcXbAAcYkHigf8vg8pz2lLWXBh/ySty/v+f3f93mbU9ytLkagBH9Ezb934FudQ5j+RkSQsczFRlFDvCaxfOuliwfgPD8IlaF5FcTiNNZmQEujoNgI1Ng1OLcc1HMF1p5BjIvYYOyPuHTlNiaZGRmvRuMBSX7G2PJ1WBOa7PXO57Cf74eWlPO4J4yOgWE4EITtswGMLH/HuGFb+Q17uEUdC6PQjBAZL4dgT+jSy9IDa1E3tIYv4vLgIELBPpTd14ny/G70VgXjrVqbAi22gbRW9C56UL54Hdu4TZclIBYC/eOFpnkzTlIagGI5i/GSbpDQcBEB/lMKukwfKF3QGPr2p/X+r1zhEG9cttiKJuK1LA/InD7fgjFypdxJSSechry4C1/d340DBZ2YELFw8BPQ8u2UC+Zx7FxcptOCWwtevBrz4LIxt/AhnLpcdl/UCVXk0iKlE98bYoPhX9blBqsjKQHr9OunkrEHqpwMJQHsN3ZvOYcODhhKlTd/uVFusPRpRoAHQ7xzv/FZ86AGOHPNd+/HfVRwtpse6Di1OzPg9xtPZpULq7+aNgTMH4dj/m3Q3Iug6Ur4JCDMkA5XakCO6xA59p2m8KU3aS1Vfod7/HUOTe/Op/kj5rQAccxWgAQOCHPASCQRMJkWEHiITHtOE6ztOkfqWunG1Zdo6aqZZg7n0xTiqE/k00JLesBMBSb1kKcR2TQgp/ZoUp6KmhCnMncoJ/MEqQEbW5Tf5iDT82e2HDBVmEdaI99HZouekhZ9NOyDO0Ko+4bw+gWHBJjfOJFVLmQNYGb35eoB6iNmx8xjZprdaaJZ/ZIr2muSgoo2f27jy0Opwkw2CxDmj94zpELxTyOPBJ7jr6k1oPCDqi54pk17eJe3f/vjLbQZl7B3U4bLnutjsRYPyFWjKE28LirbnOu79IdsqD/wApwTdn7NbwVZK8+opryQsXsm/qrQS05R2T6WDNnRGtgLl1KF+iY7arVs0jjyv/omK6+dwMGAIec2jkf5+5KwJ6rSb5UWYYeXYDlJKG4MofDUo3YcLufd9WbKZW4X6sqjcJeNwx26CTdN4DUJ4BYpm/zwbPfZ8eBJTQ8QZFzk8m8rbHRUw2m3o25EqMIx2w9ocvyJ5g6WayIXZBzFK9l/cJJlabayeCwZwuwseM/Y9STzl4wvwKVLDThs/Bb42S1VqUtB8ftO3r0qAc+a301rj3AMx41dqyx3RvkeEk//jyp9S0HRif12NPhsqB1gcUSoRn24muduoqnm7mLgP41Vq5Rc/Gb5AAAAAElFTkSuQmCC"
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAPaSURBVEhLhZVtTFNXGMefc2kpQgcFIcuyhaaoQ2OYr9myD8OhbhqTfUGXbJg5JOJALa3yojNsRDep6OLc4owTSoAlW2UywbBoG9vb2mxh+4SKS2YEkU2dlAaLKJrel91z6b2e+4I8yS+5L7m//znPObkHZqpwGDKDQSgLd1PBUbCNC3AKkqyxUWTrHjNayxp4oBKfzV48DwiLBcYFeMxwwUusJoAgQlmv3jfbNiUUM1fv9Ki7JbHEwGbLcwMkomm5h/AAEzpl9YYzMmkaetRyzB8nkhk9oR6xFXM92hCeR77LxhN6coFhOkTV9jsy91yrNN96/Fb6tcl1GaWRFGv1KGUbJuUTS7M4rgp4Zi84FCEXQ8kbdcQPAkGo9vtNq/0BdD7cS/Ej81/mIiarKGGd6GS/F9Ii5tw6Ui6zD94U5UJbLHQQDavk4/4gVUbT6Bt8jZ8NlFrkkT58wyLLmDrYNflu+nqFXCDuhOviLPw0tZUQi/hD1FVBflu6D52juHtmqxyAZ8GUGmQZUwUDbA30kAEiB2ExdFywdpJyAXl7SlwvydQscmxRjrIlAowT/iHvWTu0A7jYIXPT/ccbmr+b+vzMholLoaRvSTneQf+lWHW3qWIWDnjI7IH9ZACzC8YBGlmGpKAlsIYMWPV9a2zfyoNRUnwHXuV+hyLut0WFz2R2mIg7oJgMwGgCVrd6lkvyxq61T6TneY4bU27b1thfsJLrhI/4ZtgpEvkwWw7gamDerAElZ115WN7rt/ALjvdNqd9LYomf0rdMB1TB3ae1sHzWgCWngkU4wP6jg1O/w6gDMH+/sxAv8J14DazVC4gqJEeZ3Xj0eOEVzxPoBbSbtuEZ/NuSVHHAN28dc6XwNXa0JJsTFvkKQBPbppJE3293aVojoReACS8ufNCCKoaaoTIu4cn44EthmzKlGtEn0QDK7xsEW19cTXbqOQ2vzOmiP6U+6yflmDbjthXijw4Os4PqkOQjTzYaXvA5weyNz0iqN0Kl+RwuqrrWjSomSLkbVfYIv4rEQdQUL1IHYJCL/do+325CaT43KUap3rGUVF9NselkXjOyHz8NlTFSLtyPtRm2vD4tl8rFtuqFiNQ/ajVk9Tip9ItBZPbeNGb/XO5GVV+0wA5FzyU6DB/vFFqjPROEVv2iG1A+wsCLHgX1hr2P9ORuZD/UAA36Z7T4ez3MHtMErPpTE/Ce+ahCjNvippzbZ5Qr6quny6CRuSkHLPhVE5Cb1THyLGCH/4fk+nzhS/3zWF3yceeKvw37J4+hnDO0IiDHM4ZyOgNHkuoOnDY6lvKafksF8D+k5C+TSPNSMgAAAABJRU5ErkJggg=="
         return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
 
     
     def RunScript(self, gradientIndex):
@@ -10149,7 +10136,6 @@ class GradientLibrary(component):
         import Grasshopper.Kernel as gh
         import System
         
-        gradientIndex = 11 if gradientIndex is None else gradientIndex
         
         def gradientColor(gradientIndex):
             
