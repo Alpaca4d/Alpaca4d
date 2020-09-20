@@ -5358,14 +5358,14 @@ class BrickStress(component):
 class VisualiseModel(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
-            "Visualise Model (Alpaca4d)", "Visualise Model", """Generate Model view """, "Alpaca", "7|Visualisation")
+            "Visualise Model (Alpaca4d)", "VisualiseModel", """Generate Model view """, "Alpaca", "7|Visualisation")
         return instance
 
     def get_Exposure(self): #override Exposure property
         return Grasshopper.Kernel.GH_Exposure.quarternary
 
     def get_ComponentGuid(self):
-        return System.Guid("ff420cf3-828f-45ea-ad20-93458d7f5cd6")
+        return System.Guid("1a7e945a-bc68-485f-ab86-68ca19bb6b65")
     
     def SetUpParam(self, p, name, nickname, description):
         p.Name = name
@@ -5421,7 +5421,7 @@ class VisualiseModel(component):
         self.Params.Output.Add(p)
         
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "Model", "Model", "Geometric Model")
+        self.SetUpParam(p, "Model", "Model", "Stick or ExtrudedModel.")
         self.Params.Output.Add(p)
         
     
@@ -5459,33 +5459,30 @@ class VisualiseModel(component):
         import Rhino as rc
         import System.Drawing.Color
         import scriptcontext as sc
-
-
+        
+        
         self.line = []
         self.colorLine = []
-
-
+        
         self.ancorPoint = []
         self.forceDisplay = []
-
-
+        
         self.posTag = []
         self.nodeTag = []
-
-
+        
         self.posEleTag = []
         self.eleTag = []
-
-
+        
         self.supportBrep = []
         self.material = []
-
-
+        
+        self.MassSphere = []
+        self.materialMass = []
+        
         self.midPoint = []
         self.v1Display = []
         self.v2Display = []
         self.v3Display = []
-        
         
         def VisualiseModel(AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
@@ -5623,7 +5620,7 @@ class VisualiseModel(component):
                 eleTag = ele[1]
                 eleNodeTag = ele[2]
                 color = ele[5]
-                ##print( eleNodeTag )
+                #print( eleNodeTag )
                 index1 = eleNodeTag[0]
                 index2 = eleNodeTag[1]
                 index3 = eleNodeTag[2]
@@ -5642,7 +5639,7 @@ class VisualiseModel(component):
                 point6 =  node.get( index6 -1 , "never")
                 point7 =  node.get( index7 -1 , "never")
                 point8 =  node.get( index8 -1 , "never")
-                ##print( type(pointDef1) ) 
+                #print( type(pointDef1) ) 
                 shellDefModel = rg.Mesh()
                 shellDefModel.Vertices.Add( point1 ) #0
                 shellDefModel.Vertices.Add( point2 ) #1
@@ -5669,7 +5666,7 @@ class VisualiseModel(component):
                 eleTag = ele[1]
                 eleNodeTag = ele[2]
                 color = ele[5]
-                ##print( eleNodeTag )
+                #print( eleNodeTag )
                 index1 = eleNodeTag[0]
                 index2 = eleNodeTag[1]
                 index3 = eleNodeTag[2]
@@ -5681,7 +5678,7 @@ class VisualiseModel(component):
                 point3 =  node.get( index3 -1 , "never")
                 point4 =  node.get( index4 -1 , "never")
                 
-                ##print( type(pointDef1) )
+                #print( type(pointDef1) )
                 
                 shellDefModel = rg.Mesh()
                 shellDefModel.Vertices.Add( point1 ) #0
@@ -5750,7 +5747,7 @@ class VisualiseModel(component):
                         radius  = dimSection[1]
                         section = AddCircleFromCenter( sectionPlane, radius )
                         sectionForm.append( section )
-                    ##print(sectionForm)
+                    #print(sectionForm)
             
                 colour = rs.CreateColor( color[0], color[1], color[2] )
             
@@ -5829,13 +5826,13 @@ class VisualiseModel(component):
                 return [ line, meshExtr, colour ]
             
             def meshLoft3( point, color ):
-                ##print( point )
+                #print( point )
                 meshEle = rg.Mesh()
                 pointSection1 = point
                 for i in range(0,len(pointSection1)):
                     for j in range(0, len(pointSection1[0])):
                         vertix = pointSection1[i][j]
-                        ##print( type(vertix) )
+                        #print( type(vertix) )
                         meshEle.Vertices.Add( vertix ) 
                         #meshEle.VertexColors.Add( color[0],color[1],color[2] );
                 k = len(pointSection1[0])
@@ -5974,6 +5971,15 @@ class VisualiseModel(component):
             posTag = [row[1] for row in pointWrapper ]
             nodeTag = [row[0] for row in pointWrapper ]
             
+            """
+            if NodeTag:
+                self.posTag = posTag
+                self.nodeTag = nodeTag
+                cameraX = sc.doc.Views.ActiveView.ActiveViewport.CameraX
+                cameraY = sc.doc.Views.ActiveView.ActiveViewport.CameraY
+                for pos, index in zip(posTag, nodeTag):
+                    cd.AddText( rc.Display.Text3d( str(index) , rc.Geometry.Plane(pos, cameraX, cameraY) , 0.3 )    ,  System.Drawing.Color.Black)
+            """
             
             model = []
             extrudedModel = []
@@ -6001,7 +6007,7 @@ class VisualiseModel(component):
                     centroid = calcPropSection.Centroid
                     posEleTag.append( centroid )
                 elif nNode == 3:
-                    ##print( nNode )
+                    #print( nNode )
                     shellModel = ShellTriangle( ele, pointWrapperDict )
                     calcPropSection = rg.AreaMassProperties.Compute( shellModel[0], False, True, False, False )
                     centroid = calcPropSection.Centroid
@@ -6024,7 +6030,7 @@ class VisualiseModel(component):
                     centroid = calcPropSection.Centroid
                     posEleTag.append( centroid )
                 elif  eleType == 'FourNodeTetrahedron' :
-                    ##print(ele)
+                    #print(ele)
                     solidModel = TetraSolid( ele, pointWrapperDict )
                     calcPropSection = rg.AreaMassProperties.Compute( solidModel, False, True, False, False )
                     centroid = calcPropSection.Centroid
@@ -6062,7 +6068,7 @@ class VisualiseModel(component):
             #--------------------------------#
             
             
-            lineModel = th.list_to_tree( [ line, colorLine ]  )
+            #lineModel = th.list_to_tree( [ line, colorLine ]  )
             
             #######
             ####### LocalAxis
@@ -6103,17 +6109,13 @@ class VisualiseModel(component):
                 self.v1Display = v1Display
                 self.v2Display = v2Display
                 self.v3Display = v3Display
-            else:
-                self.midPoint = []
-                self.v1Display = []
-                self.v2Display = []
-                self.v3Display = []
             
             #######
             ####### Force
             #######
             
             forceMax = []
+            
             for force in openSeesNodeLoad :
                 forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
                 fmax = max( forceVector.X, forceVector.Y, forceVector.Z )
@@ -6127,16 +6129,18 @@ class VisualiseModel(component):
                 fmin = min( forceVector.X, forceVector.Y, forceVector.Z )
                 forceMax.append( max( [ fmax, mt.fabs(fmin) ] ) )
             
-            ##print( forceMax )
-            forceMin = min( forceMax )
-            
-            
+            #print( forceMax )
+            #print(  forceMax )
+            if  forceMax:
+                forceMin = min( forceMax )
             #scale = forceMax*0.1/coordMax 
-            if forceMin > 0 :
-                scale = 1/forceMin 
-            else :
-                scale = 0.2
+                if forceMin > 0 :
+                    scale = 1/forceMin 
+                else :
+                    scale = 0.1
             
+            
+
             forceDisplay = []
             ancorPoint = []
             
@@ -6146,6 +6150,8 @@ class VisualiseModel(component):
                 forceVector =  rg.Vector3d( force[1][0], force[1][1] , force[1][2]  )
                 ancorPoint.append( pos )
                 forceDisplay.append(  forceVector*scale  )
+                #print(ancorPoint)
+                #print(forceDisplay)
                 
             for linearLoad in openSeesBeamLoad :
                 tag =  linearLoad[0]
@@ -6186,7 +6192,12 @@ class VisualiseModel(component):
                 massPos.append(pointWrapperDict.get( index  , "never"))
                 massValue.append(mass[1][0]/scaleMass)
             
-            Mass = th.list_to_tree( [ massPos , massValue ] )
+            MassSphere = [] 
+            for center,diameter in zip( massPos, massValue ) :
+                Sphere = rg.Sphere( center, diameter/2 ) 
+                MassSphere.append( rg.Brep.CreateFromSphere( Sphere ) )
+            #Rhino.Geometry.Brep.CreateFromSphere( 
+            #print( MassSphere[0] )
             
             #######
             #######Support
@@ -6317,39 +6328,27 @@ class VisualiseModel(component):
             if Model == True:
                 self.line = line
                 self.colorLine = colorLine
-            else:
-                self.line = []
-                self.colorLine = []
 
             if Load == True:
                 self.ancorPoint = ancorPoint
                 self.forceDisplay = forceDisplay
-            else:
-                self.ancorPoint = []
-                self.forceDisplay = []
 
             if NodeTag == True:
                 self.posTag = posTag
                 self.nodeTag = nodeTag
-            else:
-                self.posTag = []
-                self.nodeTag = []
 
             if ElementTag == True:
                 self.posEleTag = posEleTag
                 self.eleTag = eleTag
-            else:
-                self.posEleTag = []
-                self.eleTag = []
 
             if Support == True:
                 self.supportBrep = supportBrep
                 self.material = rc.Display.DisplayMaterial(System.Drawing.Color.Cyan, 0.0)
-            else:
-                self.supportBrep = []
-                self.material = []
                 
-            
+            if Mass == True:
+                self.MassSphere = MassSphere
+                self.materialMass = rc.Display.DisplayMaterial(System.Drawing.Color.Violet, 0.0)
+                
             if Model == True:
                 return AlpacaModel, ModelView
             else:
@@ -6389,6 +6388,9 @@ class VisualiseModel(component):
             
         for brep in self.supportBrep:
             arg.Display.DrawBrepShaded(brep,self.material)
+            
+        for brep2 in self.MassSphere:
+            arg.Display.DrawBrepShaded(brep2,self.materialMass)
 
 
 
@@ -6595,9 +6597,9 @@ class StaticModelView(component):
             ## CREO IL MODELLO DEFORMATO  ##
             
             pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
-            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
-            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl3*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl4*scaleDef )
 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
@@ -7644,9 +7646,9 @@ class ModalModelView(component):
             ## CREO IL MODELLO DEFORMATO  ##
             
             pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
-            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
-            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl3*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl4*scaleDef )
 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
@@ -8713,9 +8715,9 @@ class GroundMotionModelView(component):
             ## CREO IL MODELLO DEFORMATO  ##
             
             pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
-            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
-            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl3*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl4*scaleDef )
 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0

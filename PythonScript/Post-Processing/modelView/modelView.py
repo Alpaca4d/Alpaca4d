@@ -10,7 +10,8 @@
         NodeTag: True: Visualise the NodeTag. Default is False
         ElementTag: True: Visualise the ElementTag. Default is False
     Output:
-        out:
+        AlpacaModel: Output of Assemble Model.
+        Model: Stick or ExtrudedModel.
 """
 
 from ghpythonlib.componentbase import executingcomponent as component
@@ -19,7 +20,7 @@ import System
 import Rhino
 import rhinoscriptsyntax as rs
 
-class VisualiseModellll(component):
+class VisualiseModel(component):
     
     def RunScript(self, AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
@@ -33,6 +34,29 @@ class VisualiseModellll(component):
         import System.Drawing.Color
         import scriptcontext as sc
         
+        
+        self.line = []
+        self.colorLine = []
+        
+        self.ancorPoint = []
+        self.forceDisplay = []
+        
+        self.posTag = []
+        self.nodeTag = []
+        
+        self.posEleTag = []
+        self.eleTag = []
+        
+        self.supportBrep = []
+        self.material = []
+        
+        self.MassSphere = []
+        self.materialMass = []
+        
+        self.midPoint = []
+        self.v1Display = []
+        self.v2Display = []
+        self.v3Display = []
         
         def VisualiseModel(AlpacaModel, Model, Support, Mass, LocalAxis, Load, NodeTag, ElementTag):
         
@@ -659,11 +683,6 @@ class VisualiseModellll(component):
                 self.v1Display = v1Display
                 self.v2Display = v2Display
                 self.v3Display = v3Display
-            else:
-                self.midPoint = []
-                self.v1Display = []
-                self.v2Display = []
-                self.v3Display = []
             
             #######
             ####### Force
@@ -883,44 +902,26 @@ class VisualiseModellll(component):
             if Model == True:
                 self.line = line
                 self.colorLine = colorLine
-            else:
-                self.line = []
-                self.colorLine = []
 
             if Load == True:
                 self.ancorPoint = ancorPoint
                 self.forceDisplay = forceDisplay
-            else:
-                self.ancorPoint = []
-                self.forceDisplay = []
 
             if NodeTag == True:
                 self.posTag = posTag
                 self.nodeTag = nodeTag
-            else:
-                self.posTag = []
-                self.nodeTag = []
 
             if ElementTag == True:
                 self.posEleTag = posEleTag
                 self.eleTag = eleTag
-            else:
-                self.posEleTag = []
-                self.eleTag = []
 
             if Support == True:
                 self.supportBrep = supportBrep
                 self.material = rc.Display.DisplayMaterial(System.Drawing.Color.Cyan, 0.0)
-            else:
-                self.supportBrep = []
-                self.material = []
                 
             if Mass == True:
                 self.MassSphere = MassSphere
                 self.materialMass = rc.Display.DisplayMaterial(System.Drawing.Color.Violet, 0.0)
-            else:
-                self.MassSphere = []
-                self.materialMass = []
                 
             if Model == True:
                 return AlpacaModel, ModelView
