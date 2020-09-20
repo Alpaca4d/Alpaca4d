@@ -157,9 +157,9 @@ class MyComponent(component):
             ## CREO IL MODELLO DEFORMATO  ##
             
             pointDef1 = rg.Point3d.Add( node.get( index1  , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl1*scaleDef )
-            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl1*scaleDef )
-            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2 , "never"), trasl2*scaleDef )
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl3*scaleDef )
+            pointDef4 = rg.Point3d.Add( node.get( index4  , "never"), trasl4*scaleDef )
 
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
