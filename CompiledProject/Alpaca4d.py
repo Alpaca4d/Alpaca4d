@@ -3503,7 +3503,15 @@ class ReactionForces(component):
         import Grasshopper as gh
         import sys
         
-        
+                
+        self.point = []
+        self.Rx = []
+        self.Ry = []
+        self.Rz = []
+
+        self.Mx = []
+        self.My = []
+        self.Mz = []
         
         #---------------------------------------------------------------------------------------#
         def reaction(AlpacaStaticOutput, scale, reactionForceView = False, reactionMomentsView = False):
