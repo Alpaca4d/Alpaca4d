@@ -298,9 +298,10 @@ if not Support:
     ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
 
 if not Load:
-    msg = "input 'Load' failed to collect data"
-    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+    msg = "no 'Load' assigned to the model"
+    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Remark, msg)
 
 
 if checkData != False:
     AlpacaModel, MassOfStructure = Assemble(Element, Support, Load, Mass)
+

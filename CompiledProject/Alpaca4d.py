@@ -2058,9 +2058,8 @@ class AssembleModel(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
         
         if not Load:
-            checkData = False
-            msg = "input 'Load' failed to collect data"
-            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+            msg = "no 'Load' assigned to the model"
+            self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Remark, msg)
         
         
         if checkData != False:
