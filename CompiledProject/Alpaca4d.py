@@ -1451,6 +1451,58 @@ class Support(component):
 
 # 3|Define Loads
 
+
+class GravityLoad(component):
+    def __new__(cls):
+        instance = Grasshopper.Kernel.GH_Component.__new__(cls,
+            "Gravity Load (Alpaca4d)", "Gravity Load", """Assigni dead load to the structure""", "Alpaca", "3|Load")
+        return instance
+
+    def get_Exposure(self): #override Exposure property
+        return Grasshopper.Kernel.GH_Exposure.primary
+
+    def get_ComponentGuid(self):
+        return System.Guid("5caac70a-56a5-4df8-bee3-359413b97026")
+    
+    def SetUpParam(self, p, name, nickname, description):
+        p.Name = name
+        p.NickName = nickname
+        p.Description = description
+        p.Optional = True
+    
+    def RegisterInputParams(self, pManager):
+        pass    
+    def RegisterOutputParams(self, pManager):
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
+        self.SetUpParam(p, "GravityLoad", "GravityLoad", "Gravity Load element.")
+        self.Params.Output.Add(p)
+        
+    
+    def SolveInstance(self, DA):
+        result = self.RunScript()
+
+        if result is not None:
+            self.marshal.SetOutput(result, DA, 0, True)
+        
+    def get_Internal_Icon_24x24(self):
+        o = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAO8SURBVEhLrVRvaBRXED/wQy0imlpaq7FpdPe9u83l7nbf7t4md8llG6NGjYoxiql/q5hKtUbjnzSlih8iVClpg4gKWsFKNHohVkQighoVheIXUSGoH/otcIiCmhpKnM7sPQ8S0JwkPxh2d2bezJvfzKwvW4TDeRPjEfUHSyjfSdXowhZs57cBDpVhDobBC6V69GAZrC35RQB2qX6whbpKqkcPQqiXuj7TYPcMP5iGukGqRw+WoZ6/+Hm6AlNnK6R6ZIgXFuZYOivHGzfh83Gdn8OyIIcRN9pxtE8sobbELda7YW4QWlfr0LnZgvbvLWheHgHX4WAK1m2aSrU8kj2csDrVFsrfjdUheLinGK40ROGXbyKwclYB1FYUQNOSMJzeaMLFehuWz9QAqbtl20quPP5+0KwLwa4fWmvAnUYHFiT4K6TmsiXYNnzePZEbgNoCpEhXbsZtDi0rdThZZxJlL0yTF8sw74ZpKL/uWRqG6zuiUF7kT1kGny1NPkyS/GtyAOoZNVldTLdGmk5QFeSP9ueWzk3bUOdRzxwn92N5NA3bZvlzitnLR3tjUBnjeCNWKU0ecEz/PIt7sAUT4NItkmpK3LyuMgjXMInQlf/q5gVh4/wgjjJrlS5p0K2qXQ2IHhzD36U6Awx0vG1KADZxpMhQ5ks1ji+fnXD4wNP9JfD8QAn0/1bq9QhpOyhd0kgk8sYSDcJg93U9kCfVGWBv/jiNCTZzokipIl1UZ6G5scC/934ugjetiYz8hIOAzV/jHcwWWNWpc0jRVqRICL6EdOsrQvkxbPbRdQJet5R6wZ9hFeVF7GXWk1VT4xuDt49bunr1Am4yNRlv10C7QnY7omhE36yYH87inrQRPQY75x3OBqbBt9QE+UADBn4wUYNjOKoLCjmU6Iwm54B081mWGsEqu3CEU1hhmVQPDxy57fT/eTquYJAcnRbABOpJ6ZYBVSxfs0MoFBondNZ781MtE/wSUlUaYb24XJx8ysrKktFoFIaK67qdXpDhQCM8J8zg0QQNbk/S4OsIG7QLjuO86evrg/7+/oykUikgvXR5P5Dr/YsX5UMFBq6yVVi75kvvdyHNProtBe3p6QH89J4dHR1eFWmPYYD/oSfJZA60t+cMnDmTA93d46HcVSAa5l+R/W0CfM3Ihyb4hwLfuDHek66uCeAmpr82zRnTyD7yCgyllm7c9OMU2Nc8GRZW5dOIHpFmLwFxTkHfSjKZzL4HBJpzHMu9uESHTVOdqSjKR9JEU3SekgwV13U7/wcgp8lYmZBG+QAAAABJRU5ErkJggg=="
+        return System.Drawing.Bitmap(System.IO.MemoryStream(System.Convert.FromBase64String(o)))
+
+    
+    def RunScript(self, ):
+        
+        import Rhino.Geometry as rg
+        import Grasshopper as gh
+        
+        def DeadLoad():
+        
+            loadType = "DeadLoad"
+        
+            return [[None, None, None, loadType]]
+        
+        GravityLoad = DeadLoad()
+        return GravityLoad
+
 class PointLoad(component):
     def __new__(cls):
         instance = Grasshopper.Kernel.GH_Component.__new__(cls,
@@ -3502,15 +3554,14 @@ class ReactionForces(component):
         import Grasshopper as gh
         import sys
         
-                
-        self.point = []
-        self.Rx = []
-        self.Ry = []
-        self.Rz = []
+        
+        self.vectorRx = []
+        self.vectorRy = []
+        self.vectorRz = []
 
-        self.Mx = []
-        self.My = []
-        self.Mz = []
+        self.vectorMx = []
+        self.vectorMy = []
+        self.vectorMz = []
         
         #---------------------------------------------------------------------------------------#
         def reaction(AlpacaStaticOutput, scale, reactionForceView = False, reactionMomentsView = False):
@@ -3589,15 +3640,33 @@ class ReactionForces(component):
             Mx = [row[4] for row in viewElement ]
             My = [row[5] for row in viewElement ]
             Mz = [row[6] for row in viewElement ]
+
+
+            vectorRx = []
+            vectorRy = []
+            vectorRz = []
+
+            for ancor, forceX, forceY, forceZ in zip(point, Rx, Ry, Rz):
+                vectorRx.append( rg.Line(ancor, forceX) )
+                vectorRy.append( rg.Line(ancor, forceY) )
+                vectorRz.append( rg.Line(ancor, forceZ) )
+
+            vectorMx = []
+            vectorMy = []
+            vectorMz = []
+
+            for ancor, momentX, momentY, momentZ in zip(point, Mx, My, Mz):
+                vectorMx.append( rg.Line(ancor, momentX) )
+                vectorMy.append( rg.Line(ancor, momentY) )
+                vectorMz.append( rg.Line(ancor, momentZ) )
+
             
-            
-            self.point = point if reactionForcesView or reactionMomentsView == True else []
-            self.Rx = Rx if reactionForcesView == True else []
-            self.Ry = Ry if reactionForcesView == True else []
-            self.Rz = Rz if reactionForcesView == True else []
-            self.Mx = Mx if reactionMomentsView == True else []
-            self.My = My if reactionMomentsView == True else []
-            self.Mz = Mz if reactionMomentsView == True else []
+            self.vectorRx = vectorRx if reactionForcesView == True
+            self.vectorRy = vectorRy if reactionForcesView == True
+            self.vectorRz = vectorRz if reactionForcesView == True
+            self.vectorMx = vectorMx if reactionMomentsView == True
+            self.vectorMy = vectorMy if reactionMomentsView == True
+            self.vectorMz = vectorMz if reactionMomentsView == True
             
         
             return tagPoints, ReactionForce, ReactionMoment
@@ -3615,15 +3684,15 @@ class ReactionForces(component):
 
     def DrawViewportWires(self,arg):
         
-        for ancor, forceX, forceY, forceZ in zip(self.point, self.Rx, self.Ry, self.Rz):
-            arg.Display.DrawArrow( rg.Line(ancor, forceX) ,  System.Drawing.Color.Black)
-            arg.Display.DrawArrow( rg.Line(ancor, forceY) ,  System.Drawing.Color.Black)
-            arg.Display.DrawArrow( rg.Line(ancor, forceZ) ,  System.Drawing.Color.Black)
+        for forceX, forceY, forceZ in zip(self.vectorRx, self.vectorRy, self.vectorRz):
+            arg.Display.DrawArrow( forceX ,  System.Drawing.Color.Black)
+            arg.Display.DrawArrow( forceY ,  System.Drawing.Color.Black)
+            arg.Display.DrawArrow( forceZ ,  System.Drawing.Color.Black)
         
-        for ancor, momentX, momentY, momentZ in zip(self.point, self.Mx, self.My, self.Mz):
-            arg.Display.DrawArrow( rg.Line(ancor, momentX) ,  System.Drawing.Color.Red)
-            arg.Display.DrawArrow( rg.Line(ancor, momentY) ,  System.Drawing.Color.Red)
-            arg.Display.DrawArrow( rg.Line(ancor, momentZ) ,  System.Drawing.Color.Red)
+        for momentX, momentY, momentZ in zip(self.vectorMx, self.vectorMy, self.vectorMz):
+            arg.Display.DrawArrow( momentX ,  System.Drawing.Color.Red)
+            arg.Display.DrawArrow( momentY ,  System.Drawing.Color.Red)
+            arg.Display.DrawArrow( momentZ ,  System.Drawing.Color.Red)
 
 
 
