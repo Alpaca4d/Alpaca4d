@@ -2048,6 +2048,67 @@ class AssembleModel(component):
             
             
             openSeesNodeLoad = openSeesNodeLoad
+
+            ### Add this piece for update the load for dead Load
+            DeadLoad = False
+            for typeLoad in Load:
+                if typeLoad[3] == 'DeadLoad':
+                    DeadLoad = True
+            
+            if DeadLoad:
+                
+                pointMassDict = {}
+                
+                for tag,point in enumerate(oPoints):
+                    pointMassDict[tag] = 0
+                
+                
+                
+                for element in Element:
+                    if (element[1] == "ElasticTimoshenkoBeam") or (element[1] == "Truss"):
+                        crv = element[0]
+                        crvLength = crv.GetLength()
+                        startPoint = crv.PointAtStart
+                        endPoint = crv.PointAtEnd
+                        startIndex = cloudPoints.ClosestPoint(startPoint)
+                        endIndex = cloudPoints.ClosestPoint(endPoint)
+                        
+                        areaMass = element[5]
+                        pointMassDict[startIndex] += (crvLength * areaMass)/2
+                        pointMassDict[endIndex] += (crvLength * areaMass)/2
+
+                    elif (element[1] == "ShellMITC4") or (element[1] == "shellDKGT"):
+                        areaMesh = rg.AreaMassProperties.Compute(element[0]).Area
+                        density = element[2][2][4]
+                        thick = element[2][1]
+                        shellNodesRhino = element[0].Vertices
+                        for node in shellNodesRhino:
+                            nodeIndex = cloudPoints.ClosestPoint(node)
+                            pointMassDict[nodeIndex] += (areaMesh * thick * density)/len(shellNodesRhino)
+
+
+                #transform openSeesLoad in dictionary
+                openSeesLoadDict = []
+                for item in openSeesNodeLoad:
+                    openSeesLoadDict.append([item[0], item[1:]])
+                
+                openSeesLoadDict = dict(openSeesLoadDict)
+                
+                
+                
+                for tag in pointMassDict.Keys:
+                    if openSeesLoadDict.get(tag) != None:
+                        openSeesLoadDict.get(tag)[0][2] -= pointMassDict[tag] # modify the load in Z direction
+                    else:
+                        openSeesLoadDict[tag] = [ [0,0,-pointMassDict[tag],0,0,0], "pointLoad"]
+            
+                openSeesNodeLoad = []
+                for key, value in zip(openSeesLoadDict.Keys, openSeesLoadDict.Values):
+                    openSeesNodeLoad.append([key, value[0], value[1]])
+                
+                openSeesNodeLoad = openSeesNodeLoad      ### updated load because of Dead Load
+
+
             openSeesBeamLoad = openSeesBeamLoad
             
             
@@ -3661,12 +3722,12 @@ class ReactionForces(component):
                 vectorMz.append( rg.Line(ancor, momentZ) )
 
             
-            self.vectorRx = vectorRx if reactionForcesView == True
-            self.vectorRy = vectorRy if reactionForcesView == True
-            self.vectorRz = vectorRz if reactionForcesView == True
-            self.vectorMx = vectorMx if reactionMomentsView == True
-            self.vectorMy = vectorMy if reactionMomentsView == True
-            self.vectorMz = vectorMz if reactionMomentsView == True
+            self.vectorRx = vectorRx if reactionForcesView == True else []
+            self.vectorRy = vectorRy if reactionForcesView == True else []
+            self.vectorRz = vectorRz if reactionForcesView == True else []
+            self.vectorMx = vectorMx if reactionMomentsView == True else []
+            self.vectorMy = vectorMy if reactionMomentsView == True else []
+            self.vectorMz = vectorMz if reactionMomentsView == True else []
             
         
             return tagPoints, ReactionForce, ReactionMoment

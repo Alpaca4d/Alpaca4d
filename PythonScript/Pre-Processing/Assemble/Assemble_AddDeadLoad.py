@@ -235,14 +235,14 @@ def Assemble(Element, Support, Load, Mass):
     
     openSeesNodeLoad = openSeesNodeLoad
     
-    
+    ### Add this piece for update the load for dead Load
     DeadLoad = False
     for typeLoad in Load:
         if typeLoad[3] == 'DeadLoad':
             DeadLoad = True
     
     if DeadLoad:
-        ### Add this piece for update the load for dead Load
+        
         pointMassDict = {}
         
         for tag,point in enumerate(oPoints):
@@ -273,12 +273,6 @@ def Assemble(Element, Support, Load, Mass):
                     pointMassDict[nodeIndex] += (areaMesh * thick * density)/len(shellNodesRhino)
 
 
-
-
-
-
-    
-    
         #transform openSeesLoad in dictionary
         openSeesLoadDict = []
         for item in openSeesNodeLoad:
