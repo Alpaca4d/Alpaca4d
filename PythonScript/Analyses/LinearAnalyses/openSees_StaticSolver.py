@@ -6,7 +6,7 @@ import openseespy.opensees as ops
 
 # perform Low Level License check
 
-ExpireDate = date(2020, 10, 1)
+ExpireDate = date(2020, 12, 31)
 actualDay = date.today()
 remainingDate = (ExpireDate - actualDay).days
 
@@ -14,7 +14,7 @@ remainingDate = (ExpireDate - actualDay).days
 if remainingDate < 0:
     sys.exit("the temporary license has expired. Please contact Alpaca Developer at alpaca4d@gmail.com to renew the license")
 
-#filename = r'C:\Users\FORMAT\Desktop\assembleData\openSeesModel.txt'
+#filename = r'C:\Users\FORMAT\Desktop\Cantilivers\assembleData\openSeesModel.txt'
 filename = sys.argv[1]
 
 workingDirectory = os.path.split(filename)[0]

@@ -7,7 +7,7 @@ import openseespy.opensees as ops
 
 
 
-ExpireDate = date(2020, 10, 1)
+ExpireDate = date(2020, 12, 31)
 actualDay = date.today()
 remainingDate = (ExpireDate - actualDay).days
 
