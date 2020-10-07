@@ -2,23 +2,6 @@
 # openSeesGh
 ## To Do List
 
-### Next Step
-
-* [x] Create Static Model with Color
-* [x] Create Modal Model with Color
-* [x] Create GroundMotion Model with Color
-
-* [x] Create Beam Displacement Visualisation
-* [x] Create Shell Displacement/Stress Visualisation
-* [x] Create Brick Displacement/Stress Visualisation
-
-* [x] Documentation - example (pdf)
-* [x] Create SocialMedia _ Facebook-Instagram
-* [x] Mail
-
-
-
-
 ### Domenico Gaudioso
 
 * [x] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
@@ -44,10 +27,6 @@
 * [ ] add coding (in panel or path script ) and view post processing. Let's make a new component for import and visualize a text file
 * [ ] modify loft mesh for brick ( problem con tetra )
 
-
-
-
-
 ### Marco Pellegrino
 
 * [x] Update Modal Analyses
@@ -65,3 +44,34 @@
 * [ ] Ask about tetraRecorder
 * [ ] problem whit trasformation global force in eleLoad
 
+### Next Step
+
+* [x] Create Static Model with Color
+* [x] Create Modal Model with Color
+* [x] Create GroundMotion Model with Color
+
+* [x] Create Beam Displacement Visualisation
+* [x] Create Shell Displacement/Stress Visualisation
+* [x] Create Brick Displacement/Stress Visualisation
+
+* [x] Documentation - example (pdf)
+* [x] Create SocialMedia _ Facebook-Instagram
+* [x] Mail
+
+### Further Step
+
+* [ ] Image for Food4Rhino: Building, Kangaroo Shell, Beam Shell, EeathQuake City, Brick Elements. Background different for each image
+* [ ] Analyse Burning Man, SteamPunk
+* [ ] Automate the post for Instagram or Facebook: Which Hashtag should we use? Google Chrome allow to upload picture to instagram
+* [ ] Create structure with PupperFish plug-in
+* [ ] Contact UCL, Barlett, AA
+* [ ] Contact: Arturo Tedeschi, Arthur Mamou-Mani
+* [ ]
+* [ ]
+* [ ]
+* [ ]
+* [ ]
+* [ ]
+* [ ]
+* [ ]
+* [ ]
