@@ -6772,9 +6772,9 @@ class StaticModelView(component):
             rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
-            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2, "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3, "never"), trasl3*scaleDef)
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
@@ -7822,9 +7822,9 @@ class ModalModelView(component):
             rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
-            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            pointDef1 = rg.Point3d.Add( node.get( index1, "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2, "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3, "never"), trasl3*scaleDef)
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
@@ -8893,9 +8893,9 @@ class GroundMotionModelView(component):
             rotate3 = nodeDisp.get( index3  , "never")[1]
             
             ## CREO IL MODELLO DEFORMATO  ##
-            pointDef1 = rg.Point3d.Add( node.get( index1 -1 , "never"), trasl1*scaleDef )
-            pointDef2 = rg.Point3d.Add( node.get( index2 -1 , "never"), trasl2*scaleDef)
-            pointDef3 = rg.Point3d.Add( node.get( index3 -1 , "never"), trasl3*scaleDef)
+            pointDef1 = rg.Point3d.Add( node.get( index1 , "never"), trasl1*scaleDef )
+            pointDef2 = rg.Point3d.Add( node.get( index2  , "never"), trasl2*scaleDef)
+            pointDef3 = rg.Point3d.Add( node.get( index3  , "never"), trasl3*scaleDef)
             
             shellDefModel = rg.Mesh()
             shellDefModel.Vertices.Add( pointDef1 ) #0
