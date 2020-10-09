@@ -2,7 +2,6 @@ Title
 Alpaca4D 
 
 
-
 Short Description
 
 Alpaca4D is a FEM solver for parametric structural analysis builted on top of OpenSees.
@@ -23,3 +22,7 @@ The tool is still in the early stage and it will be improved in the future.
 Instagram: Alpaca4d
 Facebook: Alpaca4d
 e-mail: alpaca4d@gmail.com
+
+
+Disclaimer
+the author cannot be held responsible for the output and it should therefore always be used in combination with another finite element analysis package for validation and documentation.
