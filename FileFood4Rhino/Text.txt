@@ -4,16 +4,16 @@ Alpaca4D
 
 Short Description
 
-Alpaca4D is a FEM solver for parametric structural analysis builted on top of OpenSees.
+Alpaca4D is a FEM solver for parametric structural analysis built on top of OpenSees.
 Static, Modal and Ground Motion Analysis.
 
 Body
 
 Alpaca4d is a Grasshopper plugin which has been developed on top of OpenSees. It lets you analyse beam, shell and brick elements through Static, Modal and Ground Motion Analysis.
 
-Alpaca4D is being developed by Marco Pellegrino (Format Engineers) and Domenico Gaudioso.
+Alpaca4D is being developed by Marco Pellegrino and Domenico Gaudioso.
 
-Alpaca4d facilitates the interaction with OpenSees making it possible to model complex geometries with your parametric workflow and reducing the time spent in the modelling. The main idea of Alpaca4d is to provide an efficient and easy way to use OpenSees without writing any line of code. The library is mostly used by researchers and academia because of the not user-friendly interface even if the math at the core library is highly sophisticated. 
+Alpaca4d facilitates the interaction with OpenSees making it possible to model complex geometries within your parametric workflow and reducing the time spent in the modelling. The main idea of Alpaca4d is to provide an efficient and easy way to use OpenSees without writing any line of code. The library is mostly used by researchers and academia because of the not user-friendly interface even if the math at the core library is highly sophisticated. 
 
 The belief is to bring more users to perform structural analyses with Opensees in a parametric environment such as Grasshopper.
 
@@ -26,3 +26,6 @@ e-mail: alpaca4d@gmail.com
 
 Disclaimer
 the author cannot be held responsible for the output and it should therefore always be used in combination with another finite element analysis package for validation and documentation.
+
+Acknowledge
+Marco Pellegrino would like to thanks Format Engineers (www.formatengineers.com) to be a constant source of inspiration and discussion.
