@@ -2828,7 +2828,7 @@ class StaticAnalyses(component):
         
             userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
-            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.py')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\LinearAnalyses\openSees_StaticSolver.pyc')
             
             wrapperFile = '"' + wrapperFile + '"'
             fileName = '"' + fileName + '"'
@@ -2851,7 +2851,7 @@ class StaticAnalyses(component):
         
         
             ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
-            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.pyc
         
             outputFile = os.path.join(outputFolder, outputFileName)
         
@@ -2977,7 +2977,7 @@ class ModalAnalyses(component):
         
             userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
-            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\DynamicAnalysis\openSees_ModalSolver.py')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\DynamicAnalysis\openSees_ModalSolver.pyc')
             
             wrapperFile = '"' + wrapperFile + '"'
             fileName = '"' + fileName + '"'
@@ -2999,7 +2999,7 @@ class ModalAnalyses(component):
             self.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Error, msg)
         
             ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
-            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.pyc
         
             outputFile = os.path.join(outputFolder, outputFileName)
         
@@ -3203,7 +3203,7 @@ class GroundMotionAnalyses(component):
             userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\python-3.7.7.amd64\python.exe')
             #pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
-            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.py')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\EarthQuakeAnalysis\openSees_EarthQuakeAnalysis.pyc')
         
         
             fileName = '"' + fileName + '"'
@@ -3229,7 +3229,7 @@ class GroundMotionAnalyses(component):
             #print("I have finished")
         
             ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
-            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.pyc
         
         
             outputFile = os.path.join(outputFolder, outputFileName)
@@ -3367,7 +3367,7 @@ class NDFAnalyses(component):
             #userObjectFolder = gh.Folders.DefaultUserObjectFolder
             userObjectFolder = gh.Folders.DefaultAssemblyFolder
             pythonInterpreter = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\WPy64\scripts\winpython.bat')
-            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\openSees_StaticSolver_3ndf\openSees_StaticSolver_3ndf.py')
+            fileName = os.path.join(userObjectFolder, r'Alpaca4d\Analyses\openSees_StaticSolver_3ndf\openSees_StaticSolver_3ndf.pyc')
                 
             fileName = '"' + fileName + '"'
             wrapperFile = '"' + wrapperFile + '"'
@@ -3390,7 +3390,7 @@ class NDFAnalyses(component):
         
         
             ## READ THE OUTPUT FROM THE OPEENSEES_SOLVER
-            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.py
+            ## THE ORDER MUST BE THE SAME OF THE OUTPUT LIST IN OpenSeesStaticSolver.pyc
         
             outputFile = os.path.join(outputFolder, outputFileName)
         
