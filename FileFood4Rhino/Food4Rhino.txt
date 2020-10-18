@@ -28,4 +28,5 @@ Disclaimer
 the author cannot be held responsible for the output and it should therefore always be used in combination with another finite element analysis package for validation and documentation.
 
 Acknowledge
-Marco Pellegrino would like to thanks Format Engineers (www.formatengineers.com) to be a constant source of inspiration and discussion.
+Marco Pellegrino would like to thank Format Engineers (www.formatengineers.com) for being a constant source of inspiration and innovation.
+Format Engineers work on the cutting edge of the structular engineering and carry out original research into the application of computational design techniques thus making the designs appropriate, lean, unique and beautiful.
