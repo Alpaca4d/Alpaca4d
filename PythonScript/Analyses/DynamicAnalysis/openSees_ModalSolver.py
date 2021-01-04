@@ -5,7 +5,7 @@ import math
 import time
 
 
-ExpireDate = date(2020, 12, 31)
+ExpireDate = date(2021, 6, 31)
 actualDay = date.today()
 remainingDate = (ExpireDate - actualDay).days
 
