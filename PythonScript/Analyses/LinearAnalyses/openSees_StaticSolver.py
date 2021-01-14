@@ -6,7 +6,7 @@ import openseespy.opensees as ops
 
 # perform Low Level License check
 
-ExpireDate = date(2021, 6, 31)
+ExpireDate = date(2021, 6, 30)
 actualDay = date.today()
 remainingDate = (ExpireDate - actualDay).days
 
