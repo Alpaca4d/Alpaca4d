@@ -4,24 +4,35 @@
 
 ### Domenico Gaudioso
 
-* [x] Create Disassemble Model - No more Lines, Mesh, Brick but only **GeometricModel** as output
-* [x] Update Deformed Dynamic Model
-* [x] Diagram Cds
-* [x] Add 3df Solver
-* [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
-* [x] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
-* [x] modal analyses doesn't start from mode 1
-* [x] add "IPE" section
+* [ ] hdf5 - Numerical Nodal Displacements. Points, Displacement, Rotation
+* [ ] hdf5 - Numerical Reaction forces. Points, Forces, Moments
+* [ ] hdf5 - Nx, Vy, Vz, Mx, My, Mz
+* [ ] hdf5 - Numerical Stress Shells. Values are in the Gauss Points
+* [ ] hdf5 - Numerical Stress Bricks. Values are in the Gauss Points
+* [ ] hdf5 -
+* [ ] hdf5 -
+* [ ] hdf5 -
+* [ ] hdf5 -
+* [ ] Disassemble Model - Line, Mesh, Brick, Load, Support, Section
+* [ ] Visualize Model - one single component for visualise with the boolean
+* [ ] Update the components to visualize the Supports, Loads, Beams. (we need to find a clever function to do an autoscale for the support dimension)
+* [ ] Components for Cross Section (Circle, Rectangular, Box). I assume they will have the type (elastic section where we calculate the value Area, Iy, Iz, ect, ect)
 
-* [x] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
-* [x] add inetia zz in ipe section
-* [x] add box section
 
-* [x] circular Cross-Section less dense for visualisation
-* [x] add view distribuited load in model view
-* [x] add view concentrated mass load in model view ( create a sphere in node )
-* [x] Add Warning to the components. Ask Marco for some reference script
-* [x] Create Cluster when necessary
+* [ ] Update Deformed Dynamic Model
+* [ ] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
+* [ ] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
+* [ ] add "IPE" section
+
+* [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
+* [ ] add inetia zz in ipe section
+* [ ] add box section
+
+* [ ] circular Cross-Section less dense for visualisation
+* [ ] add view distribuited load in model view
+* [ ] add view concentrated mass load in model view ( create a sphere in node )
+* [ ] Add Warning to the components. Ask Marco for some reference script
+* [ ] Create Cluster when necessary
 * [ ] password - Salvatore439505Merda506682!
 * [ ] WIP Components BrickComponents
 * [ ] add coding (in panel or path script ) and view post processing. Let's make a new component for import and visualize a text file
@@ -29,34 +40,34 @@
 
 ### Marco Pellegrino
 
-* [x] Update Modal Analyses
-* [x] Update Circular Cross-Section for Hollow Cross Section
-* [x] creationFolder name is wrong. 
-* [x] Automatically delete existing Folder to avoid to read previous file when the analyses fail
-* [x] EarthQuake Analyses - update for different way to make analyses
-* [x] update "ShellMITC" element type instead of "ShellNTGQ"
-* [x] Add Warning to the components
-* [x] Color Palette for components
-* [x] Big Alpaca with colorful rectangle in the background
-* [x] Icons
-* [x] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
-* [x] Compile and Test
+* [ ] Update Modal Analyses
+* [ ] Update Circular Cross-Section for Hollow Cross Section
+* [ ] creationFolder name is wrong. 
+* [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
+* [ ] EarthQuake Analyses - update for different way to make analyses
+* [ ] update "ShellMITC" element type instead of "ShellNTGQ"
+* [ ] Add Warning to the components
+* [ ] Color Palette for components
+* [ ] Big Alpaca with colorful rectangle in the background
+* [ ] Icons
+* [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
+* [ ] Compile and Test
 * [ ] Ask about tetraRecorder
 * [ ] problem whit trasformation global force in eleLoad
 
 ### Next Step
 
-* [x] Create Static Model with Color
-* [x] Create Modal Model with Color
-* [x] Create GroundMotion Model with Color
+* [ ] Create Static Model with Color
+* [ ] Create Modal Model with Color
+* [ ] Create GroundMotion Model with Color
 
-* [x] Create Beam Displacement Visualisation
-* [x] Create Shell Displacement/Stress Visualisation
-* [x] Create Brick Displacement/Stress Visualisation
+* [ ] Create Beam Displacement Visualisation
+* [ ] Create Shell Displacement/Stress Visualisation
+* [ ] Create Brick Displacement/Stress Visualisation
 
-* [x] Documentation - example (pdf)
-* [x] Create SocialMedia _ Facebook-Instagram
-* [x] Mail
+* [ ] Documentation - example (pdf)
+* [ ] Create SocialMedia _ Facebook-Instagram
+* [ ] Mail
 
 ### Further Step
 
@@ -66,12 +77,3 @@
 * [ ] Create structure with PupperFish plug-in
 * [ ] Contact UCL, Barlett, AA
 * [ ] Contact: Arturo Tedeschi, Arthur Mamou-Mani
-* [ ]
-* [ ]
-* [ ]
-* [ ]
-* [ ]
-* [ ]
-* [ ]
-* [ ]
-* [ ]
