@@ -1,4 +1,4 @@
-![Screenshot](Logo_BlackWhite.PNG)
+
 # openSeesGh
 ## To Do List
 
