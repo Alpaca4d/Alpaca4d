@@ -40,20 +40,13 @@
 
 ### Marco Pellegrino
 
-* [ ] Update Modal Analyses
-* [ ] Update Circular Cross-Section for Hollow Cross Section
-* [ ] creationFolder name is wrong. 
-* [ ] Automatically delete existing Folder to avoid to read previous file when the analyses fail
-* [ ] EarthQuake Analyses - update for different way to make analyses
-* [ ] update "ShellMITC" element type instead of "ShellNTGQ"
-* [ ] Add Warning to the components
-* [ ] Color Palette for components
-* [ ] Big Alpaca with colorful rectangle in the background
+* [ ] Modal Analyses
+* [ ] EarthQuake Analyses
+* [ ] 
+* [ ] 
+* [ ] 
 * [ ] Icons
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
-* [ ] Compile and Test
-* [ ] Ask about tetraRecorder
-* [ ] problem whit trasformation global force in eleLoad
 
 ### Next Step
 
