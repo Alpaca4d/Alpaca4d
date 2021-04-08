@@ -18,10 +18,13 @@ def ViewBeam( Model, type ):
         curve = iBeam.Crv
         color = iBeam.Colour
         if type is True:
+            start =  curve.PointAtNormalizedLength(0.0)
+            parameter = curve.ClosestPoint(start , 0.01)[1]
+            #rg.Curve.PerpendicularFrameAt( x, parameter )[1]
             len = curve.Line.Length
             section = iBeam.CrossSection.sectionBrep
             #Section at 0.0
-            planeStart = curve.PerpendicularFrameAt(0.0)[1]
+            planeStart = curve.PerpendicularFrameAt(parameter)[1]
             trasfom1 = rg.Transform.PlaneToPlane( rg.Plane.WorldXY, planeStart )
             profileFace = rg.Brep.Duplicate( section )
             profileFace.Transform( trasfom1 )
@@ -297,22 +300,23 @@ def carrelloZ():
 
 
 def Support( support, scale):
+    vincoli = [ incastro(), cernieraXYZ(), cernieraY(), cernieraX(), carrelloX(), carrelloY(), carrelloZ()]
     if scale is None:
         scale = 1
     if support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == True and support.Ry == True and support.Rz == True:
-        solid = incastro()
+        solid = vincoli[0] #incastro()
     elif support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == False and support.Ry == False and support.Rz == False:
-        solid = cernieraXYZ()
+        solid = vincoli[1] #cernieraXYZ()
     elif support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == True and support.Ry == False :
-        solid = cernieraY()
+        solid = vincoli[2] #cernieraY()
     elif support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == False and support.Ry == True :
-        solid = cernieraX()
+        solid = vincoli[3] #cernieraX()
     elif support.Tx == False and support.Ty == True and support.Tz == True :
-        solid = carrelloX()
+        solid = vincoli[4] #carrelloX()
     elif support.Tx == True and support.Ty == False and support.Tz == True :
-        solid = carrelloY()
+        solid = vincoli[5] #carrelloY()
     elif support.Tx == True and support.Ty == True and support.Tz == False :
-        solid = carrelloZ()
+        solid = vincoli[6] #carrelloZ()
         
     trasl = rg.Transform.Translation( rg.Vector3d(support.Pos) )
     plane = rg.Plane(support.Pos, rg.Vector3d.ZAxis)
@@ -320,3 +324,46 @@ def Support( support, scale):
     bb = rg.Transform.Scale( plane, scale, scale, scale)
     solid.Transform(bb)
     return solid
+
+
+def cdsMesh( beam, cdsVector, color_Positive, color_Negative):
+    DivCurve = beam.Crv.DivideByCount( len(cdsVector)-1, True )
+    beamPoint = [ beam.Crv.PointAt(DivCurve[index]) for index in range(len(DivCurve))]
+    cdsPoint =  [ rg.Point3d.Add( ibeamPoint, icdsVector) for ibeamPoint, icdsVector in zip(beamPoint,cdsVector)]
+    
+    Mesh = rg.Mesh()
+    for value in range( 1 , len(cdsVector)):
+        mesh = rg.Mesh()
+        
+        corner1 = beamPoint[ value-1 ]
+        corner4 = beamPoint[ value ]
+        corner2 = cdsPoint[ value-1 ]
+        corner3 = cdsPoint[ value ] 
+        mesh.Vertices.Add( corner1 )
+        mesh.Vertices.Add( corner2 )
+        mesh.Vertices.Add( corner3 )
+        mesh.Vertices.Add( corner4 )
+        
+        valor1 = cdsVector[value-1].X + cdsVector[value-1].Y + cdsVector[value-1].Z
+        valor2 = cdsVector[value].X + cdsVector[value].Y + cdsVector[value].Z
+        
+        if valor1 >= 0:
+            color1 = color_Negative
+        else:
+            color1 = color_Positive
+            
+        if valor2 > 0:
+            color2 = color_Negative
+        else:
+            color2 = color_Positive
+            
+        mesh.VertexColors.Add(color1)
+        mesh.VertexColors.Add(color1)
+        mesh.VertexColors.Add(color2)
+        mesh.VertexColors.Add(color2)
+        mesh.Faces.AddFace( 0,1,2,3 )
+        mesh.Normals.ComputeNormals()
+        mesh.Compact()
+        Mesh.Append( mesh )
+
+    return Mesh, cdsPoint
