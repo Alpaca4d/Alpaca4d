@@ -11,6 +11,7 @@ from collections import defaultdict
 
 import math
 import subprocess
+import alpaca4dUtil
 
 
 #TODO
@@ -28,6 +29,7 @@ class Model(object):
         self.uniquePointsThreeNDF = []
         self.uniquePointsSixNDF = []
         self.cloudPoint = None
+        self.RTreeCloudPoint = None
 
 
         self.nodes = []
@@ -97,12 +99,14 @@ class Model(object):
         if not threeNDFPoints:
             self.uniquePointsThreeNDF = []
         else:
-            self.uniquePointsThreeNDF = rg.Point3d.CullDuplicates(threeNDFPoints, 0.001)
+            #self.uniquePointsThreeNDF = rg.Point3d.CullDuplicates(threeNDFPoints, 0.001)
+            self.uniquePointsThreeNDF = alpaca4dUtil.removeDuplicates(threeNDFPoints, 0.001)
         
         if not sixNDFPoints:
             self.uniquePointsSixNDF = []
         else:
-            self.uniquePointsSixNDF = rg.Point3d.CullDuplicates(sixNDFPoints, 0.001)
+            #self.uniquePointsSixNDF = rg.Point3d.CullDuplicates(sixNDFPoints, 0.001)
+            self.uniquePointsSixNDF = alpaca4dUtil.removeDuplicates(sixNDFPoints, 0.001)
         
         
         #self.uniquePoints = self.uniquePointsThreeNDF + self.uniquePointsSixNDF
@@ -114,6 +118,7 @@ class Model(object):
             self.uniquePoints = self.uniquePointsThreeNDF + self.uniquePointsSixNDF
         
         self.cloudPoint = rg.PointCloud(self.uniquePoints)
+        self.RTreeCloudPoint = rg.RTree.CreateFromPointArray(self.uniquePoints)
 
         return
 
@@ -177,6 +182,19 @@ class Node(object):
 
     def setNodeTag(self, cloudPoint):
         self.nodeTag = cloudPoint.ClosestPoint(self.Pos) + 1
+        pass
+
+    def setNodeTagRTree(self, RTreeCloudPoint):
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id)
+        
+        RTreeCloudPoint.Search(rg.Sphere(self.Pos, 0.001), SearchCallback)
+        ind = closestIndices
+        
+        self.nodeTag = ind[0]
         pass
 
     def setMassNode(self, MassElement):
@@ -287,14 +305,14 @@ class uniAxialMaterialElasticPlastic(object):
         self.materialType = "ElasticPlastic"
 
     def ToString(self):
-        return self.write_py().split("ops.")[1]
+        return self.write_tcl()
 
     def write_tcl(self):
-        return "uniaxialMateria ElasticPP {} {} {} {}\n".format(self.matTag, self.E, self.epsyP, self.epsyN, self.eps0)
+        return "uniaxialMateria ElasticPP {} {} {} {} {}\n".format(self.matTag, self.E, self.epsyP, self.epsyN, self.eps0)
 
     # TODO
     def write_py(self):
-        return "ops.uniaxialMateria('ElasticPP',{},{},{},{})\n".format(self.matTag, self.E, self.epsyP, self.epsyN, self.eps0)
+        return "ops.uniaxialMateria('ElasticPP',{},{},{},{},{})\n".format(self.matTag, self.E, self.epsyP, self.epsyN, self.eps0)
     
 
 class ElasticIsotropic(object):
@@ -385,9 +403,12 @@ class J2Plasticity(object):
         self.H = H
 
         self.matTag = None
-    
-    #def ToString(self):
-    #    return write_tcl()
+
+        self.materialDimension = "nDMaterial"
+        self.materialType = "ElasticIsotropicHardening"
+
+    def ToString(self):
+        return write_tcl()
 
     def write_tcl(self):
         tcl_text = "nDMaterial J2Plasticity {0} {1} {2} {3} {4} {5} {6}\n".format(self.matTag, self.K, self.G, self.sig0, self.sigInf, self.delta, self.H)
@@ -466,6 +487,26 @@ class ForceBeamColumn(object):
         self.jNode = cloudPoint.ClosestPoint(PointAtEnd) + 1
         pass
 
+    def setTopologyRTree(self, RTreeCloudPoint):
+
+        PointAtStart = self.Crv.PointAtStart
+        PointAtEnd = self.Crv.PointAtEnd
+        
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for pt in [PointAtStart, PointAtEnd]:
+            RTreeCloudPoint.Search(rg.Sphere(pt, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.iNode = ind[0]
+        self.jNode = ind[1]
+
+        pass
+
     def beamIntegrationNewtonCotes_py(self, numberOfSection):
         return "ops.beamIntegration('NewtonCotes', {}, {}, {})\n".format( self.integrationTag, self.CrossSection.sectionTag, numberOfSection)
 
@@ -541,6 +582,23 @@ class ShellMITC4(object):
         vertices = self.Mesh.Vertices.ToPoint3dArray()
         for node in vertices:
             self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
+        pass
+
+    def setTopologyRTree(self, RTreeCloudPoint):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.indexNodes = ind
         pass
     
     def setTags(self):
@@ -704,10 +762,28 @@ class stdBrick(object):
             
     def setTopology(self, cloudPoints):
         indexNodes = []
-        for iPoint in self.Mesh.Vertices:
+        for iPoint in self.Mesh.Vertices.ToPoint3dArray():
             indexNodes.append( cloudPoints.ClosestPoint(iPoint) + 1)
         self.indexNodes = indexNodes
         pass
+
+    def setTopologyRTree(self, RTreeCloudPoint):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.indexNodes = ind
+        pass
+
 
     def setTags(self):
         # not sure if this can create some problem
@@ -753,6 +829,24 @@ class SSPbrick(object):
         self.indexNodes = indexNodes
         pass
 
+    def setTopologyRTree(self, RTreeCloudPoint):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.indexNodes = ind
+        pass
+
+
     def setTags(self):
         # not sure if this can create some problem
         # have a look at copy the object
@@ -795,6 +889,23 @@ class FourNodeTetrahedron(object):
         for iPoint in self.Mesh.Vertices:
             indexNodes.append( cloudPoints.ClosestPoint(iPoint) + 1)
         self.indexNodes = indexNodes
+        pass
+
+    def setTopologyRTree(self, RTreeCloudPoint):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.indexNodes = ind
         pass
 
     def setTags(self):
@@ -846,6 +957,19 @@ class Support(object):
 
     def setNodeTag(self, cloudPoint):
         self.nodeTag = cloudPoint.ClosestPoint(self.Pos) + 1
+        pass
+
+    def setNodeTagRTree(self, RTreeCloudPoint):
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id)
+        
+        RTreeCloudPoint.Search(rg.Sphere(self.Pos, 0.001), SearchCallback)
+        ind = closestIndices
+        
+        self.nodeTag = ind[0]
         pass
 
     ## override Rhino .ToString() method (display name of the class in Gh)
@@ -921,7 +1045,7 @@ class EqualDOF(object):
         self.dof_yy = dof_yy
         self.dof_zz = dof_zz
 
-        self.dof = list(filter(None, self.dof)) 
+        self.dof = [self.dof_x, self.dof_y, self.dof_z, self.dof_xx, self.dof_yy, self.dof_zz] 
 
         self.masterNodeTag = None
         self.slaveNodesTag = None
@@ -931,10 +1055,19 @@ class EqualDOF(object):
         self.masterNodeTag = cloudPoint.ClosestPoint(self.masterNode) + 1
         self.slaveNodesTag.append(cloudPoint.ClosestPoint(self.slaveNodes) + 1)
         return
+
+    def ToString(self):
+        return self.write_tcl()
     
     def write_tcl(self):
-        dof = ' '.join([str(i) for i in self.dof])
-        tcl_text = "equalDOF {} {}  {}\n".format(self.masterNodeTag, self.slaveNodesTag, dof)
+        dofs = []
+        for i,dof in enumerate(self.dof,1):
+            if dof == True:
+                dofs.append(i)
+
+        dofs = ' '.join([str(i) for i in dofs])
+        tcl_text = "equalDOF {} {}  {}\n".format(self.masterNodeTag, self.slaveNodesTag, dofs)
+        return tcl_text
 
     def write_py(self):
         py_text = "ops.equalDOF({}, {}, *{})".format(self.masterNodeTag, self.slaveNodesTag, self.dof)
