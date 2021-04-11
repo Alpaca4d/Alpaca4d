@@ -762,14 +762,13 @@ class stdBrick(object):
             
     def setTopology(self, cloudPoints):
         indexNodes = []
-        for iPoint in self.Mesh.Vertices.ToPoint3dArray():
+        for iPoint in self.Mesh.Vertices:
             indexNodes.append( cloudPoints.ClosestPoint(iPoint) + 1)
         self.indexNodes = indexNodes
         pass
 
     def setTopologyRTree(self, RTreeCloudPoint):
-        self.indexNodes = []
-        vertices = self.Mesh.Vertices.ToPoint3dArray()
+        vertices = self.Mesh.Vertices
 
         closestIndices = []
         
@@ -792,7 +791,7 @@ class stdBrick(object):
         pass
     
     def ToString(self):
-        return self.write_tcl()
+        return "Class Std Brick"
     
     def write_tcl(self):
         material = self.material.write_tcl()
@@ -828,10 +827,10 @@ class SSPbrick(object):
             indexNodes.append( cloudPoints.ClosestPoint(iPoint) + 1)
         self.indexNodes = indexNodes
         pass
-
+    
+    
     def setTopologyRTree(self, RTreeCloudPoint):
-        self.indexNodes = []
-        vertices = self.Mesh.Vertices.ToPoint3dArray()
+        vertices = self.Mesh.Vertices
 
         closestIndices = []
         
@@ -845,6 +844,7 @@ class SSPbrick(object):
         
         self.indexNodes = ind
         pass
+    
 
 
     def setTags(self):
@@ -854,11 +854,11 @@ class SSPbrick(object):
         pass
     
     def ToString(self):
-        return self.write_tcl()
+        return "Class SSP Brick"
     
     def write_tcl(self):
         material = self.material.write_tcl()
-        brick = "element {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n".format( self.elementType, self.eleTag, self.indexNodes[0], self.indexNodes[1], self.indexNodes[2], self.indexNodes[3], self.indexNodes[4], self.indexNodes[5], self.indexNodes[6], self.indexNodes[7], self.material.matTag, 0, 0, 0)
+        brick = "element {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}\n".format( self.elementType, self.eleTag, self.indexNodes[0], self.indexNodes[1], self.indexNodes[2], self.indexNodes[3], self.indexNodes[4], self.indexNodes[5], self.indexNodes[6], self.indexNodes[7], self.material.matTag, 0, 0, 0)
         return material + brick
 
     def write_py(self):
@@ -892,8 +892,7 @@ class FourNodeTetrahedron(object):
         pass
 
     def setTopologyRTree(self, RTreeCloudPoint):
-        self.indexNodes = []
-        vertices = self.Mesh.Vertices.ToPoint3dArray()
+        vertices = self.Mesh.Vertices
 
         closestIndices = []
         
@@ -915,7 +914,7 @@ class FourNodeTetrahedron(object):
         pass
     
     def ToString(self):
-        return self.write_py()
+        return "Class Tetrahedron"
     
     def write_tcl(self):
         material = self.material.write_tcl()
@@ -1409,26 +1408,7 @@ class PointLoad(object):
     def ToString(self):
         return "<Class PointLoad>"
 
-    """
-    #TODO add the ndf dispatch for writing the load
-    @staticmethod
-    def write_tcl(groupsTimeSeries, model):
 
-        text = []
-
-        for timeSeries in groupsTimeSeries.keys():
-            text.append(groupsTimeSeries[timeSeries][0].TimeSeries.write_tcl())
-            text.append("pattern Plain %s %s {" % (timeSeries, timeSeries)) #patternTag, TimeSeriesTag
-            for load in groupsTimeSeries[timeSeries]:
-                if model.uniquePointsThreeNDF.Contains(load.Pos):
-                    text.append("\tload %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z))
-                elif model.uniquePointsSixNDF.Contains(load.Pos):
-                    text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
-            text.append("}")
-        text = "\n".join(text)
-
-        return text
-        """
 
     #TODO add the ndf dispatch for writing the load
     @staticmethod
