@@ -2,7 +2,7 @@ import os
 import System.Drawing.Color
 
 import Rhino.Geometry as rg
-
+import Rhino as rc
 import ghpythonlib.components as ghcomp
 from collections import OrderedDict
 from collections import defaultdict
@@ -367,3 +367,339 @@ def cdsMesh( beam, cdsVector, color_Positive, color_Negative):
         Mesh.Append( mesh )
 
     return Mesh, cdsPoint
+
+#DEFORMED MODEL VIEW
+
+def BeamVectorDef(Model, DictNodeDisp):
+    vectorEle = []
+    for item in Model.beams:
+            iListvector = [ DictNodeDisp[item.iNode], DictNodeDisp[item.jNode] ]
+            vectorEle.append( iListvector )
+    return vectorEle
+    
+def ShellVectorDef(Model, DictNodeDisp):
+    vectorEle = []
+    for item in Model.shells:
+            iListvector = [ DictNodeDisp[iIndex] for iIndex in item.indexNodes ]
+            vectorEle.append( iListvector )
+    return vectorEle
+
+def BrickVectorDef(Model, DictNodeDisp):
+    vectorEle = []
+    for item in Model.bricks:
+            iListvector = [ DictNodeDisp[iIndex] for iIndex in item.indexNodes ]
+            vectorEle.append( iListvector )
+    return vectorEle
+#------------------------------------------------------------------------------------#
+def BeamDef(Model, DictNodeDisp, c):
+    beamDefModel = []
+    for item in Model.beams:
+        DefiNode = rg.Point3d.Add( item.Crv.PointAtStart, DictNodeDisp[item.iNode]*c )
+        DefjNode = rg.Point3d.Add( item.Crv.PointAtEnd, DictNodeDisp[item.jNode]*c )
+        beamDef = rg.LineCurve( DefiNode, DefjNode )
+        beamDefModel.append(beamDef)
+    return beamDefModel
+
+def ShellDef(Model, DictNodeDisp, c):
+    shellDefModel = []
+    for item in Model.shells:
+        point = [ rg.Point3d( ipoint ) for ipoint in item.Mesh.Vertices ]
+        pointDef = [ rg.Point3d.Add( ipoint, DictNodeDisp[iIndex]*c ) for ipoint, iIndex in zip(point, item.indexNodes) ]
+        shellDef = rg.Mesh()
+        for iPointDef in pointDef:
+            shellDef.Vertices.Add( iPointDef ) #0
+                    
+        if len(item.indexNodes) == 4 :
+            shellDef.Faces.AddFace( 0, 1, 2, 3 )
+        else:
+            shellDef.Faces.AddFace( 0, 1, 2 )
+                    
+        shellDefModel.append(shellDef)
+    return shellDefModel
+
+def BrickDef(Model, DictNodeDisp, c):
+    shellDefModel = []
+    for item in Model.bricks:
+        point = [ rg.Point3d( ipoint ) for ipoint in item.Mesh.Vertices ]
+        pointDef = [ rg.Point3d.Add( ipoint, DictNodeDisp[iIndex]*c ) for ipoint, iIndex in zip(point, item.indexNodes) ]
+        shellDef = rg.Mesh()
+        for iPointDef in pointDef:
+            shellDef.Vertices.Add( iPointDef ) #0
+                    
+        if len(item.indexNodes) == 8 :
+            shellDef.Faces.AddFace( 0, 1, 2, 3 )
+            shellDef.Faces.AddFace(0, 1, 2, 3)
+            shellDef.Faces.AddFace(4, 5, 6, 7)
+            shellDef.Faces.AddFace(0, 1, 5, 4)
+            shellDef.Faces.AddFace(1, 2, 6, 5)
+            shellDef.Faces.AddFace(2, 3, 7, 6)
+            shellDef.Faces.AddFace(3, 0, 4, 7)
+        else:
+            shellDef.Faces.AddFace( 0, 1, 2 )
+            shellDef.Faces.AddFace( 0, 1, 3 )
+            shellDef.Faces.AddFace( 1, 2, 3 )
+            shellDef.Faces.AddFace( 0, 2, 3 )      
+        shellDefModel.append(shellDef)
+    return shellDefModel
+#------------------------------------------------------------------------------------#
+def meshLoft( point ):
+    meshEle = rg.Mesh()
+    pointSection1 = point
+    for i in range(0,len(pointSection1)):
+        for j in range(0, len(pointSection1[0])):
+            vertix = pointSection1[i][j]
+            meshEle.Vertices.Add( vertix ) 
+    k = len(pointSection1[0])
+    for i in range(0,len(pointSection1)-1):
+        for j in range(0, len(pointSection1[0])):
+            if j < k-1:
+                index1 = i*k + j
+                index2 = (i+1)*k + j
+                index3 = index2 + 1
+                index4 = index1 + 1
+            elif j == k-1:
+                index1 = i*k + j
+                index2 = (i+1)*k + j
+                index3 = (i+1)*k
+                index4 = i*k
+            meshEle.Faces.AddFace(index1, index2, index3, index4)
+            #rs.ObjectColor(scyl,(255,0,0))
+    #colour = rs.CreateColor( color[0], color[1], color[2] )
+    #meshEle.VertexColors.CreateMonotoneMesh( colour )
+    meshElement = meshEle
+    #meshElement.IsClosed(True)
+    return meshElement
+
+def BeamDefExtrude(Model, DictNodeDisp, c):
+    beamDefExtrudeModel = []
+    for item in Model.beams:
+        pointSection = []
+        DefiNode = rg.Point3d.Add( item.Crv.PointAtStart, DictNodeDisp[item.iNode]*c )
+        DefjNode = rg.Point3d.Add( item.Crv.PointAtEnd, DictNodeDisp[item.jNode]*c )
+        beamDef = rg.LineCurve( DefiNode, DefjNode )
+        start =  beamDef.PointAtNormalizedLength(0.0)
+        end =  beamDef.PointAtNormalizedLength(1)
+        section = item.CrossSection.crv
+        #Section at 0.0
+        parameter = beamDef.ClosestPoint(start , 0.01)[1]
+        planeStart = beamDef.PerpendicularFrameAt(parameter)[1]
+        trasfom1 = rg.Transform.PlaneToPlane( rg.Plane.WorldXY, planeStart )
+        profileFace1 = rg.Curve.Duplicate(section)
+        profileFace1.Transform( trasfom1 )
+        pointSection.append( rg.NurbsCurve.GrevillePoints( profileFace1, True))
+        #Section at 1
+        parameter = beamDef.ClosestPoint(end , 0.01)[1]
+        planeEnd = beamDef.PerpendicularFrameAt(parameter)[1]
+        trasfom2 = rg.Transform.PlaneToPlane( rg.Plane.WorldXY, planeEnd )
+        profileFace2 = rg.Curve.Duplicate(section)
+        profileFace2.Transform( trasfom2 )
+        pointSection.append( rg.NurbsCurve.GrevillePoints( profileFace2, True))
+        MeshBeam = meshLoft( pointSection )
+        beamDefExtrudeModel.append(MeshBeam)
+    return beamDefExtrudeModel
+
+def ShellDefExtrude(Model, DictNodeDisp, c):
+    shellDefExtrudeModel = []
+    for item in Model.shells:
+        point = [ rg.Point3d( ipoint ) for ipoint in item.Mesh.Vertices ]
+        pointDef = [ rg.Point3d.Add( ipoint, DictNodeDisp[iIndex]*c ) for ipoint, iIndex in zip(point, item.indexNodes) ]
+        shellDef = rg.Mesh()
+        for iPointDef in pointDef:
+            shellDef.Vertices.Add( iPointDef ) #0
+                    
+        if len(item.indexNodes) == 4 :
+            shellDef.Faces.AddFace( 0, 1, 2, 3 )
+        else:
+            shellDef.Faces.AddFace( 0, 1, 2 )
+                    
+        shellExtrude = rg.Mesh()
+        thick = item.CrossSection.height
+        vt = shellDef.Vertices[0]
+        shellDef.FaceNormals.ComputeFaceNormals()
+        fid,MPt = shellDef.ClosestPoint(vt,0.01)
+        normalFace = shellDef.FaceNormals[fid]
+        vectormoltiplicate = rg.Vector3d.Multiply( normalFace, thick/2 )
+        PointMesh1 = [rg.Point3d.Add( ipoint, -vectormoltiplicate ) for ipoint in shellDef.Vertices]
+        PointMesh2 = [rg.Point3d.Add( ipoint, vectormoltiplicate ) for ipoint in shellDef.Vertices]
+        PointMesh = PointMesh1 + PointMesh2
+        for jpoint in PointMesh:
+            shellExtrude.Vertices.Add( jpoint )
+        if len(item.indexNodes) == 4 :
+            shellExtrude.Faces.AddFace( 0, 1, 2, 3 )
+            shellExtrude.Faces.AddFace( 4, 5, 6, 7 )
+            shellExtrude.Faces.AddFace( 0, 1, 5, 4 )
+            shellExtrude.Faces.AddFace( 2, 3, 7, 6 )
+            shellExtrude.Faces.AddFace( 0, 3, 7, 4 )
+            shellExtrude.Faces.AddFace( 1, 2, 6, 5 )
+        else: 
+            shellExtrude.Faces.AddFace( 0, 1, 2 )
+            shellExtrude.Faces.AddFace( 3, 4, 5 )
+            shellExtrude.Faces.AddFace( 0, 1, 4, 3 )
+            shellExtrude.Faces.AddFace( 1, 2, 5, 4 )
+            shellExtrude.Faces.AddFace( 2, 0, 3, 5 )
+            
+        shellDefExtrudeModel.append(shellExtrude)
+    return shellDefExtrudeModel
+        
+            
+def boundsDef( ListVector, type = None ):
+    if type == None:
+        type = 3
+    valorList = []
+    for i in ListVector:
+        if type <= 0:
+            valor = i.X
+        elif type == 1:
+            valor = i.Y
+        elif type == 2:
+            valor = i.Z
+        elif type >= 3:
+            valor = i.SquareLength #i.Length
+                    
+        valorList.append(valor)
+    bounds = [min(valorList),max(valorList)]
+    return bounds
+        
+def sampleColor( colorsList, value ):
+    
+    if value <= 0.0 :
+        return colorsList[0]
+    elif value >= 1.0:
+        return colorsList[-1]
+    else:
+        tSpectrum = value*(len(colorsList)-1)
+        colorID = int(mt.floor(tSpectrum))
+        tLocal = tSpectrum-colorID
+        
+        cA = rc.Display.Color4f(colorsList[colorID])
+        cB = rc.Display.Color4f(colorsList[colorID+1])
+        cC = cA.BlendTo( tLocal, cB)
+        blendColor = cC.AsSystemColor()
+        
+        return blendColor
+
+def ColorBeamDef( BeamDef, defEleVector, bounds, ListColor, type):
+    #tDomain = ghcomp.ConstructDomain( -1, 1 ) #[-1,1]
+    t1 = abs(bounds[0])
+    t2 = abs(bounds[1])
+    modelBeamDef = []
+    colorBeam = []
+    for ele, vector in zip(BeamDef,defEleVector):
+        n = 2 #len(defEleVector)
+        divide = ele.DivideByCount( n, True )
+        segmentCurve = rg.Curve.Split(ele, divide)
+        modelBeamDef.append( segmentCurve )
+        listColor = []
+        for ivector in vector:
+            if type == 0:
+                valor = ivector.X
+            elif type == 1:
+                valor = ivector.Y
+            elif type == 2:
+                valor = ivector.Z
+            elif type == 3:
+                valor = ivector.SquareLength #ivector.Length
+            Valor = (valor + t1)/(t1+t2)
+            #color = ghcomp.Interpolatedata( ListColor, Valor)
+            #color = rs.CreateColor( 255, 255, 0 )
+            color = alpacaView.sampleColor( ListColor, Valor )
+            listColor.append( color )
+        colorBeam.append( listColor )
+        
+    return modelBeamDef, colorBeam
+    
+def ColorBeamDefExtrude( BeamDef, defEleVector, bounds, ListColor, type):
+    #tDomain = ghcomp.ConstructDomain( -1, 1 ) #[-1,1]
+    t1 = abs(bounds[0])
+    t2 = abs(bounds[1])
+    modelBeamDefColor = []
+    for ele, vector in zip(BeamDef,defEleVector):
+        nVertices = range(len(ele.Vertices))
+        ele.VertexColors.Clear()
+        nDivide = len(vector)
+        n = int(len(nVertices)/nDivide)
+        list = []
+        for i in range(nDivide):
+            list.append( nVertices[n*i:n*(i+1)])
+            
+        listColor = []
+        for ivector in vector:
+            if type == 0:
+                valor = ivector.X
+            elif type == 1:
+                valor = ivector.Y
+            elif type == 2:
+                valor = ivector.Z
+            elif type == 3:
+                valor = ivector.SquareLength #ivector.Length
+            Valor = (valor + t1)/(t1+t2)
+            #color = ghcomp.Interpolatedata( ListColor, Valor)
+            #color = rs.CreateColor( 255, 255, 0 )
+            color = sampleColor( ListColor, Valor )
+            listColor.append( color )
+            
+        for icolor, iList in zip(listColor, list):
+            for iPoint in iList:
+                ele.VertexColors.Add( icolor )
+        modelBeamDefColor.append( ele)
+    return modelBeamDefColor
+
+def ColorShellDef( shellDef, defEleVector, bounds, ListColor, type, extrudeModel ):
+    #tDomain = ghcomp.ConstructDomain( -1, 1 ) #[-1,1]
+    t1 = abs(bounds[0])
+    t2 = abs(bounds[1])
+    modelShellDefColor = []
+    for ele, vector in zip(shellDef,defEleVector):
+        ele.VertexColors.Clear()
+        listColor = []
+        for ivector in vector:
+            if type == 0:
+                valor = ivector.X
+            elif type == 1:
+                valor = ivector.Y
+            elif type == 2:
+                valor = ivector.Z
+            elif type == 3:
+                valor = ivector.SquareLength #ivector.Length
+            Valor = (valor + t1)/(t1+t2)
+            #color = ghcomp.Interpolatedata( ListColor, Valor)
+            #color = rs.CreateColor( 255, 255, 0 )
+            color = sampleColor( ListColor, Valor )
+            listColor.append( color )
+        if extrudeModel is True:
+            EleColor = listColor + listColor
+        else:
+            EleColor = listColor
+        for icolor in EleColor:
+            ele.VertexColors.Add( icolor )
+        modelShellDefColor.append( ele)
+    return modelShellDefColor
+
+def ColorBrickDef( brickDef, defEleVector, bounds, ListColor, type):
+    #tDomain = ghcomp.ConstructDomain( -1, 1 ) #[-1,1]
+    t1 = abs(bounds[0])
+    t2 = abs(bounds[1])
+    modelBrickDefColor = []
+    for ele, vector in zip(brickDef,defEleVector):
+        ele.VertexColors.Clear()
+        listColor = []
+        for ivector in vector:
+            if type == 0:
+                valor = ivector.X
+            elif type == 1:
+                valor = ivector.Y
+            elif type == 2:
+                valor = ivector.Z
+            elif type == 3:
+                valor = ivector.SquareLength #ivector.Length
+            Valor = (valor + t1)/(t1+t2)
+            #color = ghcomp.Interpolatedata( ListColor, Valor)
+            #color = rs.CreateColor( 255, 255, 0 )
+            color = sampleColor( ListColor, Valor )
+            listColor.append( color )
+            EleColor = listColor
+        for icolor in EleColor:
+            ele.VertexColors.Add( icolor )
+        modelBrickDefColor.append( ele)
+    return modelBrickDefColor
+
