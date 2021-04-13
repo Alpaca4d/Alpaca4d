@@ -456,11 +456,6 @@ class ForceBeamColumn(object):
         self.CrossSection.sectionTag = self.eleTag
         self.CrossSection.material.matTag = self.eleTag
 
-        #self.transfTag = index
-        #self.integrationTag = index
-
-        #self.CrossSection.sectionTag = index
-        #self.CrossSection.material.matTag = index
         pass
 
 
@@ -710,6 +705,22 @@ class ShellNLDKGT(object):
         vertices = self.Mesh.Vertices.ToPoint3dArray()
         for node in vertices:
             self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
+        pass
+
+    def setTopologyRTree(self, RTreeCloudPoint):
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.indexNodes = ind
         pass
     
     def setTags(self):
@@ -1430,6 +1441,16 @@ class PointLoad(object):
 
         return text
 
+
+class GravityLoad(object):
+    def __init__(self, GravityFactor, TimeSeries):
+        self.GravityFactor = GravityFactor
+        self.TimeSeries = TimeSeries
+
+        self.type = "Gravity Load"
+    
+    def ToString(self):
+        return "Gravity factor {}".format(self.GravityFactor)
 
 #####################################################################
 ### Analysis ########################################################
