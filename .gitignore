@@ -124,3 +124,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.mpco
+*.mpco
+WIP/openSeesModel
+WIP/recorder.mpco
