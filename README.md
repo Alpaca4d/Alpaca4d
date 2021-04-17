@@ -4,24 +4,20 @@
 
 ### Domenico Gaudioso
 
-* [ ] hdf5 - Numerical Nodal Displacements. Points, Displacement, Rotation
-* [ ] hdf5 - Numerical Reaction forces. Points, Forces, Moments
-* [ ] hdf5 - Nx, Vy, Vz, Mx, My, Mz
-* [ ] hdf5 - Numerical Stress Shells. Values are in the Gauss Points
+* [x] hdf5 - Numerical Nodal Displacements. Points, Displacement, Rotation
+* [x] hdf5 - Numerical Reaction forces. Points, Forces, Moments
+* [x] hdf5 - Nx, Vy, Vz, Mx, My, Mz
+* [x] hdf5 - Numerical Stress Shells. Values are in the Gauss Points
 * [ ] hdf5 - Numerical Stress Bricks. Values are in the Gauss Points
-* [ ] hdf5 -
-* [ ] hdf5 -
-* [ ] hdf5 -
-* [ ] hdf5 -
-* [ ] Disassemble Model - Line, Mesh, Brick, Load, Support, Section
+* [x] Disassemble Model - Line, Mesh, Brick, Load, Support, Section
 * [ ] Visualize Model - one single component for visualise with the boolean
 * [ ] Update the components to visualize the Supports, Loads, Beams. (we need to find a clever function to do an autoscale for the support dimension)
 * [ ] Components for Cross Section (Circle, Rectangular, Box). I assume they will have the type (elastic section where we calculate the value Area, Iy, Iz, ect, ect)
 
 
 * [ ] Update Deformed Dynamic Model
-* [ ] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
-* [ ] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
+* [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
+* [x] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
 * [ ] add "IPE" section
 
 * [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
