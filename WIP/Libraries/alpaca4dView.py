@@ -111,7 +111,7 @@ def troncoPiramide(PointBase, width, height):
 def incastro():
     plane = rg.Plane.WorldXY
     b = 0.5
-    h = b/3
+    h = b
     widthDomain = rg.Interval(-b/2,b/2)
     rectangle = rg.Rectangle3d.ToNurbsCurve(rg.Rectangle3d( plane, widthDomain, widthDomain ))
     surface = rg.Brep.CreatePlanarBreps( rectangle, 0.1 )[0]
@@ -300,23 +300,23 @@ def carrelloZ():
 
 
 def Support( support, scale):
-    vincoli = [ incastro(), cernieraXYZ(), cernieraY(), cernieraX(), carrelloX(), carrelloY(), carrelloZ()]
+    #vincoli = [ incastro(), cernieraXYZ(), cernieraY(), cernieraX(), carrelloX(), carrelloY(), carrelloZ()]
     if scale is None:
         scale = 1
     if support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == True and support.Ry == True and support.Rz == True:
-        solid = vincoli[0] #incastro()
+        solid = incastro()
     elif support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == False and support.Ry == False and support.Rz == False:
-        solid = vincoli[1] #cernieraXYZ()
+        solid = cernieraXYZ()
     elif support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == True and support.Ry == False :
-        solid = vincoli[2] #cernieraY()
+        solid = cernieraY()
     elif support.Tx == True and support.Ty == True and support.Tz == True and support.Rx == False and support.Ry == True :
-        solid = vincoli[3] #cernieraX()
+        solid = cernieraX()
     elif support.Tx == False and support.Ty == True and support.Tz == True :
-        solid = vincoli[4] #carrelloX()
+        solid = carrelloX()
     elif support.Tx == True and support.Ty == False and support.Tz == True :
-        solid = vincoli[5] #carrelloY()
+        solid = carrelloY()
     elif support.Tx == True and support.Ty == True and support.Tz == False :
-        solid = vincoli[6] #carrelloZ()
+        solid = carrelloZ()
         
     trasl = rg.Transform.Translation( rg.Vector3d(support.Pos) )
     plane = rg.Plane(support.Pos, rg.Vector3d.ZAxis)
@@ -701,5 +701,19 @@ def ColorBrickDef( brickDef, defEleVector, bounds, ListColor, type):
         for icolor in EleColor:
             ele.VertexColors.Add( icolor )
         modelBrickDefColor.append( ele)
+    return modelBrickDefColor
+
+def ColorBrickStress( Model, ListValor, bounds, ListColor):
+    t1 = abs(bounds[0])
+    t2 = abs(bounds[1])
+    modelBrickDefColor = []
+    for ele, valor in zip( Model.bricks, ListValor):
+        brick = ele.Mesh
+        brick.VertexColors.Clear()
+        listColor = []
+        Valor = (valor + t1)/(t1+t2)
+        color = sampleColor( ListColor, Valor )
+        brick.VertexColors.CreateMonotoneMesh( color )
+        modelBrickDefColor.append( brick )
     return modelBrickDefColor
 
