@@ -28,8 +28,14 @@ class Model(object):
         self.uniquePoints = []
         self.uniquePointsThreeNDF = []
         self.uniquePointsSixNDF = []
+
         self.cloudPoint = None
+        self.cloudPointThreeNDF = None
+        self.cloudPointSixNDF = None
+
         self.RTreeCloudPoint = None
+        self.RTreeCloudPointThreeNDF = None
+        self.RTreeCloudPointSixNDF = None
 
 
         self.nodes = []
@@ -119,8 +125,14 @@ class Model(object):
         else:
             self.uniquePoints = self.uniquePointsThreeNDF + self.uniquePointsSixNDF
         
-        self.cloudPoint = rg.PointCloud(self.uniquePoints)
-        self.RTreeCloudPoint = rg.RTree.CreateFromPointArray(self.uniquePoints)
+        #self.cloudPoint = rg.PointCloud(self.uniquePoints)
+        #self.RTreeCloudPoint = rg.RTree.CreateFromPointArray(self.uniquePoints)
+
+        self.cloudPointThreeNDF = rg.PointCloud(self.uniquePointsThreeNDF)
+        self.RTreeCloudPointThreeNDF = rg.RTree.CreateFromPointArray(self.uniquePointsThreeNDF)
+
+        self.cloudPointSixNDF = rg.PointCloud(self.uniquePointsSixNDF)
+        self.RTreeCloudPointSixNDF = rg.RTree.CreateFromPointArray(self.uniquePointsSixNDF)
 
         return
 
@@ -182,8 +194,11 @@ class Node(object):
         self.displacement = None
         self.rotation = None
 
-    def setNodeTag(self, cloudPoint):
-        self.nodeTag = cloudPoint.ClosestPoint(self.Pos) + 1
+    def setNodeTag(self, model):
+        if self.ndf == 3:
+            self.nodeTag = model.cloudPointThreeNDF.ClosestPoint(self.Pos) + 1
+        elif self.ndf == 6:
+            self.nodeTag = model.cloudPointSixNDF.ClosestPoint(self.Pos) + 1 + len(model.uniquePointsThreeNDF)
         pass
 
     def setNodeTagRTree(self, RTreeCloudPoint):
@@ -484,7 +499,7 @@ class ForceBeamColumn(object):
         self.jNode = cloudPoint.ClosestPoint(PointAtEnd) + 1
         pass
 
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
 
         PointAtStart = self.Crv.PointAtStart
         PointAtEnd = self.Crv.PointAtEnd
@@ -496,11 +511,11 @@ class ForceBeamColumn(object):
             closestIndices.Add(e.Id + 1)
         
         for pt in [PointAtStart, PointAtEnd]:
-            RTreeCloudPoint.Search(rg.Sphere(pt, 0.001), SearchCallback)
+            model.RTreeCloudPointSixNDF.Search(rg.Sphere(pt, 0.001), SearchCallback)
             ind = closestIndices
         
-        self.iNode = ind[0]
-        self.jNode = ind[1]
+        self.iNode = ind[0] + len(model.uniquePointsThreeNDF)
+        self.jNode = ind[1] + len(model.uniquePointsThreeNDF)
 
         pass
 
@@ -581,7 +596,7 @@ class ShellMITC4(object):
             self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
         pass
 
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
         self.indexNodes = []
         vertices = self.Mesh.Vertices.ToPoint3dArray()
 
@@ -592,9 +607,10 @@ class ShellMITC4(object):
             closestIndices.Add(e.Id + 1)
         
         for node in vertices:
-            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            model.RTreeCloudPointSixNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
             ind = closestIndices
         
+        ind = [item + len(model.uniquePointsThreeNDF) for item in ind]
         self.indexNodes = ind
         pass
     
@@ -653,7 +669,7 @@ class ASDShellQ4(object):
             self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
         pass
 
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
         self.indexNodes = []
         vertices = self.Mesh.Vertices.ToPoint3dArray()
 
@@ -664,9 +680,10 @@ class ASDShellQ4(object):
             closestIndices.Add(e.Id + 1)
         
         for node in vertices:
-            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            model.RTreeCloudPointSixNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
             ind = closestIndices
         
+        ind = [item + len(model.uniquePointsThreeNDF) for item in ind]
         self.indexNodes = ind
         pass
 
@@ -727,7 +744,7 @@ class ShellNLDKGT(object):
             self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
         pass
 
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
         vertices = self.Mesh.Vertices.ToPoint3dArray()
 
         closestIndices = []
@@ -737,9 +754,10 @@ class ShellNLDKGT(object):
             closestIndices.Add(e.Id + 1)
         
         for node in vertices:
-            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            model.RTreeCloudPointSixNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
             ind = closestIndices
         
+        ind = [item + len(model.uniquePointsThreeNDF) for item in ind]
         self.indexNodes = ind
         pass
     
@@ -798,7 +816,7 @@ class stdBrick(object):
         self.indexNodes = indexNodes
         pass
 
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
         vertices = self.Mesh.Vertices
 
         closestIndices = []
@@ -808,7 +826,7 @@ class stdBrick(object):
             closestIndices.Add(e.Id + 1)
         
         for node in vertices:
-            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            model.RTreeCloudPointThreeNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
             ind = closestIndices
         
         self.indexNodes = ind
@@ -860,7 +878,7 @@ class SSPbrick(object):
         pass
     
     
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
         vertices = self.Mesh.Vertices
 
         closestIndices = []
@@ -870,7 +888,7 @@ class SSPbrick(object):
             closestIndices.Add(e.Id + 1)
         
         for node in vertices:
-            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            model.RTreeCloudPointThreeNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
             ind = closestIndices
         
         self.indexNodes = ind
@@ -922,7 +940,7 @@ class FourNodeTetrahedron(object):
         self.indexNodes = indexNodes
         pass
 
-    def setTopologyRTree(self, RTreeCloudPoint):
+    def setTopologyRTree(self, model):
         vertices = self.Mesh.Vertices
 
         closestIndices = []
@@ -932,7 +950,7 @@ class FourNodeTetrahedron(object):
             closestIndices.Add(e.Id + 1)
         
         for node in vertices:
-            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            model.RTreeCloudPointThreeNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
             ind = closestIndices
         
         self.indexNodes = ind
@@ -985,9 +1003,13 @@ class Support(object):
         self.ndf = None
 
 
-    def setNodeTag(self, cloudPoint):
-        self.nodeTag = cloudPoint.ClosestPoint(self.Pos) + 1
+    def setNodeTag(self, model):
+        if self.ndf == 3:
+            self.nodeTag = model.cloudPointThreeNDF.ClosestPoint(self.Pos) + 1
+        elif self.ndf == 6:
+            self.nodeTag = model.cloudPointSixNDF.ClosestPoint(self.Pos) + 1 + len(model.uniquePointsThreeNDF)
         pass
+
 
     def setNodeTagRTree(self, RTreeCloudPoint):
         closestIndices = []
@@ -1012,7 +1034,7 @@ class Support(object):
         elif self.ndf == 3:
             tcl_text = "fix {} {} {} {}".format(self.nodeTag, self.Tx, self.Ty, self.Tz)
         else:
-            raise ValueError('No ndf has been assigned')
+            raise ValueError('The support at location {} is not part of the mdodel'.format(self.Pos.ToString()))
         return tcl_text
 
     def write_py(self):
@@ -1042,11 +1064,11 @@ class RigidDiaphragm(object):
         # It is assuming that Diaphgram is Horizontal
         self.perDir = 3 
     
-    def setNodeTag(self, cloudPoint):
+    def setNodeTag(self, model):
         
-        self.masterNodeTag = cloudPoint.ClosestPoint(self.masterNode) + 1
+        self.masterNodeTag = model.cloudPointSixNDF.ClosestPoint(self.masterNode) + 1 + len(model.uniquePointsThreeNDF)
         for node in self.slaveNodes:
-            self.slaveNodesTag.append(cloudPoint.ClosestPoint(node) + 1)
+            self.slaveNodesTag.append(model.cloudPointSixNDF.ClosestPoint(node) + 1 + len(model.uniquePointsThreeNDF))
         return
     
     def ToString(self):
@@ -1080,11 +1102,40 @@ class EqualDOF(object):
         self.masterNodeTag = None
         self.slaveNodesTag = None
 
+    def setNodeTag(self, model):
+        # work around to be sure that works when only 3df or 6df is present
+
+        try:
+            if self.masterNode.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,self.masterNode)) < 0.001:
+                self.masterNodeTag = model.cloudPointThreeNDF.ClosestPoint(self.masterNode) + 1
+            elif self.masterNode.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,self.masterNode)) < 0.001:
+                self.masterNodeTag = model.cloudPointSixNDF.ClosestPoint(self.masterNode) + 1 + len(model.uniquePointsThreeNDF)
+        except:
+            if self.masterNode.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,self.masterNode)) < 0.001:
+                self.masterNodeTag = model.cloudPointSixNDF.ClosestPoint(self.masterNode) + 1 + len(model.uniquePointsThreeNDF)
+            elif self.masterNode.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,self.masterNode)) < 0.001:
+                self.masterNodeTag = model.cloudPointThreeNDF.ClosestPoint(self.masterNode) + 1
+        
+        try:
+            if self.slaveNodes.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,self.slaveNodes)) < 0.001:
+                self.slaveNodesTag = model.cloudPointThreeNDF.ClosestPoint(self.slaveNodes) + 1
+            elif self.slaveNodes.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,self.slaveNodes)) < 0.001:
+                self.slaveNodesTag = model.cloudPointSixNDF.ClosestPoint(self.slaveNodes) + 1 + len(model.uniquePointsThreeNDF)
+        except:
+            if self.slaveNodes.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,self.slaveNodes)) < 0.001:
+                self.slaveNodesTag = model.cloudPointSixNDF.ClosestPoint(self.slaveNodes) + 1 + len(model.uniquePointsThreeNDF)
+            elif self.slaveNodes.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,self.slaveNodes)) < 0.001:
+                self.slaveNodesTag = model.cloudPointThreeNDF.ClosestPoint(self.slaveNodes) + 1
+
+        pass
+
+    """
     def setNodeTag(self, cloudPoint):
         
         self.masterNodeTag = cloudPoint.ClosestPoint(self.masterNode) + 1
         self.slaveNodesTag = cloudPoint.ClosestPoint(self.slaveNodes) + 1
         return
+    """
 
     def ToString(self):
         return self.write_tcl()
@@ -1415,9 +1466,20 @@ class PointLoad(object):
         self.TimeSeries = TimeSeries
 
 
-    def setNodeTag(self, cloudPoint):
-        self.nodeTag = cloudPoint.ClosestPoint(self.Pos) + 1
+    def setNodeTag(self, model):
+        # work around to be sure that works when only 3df or 6df is present
+        try:
+            if self.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,self.Pos)) < 0.001:
+                self.nodeTag = model.cloudPointThreeNDF.ClosestPoint(self.Pos) + 1
+            elif self.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,self.Pos)) < 0.001:
+                self.nodeTag = model.cloudPointSixNDF.ClosestPoint(self.Pos) + 1 + len(model.uniquePointsThreeNDF)
+        except:
+            if self.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,self.Pos)) < 0.001:
+                self.nodeTag = model.cloudPointSixNDF.ClosestPoint(self.Pos) + 1 + len(model.uniquePointsThreeNDF)
+            elif self.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,self.Pos)) < 0.001:
+                self.nodeTag = model.cloudPointThreeNDF.ClosestPoint(self.Pos) + 1
         pass
+
 
     #TODO
     # Allowing for more than one time series
@@ -1458,9 +1520,9 @@ class PointLoad(object):
                         text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
                 except:
                     if load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,load.Pos)) < 0.001:
-                        text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z))
+                        text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
                     elif load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,load.Pos)) < 0.001:
-                        text.append("\tload %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
+                        text.append("\tload %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z))
             text.append("}\n")
         text = "\n".join(text)
 
