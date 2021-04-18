@@ -58,6 +58,8 @@ class Model(object):
 
         self.analysis = None
 
+        self.IsAnalysed = None
+
         self.py = []
 
 
@@ -516,7 +518,7 @@ class ForceBeamColumn(object):
         return "geomTransf Linear {} {} {} {}\n".format(self.transfTag, self.getGeomTransfVector().X, self.getGeomTransfVector().Y, self.getGeomTransfVector().Z)
 
     def ToString(self):
-        return self.write_tcl()
+        return "Class ForceBeamColumn"
 
     def write_tcl(self):
         # https://opensees.berkeley.edu/wiki/index.php/Elastic_Timoshenko_Beam_Column_Element
@@ -650,6 +652,24 @@ class ASDShellQ4(object):
         for node in vertices:
             self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
         pass
+
+    def setTopologyRTree(self, RTreeCloudPoint):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            RTreeCloudPoint.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        self.indexNodes = ind
+        pass
+
     
     def setTags(self):
 
@@ -925,7 +945,7 @@ class FourNodeTetrahedron(object):
         pass
     
     def ToString(self):
-        return "Class Tetrahedron"
+        return "Class FourNodeTetrahedron"
     
     def write_tcl(self):
         material = self.material.write_tcl()
@@ -1063,7 +1083,7 @@ class EqualDOF(object):
     def setNodeTag(self, cloudPoint):
         
         self.masterNodeTag = cloudPoint.ClosestPoint(self.masterNode) + 1
-        self.slaveNodesTag.append(cloudPoint.ClosestPoint(self.slaveNodes) + 1)
+        self.slaveNodesTag = cloudPoint.ClosestPoint(self.slaveNodes) + 1
         return
 
     def ToString(self):
@@ -1431,12 +1451,17 @@ class PointLoad(object):
             text.append(groupsTimeSeries[timeSeries][0].TimeSeries.write_tcl())
             text.append("pattern Plain %s %s {" % (timeSeries, timeSeries)) #patternTag, TimeSeriesTag
             for load in groupsTimeSeries[timeSeries]:
-                if model.uniquePointsThreeNDF:
+                try:
                     if load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,load.Pos)) < 0.001:
                         text.append("\tload %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z))
-                elif load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,load.Pos)) < 0.001:
-                    text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
-            text.append("}")
+                    elif load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,load.Pos)) < 0.001:
+                        text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
+                except:
+                    if load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsSixNDF,load.Pos)) < 0.001:
+                        text.append("\tload %s %s %s %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z))
+                    elif load.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.uniquePointsThreeNDF,load.Pos)) < 0.001:
+                        text.append("\tload %s %s %s %s" % (load.nodeTag, load.Force.X, load.Force.Y, load.Force.Z, load.Moment.X, load.Moment.Y, load.Moment.Z))
+            text.append("}\n")
         text = "\n".join(text)
 
         return text
