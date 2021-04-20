@@ -40,7 +40,7 @@ def ViewShell(Model, type):
     for item in Model.shells:
         shell = item.Mesh
         color = item.Colour
-        if type is False: 
+        if type is not True: 
             Shell.append([shell, color])
         else:
             point = [ rg.Point3d( ipoint ) for ipoint in item.Mesh.Vertices ]
@@ -602,7 +602,7 @@ def ColorBeamDef( BeamDef, defEleVector, bounds, ListColor, type):
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
-            color = alpacaView.sampleColor( ListColor, Valor )
+            color = sampleColor( ListColor, Valor )
             listColor.append( color )
         colorBeam.append( listColor )
         
