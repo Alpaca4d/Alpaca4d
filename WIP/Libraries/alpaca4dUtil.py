@@ -86,3 +86,72 @@ def cleanTetrahedron(iMesh):
         newTets = tets
     
     return newTets
+
+def cleanHexahedron(Brick):
+
+    Brick.FaceNormals.ComputeFaceNormals()
+    Brick.UnifyNormals()
+
+    # find the center face and normal
+    faceCenter = Brick.Faces.GetFaceCenter(0)
+    faceNormal = Brick.FaceNormals.Item[0]
+
+
+    polyCurvePts = []
+    firstFace = []
+
+
+    for item in Brick.Faces.GetTopologicalVertices(0):
+        polyCurvePts.append( Brick.Vertices.Item[item] )
+        firstFace.append(item)
+
+    faceEdge = ghcomp.PolyLine(polyCurvePts , True).ToNurbsCurve()
+
+
+
+    # find number of intersection to understand if the normal is pointing outside
+    line = rg.Line(faceCenter,  faceCenter + (1000 * faceNormal))
+    line.Extend(0.001, 0.001)
+    result = len( rg.Intersect.Intersection.MeshLine(Brick, line)[0] )
+
+
+
+    if result > 1:
+        faceNormal = -faceNormal
+
+
+    orientation = faceEdge.ClosedCurveOrientation(faceNormal)
+
+
+    secondFace = []
+    for item in Brick.Faces.GetTopologicalVertices(0):
+        index = Brick.Vertices.GetConnectedVertices(item)
+        for i in index:
+            if i not in Brick.Faces.GetTopologicalVertices(0):
+                secondFace.append(i)
+
+
+    if (orientation != rg.CurveOrientation.Clockwise):
+        firstFace.reverse()
+        secondFace.reverse()
+
+
+    # create new  Brick
+    newBrick = rg.Mesh()
+
+    for index in firstFace:
+        newBrick.Vertices.Add( Brick.Vertices.Item[index] )
+    for index in secondFace:
+        newBrick.Vertices.Add( Brick.Vertices.Item[index] )
+
+    newBrick.Faces.AddFace(0,1,2,3)
+    newBrick.Faces.AddFace(4,5,6,7)
+    newBrick.Faces.AddFace(1,2,6,5)
+    newBrick.Faces.AddFace(0,3,7,4)
+    newBrick.Faces.AddFace(0,1,5,4)
+    newBrick.Faces.AddFace(3,2,6,7)
+
+    newBrick.FaceNormals.ComputeFaceNormals()
+    newBrick.UnifyNormals()
+
+    return newBrick
