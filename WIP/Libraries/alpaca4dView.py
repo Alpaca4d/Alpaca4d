@@ -554,7 +554,7 @@ def boundsDef( ListVector, type = None ):
         elif type == 2:
             valor = i.Z
         elif type >= 3:
-            valor = i.SquareLength #i.Length
+            valor = i.Length
                     
         valorList.append(valor)
     bounds = [min(valorList),max(valorList)]
