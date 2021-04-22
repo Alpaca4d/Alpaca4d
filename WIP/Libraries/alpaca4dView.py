@@ -543,8 +543,8 @@ def ShellDefExtrude(Model, DictNodeDisp, c):
         
             
 def boundsDef( ListVector, type = None ):
-    if type == None:
-        type = 3
+    if type == None: type = 3
+
     valorList = []
     for i in ListVector:
         if type <= 0:
@@ -554,8 +554,8 @@ def boundsDef( ListVector, type = None ):
         elif type == 2:
             valor = i.Z
         elif type >= 3:
-            valor = i.Length
-                    
+            valor = i.SquareLength #i.Length
+
         valorList.append(valor)
     bounds = [min(valorList),max(valorList)]
     return bounds
@@ -591,13 +591,13 @@ def ColorBeamDef( BeamDef, defEleVector, bounds, ListColor, type):
         modelBeamDef.append( segmentCurve )
         listColor = []
         for ivector in vector:
-            if type == 0:
+            if type <= 0:
                 valor = ivector.X
             elif type == 1:
                 valor = ivector.Y
             elif type == 2:
                 valor = ivector.Z
-            elif type == 3:
+            elif type >= 3:
                 valor = ivector.SquareLength #ivector.Length
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
@@ -624,14 +624,14 @@ def ColorBeamDefExtrude( BeamDef, defEleVector, bounds, ListColor, type):
             
         listColor = []
         for ivector in vector:
-            if type == 0:
+            if type <= 0:
                 valor = ivector.X
             elif type == 1:
                 valor = ivector.Y
             elif type == 2:
                 valor = ivector.Z
-            elif type == 3:
-                valor = ivector.SquareLength #ivector.Length
+            elif type >= 3:
+                valor = ivector.SquareLength  #ivector.Length
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
@@ -653,14 +653,14 @@ def ColorShellDef( shellDef, defEleVector, bounds, ListColor, type, extrudeModel
         ele.VertexColors.Clear()
         listColor = []
         for ivector in vector:
-            if type == 0:
+            if type <= 0:
                 valor = ivector.X
             elif type == 1:
                 valor = ivector.Y
             elif type == 2:
                 valor = ivector.Z
-            elif type == 3:
-                valor = ivector.SquareLength #ivector.Length
+            elif type >= 3:
+                valor = ivector.SquareLength  #ivector.Length
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
@@ -684,14 +684,14 @@ def ColorBrickDef( brickDef, defEleVector, bounds, ListColor, type):
         ele.VertexColors.Clear()
         listColor = []
         for ivector in vector:
-            if type == 0:
+            if type <= 0:
                 valor = ivector.X
             elif type == 1:
                 valor = ivector.Y
             elif type == 2:
                 valor = ivector.Z
-            elif type == 3:
-                valor = ivector.SquareLength #ivector.Length
+            elif type >= 3:
+                valor = ivector.SquareLength  #ivector.Length
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
@@ -703,17 +703,17 @@ def ColorBrickDef( brickDef, defEleVector, bounds, ListColor, type):
         modelBrickDefColor.append( ele)
     return modelBrickDefColor
 
-def ColorBrickStress( Model, ListValor, bounds, ListColor):
+def ColorBrickStress( brick, ListValor, bounds, ListColor):
     t1 = abs(bounds[0])
     t2 = abs(bounds[1])
     modelBrickDefColor = []
-    for ele, valor in zip( Model.bricks, ListValor):
-        brick = ele.Mesh
-        brick.VertexColors.Clear()
+    for ele, valor in zip( brick, ListValor):
+        brickMesh = ele.Mesh
+        brickMesh.VertexColors.Clear()
         listColor = []
         Valor = (valor + t1)/(t1+t2)
         color = sampleColor( ListColor, Valor )
-        brick.VertexColors.CreateMonotoneMesh( color )
-        modelBrickDefColor.append( brick )
+        brickMesh.VertexColors.CreateMonotoneMesh( color )
+        modelBrickDefColor.append( brickMesh )
     return modelBrickDefColor
 
