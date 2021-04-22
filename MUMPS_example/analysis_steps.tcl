@@ -1,23 +1,4 @@
 
-
-# a list of all monitor and custom function actors to be called by the MonitorFunction
-# set all_custom_functions {}
-# set all_monitor_actors {}
-
-# the main custom function caller that will call all actors in $all_monitor_actors and in $all_custom_functions list
-# proc CustomFunctionCaller {monitor_dir step_id dt T n_iter norm perc process_id} {
-	# global all_monitor_actors
-	# global all_custom_functions
-	# # Call monitors: we pass the parameters needed
-	# foreach p $all_monitor_actors {
-		# $p $monitor_dir $step_id $dt $T $n_iter $norm $perc $process_id
-	# }
-	# # Call all other custom functions
-	# foreach p $all_custom_functions {
-		# $p
-	# }
-# }
-
 recorder mpco "recorder.part-$process_id.mpco" \
 -N "displacement"
 
@@ -38082,7 +38063,7 @@ numberer ParallelRCM
 system Mumps
 test NormDispIncr 1e-06 12  
 algorithm ModifiedNewton
-integrator LoadControl 0.0
+integrator LoadControl 1.0
 analysis Static
 # ======================================================================================
 # NON-ADAPTIVE LOAD CONTROL ANALYSIS
@@ -38097,12 +38078,10 @@ analysis Static
 set total_time 1.0
 set initial_num_incr 1
 
-#monitor
-set monitor_dir "C:/VBShared/BUG_temp/pellegrino"
+
 
 set time 0.0
 set time_increment [expr $total_time / $initial_num_incr]
-integrator LoadControl $time_increment 
 for {set increment_counter 1} {$increment_counter <= $initial_num_incr} {incr increment_counter} {
 	
 	set ok [analyze 1 ]
