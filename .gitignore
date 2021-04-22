@@ -127,3 +127,5 @@ dmypy.json
 *.mpco
 WIP/openSeesModel
 WIP/recorder.mpco
+*.mpco
+WIP/openSeesModel
