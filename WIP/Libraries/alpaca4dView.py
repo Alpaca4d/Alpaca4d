@@ -554,7 +554,7 @@ def boundsDef( ListVector, type = None ):
         elif type == 2:
             valor = i.Z
         elif type >= 3:
-            valor = i.SquareLength #i.Length
+            valor = i.Length #i.SquareLength
 
         valorList.append(valor)
     bounds = [min(valorList),max(valorList)]
@@ -598,7 +598,7 @@ def ColorBeamDef( BeamDef, defEleVector, bounds, ListColor, type):
             elif type == 2:
                 valor = ivector.Z
             elif type >= 3:
-                valor = ivector.SquareLength #ivector.Length
+                valor = ivector.Length #ivector.SquareLength
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
@@ -631,7 +631,7 @@ def ColorBeamDefExtrude( BeamDef, defEleVector, bounds, ListColor, type):
             elif type == 2:
                 valor = ivector.Z
             elif type >= 3:
-                valor = ivector.SquareLength  #ivector.Length
+                valor = ivector.Length #ivector.SquareLength 
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
@@ -660,7 +660,7 @@ def ColorShellDef( shellDef, defEleVector, bounds, ListColor, type, extrudeModel
             elif type == 2:
                 valor = ivector.Z
             elif type >= 3:
-                valor = ivector.SquareLength  #ivector.Length
+                valor = ivector.Length #ivector.SquareLength 
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
@@ -691,7 +691,7 @@ def ColorBrickDef( brickDef, defEleVector, bounds, ListColor, type):
             elif type == 2:
                 valor = ivector.Z
             elif type >= 3:
-                valor = ivector.SquareLength  #ivector.Length
+                valor = ivector.Length #ivector.SquareLength 
             Valor = (valor + t1)/(t1+t2)
             #color = ghcomp.Interpolatedata( ListColor, Valor)
             #color = rs.CreateColor( 255, 255, 0 )
