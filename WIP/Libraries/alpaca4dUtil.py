@@ -89,6 +89,7 @@ def cleanTetrahedron(iMesh):
 
 def cleanHexahedron(Brick):
 
+
     Brick.FaceNormals.ComputeFaceNormals()
     Brick.UnifyNormals()
 
@@ -155,3 +156,35 @@ def cleanHexahedron(Brick):
     newBrick.UnifyNormals()
 
     return newBrick
+
+
+def cleanShellMITC9(iMesh):
+    
+    newMesh = iMesh.Duplicate()
+    polyCrv = newMesh.GetNakedEdges()[0]
+    
+    vts = polyCrv.ToArray()[:-1]
+    
+    vt_4 = (vts[0] + vts [1]) / 2.0
+    vt_5 = (vts[1] + vts [2]) / 2.0
+    vt_6 = (vts[2] + vts [3]) / 2.0
+    vt_7 = (vts[3] + vts [0]) / 2.0
+    vt_center = newMesh.Faces.GetFaceCenter(0)
+    
+    
+    oMesh = rg.Mesh()
+    for pt in vts:
+        oMesh.Vertices.Add(pt)
+    
+    oMesh.Vertices.Add(vt_4)
+    oMesh.Vertices.Add(vt_5)
+    oMesh.Vertices.Add(vt_6)
+    oMesh.Vertices.Add(vt_7)
+    oMesh.Vertices.Add(vt_center)
+    
+    oMesh.Faces.AddFace(0,4,8,7)
+    oMesh.Faces.AddFace(4,1,5,8)
+    oMesh.Faces.AddFace(8,5,2,6)
+    oMesh.Faces.AddFace(7,8,6,3)
+    
+    return oMesh

@@ -64,7 +64,8 @@ class Model(object):
 
         self.analysis = None
 
-        self.IsAnalysed = None
+        self.isAnalysed = None
+        self.isModal = None
 
         self.py = []
 
@@ -181,6 +182,18 @@ class Model(object):
         process = subprocess.Popen([executable, self.filename], shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
         return stdout, stderr
+    
+    def runEigen(self, executable):
+
+        process = subprocess.Popen([executable, self.filename], shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        stdout, stderr = process.communicate()
+
+        delim = 'Italy.'
+        eigen = stderr.partition(delim)[2].strip().split('\r\n')
+        return stdout, eigen
+
+
+
 
 class Node(object):
     def __init__(self, Pos):
@@ -645,6 +658,82 @@ class ShellMITC4(object):
         shell =  "ops.element('ShellMITC4', {}, {}, {}, {}, {}, {})\n".format(self.eleTag, self.indexNodes[0], self.indexNodes[1], self.indexNodes[2], self.indexNodes[3], self.CrossSection.sectionTag)
 
         return material + section + shell
+
+
+class ShellMITC9(object):
+    def __init__(self, Mesh, CrossSection, Colour):
+
+        self.Mesh = Mesh
+        self.CrossSection = CrossSection
+        self.Colour = Colour
+
+        self.type = "Shell"
+
+        self.ndf = 6
+        
+        self.eleTag = None
+        self.indexNodes = []
+
+        self.elementType = "ShellMITC9"
+
+    def setTopology(self, cloudPoint):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+        for node in vertices:
+            self.indexNodes.append( cloudPoint.ClosestPoint(node) + 1 )
+        pass
+
+    def setTopologyRTree(self, model):
+        self.indexNodes = []
+        vertices = self.Mesh.Vertices.ToPoint3dArray()
+
+        closestIndices = []
+        
+        #event handler of type RTreeEventArgs
+        def SearchCallback(sender, e):
+            closestIndices.Add(e.Id + 1)
+        
+        for node in vertices:
+            model.RTreeCloudPointSixNDF.Search(rg.Sphere(node, 0.001), SearchCallback)
+            ind = closestIndices
+        
+        ind = [item + len(model.uniquePointsThreeNDF) for item in ind]
+        self.indexNodes = ind
+        pass
+    
+    def setTags(self):
+
+        self.CrossSection.sectionTag = self.eleTag
+        self.CrossSection.material.matTag = self.eleTag
+
+        #self.CrossSection.sectionTag = index
+        #self.CrossSection.material.matTag = index
+        pass
+
+    def ToString(self):
+        return "Class ShellMITC4"
+
+    def write_tcl(self):
+        # https://opensees.berkeley.edu/wiki/index.php/Shell_Element
+        # element ShellMITC4 $eleTag $iNode $jNode $kNode $lNode $secTag
+
+        material = self.CrossSection.material.write_tcl()
+        section = self.CrossSection.write_tcl()
+
+        shell = "element ShellMITC4 {} {} {} {} {} {} {} {} {} {} {}\n".format(self.eleTag, self.indexNodes[0], self.indexNodes[1], self.indexNodes[2], self.indexNodes[3], self.indexNodes[4], self.indexNodes[5], self.indexNodes[6], self.indexNodes[7], self.indexNodes[8], self.CrossSection.sectionTag)
+
+        return material + section + shell
+
+    def write_py(self):
+
+        material = self.CrossSection.material.write_py()
+        section = self.CrossSection.write_py()
+
+        shell =  "ops.element('ShellMITC4', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})\n".format(self.eleTag, self.indexNodes[0], self.indexNodes[1], self.indexNodes[2], self.indexNodes[3], self.indexNodes[4], self.indexNodes[5], self.indexNodes[6], self.indexNodes[7], self.indexNodes[8], self.CrossSection.sectionTag)
+
+        return material + section + shell
+
+
 
 class ASDShellQ4(object):
     def __init__(self, Mesh, CrossSection, Colour):
