@@ -1415,12 +1415,13 @@ class ElasticSection(object):
         return py_text
 
 
+
 #TODO
 class PlateFiberSection(object):
-    def __init__(self, sectionName, height, material):
+    def __init__(self, sectionName, thickness, material):
 
         self.sectionName = sectionName
-        self.height = height
+        self.thickness = thickness
         self.material = material
         
         self.sectionTag = None
@@ -1431,18 +1432,18 @@ class PlateFiberSection(object):
     def write_tcl(self):
         # https://opensees.berkeley.edu/wiki/index.php/Plate_Fiber_Section
         #       section PlateFiber $secTag $matTag $h
-        return "section PlateFiber {} {} {}\n".format(self.sectionTag, self.material.matTag, self.height)
+        return "section PlateFiber {} {} {}\n".format(self.sectionTag, self.material.matTag, self.thickness)
 
     def write_py(self):
-        return "ops.section('PlateFiber',{},{},{})\n".format(self.sectionTag, self.material.matTag, self.height)
+        return "ops.section('PlateFiber',{},{},{})\n".format(self.sectionTag, self.material.matTag, self.thickness)
 
 #TODO
 class ElasticMembranePlateSection(object):
-    def __init__(self, sectionName, height, material):
+    def __init__(self, sectionName, thickness, material):
 
         self.sectionName = sectionName
         self.material = material
-        self.height = height
+        self.thickness = thickness
 
         self.sectionTag = None
 
@@ -1452,18 +1453,17 @@ class ElasticMembranePlateSection(object):
     def write_tcl(self):
         # https://opensees.berkeley.edu/wiki/index.php/Elastic_Membrane_Plate_Section
         #       section ElasticMembranePlateSection {$secTag} {$E} {$n} {$h} {$rho}
-        return "section ElasticMembranePlateSection {} {} {} {} {}\n".format(self.sectionTag, self.material.E, self.material.v, self.height, self.material.rho)
+        return "section ElasticMembranePlateSection {} {} {} {} {}\n".format(self.sectionTag, self.material.E, self.material.v, self.thickness, self.material.rho)
 
     def write_py(self):
-        return "ops.section('ElasticMembranePlateSection',{},{},{},{},{})\n".format(self.sectionTag, self.material.E, self.material.v, self.height, self.material.rho)
-
+        return "ops.section('ElasticMembranePlateSection',{},{},{},{},{})\n".format(self.sectionTag, self.material.E, self.material.v, self.thickness, self.material.rho)
 #TODO
 class LayeredShell(object):
-    def __init__(self, sectionName, materials, thicknesses):
+    def __init__(self, sectionName, material, thickness):
 
         self.sectionName = sectionName
-        self.materials = materials
-        self.thicknesses = thicknesses
+        self.material = material
+        self.thickness = thickness
 
         self.numLayer = None
         self.sectionTag = None
@@ -1476,9 +1476,9 @@ class LayeredShell(object):
         # section LayeredShell $sectionTag $nLayers $matTag1 $thickness1...$matTagn $thicknessn
         
         subDividedThickness = []
-        for layerThickness in self.thicknesses:
+        for layerThickness in self.thickness:
             tempThick = []
-            subLayerThickness = layerThickness/3
+            subLayerThickness = float(layerThickness/3.0)
             tempThick.append(subLayerThickness)
             tempThick = tempThick * 3
             subDividedThickness.append(tempThick)
@@ -1487,30 +1487,29 @@ class LayeredShell(object):
         numLayer = 0
         for listElem in subDividedThickness:
             numLayer += len(listElem)
-
+        
         self.numLayer = numLayer
             
         
         tcl_text = "section LayeredShell {} {} ".format(self.sectionTag, numLayer)
-        for i in range(len(self.materials)):
-            for j in range(len(subDividedThickness)):
+        for i in range(len(self.material)):
+            for j in range(len(subDividedThickness[i])):
                 
-                tcl_text += str(self.materials[i].matTag) + " "
+                tcl_text += str(self.material[i].matTag) + " "
                 tcl_text += str(subDividedThickness[i][j]) + " "
         
         tcl_text += "\n"
         
-        return tcl_text 
-
+        return tcl_text
 
     def write_py(self):
         
         subDividedThickness = []
-        for layerThickness in self.thicknesses:
+        for layerThickness in self.thickness:
             tempThick = []
-            subLayerThickness = layerThickness/3
+            subLayerThickness = layerThickness/3.0
             tempThick.append(subLayerThickness)
-            tempThick = tempThick * 3
+            tempThick = tempThick * 3.0
             subDividedThickness.append(tempThick)
         
         
@@ -1521,10 +1520,10 @@ class LayeredShell(object):
         self.numLayer = numLayer
         
         py_text = "ops.section('LayeredShell',{},{}, ".format(self.sectionTag, numLayer)
-        for i in range(len(self.materials)):
+        for i in range(len(self.material)):
             for j in range(len(subDividedThickness)):
                 
-                py_text += str(self.materials[i].matTag) + ","
+                py_text += str(self.material[i].matTag) + ","
                 py_text += str(subDividedThickness[i][j]) + ","
         py_text = py_text[:-1]
         py_text += ")\n"
