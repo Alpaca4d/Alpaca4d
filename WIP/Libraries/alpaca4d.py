@@ -103,7 +103,8 @@ class Model(object):
                 threeNDFPoints.append(node)
         
         for constraint in constraints:
-            sixNDFPoints.extend(constraint.slaveNodes, constraint.masterNode)
+            sixNDFPoints.extend(constraint.slaveNodes)
+            sixNDFPoints.append(constraint.masterNode)
         
         if not threeNDFPoints:
             self.uniquePointsThreeNDF = []
