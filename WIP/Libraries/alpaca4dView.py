@@ -706,14 +706,30 @@ def ColorBrickDef( brickDef, defEleVector, bounds, ListColor, type):
 def ColorBrickStress( brick, ListValor, bounds, ListColor):
     t1 = abs(bounds[0])
     t2 = abs(bounds[1])
-    modelBrickDefColor = []
+    modelBrickColor = []
     for ele, valor in zip( brick, ListValor):
         brickMesh = ele.Mesh
         brickMesh.VertexColors.Clear()
-        listColor = []
         Valor = (valor + t1)/(t1+t2)
         color = sampleColor( ListColor, Valor )
         brickMesh.VertexColors.CreateMonotoneMesh( color )
-        modelBrickDefColor.append( brickMesh )
-    return modelBrickDefColor
+        modelBrickColor.append( brickMesh )
+    return modelBrickColor
+
+def ColorShellStress( shell, ListValor, bounds, ListColor):
+    t1 = abs(bounds[0])
+    t2 = abs(bounds[1])
+    modelShellColor = []
+    for ele, valor in zip( shell, ListValor):
+        shellMesh = ele.Mesh
+        shellMesh.VertexColors.Clear()
+        for ivalor in valor:
+            Valor = (ivalor + t1)/(t1+t2)
+            color = sampleColor( ListColor, Valor )
+            shellMesh.VertexColors.Add( color )
+        modelShellColor.append( shellMesh )
+    return modelShellColor
+
+
+
 
