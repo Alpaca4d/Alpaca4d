@@ -103,8 +103,13 @@ class Model(object):
                 threeNDFPoints.append(node)
         
         for constraint in constraints:
-            sixNDFPoints.extend(constraint.slaveNodes)
-            sixNDFPoints.append(constraint.masterNode)
+            if constraint.type == "rigidDiaphragm":
+                sixNDFPoints.extend(constraint.slaveNodes)
+                sixNDFPoints.append(constraint.masterNode)
+            
+            elif constraint.type == "equalDOF":
+                sixNDFPoints.append(constraint.slaveNodes)
+                sixNDFPoints.append(constraint.masterNode)
         
         if not threeNDFPoints:
             self.uniquePointsThreeNDF = []
@@ -1150,6 +1155,8 @@ class RigidDiaphragm(object):
 
         self.masterNodeTag = None
         self.slaveNodesTag = []
+
+        self.type = "rigidDiaphragm"
         
         # It is assuming that Diaphgram is Horizontal
         self.perDir = 3 
@@ -1191,6 +1198,8 @@ class EqualDOF(object):
 
         self.masterNodeTag = None
         self.slaveNodesTag = None
+
+        self.type = "equalDOF"
 
     def setNodeTag(self, model):
         # work around to be sure that works when only 3df or 6df is present
