@@ -1390,8 +1390,83 @@ class RectangularCS(object):
     def write_py(self):
         pass
 
+#TODO
+class doubleTCS(object):
+    def __init__(self, Bsup, tsup, Binf, tinf, H, tw, material = None):
 
+        self.Bsup = Bsup
+        self.tsup = tsup
+        self.Binf = Binf
+        self.tinf = tinf
+        self.H = H     
+        self.tw = tw
+        self.shape = "doubleT"
+        self.material = material
 
+        A1, y1 = Bsup*tsup, (H - tsup/2 )
+        A2, y2 = ( H - tsup -tinf )*ta, (H-tsup-tinf)/2 + tinf
+        A3, y3 = Binf*tinf, tinf/2
+
+        self.yg = ( A1*y1 + A2*y2 + A3*y3 )/(A1 + A2 + A3 )
+        #-------------------------------------------------------#
+        p1 = plane.PointAt( -(yg - tinf), ta/2 )
+        p2 = plane.PointAt( -(yg - tinf), Binf/2 )
+        p3 = plane.PointAt( -yg, Binf/2 )
+        p4 = plane.PointAt( -yg, -Binf/2 )
+        p5 = plane.PointAt( -(yg - tinf), -Binf/2 ) 
+        p6 = plane.PointAt( -(yg - tinf), -ta/2 )
+        p7 = plane.PointAt( (H - yg - tsup), -ta/2)
+        p8 = plane.PointAt( (H - yg - tsup), -Bsup/2 )
+        p9 = plane.PointAt( (H - yg ), -Bsup/2 )
+        p10 = plane.PointAt( (H - yg ), Bsup/2 )
+        p11 = plane.PointAt( (H - yg - tsup), Bsup/2 )
+        p12 = plane.PointAt( (H - yg - tsup), ta/2 ) 
+        wirframe  = [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ] 
+        #-------------------------------------------------------#
+        self.crv = rg.PolylineCurve( wirframe )
+        self.sectionBrep = rg.Brep.CreatePlanarBreps( self.crv, 0.1 )[0]
+
+    def Area(self):
+        return  self.Bsup*self.tsup + ( self.H - self.tsup - self.tinf )*self.ta + self.Binf*self.tinf
+
+    def AreaY(self):
+        return self.Area() / (self.Area()/(( self.H - self.tsup - self.tinf )*self.ta)) 
+
+    def AreaZ(self):
+        return self.Area() / (self.Area()/(self.Bsup*self.tsup + self.Binf*self.tinf))
+
+    def Iyy(self):
+        return self.Bsup*self.tsup**3/12 + ( self.Bsup*self.tsup )*( self.H - self.yg - self.tsup/2 )**2 + ( self.H - self.tsup - self.tinf )**3/12 + ( self.H - self.tsup - self.tinf )*self.ta*( math.fabs(( self.H - self.tsup - self.tinf )/2 - self.yg) )**2 + self.Binf*self.tinf**3/12 + self.Binf*self.tinf*( self.yg - self.tinf/2 )**2
+
+    def Izz(self):
+        return self.tsup*self.Bsup**3/12 + self.tinf*self.Binf**3/12 + ( self.H - self.tsup - self.tinf )*self.ta**3/12
+
+    def J(self):
+        return  1/3*( self.Bsup*self.tsup**3 + self.Binf*self.tinf**3 + ( self.H - self.tsup - self.tinf )*self.ta**3 ) # Prandt per sezioni sottile aperte
+
+    def ToString(self):
+        return "Class doubleTCS: \
+                \n\tshape: {0} \
+                \n\tBsup: {1} \
+                \n\ttsup: {2} \
+                \n\tBinf: {3} \
+                \n\ttinf: {4} \
+                \n\tH: {5} \
+                \n\tw: {6} \                          
+                \n\tArea {7} \
+                \n\tAreaY {8} \
+                \n\tAreaZ {9} \
+                \n\tIyy {10} \
+                \n\tIzz {11} \
+                \n\tJ {12}".format(self.shape, self.Bsup, self.tsup, self.Binf, self.tinf, self.H, self.tw, round(self.Area(),3), round(self.AreaY(),3), round(self.AreaZ(),3), round(self.Iyy(),3), round(self.Izz(),3), round(self.J(),3))
+
+    def write_tcl(self):
+        pass
+
+    def write_py(self):
+        pass
+
+#TODO
 class ElasticSection(object):
     def __init__(self, secName, Area, Izz, Iyy, J, alphaY, alphaZ, material):
 
