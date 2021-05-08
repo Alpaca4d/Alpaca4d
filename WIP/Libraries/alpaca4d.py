@@ -1432,11 +1432,11 @@ class doubleTCS(object):
     def Area(self):
         return  self.Bsup*self.tsup + ( self.H - self.tsup - self.tinf )*self.tw + self.Binf*self.tinf
 
-    def AreaY(self):
-        return (( self.H - self.tsup - self.tinf )*self.tw)*self.Area()
+    def alphaY(self):
+        return (( self.H - self.tsup - self.tinf )*self.tw)/self.Area()
 
-    def AreaZ(self):
-        return (self.Bsup*self.tsup + self.Binf*self.tinf)*self.Area()
+    def alphaZ(self):
+        return (self.Bsup*self.tsup + self.Binf*self.tinf)/self.Area()
 
     def Iyy(self):
         return self.Bsup*self.tsup**3/12 + ( self.Bsup*self.tsup )*( self.H - self.yg - self.tsup/2 )**2 + ( self.H - self.tsup - self.tinf )**3/12 + ( self.H - self.tsup - self.tinf )*self.tw*( math.fabs(( self.H - self.tsup - self.tinf )/2 - self.yg) )**2 + self.Binf*self.tinf**3/12 + self.Binf*self.tinf*( self.yg - self.tinf/2 )**2
@@ -1445,7 +1445,7 @@ class doubleTCS(object):
         return self.tsup*self.Bsup**3/12 + self.tinf*self.Binf**3/12 + ( self.H - self.tsup - self.tinf )*self.tw**3/12
 
     def J(self):
-        return  1/3*( self.Bsup*self.tsup**3 + self.Binf*self.tinf**3 + ( self.H - self.tsup - self.tinf )*self.tw**3 ) # Prandt per sezioni sottile aperte
+        return  self.Izz() + self.Iyy() #1/3*( self.Bsup*self.tsup**3 + self.Binf*self.tinf**3 + ( self.H - self.tsup - self.tinf )*self.tw**3 ) # Prandt per sezioni sottile aperte
 
     def ToString(self):
         pass
