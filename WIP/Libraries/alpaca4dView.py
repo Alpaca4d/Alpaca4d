@@ -18,17 +18,17 @@ def ViewBeam( Model, type ):
         curve = iBeam.Crv
         color = iBeam.Colour
         if type is True:
-            start =  curve.PointAtNormalizedLength(0.0)
-            parameter = curve.ClosestPoint(start , 0.01)[1]
+            start =  curve.PointAtStart
+            OPSaxis = iBeam.getGeomTransfVector() 
             #rg.Curve.PerpendicularFrameAt( x, parameter )[1]
-            len = curve.Line.Length
             section = iBeam.CrossSection.sectionBrep
             #Section at 0.0
-            planeStart = curve.PerpendicularFrameAt(parameter)[1]
+            planeStart = rg.Plane( start, iBeam.getPerpFrame().XAxis, OPSaxis) 
             trasfom1 = rg.Transform.PlaneToPlane( rg.Plane.WorldXY, planeStart )
             profileFace = rg.Brep.Duplicate( section )
             profileFace.Transform( trasfom1 )
             #SolidBeam
+            len = curve.Line.Length
             solidBeam = rg.Brep.CreateFromOffsetFace( profileFace.Faces[0], len, 0.1, False, True )
             Beam.append( [solidBeam, color] )
         else:
@@ -477,19 +477,19 @@ def BeamDefExtrude(Model, DictNodeDisp, c):
         DefiNode = rg.Point3d.Add( item.Crv.PointAtStart, DictNodeDisp[item.iNode]*c )
         DefjNode = rg.Point3d.Add( item.Crv.PointAtEnd, DictNodeDisp[item.jNode]*c )
         beamDef = rg.LineCurve( DefiNode, DefjNode )
-        start =  beamDef.PointAtNormalizedLength(0.0)
-        end =  beamDef.PointAtNormalizedLength(1)
+        start =  beamDef.PointAtStart
+        end =  beamDef.PointAtEnd
+
         section = item.CrossSection.crv
+        OPSaxis = item.getGeomTransfVector() 
         #Section at 0.0
-        parameter = beamDef.ClosestPoint(start , 0.01)[1]
-        planeStart = beamDef.PerpendicularFrameAt(parameter)[1]
+        planeStart = rg.Plane( start, item.getPerpFrame().XAxis, OPSaxis) 
         trasfom1 = rg.Transform.PlaneToPlane( rg.Plane.WorldXY, planeStart )
         profileFace1 = rg.Curve.Duplicate(section)
         profileFace1.Transform( trasfom1 )
         pointSection.append( rg.NurbsCurve.GrevillePoints( profileFace1, True))
         #Section at 1
-        parameter = beamDef.ClosestPoint(end , 0.01)[1]
-        planeEnd = beamDef.PerpendicularFrameAt(parameter)[1]
+        planeEnd  = rg.Plane( end, item.getPerpFrame().XAxis, OPSaxis) 
         trasfom2 = rg.Transform.PlaneToPlane( rg.Plane.WorldXY, planeEnd )
         profileFace2 = rg.Curve.Duplicate(section)
         profileFace2.Transform( trasfom2 )
