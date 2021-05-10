@@ -3976,14 +3976,8 @@ pattern Plain 1 1 {
 	load 295 50.0 0.0 0.0 0.0 0.0 0.0
 }
 
-recorder mpco recorder.mpco -N  displacement rotation reactionForce reactionMoment -E  force stresses section.force section.fiber.stress
-constraints Transformation
-numberer RCM
-system BandSPD
-test NormDispIncr 1.0e-6 12 5
-algorithm Linear
-integrator LoadControl 1.0
-analysis Static
-analyze 1
-
+recorder mpco recorder_modes.mpco -N  modesOfVibration modesOfVibrationRotational -E 
+set lambdaN [eigen 1]
+puts "$lambdaN"
+record
 wipe
