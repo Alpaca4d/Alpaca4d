@@ -317,10 +317,13 @@ def Support( support, scale):
         solid = carrelloY()
     elif support.Tx == True and support.Ty == True and support.Tz == False :
         solid = carrelloZ()
+    else :
+        solid = cernieraXYZ()
+
         
     trasl = rg.Transform.Translation( rg.Vector3d(support.Pos) )
     plane = rg.Plane(support.Pos, rg.Vector3d.ZAxis)
-    solid.Transform(trasl)
+    solid.Transform( trasl )
     bb = rg.Transform.Scale( plane, scale, scale, scale)
     solid.Transform(bb)
     return solid
