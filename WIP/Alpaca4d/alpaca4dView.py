@@ -45,7 +45,7 @@ def ViewShell(Model, type):
         else:
             point = [ rg.Point3d( ipoint ) for ipoint in item.Mesh.Vertices ]
             shellExtrude = rg.Mesh()
-            thick = item.CrossSection.height
+            thick = item.CrossSection.thickness
             vt = shell.Vertices[0]
             shell.FaceNormals.ComputeFaceNormals()
             fid,MPt = shell.ClosestPoint(vt,0.01)
@@ -317,10 +317,13 @@ def Support( support, scale):
         solid = carrelloY()
     elif support.Tx == True and support.Ty == True and support.Tz == False :
         solid = carrelloZ()
+    else :
+        solid = cernieraXYZ()
+
         
     trasl = rg.Transform.Translation( rg.Vector3d(support.Pos) )
     plane = rg.Plane(support.Pos, rg.Vector3d.ZAxis)
-    solid.Transform(trasl)
+    solid.Transform( trasl )
     bb = rg.Transform.Scale( plane, scale, scale, scale)
     solid.Transform(bb)
     return solid
@@ -513,7 +516,7 @@ def ShellDefExtrude(Model, DictNodeDisp, c):
             shellDef.Faces.AddFace( 0, 1, 2 )
                     
         shellExtrude = rg.Mesh()
-        thick = item.CrossSection.height
+        thick = item.CrossSection.thickness
         vt = shellDef.Vertices[0]
         shellDef.FaceNormals.ComputeFaceNormals()
         fid,MPt = shellDef.ClosestPoint(vt,0.01)
