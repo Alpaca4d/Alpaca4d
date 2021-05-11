@@ -1,0 +1,1260 @@
+model BasicBuilder -ndm 3 -ndf 6
+
+node 1 -1.24945402145 6.24979114532 0.0001395480067 -mass 0 0 0 0 0 0
+node 2 -0.654492914677 5.67846298218 0.380726397038 -mass 0 0 0 0 0 0
+node 3 -0.204519212246 5.68735218048 0.476877838373 -mass 0 0 0 0 0 0
+node 4 -0.613135576248 6.2473487854 0.000518193817697 -mass 0 0 0 0 0 0
+node 5 0.273945093155 5.69754457474 0.556524038315 -mass 0 0 0 0 0 0
+node 6 -0.0226697064936 6.24108982086 0.000599719816819 -mass 0 0 0 0 0 0
+node 7 0.17560428381 5.12605142593 0.884747385979 -mass 0 0 0 0 0 0
+node 8 0.56936609745 5.15283393860 1.02624940872 -mass 0 0 0 0 0 0
+node 9 -0.172025620937 5.10491275787 0.726627588272 -mass 0 0 0 0 0 0
+node 10 0.753601312637 5.70889997482 0.636325657368 -mass 0 0 0 0 0 0
+node 11 0.533821761608 6.23036956787 0.000680207915138 -mass 0 0 0 0 0 0
+node 12 1.22365486622 5.72120046616 0.736210942268 -mass 0 0 0 0 0 0
+node 13 1.06422472000 6.21470069885 0.000819449080154 -mass 0 0 0 0 0 0
+node 14 0.982979238033 5.18648481369 1.16479635239 -mass 0 0 0 0 0 0
+node 15 1.39805591106 5.22937250137 1.31448733807 -mass 0 0 0 0 0 0
+node 16 0.844937860966 4.60125255585 1.41572034359 -mass 0 0 0 0 0 0
+node 17 1.21089720726 4.65482854843 1.59786522388 -mass 0 0 0 0 0 0
+node 18 1.58921265602 4.72789573669 1.77962863445 -mass 0 0 0 0 0 0
+node 19 1.42647254467 4.10367774963 1.94989264011 -mass 0 0 0 0 0 0
+node 20 1.81900000572 4.17654991150 2.19085764885 -mass 0 0 0 0 0 0
+node 21 1.08989930153 4.03823947906 1.73131871223 -mass 0 0 0 0 0 0
+node 22 0.223534986377 4.52607774734 1.02270472050 -mass 0 0 0 0 0 0
+node 23 0.509598016739 4.55910491943 1.22707331181 -mass 0 0 0 0 0 0
+node 24 0.794319868088 3.98303604126 1.50579559803 -mass 0 0 0 0 0 0
+node 25 0.547580897808 3.93898487091 1.25774991512 -mass 0 0 0 0 0 0
+node 26 1.67873477936 5.73182535172 0.800082802773 -mass 0 0 0 0 0 0
+node 27 1.57467699051 6.19334173203 0.000937079777941 -mass 0 0 0 0 0 0
+node 28 2.12022328377 5.73085260391 0.801138162613 -mass 0 0 0 0 0 0
+node 29 2.0706782341 6.16518211365 0.000918387260754 -mass 0 0 0 0 0 0
+node 30 1.79638195038 5.28190517426 1.40174210072 -mass 0 0 0 0 0 0
+node 31 2.17983174324 5.31559228897 1.40471935272 -mass 0 0 0 0 0 0
+node 32 2.55164933205 5.71080827713 0.778959155083 -mass 0 0 0 0 0 0
+node 33 2.55737423897 6.12857675552 0.000878308725078 -mass 0 0 0 0 0 0
+node 34 2.97642230988 5.66670989990 0.761777281761 -mass 0 0 0 0 0 0
+node 35 3.03970074654 6.08105230331 0.000828826450743 -mass 0 0 0 0 0 0
+node 36 2.55257892609 5.31709098816 1.37341928482 -mass 0 0 0 0 0 0
+node 37 2.91721272469 5.28084659576 1.35575652122 -mass 0 0 0 0 0 0
+node 38 2.25015521050 4.93251562119 1.84745037556 -mass 0 0 0 0 0 0
+node 39 2.56163859367 4.96111011505 1.81513011456 -mass 0 0 0 0 0 0
+node 40 2.86521196365 4.93649673462 1.79526340961 -mass 0 0 0 0 0 0
+node 41 2.57863521576 4.65832948685 2.12271070480 -mass 0 0 0 0 0 0
+node 42 2.82251811028 4.64637851715 2.0983979702 -mass 0 0 0 0 0 0
+node 43 2.33025932312 4.60252666473 2.15812802315 -mass 0 0 0 0 0 0
+node 44 1.92891335487 4.85082578659 1.85539615154 -mass 0 0 0 0 0 0
+node 45 2.07992196083 4.46098089218 2.18544936180 -mass 0 0 0 0 0 0
+node 46 3.39713263512 5.59412860870 0.761310458183 -mass 0 0 0 0 0 0
+node 47 3.52220511436 6.01881551743 0.000844556605443 -mass 0 0 0 0 0 0
+node 48 3.81525635719 5.48790407181 0.764481544495 -mass 0 0 0 0 0 0
+node 49 4.00857686996 5.93589258194 0.000857476494275 -mass 0 0 0 0 0 0
+node 50 3.27465867996 5.20308208466 1.35630738735 -mass 0 0 0 0 0 0
+node 51 3.62480378151 5.07970237732 1.35917627811 -mass 0 0 0 0 0 0
+node 52 4.23052549362 5.34188890457 0.75487279892 -mass 0 0 0 0 0 0
+node 53 4.50062513351 5.82252073288 0.000857634935528 -mass 0 0 0 0 0 0
+node 54 4.63894176483 5.14972019196 0.709262311459 -mass 0 0 0 0 0 0
+node 55 4.99543476105 5.66214370728 0.000768552999943 -mass 0 0 0 0 0 0
+node 56 3.96729230881 4.90740633011 1.34339320660 -mass 0 0 0 0 0 0
+node 57 4.30230712891 4.68930959702 1.27723205090 -mass 0 0 0 0 0 0
+node 58 3.44203186035 4.72041130066 1.79981303215 -mass 0 0 0 0 0 0
+node 59 3.71155786514 4.51871776581 1.78981137276 -mass 0 0 0 0 0 0
+node 60 3.97449278831 4.25544691086 1.73259484768 -mass 0 0 0 0 0 0
+node 61 3.46244621277 4.19159841537 2.10001373291 -mass 0 0 0 0 0 0
+node 62 3.61795806885 3.80739212036 2.11410546303 -mass 0 0 0 0 0 0
+node 63 3.27228879929 4.42557144165 2.09058809280 -mass 0 0 0 0 0 0
+node 64 3.15950870514 4.85764408112 1.79600226879 -mass 0 0 0 0 0 0
+node 65 3.05616331100 4.57057857513 2.08664584160 -mass 0 0 0 0 0 0
+node 66 5.02751302719 4.90553569794 0.632818281651 -mass 0 0 0 0 0 0
+node 67 5.47776508331 5.42634344101 0.000690774933901 -mass 0 0 0 0 0 0
+node 68 5.36483144760 4.60141658783 0.554810345173 -mass 0 0 0 0 0 0
+node 69 5.90061903000 5.07377672195 0.000603365595452 -mass 0 0 0 0 0 0
+node 70 4.62852668762 4.44465732574 1.15718960762 -mass 0 0 0 0 0 0
+node 71 4.91813087463 4.17741775513 1.02325975895 -mass 0 0 0 0 0 0
+node 72 5.61307287216 4.24893379211 0.470357567072 -mass 0 0 0 0 0 0
+node 73 6.17130661011 4.59356164932 0.000508490600623 -mass 0 0 0 0 0 0
+node 74 5.76621866226 3.90008950233 0.374516665936 -mass 0 0 0 0 0 0
+node 75 6.24979543686 4.06741189957 0.00013811646204 -mass 0 0 0 0 0 0
+node 76 5.14994096756 3.90066432953 0.876539945602 -mass 0 0 0 0 0 0
+node 77 5.32093000412 3.64555501938 0.717614769936 -mass 0 0 0 0 0 0
+node 78 4.52924060822 3.76292657852 1.41675591469 -mass 0 0 0 0 0 0
+node 79 4.74764251709 3.53074645996 1.22375190258 -mass 0 0 0 0 0 0
+node 80 4.91839313507 3.32724189758 1.01410675049 -mass 0 0 0 0 0 0
+node 81 4.39301109314 3.13214755058 1.51746332645 -mass 0 0 0 0 0 0
+node 82 4.55854892731 2.95805072784 1.25133621693 -mass 0 0 0 0 0 0
+node 83 4.18503141403 3.33717656136 1.74557387829 -mass 0 0 0 0 0 0
+node 84 4.26617860794 4.00635957718 1.58690452576 -mass 0 0 0 0 0 0
+node 85 3.93248057365 3.56240057945 1.94069218636 -mass 0 0 0 0 0 0
+node 86 2.79009985924 4.42009878159 2.29579520226 -mass 0 0 0 0 0 0
+node 87 2.97037625313 4.35270977020 2.27676415443 -mass 0 0 0 0 0 0
+node 88 3.12855124474 4.21968793869 2.27787256241 -mass 0 0 0 0 0 0
+node 89 2.90673685074 4.20046234131 2.41004562378 -mass 0 0 0 0 0 0
+node 90 3.02356696129 4.08575630188 2.41011023521 -mass 0 0 0 0 0 0
+node 91 2.76739215851 4.25800180435 2.43154978752 -mass 0 0 0 0 0 0
+node 92 3.24801707268 4.01470279694 2.29608941078 -mass 0 0 0 0 0 0
+node 93 3.29914116859 3.73077535629 2.33915209770 -mass 0 0 0 0 0 0
+node 94 3.1019718647 3.91673922539 2.42996740341 -mass 0 0 0 0 0 0
+node 95 3.12245273590 3.70223450661 2.47253608704 -mass 0 0 0 0 0 0
+node 96 2.95705866814 4.00612306595 2.48956990242 -mass 0 0 0 0 0 0
+node 97 3.01389813423 3.86425113678 2.5086414814 -mass 0 0 0 0 0 0
+node 98 3.02388143539 3.69285368919 2.54760336876 -mass 0 0 0 0 0 0
+node 99 2.97273015976 3.84127640724 2.53979182243 -mass 0 0 0 0 0 0
+node 100 2.97917389870 3.69046473503 2.57748198509 -mass 0 0 0 0 0 0
+node 101 2.92515850067 3.96910333633 2.52148342133 -mass 0 0 0 0 0 0
+node 102 2.75319361687 4.15497207642 2.51150202751 -mass 0 0 0 0 0 0
+node 103 2.86566543579 4.10536813736 2.49001383781 -mass 0 0 0 0 0 0
+node 104 2.84572958946 4.05989980698 2.52214980125 -mass 0 0 0 0 0 0
+node 105 2.74640870094 4.10521650314 2.54263401031 -mass 0 0 0 0 0 0
+node 106 2.11618971825 3.97150158882 2.49727010727 -mass 0 0 0 0 0 0
+node 107 2.24154257774 4.21401309967 2.42358922958 -mass 0 0 0 0 0 0
+node 108 2.41235637665 4.35827159882 2.37200760841 -mass 0 0 0 0 0 0
+node 109 2.35774040222 4.06528854370 2.57886791229 -mass 0 0 0 0 0 0
+node 110 2.47750473022 4.19324350357 2.51726436615 -mass 0 0 0 0 0 0
+node 111 2.28256297112 3.87245368958 2.66067552567 -mass 0 0 0 0 0 0
+node 112 2.60015988350 4.42329263687 2.32931995392 -mass 0 0 0 0 0 0
+node 113 2.61959218979 4.25645971298 2.46893572807 -mass 0 0 0 0 0 0
+node 114 2.52038097382 4.09294033051 2.59895515442 -mass 0 0 0 0 0 0
+node 115 2.63336443901 4.15128850937 2.5491502285 -mass 0 0 0 0 0 0
+node 116 2.6403465271 4.10076665878 2.57811379433 -mass 0 0 0 0 0 0
+node 117 2.54131031036 4.04578399658 2.62696123123 -mass 0 0 0 0 0 0
+node 118 2.37628555298 3.82385039330 2.73824405670 -mass 0 0 0 0 0 0
+node 119 2.42939972878 3.98143172264 2.66161417961 -mass 0 0 0 0 0 0
+node 120 2.46324706078 3.94363427162 2.68755793571 -mass 0 0 0 0 0 0
+node 121 2.41907572746 3.80367565155 2.75768280029 -mass 0 0 0 0 0 0
+node 122 2.50556969643 2.04495143890 2.20567655563 -mass 0 0 0 0 0 0
+node 123 2.57902288437 2.72930526733 2.56145310402 -mass 0 0 0 0 0 0
+node 124 2.35937905312 2.95377707481 2.64353013039 -mass 0 0 0 0 0 0
+node 125 2.19326543808 2.63620376587 2.43817329407 -mass 0 0 0 0 0 0
+node 126 2.20728993416 3.272564888 2.66394352913 -mass 0 0 0 0 0 0
+node 127 2.00616192818 3.13011384010 2.48691868782 -mass 0 0 0 0 0 0
+node 128 2.45797300339 3.17702651024 2.77385902405 -mass 0 0 0 0 0 0
+node 129 2.34196591377 3.38337993622 2.77730607986 -mass 0 0 0 0 0 0
+node 130 2.61643099785 3.06222271919 2.72973108292 -mass 0 0 0 0 0 0
+node 131 2.12168955803 3.62298083305 2.60534453392 -mass 0 0 0 0 0 0
+node 132 1.88323390484 3.61868476868 2.40459012985 -mass 0 0 0 0 0 0
+node 133 2.28008198738 3.62916326523 2.73793673515 -mass 0 0 0 0 0 0
+node 134 2.42256188393 3.45475530624 2.83197975159 -mass 0 0 0 0 0 0
+node 135 2.37415456772 3.63782811165 2.80023384094 -mass 0 0 0 0 0 0
+node 136 2.41773581505 3.64353275299 2.80909132957 -mass 0 0 0 0 0 0
+node 137 2.46001458168 3.48908519745 2.83664727211 -mass 0 0 0 0 0 0
+node 138 2.63636040688 3.23411846161 2.80460596085 -mass 0 0 0 0 0 0
+node 139 2.51415777206 3.30871748924 2.83552980423 -mass 0 0 0 0 0 0
+node 140 2.53978085518 3.36896014214 2.84211444855 -mass 0 0 0 0 0 0
+node 141 2.64520430565 3.30906987190 2.81927537918 -mass 0 0 0 0 0 0
+node 142 2.76969337463 3.25645422935 2.74355769157 -mass 0 0 0 0 0 0
+node 143 2.75950598717 3.32412385941 2.76114964485 -mass 0 0 0 0 0 0
+node 144 2.89054059982 3.35913324356 2.67474317551 -mass 0 0 0 0 0 0
+node 145 2.86365365982 3.40683984756 2.69407391548 -mass 0 0 0 0 0 0
+node 146 2.79240965843 3.10843133926 2.67489290237 -mass 0 0 0 0 0 0
+node 147 2.94881105423 3.25877690315 2.61285114288 -mass 0 0 0 0 0 0
+node 148 2.98004674911 3.51445269585 2.60451269150 -mass 0 0 0 0 0 0
+node 149 2.94094681740 3.53725504875 2.62820672989 -mass 0 0 0 0 0 0
+node 150 3.06486105919 3.46855902672 2.53974699974 -mass 0 0 0 0 0 0
+node 151 3.04747438431 3.09897422791 2.51007318497 -mass 0 0 0 0 0 0
+node 152 3.20817708969 3.39876174927 2.43374633789 -mass 0 0 0 0 0 0
+node 153 3.42127132416 3.29672884941 2.30574703217 -mass 0 0 0 0 0 0
+node 154 3.19820261002 2.88208675385 2.38732671738 -mass 0 0 0 0 0 0
+node 155 2.83474564552 2.85626268387 2.54645419121 -mass 0 0 0 0 0 0
+node 156 2.92011117935 2.48833203316 2.36446475983 -mass 0 0 0 0 0 0
+node 157 3.66078114510 3.09866642952 2.1615691185 -mass 0 0 0 0 0 0
+node 158 3.88541364670 2.89122509956 1.96327638626 -mass 0 0 0 0 0 0
+node 159 3.40398526192 2.64430475235 2.24026846886 -mass 0 0 0 0 0 0
+node 160 3.61502599716 2.42643952370 2.03714323044 -mass 0 0 0 0 0 0
+node 161 4.08083629608 2.70261216164 1.71560192108 -mass 0 0 0 0 0 0
+node 162 4.24009513855 2.54533338547 1.40915882587 -mass 0 0 0 0 0 0
+node 163 3.80484008789 2.24173784256 1.78236532211 -mass 0 0 0 0 0 0
+node 164 3.96146130562 2.09329462051 1.46668076515 -mass 0 0 0 0 0 0
+node 165 3.36588335037 1.92848575115 1.97651541233 -mass 0 0 0 0 0 0
+node 166 3.56205010414 1.74460160732 1.72696113586 -mass 0 0 0 0 0 0
+node 167 3.72198796272 1.60414373875 1.42244315147 -mass 0 0 0 0 0 0
+node 168 3.35549926758 1.20403659344 1.55032622814 -mass 0 0 0 0 0 0
+node 169 3.52250313759 1.07987737656 1.28008770943 -mass 0 0 0 0 0 0
+node 170 3.14451789856 1.3728774786 1.77697038651 -mass 0 0 0 0 0 0
+node 171 3.14195489883 2.17002081871 2.18581342697 -mass 0 0 0 0 0 0
+node 172 2.87786102295 1.61895632744 1.97984468937 -mass 0 0 0 0 0 0
+node 173 0.80994361639 3.34087872505 1.41984879971 -mass 0 0 0 0 0 0
+node 174 1.03020763397 3.39581370354 1.70641565323 -mass 0 0 0 0 0 0
+node 175 1.29388010502 3.46498823166 1.95473778248 -mass 0 0 0 0 0 0
+node 176 1.22269499302 2.79435062408 1.80341517925 -mass 0 0 0 0 0 0
+node 177 1.46931540966 2.88080811501 2.06081342697 -mass 0 0 0 0 0 0
+node 178 1.01724219322 2.72903847694 1.49291479588 -mass 0 0 0 0 0 0
+node 179 1.58611285686 3.54508781433 2.18189764023 -mass 0 0 0 0 0 0
+node 180 1.74088656902 2.99299550056 2.28417205811 -mass 0 0 0 0 0 0
+node 181 1.61981654167 2.27089548111 2.03554630280 -mass 0 0 0 0 0 0
+node 182 1.90197789669 2.41596746445 2.24666213989 -mass 0 0 0 0 0 0
+node 183 2.05396437645 1.76377046108 2.03905224800 -mass 0 0 0 0 0 0
+node 184 1.73396492004 1.61506211758 1.85769259930 -mass 0 0 0 0 0 0
+node 185 1.17317962646 2.10086941719 1.46704852581 -mass 0 0 0 0 0 0
+node 186 1.37402439117 2.17174100876 1.7835085392 -mass 0 0 0 0 0 0
+node 187 1.48041689396 1.52084660530 1.63055574894 -mass 0 0 0 0 0 0
+node 188 1.27890825272 1.45498239994 1.33722198009 -mass 0 0 0 0 0 0
+node 189 1.33426201344 0.792629003525 1.10774552822 -mass 0 0 0 0 0 0
+node 190 1.53477895260 0.84159964323 1.35421609879 -mass 0 0 0 0 0 0
+node 191 1.78167605400 0.904733419418 1.53654551506 -mass 0 0 0 0 0 0
+node 192 1.54276764393 0.148188829422 0.990693449974 -mass 0 0 0 0 0 0
+node 193 1.78360855579 0.183172300458 1.12196159363 -mass 0 0 0 0 0 0
+node 194 1.33948826790 0.118032924831 0.798141300678 -mass 0 0 0 0 0 0
+node 195 2.07436275482 0.97909784317 1.65753507614 -mass 0 0 0 0 0 0
+node 196 2.40922641754 1.03313398361 1.70013117790 -mass 0 0 0 0 0 0
+node 197 2.05259752274 0.214751198888 1.19618415833 -mass 0 0 0 0 0 0
+node 198 2.33756923676 0.220511883497 1.20144295692 -mass 0 0 0 0 0 0
+node 199 1.75740087032 -0.534985423088 0.615071952343 -mass 0 0 0 0 0 0
+node 200 2.01485943794 -0.523778855801 0.650994837284 -mass 0 0 0 0 0 0
+node 201 2.27670669556 -0.525607645512 0.644426167011 -mass 0 0 0 0 0 0
+node 202 1.97273778915 -1.24927461147 0.000720177253243 -mass 0 0 0 0 0 0
+node 203 2.22285246849 -1.24927639961 0.000700774602592 -mass 0 0 0 0 0 0
+node 204 1.71793949604 -1.24928569794 0.000683593971189 -mass 0 0 0 0 0 0
+node 205 1.29389619827 -0.564102232456 0.422662883997 -mass 0 0 0 0 0 0
+node 206 1.51320016384 -0.550050258636 0.54211884737 -mass 0 0 0 0 0 0
+node 207 1.45873856544 -1.24930262566 0.000607612193562 -mass 0 0 0 0 0 0
+node 208 1.19347906113 -1.24975049496 0.000157116897753 -mass 0 0 0 0 0 0
+node 209 2.71941804886 0.887972354889 1.59509289265 -mass 0 0 0 0 0 0
+node 210 2.97883963585 0.740028858185 1.44745969772 -mass 0 0 0 0 0 0
+node 211 2.61175656319 0.159768298268 1.13483715057 -mass 0 0 0 0 0 0
+node 212 2.85849690437 0.0804755762219 1.03547608852 -mass 0 0 0 0 0 0
+node 213 3.19293451309 0.618788540363 1.26608037949 -mass 0 0 0 0 0 0
+node 214 3.36477255821 0.524570584297 1.04655432701 -mass 0 0 0 0 0 0
+node 215 3.07263278961 0.00651712575927 0.906106173992 -mass 0 0 0 0 0 0
+node 216 3.25000333786 -0.054291009903 0.744069635868 -mass 0 0 0 0 0 0
+node 217 2.77076530457 -0.584413051605 0.551600933075 -mass 0 0 0 0 0 0
+node 218 2.98910117149 -0.618905305862 0.482406467199 -mass 0 0 0 0 0 0
+node 219 3.17957830429 -0.648354828358 0.388917952776 -mass 0 0 0 0 0 0
+node 220 2.93343091011 -1.24937081337 0.000515061605256 -mass 0 0 0 0 0 0
+node 221 3.15677332878 -1.24978113174 0.000143681041664 -mass 0 0 0 0 0 0
+node 222 2.70391678810 -1.24933505058 0.000585924426559 -mass 0 0 0 0 0 0
+node 223 2.53155064583 -0.549888014793 0.604895293713 -mass 0 0 0 0 0 0
+node 224 2.46697878838 -1.24930059910 0.00063786940882 -mass 0 0 0 0 0 0
+fix 75 1 1 1 0 0 0
+fix 73 1 1 1 0 0 0
+fix 69 1 1 1 0 0 0
+fix 67 1 1 1 0 0 0
+fix 55 1 1 1 0 0 0
+fix 53 1 1 1 0 0 0
+fix 49 1 1 1 0 0 0
+fix 47 1 1 1 0 0 0
+fix 221 1 1 1 0 0 0
+fix 220 1 1 1 0 0 0
+fix 35 1 1 1 0 0 0
+fix 222 1 1 1 0 0 0
+fix 224 1 1 1 0 0 0
+fix 203 1 1 1 0 0 0
+fix 202 1 1 1 0 0 0
+fix 33 1 1 1 0 0 0
+fix 204 1 1 1 0 0 0
+fix 207 1 1 1 0 0 0
+fix 29 1 1 1 0 0 0
+fix 208 1 1 1 0 0 0
+fix 27 1 1 1 0 0 0
+fix 13 1 1 1 0 0 0
+fix 11 1 1 1 0 0 0
+fix 6 1 1 1 0 0 0
+fix 4 1 1 1 0 0 0
+fix 1 1 1 1 0 0 0
+nDMaterial ElasticIsotropic 1 30000000.0 0.3 25.0
+section PlateFiber 1 1 0.125
+element ShellMITC4 1 1 2 3 4 1
+
+nDMaterial ElasticIsotropic 2 30000000.0 0.3 25.0
+section PlateFiber 2 2 0.125
+element ShellMITC4 2 4 3 5 6 2
+
+nDMaterial ElasticIsotropic 3 30000000.0 0.3 25.0
+section PlateFiber 3 3 0.125
+element ShellMITC4 3 3 7 8 5 3
+
+nDMaterial ElasticIsotropic 4 30000000.0 0.3 25.0
+section PlateFiber 4 4 0.125
+element ShellMITC4 4 2 9 7 3 4
+
+nDMaterial ElasticIsotropic 5 30000000.0 0.3 25.0
+section PlateFiber 5 5 0.125
+element ShellMITC4 5 6 5 10 11 5
+
+nDMaterial ElasticIsotropic 6 30000000.0 0.3 25.0
+section PlateFiber 6 6 0.125
+element ShellMITC4 6 11 10 12 13 6
+
+nDMaterial ElasticIsotropic 7 30000000.0 0.3 25.0
+section PlateFiber 7 7 0.125
+element ShellMITC4 7 10 14 15 12 7
+
+nDMaterial ElasticIsotropic 8 30000000.0 0.3 25.0
+section PlateFiber 8 8 0.125
+element ShellMITC4 8 5 8 14 10 8
+
+nDMaterial ElasticIsotropic 9 30000000.0 0.3 25.0
+section PlateFiber 9 9 0.125
+element ShellMITC4 9 8 16 17 14 9
+
+nDMaterial ElasticIsotropic 10 30000000.0 0.3 25.0
+section PlateFiber 10 10 0.125
+element ShellMITC4 10 14 17 18 15 10
+
+nDMaterial ElasticIsotropic 11 30000000.0 0.3 25.0
+section PlateFiber 11 11 0.125
+element ShellMITC4 11 17 19 20 18 11
+
+nDMaterial ElasticIsotropic 12 30000000.0 0.3 25.0
+section PlateFiber 12 12 0.125
+element ShellMITC4 12 16 21 19 17 12
+
+nDMaterial ElasticIsotropic 13 30000000.0 0.3 25.0
+section PlateFiber 13 13 0.125
+element ShellMITC4 13 9 22 23 7 13
+
+nDMaterial ElasticIsotropic 14 30000000.0 0.3 25.0
+section PlateFiber 14 14 0.125
+element ShellMITC4 14 7 23 16 8 14
+
+nDMaterial ElasticIsotropic 15 30000000.0 0.3 25.0
+section PlateFiber 15 15 0.125
+element ShellMITC4 15 23 24 21 16 15
+
+nDMaterial ElasticIsotropic 16 30000000.0 0.3 25.0
+section PlateFiber 16 16 0.125
+element ShellMITC4 16 22 25 24 23 16
+
+nDMaterial ElasticIsotropic 17 30000000.0 0.3 25.0
+section PlateFiber 17 17 0.125
+element ShellMITC4 17 13 12 26 27 17
+
+nDMaterial ElasticIsotropic 18 30000000.0 0.3 25.0
+section PlateFiber 18 18 0.125
+element ShellMITC4 18 27 26 28 29 18
+
+nDMaterial ElasticIsotropic 19 30000000.0 0.3 25.0
+section PlateFiber 19 19 0.125
+element ShellMITC4 19 26 30 31 28 19
+
+nDMaterial ElasticIsotropic 20 30000000.0 0.3 25.0
+section PlateFiber 20 20 0.125
+element ShellMITC4 20 12 15 30 26 20
+
+nDMaterial ElasticIsotropic 21 30000000.0 0.3 25.0
+section PlateFiber 21 21 0.125
+element ShellMITC4 21 29 28 32 33 21
+
+nDMaterial ElasticIsotropic 22 30000000.0 0.3 25.0
+section PlateFiber 22 22 0.125
+element ShellMITC4 22 33 32 34 35 22
+
+nDMaterial ElasticIsotropic 23 30000000.0 0.3 25.0
+section PlateFiber 23 23 0.125
+element ShellMITC4 23 32 36 37 34 23
+
+nDMaterial ElasticIsotropic 24 30000000.0 0.3 25.0
+section PlateFiber 24 24 0.125
+element ShellMITC4 24 28 31 36 32 24
+
+nDMaterial ElasticIsotropic 25 30000000.0 0.3 25.0
+section PlateFiber 25 25 0.125
+element ShellMITC4 25 31 38 39 36 25
+
+nDMaterial ElasticIsotropic 26 30000000.0 0.3 25.0
+section PlateFiber 26 26 0.125
+element ShellMITC4 26 36 39 40 37 26
+
+nDMaterial ElasticIsotropic 27 30000000.0 0.3 25.0
+section PlateFiber 27 27 0.125
+element ShellMITC4 27 39 41 42 40 27
+
+nDMaterial ElasticIsotropic 28 30000000.0 0.3 25.0
+section PlateFiber 28 28 0.125
+element ShellMITC4 28 38 43 41 39 28
+
+nDMaterial ElasticIsotropic 29 30000000.0 0.3 25.0
+section PlateFiber 29 29 0.125
+element ShellMITC4 29 15 18 44 30 29
+
+nDMaterial ElasticIsotropic 30 30000000.0 0.3 25.0
+section PlateFiber 30 30 0.125
+element ShellMITC4 30 30 44 38 31 30
+
+nDMaterial ElasticIsotropic 31 30000000.0 0.3 25.0
+section PlateFiber 31 31 0.125
+element ShellMITC4 31 44 45 43 38 31
+
+nDMaterial ElasticIsotropic 32 30000000.0 0.3 25.0
+section PlateFiber 32 32 0.125
+element ShellMITC4 32 18 20 45 44 32
+
+nDMaterial ElasticIsotropic 33 30000000.0 0.3 25.0
+section PlateFiber 33 33 0.125
+element ShellMITC4 33 35 34 46 47 33
+
+nDMaterial ElasticIsotropic 34 30000000.0 0.3 25.0
+section PlateFiber 34 34 0.125
+element ShellMITC4 34 47 46 48 49 34
+
+nDMaterial ElasticIsotropic 35 30000000.0 0.3 25.0
+section PlateFiber 35 35 0.125
+element ShellMITC4 35 46 50 51 48 35
+
+nDMaterial ElasticIsotropic 36 30000000.0 0.3 25.0
+section PlateFiber 36 36 0.125
+element ShellMITC4 36 34 37 50 46 36
+
+nDMaterial ElasticIsotropic 37 30000000.0 0.3 25.0
+section PlateFiber 37 37 0.125
+element ShellMITC4 37 49 48 52 53 37
+
+nDMaterial ElasticIsotropic 38 30000000.0 0.3 25.0
+section PlateFiber 38 38 0.125
+element ShellMITC4 38 53 52 54 55 38
+
+nDMaterial ElasticIsotropic 39 30000000.0 0.3 25.0
+section PlateFiber 39 39 0.125
+element ShellMITC4 39 52 56 57 54 39
+
+nDMaterial ElasticIsotropic 40 30000000.0 0.3 25.0
+section PlateFiber 40 40 0.125
+element ShellMITC4 40 48 51 56 52 40
+
+nDMaterial ElasticIsotropic 41 30000000.0 0.3 25.0
+section PlateFiber 41 41 0.125
+element ShellMITC4 41 51 58 59 56 41
+
+nDMaterial ElasticIsotropic 42 30000000.0 0.3 25.0
+section PlateFiber 42 42 0.125
+element ShellMITC4 42 56 59 60 57 42
+
+nDMaterial ElasticIsotropic 43 30000000.0 0.3 25.0
+section PlateFiber 43 43 0.125
+element ShellMITC4 43 59 61 62 60 43
+
+nDMaterial ElasticIsotropic 44 30000000.0 0.3 25.0
+section PlateFiber 44 44 0.125
+element ShellMITC4 44 58 63 61 59 44
+
+nDMaterial ElasticIsotropic 45 30000000.0 0.3 25.0
+section PlateFiber 45 45 0.125
+element ShellMITC4 45 37 40 64 50 45
+
+nDMaterial ElasticIsotropic 46 30000000.0 0.3 25.0
+section PlateFiber 46 46 0.125
+element ShellMITC4 46 50 64 58 51 46
+
+nDMaterial ElasticIsotropic 47 30000000.0 0.3 25.0
+section PlateFiber 47 47 0.125
+element ShellMITC4 47 64 65 63 58 47
+
+nDMaterial ElasticIsotropic 48 30000000.0 0.3 25.0
+section PlateFiber 48 48 0.125
+element ShellMITC4 48 40 42 65 64 48
+
+nDMaterial ElasticIsotropic 49 30000000.0 0.3 25.0
+section PlateFiber 49 49 0.125
+element ShellMITC4 49 55 54 66 67 49
+
+nDMaterial ElasticIsotropic 50 30000000.0 0.3 25.0
+section PlateFiber 50 50 0.125
+element ShellMITC4 50 67 66 68 69 50
+
+nDMaterial ElasticIsotropic 51 30000000.0 0.3 25.0
+section PlateFiber 51 51 0.125
+element ShellMITC4 51 66 70 71 68 51
+
+nDMaterial ElasticIsotropic 52 30000000.0 0.3 25.0
+section PlateFiber 52 52 0.125
+element ShellMITC4 52 54 57 70 66 52
+
+nDMaterial ElasticIsotropic 53 30000000.0 0.3 25.0
+section PlateFiber 53 53 0.125
+element ShellMITC4 53 69 68 72 73 53
+
+nDMaterial ElasticIsotropic 54 30000000.0 0.3 25.0
+section PlateFiber 54 54 0.125
+element ShellMITC4 54 73 72 74 75 54
+
+nDMaterial ElasticIsotropic 55 30000000.0 0.3 25.0
+section PlateFiber 55 55 0.125
+element ShellMITC4 55 72 76 77 74 55
+
+nDMaterial ElasticIsotropic 56 30000000.0 0.3 25.0
+section PlateFiber 56 56 0.125
+element ShellMITC4 56 68 71 76 72 56
+
+nDMaterial ElasticIsotropic 57 30000000.0 0.3 25.0
+section PlateFiber 57 57 0.125
+element ShellMITC4 57 71 78 79 76 57
+
+nDMaterial ElasticIsotropic 58 30000000.0 0.3 25.0
+section PlateFiber 58 58 0.125
+element ShellMITC4 58 76 79 80 77 58
+
+nDMaterial ElasticIsotropic 59 30000000.0 0.3 25.0
+section PlateFiber 59 59 0.125
+element ShellMITC4 59 79 81 82 80 59
+
+nDMaterial ElasticIsotropic 60 30000000.0 0.3 25.0
+section PlateFiber 60 60 0.125
+element ShellMITC4 60 78 83 81 79 60
+
+nDMaterial ElasticIsotropic 61 30000000.0 0.3 25.0
+section PlateFiber 61 61 0.125
+element ShellMITC4 61 57 60 84 70 61
+
+nDMaterial ElasticIsotropic 62 30000000.0 0.3 25.0
+section PlateFiber 62 62 0.125
+element ShellMITC4 62 70 84 78 71 62
+
+nDMaterial ElasticIsotropic 63 30000000.0 0.3 25.0
+section PlateFiber 63 63 0.125
+element ShellMITC4 63 84 85 83 78 63
+
+nDMaterial ElasticIsotropic 64 30000000.0 0.3 25.0
+section PlateFiber 64 64 0.125
+element ShellMITC4 64 60 62 85 84 64
+
+nDMaterial ElasticIsotropic 65 30000000.0 0.3 25.0
+section PlateFiber 65 65 0.125
+element ShellMITC4 65 42 86 87 65 65
+
+nDMaterial ElasticIsotropic 66 30000000.0 0.3 25.0
+section PlateFiber 66 66 0.125
+element ShellMITC4 66 65 87 88 63 66
+
+nDMaterial ElasticIsotropic 67 30000000.0 0.3 25.0
+section PlateFiber 67 67 0.125
+element ShellMITC4 67 87 89 90 88 67
+
+nDMaterial ElasticIsotropic 68 30000000.0 0.3 25.0
+section PlateFiber 68 68 0.125
+element ShellMITC4 68 86 91 89 87 68
+
+nDMaterial ElasticIsotropic 69 30000000.0 0.3 25.0
+section PlateFiber 69 69 0.125
+element ShellMITC4 69 63 88 92 61 69
+
+nDMaterial ElasticIsotropic 70 30000000.0 0.3 25.0
+section PlateFiber 70 70 0.125
+element ShellMITC4 70 61 92 93 62 70
+
+nDMaterial ElasticIsotropic 71 30000000.0 0.3 25.0
+section PlateFiber 71 71 0.125
+element ShellMITC4 71 92 94 95 93 71
+
+nDMaterial ElasticIsotropic 72 30000000.0 0.3 25.0
+section PlateFiber 72 72 0.125
+element ShellMITC4 72 88 90 94 92 72
+
+nDMaterial ElasticIsotropic 73 30000000.0 0.3 25.0
+section PlateFiber 73 73 0.125
+element ShellMITC4 73 90 96 97 94 73
+
+nDMaterial ElasticIsotropic 74 30000000.0 0.3 25.0
+section PlateFiber 74 74 0.125
+element ShellMITC4 74 94 97 98 95 74
+
+nDMaterial ElasticIsotropic 75 30000000.0 0.3 25.0
+section PlateFiber 75 75 0.125
+element ShellMITC4 75 97 99 100 98 75
+
+nDMaterial ElasticIsotropic 76 30000000.0 0.3 25.0
+section PlateFiber 76 76 0.125
+element ShellMITC4 76 96 101 99 97 76
+
+nDMaterial ElasticIsotropic 77 30000000.0 0.3 25.0
+section PlateFiber 77 77 0.125
+element ShellMITC4 77 91 102 103 89 77
+
+nDMaterial ElasticIsotropic 78 30000000.0 0.3 25.0
+section PlateFiber 78 78 0.125
+element ShellMITC4 78 89 103 96 90 78
+
+nDMaterial ElasticIsotropic 79 30000000.0 0.3 25.0
+section PlateFiber 79 79 0.125
+element ShellMITC4 79 103 104 101 96 79
+
+nDMaterial ElasticIsotropic 80 30000000.0 0.3 25.0
+section PlateFiber 80 80 0.125
+element ShellMITC4 80 102 105 104 103 80
+
+nDMaterial ElasticIsotropic 81 30000000.0 0.3 25.0
+section PlateFiber 81 81 0.125
+element ShellMITC4 81 20 106 107 45 81
+
+nDMaterial ElasticIsotropic 82 30000000.0 0.3 25.0
+section PlateFiber 82 82 0.125
+element ShellMITC4 82 45 107 108 43 82
+
+nDMaterial ElasticIsotropic 83 30000000.0 0.3 25.0
+section PlateFiber 83 83 0.125
+element ShellMITC4 83 107 109 110 108 83
+
+nDMaterial ElasticIsotropic 84 30000000.0 0.3 25.0
+section PlateFiber 84 84 0.125
+element ShellMITC4 84 106 111 109 107 84
+
+nDMaterial ElasticIsotropic 85 30000000.0 0.3 25.0
+section PlateFiber 85 85 0.125
+element ShellMITC4 85 43 108 112 41 85
+
+nDMaterial ElasticIsotropic 86 30000000.0 0.3 25.0
+section PlateFiber 86 86 0.125
+element ShellMITC4 86 41 112 86 42 86
+
+nDMaterial ElasticIsotropic 87 30000000.0 0.3 25.0
+section PlateFiber 87 87 0.125
+element ShellMITC4 87 112 113 91 86 87
+
+nDMaterial ElasticIsotropic 88 30000000.0 0.3 25.0
+section PlateFiber 88 88 0.125
+element ShellMITC4 88 108 110 113 112 88
+
+nDMaterial ElasticIsotropic 89 30000000.0 0.3 25.0
+section PlateFiber 89 89 0.125
+element ShellMITC4 89 110 114 115 113 89
+
+nDMaterial ElasticIsotropic 90 30000000.0 0.3 25.0
+section PlateFiber 90 90 0.125
+element ShellMITC4 90 113 115 102 91 90
+
+nDMaterial ElasticIsotropic 91 30000000.0 0.3 25.0
+section PlateFiber 91 91 0.125
+element ShellMITC4 91 115 116 105 102 91
+
+nDMaterial ElasticIsotropic 92 30000000.0 0.3 25.0
+section PlateFiber 92 92 0.125
+element ShellMITC4 92 114 117 116 115 92
+
+nDMaterial ElasticIsotropic 93 30000000.0 0.3 25.0
+section PlateFiber 93 93 0.125
+element ShellMITC4 93 111 118 119 109 93
+
+nDMaterial ElasticIsotropic 94 30000000.0 0.3 25.0
+section PlateFiber 94 94 0.125
+element ShellMITC4 94 109 119 114 110 94
+
+nDMaterial ElasticIsotropic 95 30000000.0 0.3 25.0
+section PlateFiber 95 95 0.125
+element ShellMITC4 95 119 120 117 114 95
+
+nDMaterial ElasticIsotropic 96 30000000.0 0.3 25.0
+section PlateFiber 96 96 0.125
+element ShellMITC4 96 118 121 120 119 96
+
+nDMaterial ElasticIsotropic 97 30000000.0 0.3 25.0
+section PlateFiber 97 97 0.125
+element ShellMITC4 97 122 123 124 125 97
+
+nDMaterial ElasticIsotropic 98 30000000.0 0.3 25.0
+section PlateFiber 98 98 0.125
+element ShellMITC4 98 125 124 126 127 98
+
+nDMaterial ElasticIsotropic 99 30000000.0 0.3 25.0
+section PlateFiber 99 99 0.125
+element ShellMITC4 99 124 128 129 126 99
+
+nDMaterial ElasticIsotropic 100 30000000.0 0.3 25.0
+section PlateFiber 100 100 0.125
+element ShellMITC4 100 123 130 128 124 100
+
+nDMaterial ElasticIsotropic 101 30000000.0 0.3 25.0
+section PlateFiber 101 101 0.125
+element ShellMITC4 101 127 126 131 132 101
+
+nDMaterial ElasticIsotropic 102 30000000.0 0.3 25.0
+section PlateFiber 102 102 0.125
+element ShellMITC4 102 132 131 106 20 102
+
+nDMaterial ElasticIsotropic 103 30000000.0 0.3 25.0
+section PlateFiber 103 103 0.125
+element ShellMITC4 103 131 133 111 106 103
+
+nDMaterial ElasticIsotropic 104 30000000.0 0.3 25.0
+section PlateFiber 104 104 0.125
+element ShellMITC4 104 126 129 133 131 104
+
+nDMaterial ElasticIsotropic 105 30000000.0 0.3 25.0
+section PlateFiber 105 105 0.125
+element ShellMITC4 105 129 134 135 133 105
+
+nDMaterial ElasticIsotropic 106 30000000.0 0.3 25.0
+section PlateFiber 106 106 0.125
+element ShellMITC4 106 133 135 118 111 106
+
+nDMaterial ElasticIsotropic 107 30000000.0 0.3 25.0
+section PlateFiber 107 107 0.125
+element ShellMITC4 107 135 136 121 118 107
+
+nDMaterial ElasticIsotropic 108 30000000.0 0.3 25.0
+section PlateFiber 108 108 0.125
+element ShellMITC4 108 134 137 136 135 108
+
+nDMaterial ElasticIsotropic 109 30000000.0 0.3 25.0
+section PlateFiber 109 109 0.125
+element ShellMITC4 109 130 138 139 128 109
+
+nDMaterial ElasticIsotropic 110 30000000.0 0.3 25.0
+section PlateFiber 110 110 0.125
+element ShellMITC4 110 128 139 134 129 110
+
+nDMaterial ElasticIsotropic 111 30000000.0 0.3 25.0
+section PlateFiber 111 111 0.125
+element ShellMITC4 111 139 140 137 134 111
+
+nDMaterial ElasticIsotropic 112 30000000.0 0.3 25.0
+section PlateFiber 112 112 0.125
+element ShellMITC4 112 138 141 140 139 112
+
+nDMaterial ElasticIsotropic 113 30000000.0 0.3 25.0
+section PlateFiber 113 113 0.125
+element ShellMITC4 113 141 138 142 143 113
+
+nDMaterial ElasticIsotropic 114 30000000.0 0.3 25.0
+section PlateFiber 114 114 0.125
+element ShellMITC4 114 143 142 144 145 114
+
+nDMaterial ElasticIsotropic 115 30000000.0 0.3 25.0
+section PlateFiber 115 115 0.125
+element ShellMITC4 115 142 146 147 144 115
+
+nDMaterial ElasticIsotropic 116 30000000.0 0.3 25.0
+section PlateFiber 116 116 0.125
+element ShellMITC4 116 138 130 146 142 116
+
+nDMaterial ElasticIsotropic 117 30000000.0 0.3 25.0
+section PlateFiber 117 117 0.125
+element ShellMITC4 117 145 144 148 149 117
+
+nDMaterial ElasticIsotropic 118 30000000.0 0.3 25.0
+section PlateFiber 118 118 0.125
+element ShellMITC4 118 149 148 98 100 118
+
+nDMaterial ElasticIsotropic 119 30000000.0 0.3 25.0
+section PlateFiber 119 119 0.125
+element ShellMITC4 119 148 150 95 98 119
+
+nDMaterial ElasticIsotropic 120 30000000.0 0.3 25.0
+section PlateFiber 120 120 0.125
+element ShellMITC4 120 144 147 150 148 120
+
+nDMaterial ElasticIsotropic 121 30000000.0 0.3 25.0
+section PlateFiber 121 121 0.125
+element ShellMITC4 121 147 151 152 150 121
+
+nDMaterial ElasticIsotropic 122 30000000.0 0.3 25.0
+section PlateFiber 122 122 0.125
+element ShellMITC4 122 150 152 93 95 122
+
+nDMaterial ElasticIsotropic 123 30000000.0 0.3 25.0
+section PlateFiber 123 123 0.125
+element ShellMITC4 123 152 153 62 93 123
+
+nDMaterial ElasticIsotropic 124 30000000.0 0.3 25.0
+section PlateFiber 124 124 0.125
+element ShellMITC4 124 151 154 153 152 124
+
+nDMaterial ElasticIsotropic 125 30000000.0 0.3 25.0
+section PlateFiber 125 125 0.125
+element ShellMITC4 125 130 123 155 146 125
+
+nDMaterial ElasticIsotropic 126 30000000.0 0.3 25.0
+section PlateFiber 126 126 0.125
+element ShellMITC4 126 146 155 151 147 126
+
+nDMaterial ElasticIsotropic 127 30000000.0 0.3 25.0
+section PlateFiber 127 127 0.125
+element ShellMITC4 127 155 156 154 151 127
+
+nDMaterial ElasticIsotropic 128 30000000.0 0.3 25.0
+section PlateFiber 128 128 0.125
+element ShellMITC4 128 123 122 156 155 128
+
+nDMaterial ElasticIsotropic 129 30000000.0 0.3 25.0
+section PlateFiber 129 129 0.125
+element ShellMITC4 129 62 153 157 85 129
+
+nDMaterial ElasticIsotropic 130 30000000.0 0.3 25.0
+section PlateFiber 130 130 0.125
+element ShellMITC4 130 85 157 158 83 130
+
+nDMaterial ElasticIsotropic 131 30000000.0 0.3 25.0
+section PlateFiber 131 131 0.125
+element ShellMITC4 131 157 159 160 158 131
+
+nDMaterial ElasticIsotropic 132 30000000.0 0.3 25.0
+section PlateFiber 132 132 0.125
+element ShellMITC4 132 153 154 159 157 132
+
+nDMaterial ElasticIsotropic 133 30000000.0 0.3 25.0
+section PlateFiber 133 133 0.125
+element ShellMITC4 133 83 158 161 81 133
+
+nDMaterial ElasticIsotropic 134 30000000.0 0.3 25.0
+section PlateFiber 134 134 0.125
+element ShellMITC4 134 81 161 162 82 134
+
+nDMaterial ElasticIsotropic 135 30000000.0 0.3 25.0
+section PlateFiber 135 135 0.125
+element ShellMITC4 135 161 163 164 162 135
+
+nDMaterial ElasticIsotropic 136 30000000.0 0.3 25.0
+section PlateFiber 136 136 0.125
+element ShellMITC4 136 158 160 163 161 136
+
+nDMaterial ElasticIsotropic 137 30000000.0 0.3 25.0
+section PlateFiber 137 137 0.125
+element ShellMITC4 137 160 165 166 163 137
+
+nDMaterial ElasticIsotropic 138 30000000.0 0.3 25.0
+section PlateFiber 138 138 0.125
+element ShellMITC4 138 163 166 167 164 138
+
+nDMaterial ElasticIsotropic 139 30000000.0 0.3 25.0
+section PlateFiber 139 139 0.125
+element ShellMITC4 139 166 168 169 167 139
+
+nDMaterial ElasticIsotropic 140 30000000.0 0.3 25.0
+section PlateFiber 140 140 0.125
+element ShellMITC4 140 165 170 168 166 140
+
+nDMaterial ElasticIsotropic 141 30000000.0 0.3 25.0
+section PlateFiber 141 141 0.125
+element ShellMITC4 141 154 156 171 159 141
+
+nDMaterial ElasticIsotropic 142 30000000.0 0.3 25.0
+section PlateFiber 142 142 0.125
+element ShellMITC4 142 159 171 165 160 142
+
+nDMaterial ElasticIsotropic 143 30000000.0 0.3 25.0
+section PlateFiber 143 143 0.125
+element ShellMITC4 143 171 172 170 165 143
+
+nDMaterial ElasticIsotropic 144 30000000.0 0.3 25.0
+section PlateFiber 144 144 0.125
+element ShellMITC4 144 156 122 172 171 144
+
+nDMaterial ElasticIsotropic 145 30000000.0 0.3 25.0
+section PlateFiber 145 145 0.125
+element ShellMITC4 145 25 173 174 24 145
+
+nDMaterial ElasticIsotropic 146 30000000.0 0.3 25.0
+section PlateFiber 146 146 0.125
+element ShellMITC4 146 24 174 175 21 146
+
+nDMaterial ElasticIsotropic 147 30000000.0 0.3 25.0
+section PlateFiber 147 147 0.125
+element ShellMITC4 147 174 176 177 175 147
+
+nDMaterial ElasticIsotropic 148 30000000.0 0.3 25.0
+section PlateFiber 148 148 0.125
+element ShellMITC4 148 173 178 176 174 148
+
+nDMaterial ElasticIsotropic 149 30000000.0 0.3 25.0
+section PlateFiber 149 149 0.125
+element ShellMITC4 149 21 175 179 19 149
+
+nDMaterial ElasticIsotropic 150 30000000.0 0.3 25.0
+section PlateFiber 150 150 0.125
+element ShellMITC4 150 19 179 132 20 150
+
+nDMaterial ElasticIsotropic 151 30000000.0 0.3 25.0
+section PlateFiber 151 151 0.125
+element ShellMITC4 151 179 180 127 132 151
+
+nDMaterial ElasticIsotropic 152 30000000.0 0.3 25.0
+section PlateFiber 152 152 0.125
+element ShellMITC4 152 175 177 180 179 152
+
+nDMaterial ElasticIsotropic 153 30000000.0 0.3 25.0
+section PlateFiber 153 153 0.125
+element ShellMITC4 153 177 181 182 180 153
+
+nDMaterial ElasticIsotropic 154 30000000.0 0.3 25.0
+section PlateFiber 154 154 0.125
+element ShellMITC4 154 180 182 125 127 154
+
+nDMaterial ElasticIsotropic 155 30000000.0 0.3 25.0
+section PlateFiber 155 155 0.125
+element ShellMITC4 155 182 183 122 125 155
+
+nDMaterial ElasticIsotropic 156 30000000.0 0.3 25.0
+section PlateFiber 156 156 0.125
+element ShellMITC4 156 181 184 183 182 156
+
+nDMaterial ElasticIsotropic 157 30000000.0 0.3 25.0
+section PlateFiber 157 157 0.125
+element ShellMITC4 157 178 185 186 176 157
+
+nDMaterial ElasticIsotropic 158 30000000.0 0.3 25.0
+section PlateFiber 158 158 0.125
+element ShellMITC4 158 176 186 181 177 158
+
+nDMaterial ElasticIsotropic 159 30000000.0 0.3 25.0
+section PlateFiber 159 159 0.125
+element ShellMITC4 159 186 187 184 181 159
+
+nDMaterial ElasticIsotropic 160 30000000.0 0.3 25.0
+section PlateFiber 160 160 0.125
+element ShellMITC4 160 185 188 187 186 160
+
+nDMaterial ElasticIsotropic 161 30000000.0 0.3 25.0
+section PlateFiber 161 161 0.125
+element ShellMITC4 161 188 189 190 187 161
+
+nDMaterial ElasticIsotropic 162 30000000.0 0.3 25.0
+section PlateFiber 162 162 0.125
+element ShellMITC4 162 187 190 191 184 162
+
+nDMaterial ElasticIsotropic 163 30000000.0 0.3 25.0
+section PlateFiber 163 163 0.125
+element ShellMITC4 163 190 192 193 191 163
+
+nDMaterial ElasticIsotropic 164 30000000.0 0.3 25.0
+section PlateFiber 164 164 0.125
+element ShellMITC4 164 189 194 192 190 164
+
+nDMaterial ElasticIsotropic 165 30000000.0 0.3 25.0
+section PlateFiber 165 165 0.125
+element ShellMITC4 165 184 191 195 183 165
+
+nDMaterial ElasticIsotropic 166 30000000.0 0.3 25.0
+section PlateFiber 166 166 0.125
+element ShellMITC4 166 183 195 196 122 166
+
+nDMaterial ElasticIsotropic 167 30000000.0 0.3 25.0
+section PlateFiber 167 167 0.125
+element ShellMITC4 167 195 197 198 196 167
+
+nDMaterial ElasticIsotropic 168 30000000.0 0.3 25.0
+section PlateFiber 168 168 0.125
+element ShellMITC4 168 191 193 197 195 168
+
+nDMaterial ElasticIsotropic 169 30000000.0 0.3 25.0
+section PlateFiber 169 169 0.125
+element ShellMITC4 169 193 199 200 197 169
+
+nDMaterial ElasticIsotropic 170 30000000.0 0.3 25.0
+section PlateFiber 170 170 0.125
+element ShellMITC4 170 197 200 201 198 170
+
+nDMaterial ElasticIsotropic 171 30000000.0 0.3 25.0
+section PlateFiber 171 171 0.125
+element ShellMITC4 171 200 202 203 201 171
+
+nDMaterial ElasticIsotropic 172 30000000.0 0.3 25.0
+section PlateFiber 172 172 0.125
+element ShellMITC4 172 199 204 202 200 172
+
+nDMaterial ElasticIsotropic 173 30000000.0 0.3 25.0
+section PlateFiber 173 173 0.125
+element ShellMITC4 173 194 205 206 192 173
+
+nDMaterial ElasticIsotropic 174 30000000.0 0.3 25.0
+section PlateFiber 174 174 0.125
+element ShellMITC4 174 192 206 199 193 174
+
+nDMaterial ElasticIsotropic 175 30000000.0 0.3 25.0
+section PlateFiber 175 175 0.125
+element ShellMITC4 175 206 207 204 199 175
+
+nDMaterial ElasticIsotropic 176 30000000.0 0.3 25.0
+section PlateFiber 176 176 0.125
+element ShellMITC4 176 205 208 207 206 176
+
+nDMaterial ElasticIsotropic 177 30000000.0 0.3 25.0
+section PlateFiber 177 177 0.125
+element ShellMITC4 177 122 196 209 172 177
+
+nDMaterial ElasticIsotropic 178 30000000.0 0.3 25.0
+section PlateFiber 178 178 0.125
+element ShellMITC4 178 172 209 210 170 178
+
+nDMaterial ElasticIsotropic 179 30000000.0 0.3 25.0
+section PlateFiber 179 179 0.125
+element ShellMITC4 179 209 211 212 210 179
+
+nDMaterial ElasticIsotropic 180 30000000.0 0.3 25.0
+section PlateFiber 180 180 0.125
+element ShellMITC4 180 196 198 211 209 180
+
+nDMaterial ElasticIsotropic 181 30000000.0 0.3 25.0
+section PlateFiber 181 181 0.125
+element ShellMITC4 181 170 210 213 168 181
+
+nDMaterial ElasticIsotropic 182 30000000.0 0.3 25.0
+section PlateFiber 182 182 0.125
+element ShellMITC4 182 168 213 214 169 182
+
+nDMaterial ElasticIsotropic 183 30000000.0 0.3 25.0
+section PlateFiber 183 183 0.125
+element ShellMITC4 183 213 215 216 214 183
+
+nDMaterial ElasticIsotropic 184 30000000.0 0.3 25.0
+section PlateFiber 184 184 0.125
+element ShellMITC4 184 210 212 215 213 184
+
+nDMaterial ElasticIsotropic 185 30000000.0 0.3 25.0
+section PlateFiber 185 185 0.125
+element ShellMITC4 185 212 217 218 215 185
+
+nDMaterial ElasticIsotropic 186 30000000.0 0.3 25.0
+section PlateFiber 186 186 0.125
+element ShellMITC4 186 215 218 219 216 186
+
+nDMaterial ElasticIsotropic 187 30000000.0 0.3 25.0
+section PlateFiber 187 187 0.125
+element ShellMITC4 187 218 220 221 219 187
+
+nDMaterial ElasticIsotropic 188 30000000.0 0.3 25.0
+section PlateFiber 188 188 0.125
+element ShellMITC4 188 217 222 220 218 188
+
+nDMaterial ElasticIsotropic 189 30000000.0 0.3 25.0
+section PlateFiber 189 189 0.125
+element ShellMITC4 189 198 201 223 211 189
+
+nDMaterial ElasticIsotropic 190 30000000.0 0.3 25.0
+section PlateFiber 190 190 0.125
+element ShellMITC4 190 211 223 217 212 190
+
+nDMaterial ElasticIsotropic 191 30000000.0 0.3 25.0
+section PlateFiber 191 191 0.125
+element ShellMITC4 191 223 224 222 217 191
+
+nDMaterial ElasticIsotropic 192 30000000.0 0.3 25.0
+section PlateFiber 192 192 0.125
+element ShellMITC4 192 201 203 224 223 192
+
+timeSeries Trig 1 0.0 10.0 3.0 -factor 10.0 -shift 0
+
+pattern Plain 1 1 {
+	load 75 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 74 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 73 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 77 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 69 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 72 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 80 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 67 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 76 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 68 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 82 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 55 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 79 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 66 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 71 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 81 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 54 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 78 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 70 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 162 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 83 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 57 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 84 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 53 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 161 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 164 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 85 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 60 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 52 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 158 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 56 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 163 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 62 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 93 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 49 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 157 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 167 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 59 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 95 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 160 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 48 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 98 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 166 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 153 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 100 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 61 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 152 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 92 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 51 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 150 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 94 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 159 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 169 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 97 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 148 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 99 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 149 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 58 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 165 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 214 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 47 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 216 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 154 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 168 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 151 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 63 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 88 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 147 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 90 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 96 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 46 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 144 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 101 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 145 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 213 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 219 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 171 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 50 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 215 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 221 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 104 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 170 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 143 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 218 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 64 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 103 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 142 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 210 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 146 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 89 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 155 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 220 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 87 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 212 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 156 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 65 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 217 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 105 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 35 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 141 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 222 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 172 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 102 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 209 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 138 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 34 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 211 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 116 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 223 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 140 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 130 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 91 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 224 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 37 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 123 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 86 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 117 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 40 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 115 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 137 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 139 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 122 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 196 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 198 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 201 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 203 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 42 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 120 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 136 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 128 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 113 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 114 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 134 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 121 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 124 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 112 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 202 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 200 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 197 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 119 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 135 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 129 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 110 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 195 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 183 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 125 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 41 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 39 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 36 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 32 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 33 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 118 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 126 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 108 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 133 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 109 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 204 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 199 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 193 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 182 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 191 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 184 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 127 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 43 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 111 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 131 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 107 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 38 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 207 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 206 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 31 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 192 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 181 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 180 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 190 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 187 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 28 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 132 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 45 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 106 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 29 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 208 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 205 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 177 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 186 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 44 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 194 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 179 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 189 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 188 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 20 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 30 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 176 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 175 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 185 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 19 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 26 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 18 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 174 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 178 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 21 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 27 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 17 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 173 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 24 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 15 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 16 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 25 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 14 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 23 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 12 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 8 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 22 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 10 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 7 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 13 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 5 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 9 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 11 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 3 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 6 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 2 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 4 -0.25 0.0 0.0 0.0 0.0 0.0
+	load 1 -0.25 0.0 0.0 0.0 0.0 0.0
+}
+
+recorder mpco recorder.mpco -N  displacement rotation reactionForce reactionMoment -E  force stresses section.force section.fiber.stress
+constraints Transformation
+numberer RCM
+system BandSPD
+test NormDispIncr 1.0e-6 12 5
+algorithm Linear
+integrator LoadControl 1.0
+analysis Static
+analyze 8
+
+wipe
