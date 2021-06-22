@@ -41,7 +41,7 @@ def cleanTetrahedron(iMesh):
     tets.Faces.AddFace(1,3,2)
     
     tets.FaceNormals.ComputeFaceNormals()
-    tets.UnifyNormals()
+    #tets.UnifyNormals()
     
     # find the center face and normal
     faceCenter = tets.Faces.GetFaceCenter(0)
@@ -91,7 +91,7 @@ def cleanHexahedron(Brick):
 
 
     Brick.FaceNormals.ComputeFaceNormals()
-    Brick.UnifyNormals()
+    #Brick.UnifyNormals()
 
     # find the center face and normal
     faceCenter = Brick.Faces.GetFaceCenter(0)
