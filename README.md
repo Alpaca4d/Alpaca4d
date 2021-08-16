@@ -38,8 +38,8 @@
 
 * [ ] Modal Analyses
 * [ ] EarthQuake Analyses
-* [ ] 
-* [ ] 
+* [ ] Test Transient Analyses
+* [ ] Issue on the number of Steps. Have a look at the class
 * [ ] 
 * [ ] Icons
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
@@ -55,12 +55,12 @@
 * [ ] Create Brick Displacement/Stress Visualisation
 
 * [ ] Documentation - example (pdf)
-* [ ] Create SocialMedia _ Facebook-Instagram
-* [ ] Mail
+* [x] Create SocialMedia _ Facebook-Instagram
+* [x] Mail
 
 ### Further Step
 
-* [ ] Image for Food4Rhino: Building, Kangaroo Shell, Beam Shell, EeathQuake City, Brick Elements. Background different for each image
+* [x] Image for Food4Rhino: Building, Kangaroo Shell, Beam Shell, EeathQuake City, Brick Elements. Background different for each image
 * [ ] Analyse Burning Man, SteamPunk
 * [ ] Automate the post for Instagram or Facebook: Which Hashtag should we use? Google Chrome allow to upload picture to instagram
 * [ ] Create structure with PupperFish plug-in
