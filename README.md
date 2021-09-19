@@ -8,40 +8,38 @@
 * [x] hdf5 - Numerical Reaction forces. Points, Forces, Moments
 * [x] hdf5 - Nx, Vy, Vz, Mx, My, Mz
 * [x] hdf5 - Numerical Stress Shells. Values are in the Gauss Points
-* [ ] hdf5 - Numerical Stress Bricks. Values are in the Gauss Points
+* [x] hdf5 - Numerical Stress Bricks. Values are in the Gauss Points
 * [x] Disassemble Model - Line, Mesh, Brick, Load, Support, Section
 * [ ] Visualize Model - one single component for visualise with the boolean
 * [ ] Update the components to visualize the Supports, Loads, Beams. (we need to find a clever function to do an autoscale for the support dimension)
-* [ ] Components for Cross Section (Circle, Rectangular, Box). I assume they will have the type (elastic section where we calculate the value Area, Iy, Iz, ect, ect)
+* [x] Components for Cross Section (Circle, Rectangular, Box). I assume they will have the type (elastic section where we calculate the value Area, Iy, Iz, ect, ect)
 
 
-* [ ] Update Deformed Dynamic Model
+* [x] Update Deformed Dynamic Model
 * [x] time-history: Displacement Vector every TimeStep for each node. Example: {0}(200)   {timeStep}(numbers of nodE)
 * [x] Circular CrossSection has some visualisation problem / it update with Internal Thickness and not Diameter
-* [ ] add "IPE" section
+* [x] add "IPE" section
 
 * [ ] check input english name for IPE. web = anima, flange = flangia. Karamba could be a quick reference to look at.
-* [ ] add inetia zz in ipe section
+* [x] add inetia zz in ipe section
 * [ ] add box section
+* [ ] import section from Database (export from SAP2000 or IFC library)
 
-* [ ] circular Cross-Section less dense for visualisation
+* [x] circular Cross-Section less dense for visualisation
 * [ ] add view distribuited load in model view
 * [ ] add view concentrated mass load in model view ( create a sphere in node )
 * [ ] Add Warning to the components. Ask Marco for some reference script
-* [ ] Create Cluster when necessary
+* [x] Create Cluster when necessary
 * [ ] password - Salvatore439505Merda506682!
-* [ ] WIP Components BrickComponents
-* [ ] add coding (in panel or path script ) and view post processing. Let's make a new component for import and visualize a text file
-* [ ] modify loft mesh for brick ( problem con tetra )
+
 
 ### Marco Pellegrino
 
-* [ ] Modal Analyses
+* [ ] Modal Analyses - use the new function from OpenSees. Parse the text file?
 * [ ] EarthQuake Analyses
 * [ ] Test Transient Analyses
-* [ ] Issue on the number of Steps. Have a look at the class
-* [ ] 
-* [ ] Icons
+* [ ] Response Spectrum Analyses
+* [ ] Create a Response Spectrum tool
 * [ ] Be sure that works for computer with Space in the same c:/Marco Pellegrino/todo/todo
 
 ### Next Step
