@@ -1,0 +1,10 @@
+{
+    "Solid_Timber":{
+                    "1":{"permanent":0.60,"long_term":0.70,"medium_term":0.80,"short_term":0.90,"instantaneous":1.10},
+                    "2":{"permanent":0.60,"long_term":0.70,"medium_term":0.80,"short_term":0.90,"instantaneous":1.10},
+                    "3":{"permanent":0.50,"long_term":0.55,"medium_term":0.65,"short_term":0.70,"instantaneous":0.90}},
+        "LVL":   {
+                    "1":{"permanent":0.00,"long_term":0.00,"medium_term":0.00,"short_term":0.00,"instantaneous":0.00},
+                    "2":{"permanent":0.00,"long_term":0.00,"medium_term":0.00,"short_term":0.00,"instantaneous":0.00},
+                    "3":{"permanent":0.00,"long_term":0.00,"medium_term":0.00,"short_term":0.00,"instantaneous":0.00}}
+}
