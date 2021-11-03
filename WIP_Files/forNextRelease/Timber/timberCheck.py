@@ -7,11 +7,11 @@ import os
 
 # Input [mm]
 
-# b = 75
-# h = 15
+# b = 
+# h = 
 
-# L_ey = 1000
-# L_ez = 1000
+# L_ey = 
+# L_ez = 
 
 
 # Timber_Class = "C22"
@@ -20,12 +20,12 @@ import os
 
 # # Units [N]
 
-# N_x = -4000
-# V_y = 1000
-# V_z = 1000
-# M_x = 1000
-# M_y = 100000
-# M_z = 100000
+# N_x = 
+# V_y = 
+# V_z = 
+# M_x = 
+# M_y = 
+# M_z = 
 
 
 
