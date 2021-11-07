@@ -1,0 +1,386 @@
+model BasicBuilder -ndm 3 -ndf 6
+
+node 1 0.0 0.0 0.0 -mass 0 0 0 0 0 0
+node 2 0.05 0.0 0.15 -mass 0 0 0 0 0 0
+node 3 0.1 0.0 0.3 -mass 0 0 0 0 0 0
+node 4 0.15 0.0 0.45 -mass 0 0 0 0 0 0
+node 5 0.2 0.0 0.6 -mass 0 0 0 0 0 0
+node 6 0.25 0.0 0.75 -mass 0 0 0 0 0 0
+node 7 0.3 0.0 0.9 -mass 0 0 0 0 0 0
+node 8 0.35 0.0 1.05 -mass 0 0 0 0 0 0
+node 9 0.4 0.0 1.2 -mass 0 0 0 0 0 0
+node 10 0.45 0.0 1.35 -mass 0 0 0 0 0 0
+node 11 0.5 0.0 1.5 -mass 0 0 0 0 0 0
+node 12 0.55 0.0 1.65 -mass 0 0 0 0 0 0
+node 13 0.6 0.0 1.8 -mass 0 0 0 0 0 0
+node 14 0.65 0.0 1.95 -mass 0 0 0 0 0 0
+node 15 0.7 0.0 2.1 -mass 0 0 0 0 0 0
+node 16 0.75 0.0 2.25 -mass 0 0 0 0 0 0
+node 17 0.8 0.0 2.4 -mass 0 0 0 0 0 0
+node 18 0.85 0.0 2.55 -mass 0 0 0 0 0 0
+node 19 0.9 0.0 2.7 -mass 0 0 0 0 0 0
+node 20 0.95 0.0 2.85 -mass 0 0 0 0 0 0
+node 21 1.0 0.0 3.0 -mass 0 0 0 0 0 0
+node 22 1.35 0.0 3.05 -mass 0 0 0 0 0 0
+node 23 1.7 0.0 3.1 -mass 0 0 0 0 0 0
+node 24 2.05 0.0 3.15 -mass 0 0 0 0 0 0
+node 25 2.4 0.0 3.2 -mass 0 0 0 0 0 0
+node 26 2.75 0.0 3.25 -mass 0 0 0 0 0 0
+node 27 3.1 0.0 3.3 -mass 0 0 0 0 0 0
+node 28 3.45 0.0 3.35 -mass 0 0 0 0 0 0
+node 29 3.8 0.0 3.4 -mass 0 0 0 0 0 0
+node 30 4.15 0.0 3.45 -mass 0 0 0 0 0 0
+node 31 4.5 0.0 3.5 -mass 0 0 0 0 0 0
+node 32 4.85 0.0 3.55 -mass 0 0 0 0 0 0
+node 33 5.2 0.0 3.6 -mass 0 0 0 0 0 0
+node 34 5.55 0.0 3.65 -mass 0 0 0 0 0 0
+node 35 5.9 0.0 3.7 -mass 0 0 0 0 0 0
+node 36 6.25 0.0 3.75 -mass 0 0 0 0 0 0
+node 37 6.6 0.0 3.8 -mass 0 0 0 0 0 0
+node 38 6.95 0.0 3.85 -mass 0 0 0 0 0 0
+node 39 7.3 0.0 3.9 -mass 0 0 0 0 0 0
+node 40 7.65 0.0 3.95 -mass 0 0 0 0 0 0
+node 41 8.0 0.0 4.0 -mass 0 0 0 0 0 0
+node 42 8.15 0.0 3.8 -mass 0 0 0 0 0 0
+node 43 8.3 0.0 3.6 -mass 0 0 0 0 0 0
+node 44 8.45 0.0 3.4 -mass 0 0 0 0 0 0
+node 45 8.6 0.0 3.2 -mass 0 0 0 0 0 0
+node 46 8.75 0.0 3.0 -mass 0 0 0 0 0 0
+node 47 8.9 0.0 2.8 -mass 0 0 0 0 0 0
+node 48 9.05 0.0 2.6 -mass 0 0 0 0 0 0
+node 49 9.2 0.0 2.4 -mass 0 0 0 0 0 0
+node 50 9.35 0.0 2.2 -mass 0 0 0 0 0 0
+node 51 9.5 0.0 2.0 -mass 0 0 0 0 0 0
+node 52 9.65 0.0 1.8 -mass 0 0 0 0 0 0
+node 53 9.8 0.0 1.6 -mass 0 0 0 0 0 0
+node 54 9.95 0.0 1.4 -mass 0 0 0 0 0 0
+node 55 10.1 0.0 1.2 -mass 0 0 0 0 0 0
+node 56 10.25 0.0 1.0 -mass 0 0 0 0 0 0
+node 57 10.4 0.0 0.8 -mass 0 0 0 0 0 0
+node 58 10.55 0.0 0.6 -mass 0 0 0 0 0 0
+node 59 10.7 0.0 0.4 -mass 0 0 0 0 0 0
+node 60 10.85 0.0 0.2 -mass 0 0 0 0 0 0
+node 61 11.0 0.0 0.0 -mass 0 0 0 0 0 0
+fix 1 1 1 1 1 1 1
+fix 61 1 1 1 1 1 1
+uniaxialMaterial Elastic 1 201000000000.0 0.0 201000000000.0
+
+section Elastic 1 201000000000.0 0.025 3.02083333333e-05 0.000270833333333 77307692307.7 0.000301041666667 0.6 0.4
+
+geomTransf Linear 1 -1.38777878078e-17 -1.0 0.0
+element forceBeamColumn 1 1 2 1 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 2 1.38777878078e-17 -1.0 0.0
+element forceBeamColumn 2 2 3 2 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 3 1.38777878078e-17 -1.0 5.55111512313e-17
+element forceBeamColumn 3 3 4 3 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 4 1.38777878078e-17 -1.0 0.0
+element forceBeamColumn 4 4 5 4 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 5 1.38777878078e-17 -1.0 5.55111512313e-17
+element forceBeamColumn 5 5 6 5 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 6 0.0 -1.0 0.0
+element forceBeamColumn 6 6 7 6 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 7 0.0 1.0 -5.55111512313e-17
+element forceBeamColumn 7 7 8 7 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 8 0.0 -1.0 0.0
+element forceBeamColumn 8 8 9 8 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 9 0.0 -1.0 -5.55111512313e-17
+element forceBeamColumn 9 9 10 9 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 10 0.0 -1.0 -5.55111512313e-17
+element forceBeamColumn 10 10 11 10 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 11 -1.38777878078e-17 -1.0 0.0
+element forceBeamColumn 11 11 12 11 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 12 0.0 1.0 -5.55111512313e-17
+element forceBeamColumn 12 12 13 12 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 13 -1.38777878078e-17 -1.0 0.0
+element forceBeamColumn 13 13 14 13 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 14 0.0 -1.0 -5.55111512313e-17
+element forceBeamColumn 14 14 15 14 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 15 -1.38777878078e-17 1.0 5.55111512313e-17
+element forceBeamColumn 15 15 16 15 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 16 0.0 -1.0 0.0
+element forceBeamColumn 16 16 17 16 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 17 0.0 1.0 0.0
+element forceBeamColumn 17 17 18 17 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 18 0.0 -1.0 -5.55111512313e-17
+element forceBeamColumn 18 18 19 18 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 19 -1.38777878078e-17 -1.0 5.55111512313e-17
+element forceBeamColumn 19 19 20 19 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 20 -1.38777878078e-17 -1.0 0.0
+element forceBeamColumn 20 20 21 20 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 21 -2.77555756156e-17 1.0 3.46944695195e-18
+element forceBeamColumn 21 21 22 21 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 22 0.0 -1.0 0.0
+element forceBeamColumn 22 22 23 22 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 23 0.0 -1.0 -3.46944695195e-18
+element forceBeamColumn 23 23 24 23 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 24 2.77555756156e-17 1.0 0.0
+element forceBeamColumn 24 24 25 24 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 25 0.0 -1.0 -3.46944695195e-18
+element forceBeamColumn 25 25 26 25 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 26 0.0 -1.0 3.46944695195e-18
+element forceBeamColumn 26 26 27 26 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 27 2.77555756156e-17 1.0 -3.46944695195e-18
+element forceBeamColumn 27 27 28 27 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 28 0.0 -1.0 3.46944695195e-18
+element forceBeamColumn 28 28 29 28 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 29 0.0 -1.0 3.46944695195e-18
+element forceBeamColumn 29 29 30 29 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 30 0.0 1.0 -3.46944695195e-18
+element forceBeamColumn 30 30 31 30 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 31 0.0 -1.0 0.0
+element forceBeamColumn 31 31 32 31 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 32 0.0 1.0 -3.46944695195e-18
+element forceBeamColumn 32 32 33 32 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 33 0.0 1.0 0.0
+element forceBeamColumn 33 33 34 33 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 34 -2.77555756156e-17 -1.0 3.46944695195e-18
+element forceBeamColumn 34 34 35 34 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 35 0.0 -1.0 0.0
+element forceBeamColumn 35 35 36 35 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 36 0.0 -1.0 3.46944695195e-18
+element forceBeamColumn 36 36 37 36 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 37 0.0 -1.0 3.46944695195e-18
+element forceBeamColumn 37 37 38 37 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 38 0.0 1.0 0.0
+element forceBeamColumn 38 38 39 38 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 39 2.77555756156e-17 1.0 0.0
+element forceBeamColumn 39 39 40 39 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 40 0.0 -1.0 -3.46944695195e-18
+element forceBeamColumn 40 40 41 40 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 41 -5.55111512313e-17 -1.0 5.55111512313e-17
+element forceBeamColumn 41 41 42 41 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 42 0.0 -1.0 0.0
+element forceBeamColumn 42 42 43 42 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 43 0.0 -1.0 0.0
+element forceBeamColumn 43 43 44 43 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 44 0.0 1.0 0.0
+element forceBeamColumn 44 44 45 44 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 45 5.55111512313e-17 -1.0 5.55111512313e-17
+element forceBeamColumn 45 45 46 45 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 46 0.0 -1.0 0.0
+element forceBeamColumn 46 46 47 46 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 47 -5.55111512313e-17 1.0 5.55111512313e-17
+element forceBeamColumn 47 47 48 47 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 48 0.0 1.0 -5.55111512313e-17
+element forceBeamColumn 48 48 49 48 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 49 5.55111512313e-17 1.0 0.0
+element forceBeamColumn 49 49 50 49 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 50 -5.55111512313e-17 -1.0 0.0
+element forceBeamColumn 50 50 51 50 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 51 0.0 1.0 0.0
+element forceBeamColumn 51 51 52 51 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 52 0.0 1.0 0.0
+element forceBeamColumn 52 52 53 52 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 53 -5.55111512313e-17 1.0 5.55111512313e-17
+element forceBeamColumn 53 53 54 53 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 54 0.0 -1.0 0.0
+element forceBeamColumn 54 54 55 54 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 55 0.0 1.0 5.55111512313e-17
+element forceBeamColumn 55 55 56 55 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 56 -5.55111512313e-17 1.0 5.55111512313e-17
+element forceBeamColumn 56 56 57 56 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 57 0.0 1.0 5.55111512313e-17
+element forceBeamColumn 57 57 58 57 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 58 -5.55111512313e-17 1.0 5.55111512313e-17
+element forceBeamColumn 58 58 59 58 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 59 0.0 -1.0 0.0
+element forceBeamColumn 59 59 60 59 NewtonCotes 1 5 -mass 196.25
+
+geomTransf Linear 60 0.0 1.0 0.0
+element forceBeamColumn 60 60 61 60 NewtonCotes 1 5 -mass 196.25
+
+timeSeries Constant 1 -factor 1
+
+pattern Plain 1 1 {
+	load 1 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 2 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 2 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 3 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 3 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 4 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 4 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 5 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 5 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 6 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 6 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 7 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 7 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 8 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 8 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 9 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 9 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 10 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 10 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 11 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 11 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 12 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 12 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 13 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 13 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 14 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 14 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 15 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 15 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 16 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 16 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 17 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 17 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 18 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 18 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 19 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 19 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 20 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 20 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 21 0.0 0.0 -155.149247702 0.0 0.0 0.0
+	load 21 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 22 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 22 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 23 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 23 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 24 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 24 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 25 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 25 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 26 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 26 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 27 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 27 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 28 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 28 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 29 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 29 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 30 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 30 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 31 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 31 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 32 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 32 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 33 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 33 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 34 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 34 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 35 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 35 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 36 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 36 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 37 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 37 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 38 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 38 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 39 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 39 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 40 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 40 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 41 0.0 0.0 -346.924264520 0.0 0.0 0.0
+	load 41 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 42 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 42 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 43 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 43 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 44 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 44 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 45 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 45 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 46 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 46 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 47 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 47 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 48 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 48 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 49 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 49 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 50 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 50 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 51 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 51 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 52 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 52 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 53 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 53 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 54 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 54 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 55 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 55 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 56 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 56 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 57 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 57 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 58 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 58 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 59 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 59 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 60 0.0 0.0 -245.3125 0.0 0.0 0.0
+	load 60 0.0 0.0 -245.312500000 0.0 0.0 0.0
+	load 61 0.0 0.0 -245.312500000 0.0 0.0 0.0
+}
+
+recorder mpco recorder.mpco -N  displacement rotation reactionForce reactionMoment -E  force stresses section.force section.fiber.stress
+
+constraints Transformation
+numberer RCM
+system BandSPD
+test NormDispIncr 1.0e-6 12 5
+algorithm Linear
+integrator LoadControl 1.0
+analysis Static
+analyze 1 
+
+wipe
