@@ -1,35 +1,7 @@
-import math
-import json
 import os
+import json
+import math
 
-
-# reference value in [N/mm2]
-
-# Input [mm]
-
-# b = 
-# h = 
-
-# L_ey = 
-# L_ez = 
-
-
-# Timber_Class = "C22"
-# service_class = 1
-# duration = "instantaneous"
-
-# # Units [N]
-
-# N_x = 
-# V_y = 
-# V_z = 
-# M_x = 
-# M_y = 
-# M_z = 
-
-
-
-# Opening JSON
 def load_timber_properties(folder_path):
 
     collected_properties = []
@@ -233,7 +205,7 @@ def shear_stress(V_y, V_z, b, h):
     return tau_d
 
 
-def axial_resistance(kmod, fc_0_k, ft_0_k, gamma_m):
+def axial_resistance(kh, kmod, fc_0_k, ft_0_k, gamma_m):
 
     fc_0_d = kmod * fc_0_k / gamma_m
     ft_0_d = kh * kmod * ft_0_k / gamma_m
@@ -330,23 +302,3 @@ def utilisation_LTB(b, h, sigma_c_0_d, fc_0_d, sigma_t_0_d, sigma_m_y_d, fm_y_d,
         util_LTB_capacity = util_LTB_capacity_z
 
     return util_LTB_capacity
-
-
-
-# utilisation = [util_axial, util_bending_y, util_bending_z, util_shear, util_bending_tens_y, util_bending_tens_z, util_bending_comp_y, util_bending_comp_z, util_LTB_capacity]
-# utilisation = [round(number,2) for number in utilisation]
-
-
-
-# print("\n")
-# print("Util Axial: {}".format(abs(round(util_axial,2))))
-# print("Util Bending y: {}".format(abs(round(util_bending_y,2))))
-# print("Util Bending z: {}".format(abs(round(util_bending_z,2))))
-# print("Util Shear: {}".format(abs(round(util_shear,2))))
-
-# print("\n")
-# print("Util Combined Bending_y Tension: {}".format(abs(round(util_bending_tens_y,2))))
-# print("Util Combined Bending_z Tension: {}".format(abs(round(util_bending_tens_z,2))))
-# print("Util Combined Bending_y Compression: {}".format(abs(round(util_bending_comp_y,2))))
-# print("Util Combined Bending_z Compression: {}".format(abs(round(util_bending_comp_z,2))))
-# print("Util Lateral Buckling: {}".format(abs(round(util_LTB_capacity,2))))
