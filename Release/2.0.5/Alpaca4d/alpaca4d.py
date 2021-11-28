@@ -1374,6 +1374,98 @@ class RectangularCS(object):
         return self.write_tcl()
 
 
+class Rectangular_HollowSection(object):
+    def __init__(self, secName, width, height, t_sides, t_bottom, t_upper, material):
+
+        self.secName = secName
+        self.width = width
+        self.height = height
+        self.t_sides = t_sides
+        self.t_bottom = t_bottom
+        self.t_upper = t_upper
+        self.material = material
+
+        self.shape = 'RHS'
+        
+        self.crv = self.geometry()[0]
+        self.sectionBrep = self.geometry()[1]
+        
+        self.sectionTag = None
+        
+        
+    def geometry(self):
+        width_internval = rg.Interval(-self.width/2, self.width/2)
+        height_internval = rg.Interval(-self.height/2, self.height/2)
+        
+        outer_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_internval, height_internval).ToNurbsCurve()
+        
+        
+        width_internval = rg.Interval(-(self.width- 2*self.t_sides)/2, (self.width- 2*self.t_sides)/2)
+        height_internval = rg.Interval(-(self.height/2 - self.t_bottom)/2, (self.height/2 - self.t_upper))
+        
+        inner_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_internval, height_internval).ToNurbsCurve()
+        
+        
+        boundary_curves = [outer_curve, inner_curve]
+        sectionBrep = rg.Brep.CreatePlanarBreps(boundary_curves, 0.01)
+        
+        
+        return boundary_curves, sectionBrep
+    
+        
+    def Area(self):
+        Area = rg.AreaMassProperties.Compute(self.sectionBrep).Area
+        return Area
+
+    def AreaY(self):
+        return self.Area() * self.alphaY()
+
+    def AreaZ(self):
+        return self.Area() * self.alphaZ()
+    
+    # alphaY is a function because for some section it is not a constant factor
+    def alphaY(self):
+        return 9.0/10.0
+    
+    def alphaZ(self):
+        return 9.0/10.0
+
+    def Iyy(self):
+        if self.t <= (self.height/2 and self.width/2):
+            Iyy = (self.width* math.pow(self.height,3)/12) - ((self.width-2*self.t)*math.pow((self.height-2*self.t),3)/12)
+        else:
+            Iyy = None
+        return Iyy
+
+    def Izz(self):
+        if self.t <= (self.height/2 and self.width/2):
+            Izz = (self.height*math.pow(self.width,3)/12) - ((self.height-2*self.t)*math.pow((self.width-2*self.t),3)/12)
+        else:
+            Izz = None
+        return Izz
+
+    def torsion(self):
+        if self.t <= (self.height/2 and self.width/2):
+            h0 =2*((self.height-self.t) + (self.width-self.t))
+            Ah = (self.height-self.t)*(self.width-self.t)
+            k=2*Ah*self.t/h0
+            J = (math.pow(self.t,3)*h0/3) + 2*k*Ah
+            Cw= J/(self.t+ k/self.t)   #torsional modulus, not used in RHS
+        else:
+            J = None; Cw = None
+        return J, Cw
+
+    def write_tcl(self):
+        tcl_text = "section Elastic {} {} {} {} {} {} {} {} {}\n".format(self.sectionTag, self.material.E, self.Area(), self.Izz(), self.Iyy(), self.material.G, self.torsion()[0], self.alphaY(), self.alphaZ())
+        return tcl_text
+
+    def write_py(self):
+        py_text = "ops.section('Elastic',{},{},{},{},{},{},{},{},{})\n".format(self.sectionTag, self.material.E, self.Area(), self.Izz(), self.Iyy(), self.material.G, self.torsion()[0], self.alphaY(), self.alphaZ())
+        return py_text
+    
+    def ToString(self):
+        return self.write_tcl()
+
 
 #TODO
 class I_Section(object):
