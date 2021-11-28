@@ -1,0 +1,2 @@
+mklink /J "C:\Users\Marco\AppData\Roaming\Grasshopper\UserObjects\Alpaca4d" "C:\GitHub\Alpaca4d_Development\Release\2.0.5\userObject"
+mklink /J "C:\Users\Marco\AppData\Roaming\Grasshopper\Libraries\Alpaca4d" "C:\GitHub\Alpaca4d_Development\Release\2.0.5\Alpaca4d" 
