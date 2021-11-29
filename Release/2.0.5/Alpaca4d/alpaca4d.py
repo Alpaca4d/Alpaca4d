@@ -1394,16 +1394,15 @@ class Rectangular_HollowSection(object):
         
         
     def geometry(self):
-        width_internval = rg.Interval(-self.width/2, self.width/2)
-        height_internval = rg.Interval(-self.height/2, self.height/2)
+        width_interval = rg.Interval(-self.width/2, self.width/2)
+        height_interval = rg.Interval(-self.height/2, self.height/2)
+        outer_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_interval, height_interval).ToNurbsCurve()
         
-        outer_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_internval, height_internval).ToNurbsCurve()
         
+        width_interval = rg.Interval(-(self.width- 2*self.t_sides)/2, (self.width- 2*self.t_sides)/2)
+        height_interval = rg.Interval(-(self.height/2 - self.t_bottom)/2, (self.height/2 - self.t_upper))
         
-        width_internval = rg.Interval(-(self.width- 2*self.t_sides)/2, (self.width- 2*self.t_sides)/2)
-        height_internval = rg.Interval(-(self.height/2 - self.t_bottom)/2, (self.height/2 - self.t_upper))
-        
-        inner_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_internval, height_internval).ToNurbsCurve()
+        inner_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_interval, height_interval).ToNurbsCurve()
         
         
         boundary_curves = [outer_curve, inner_curve]
@@ -1431,17 +1430,11 @@ class Rectangular_HollowSection(object):
         return 9.0/10.0
 
     def Iyy(self):
-        if self.t <= (self.height/2 and self.width/2):
-            Iyy = (self.width* math.pow(self.height,3)/12) - ((self.width-2*self.t)*math.pow((self.height-2*self.t),3)/12)
-        else:
-            Iyy = None
+        Iyy = rg.AreaMassProperties.Compute(self.sectionBrep).CentroidCoordinatesMomentsOfInertia[0]
         return Iyy
 
     def Izz(self):
-        if self.t <= (self.height/2 and self.width/2):
-            Izz = (self.height*math.pow(self.width,3)/12) - ((self.height-2*self.t)*math.pow((self.width-2*self.t),3)/12)
-        else:
-            Izz = None
+        Izz = rg.AreaMassProperties.Compute(self.sectionBrep).CentroidCoordinatesMomentsOfInertia[0]
         return Izz
 
     def torsion(self):
