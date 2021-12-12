@@ -1257,6 +1257,7 @@ class CircleCS(object):
         self.sectionBrep = rg.Brep.CreatePlanarBreps( self.crv, 0.1 )[0]
 
         self.sectionTag = None
+    
 
         
     def Area(self):
@@ -1373,7 +1374,7 @@ class RectangularCS(object):
     def ToString(self):
         return self.write_tcl()
 
-
+#TODO
 class Rectangular_HollowSection(object):
     def __init__(self, secName, width, height, t_sides, t_bottom, t_upper, material):
 
