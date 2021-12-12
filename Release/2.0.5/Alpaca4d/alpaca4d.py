@@ -1375,6 +1375,7 @@ class RectangularCS(object):
         return self.write_tcl()
 
 #TODO
+# TO REVIEW THE SECTION PROPERTIES. ESPECIALLY THE TORSIONAL CONSTANT
 class Rectangular_HollowSection(object):
     def __init__(self, secName, width, height, t_sides, t_bottom, t_upper, material):
 
@@ -1439,12 +1440,12 @@ class Rectangular_HollowSection(object):
         return Izz
 
     def torsion(self):
-        if self.t <= (self.height/2 and self.width/2):
-            h0 =2*((self.height-self.t) + (self.width-self.t))
-            Ah = (self.height-self.t)*(self.width-self.t)
-            k=2*Ah*self.t/h0
-            J = (math.pow(self.t,3)*h0/3) + 2*k*Ah
-            Cw= J/(self.t+ k/self.t)   #torsional modulus, not used in RHS
+        if self.t_sides <= (self.height/2 and self.width/2):
+            h0 =2*((self.height-self.t_bottom) + (self.width-self.t_sides))
+            Ah = (self.height-self.t_bottom)*(self.width-self.t_sides)
+            k=2*Ah*self.t_sides/h0
+            J = (math.pow(self.t_sides,3)*h0/3) + 2*k*Ah
+            Cw= J/(self.t_sides+ k/self.t_sides)   #torsional modulus, not used in RHS
         else:
             J = None; Cw = None
         return J, Cw
