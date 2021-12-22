@@ -1401,8 +1401,8 @@ class Rectangular_HollowSection(object):
         outer_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_interval, height_interval).ToNurbsCurve()
         
         
-        width_interval = rg.Interval(-(self.width- 2*self.t_sides)/2, (self.width- 2*self.t_sides)/2)
-        height_interval = rg.Interval(-(self.height/2 - self.t_bottom)/2, (self.height/2 - self.t_upper))
+        width_interval = rg.Interval(-(self.width/2 - self.t_sides), (self.width/2 - self.t_sides))
+        height_interval = rg.Interval(-(self.height/2 - self.t_bottom), (self.height/2 - self.t_upper))
         
         inner_curve = rg.Rectangle3d(rg.Plane.WorldXY, width_interval, height_interval).ToNurbsCurve()
         
@@ -1449,6 +1449,9 @@ class Rectangular_HollowSection(object):
         else:
             J = None; Cw = None
         return J, Cw
+    
+    def J(self):
+        return self.torsion()[0]
 
     def write_tcl(self):
         tcl_text = "section Elastic {} {} {} {} {} {} {} {} {}\n".format(self.sectionTag, self.material.E, self.Area(), self.Izz(), self.Iyy(), self.material.G, self.torsion()[0], self.alphaY(), self.alphaZ())
