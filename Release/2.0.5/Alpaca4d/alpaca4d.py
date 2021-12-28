@@ -273,7 +273,7 @@ class uniAxialMaterialElastic(object):
                 G: Tangential Modulus [MPa].
                 v: Poisson ratio.
                 rho: specific weight [kg/m3].
-                fy: Yield stress value of the material [MPa]"""
+                attributes: attributes of the material [MPa]"""
 
 
         self.matName = matName
@@ -414,7 +414,10 @@ class ElasticIsotropic(object):
         self.materialType = "ElasticIsotropic"
 
         if self.v == None:
+            self.G = G  # Input value in N/mm2 ---> Output kN/m2
             self.v = (E / (2 * G)) - 1
+        else:
+            self.G = E / (2 * (1 + v))
 
     def ToString(self):
         return self.write_tcl()
