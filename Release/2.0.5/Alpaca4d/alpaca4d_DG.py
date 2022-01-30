@@ -2028,7 +2028,6 @@ class TCLRecorder(object):
             elementRespType += ' section.fiber.stress'
         
 
-
         if nodeRespType:
             return "recorder mpco {} -N {} -E {}".format(recorderName, nodeRespType, elementRespType)
 
@@ -2430,7 +2429,7 @@ class layerCirc(object):
         self.radius = radius
         
         area = (math.pi*self.diameter**2/4)
-        self.Atot = area #*self.nBar 
+        self.Atot = area *self.nBar 
         
         
         
