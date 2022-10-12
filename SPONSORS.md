@@ -3,3 +3,5 @@
 <h2 align="center">Backers via Patreon</h2>
 
 - Zeno Zoppi
+- ずき す
+- Felipe Junqueira
