@@ -32,5 +32,26 @@ namespace Alpaca4d.Helper
 
             return _resultType;
         }
-	}
+
+        public static string SolverTypeConvert(Alpaca4d.Analysis.Solver resultType)
+        {
+            string _resultType = "";
+
+            if (resultType == Alpaca4d.Analysis.Solver.genBandArpack)
+            {
+                _resultType = "-genBandArpack";
+            }
+            else if (resultType == Alpaca4d.Analysis.Solver.symmBandLapack)
+            {
+                _resultType = "-symmBandLapack";
+            }
+            else if (resultType == Alpaca4d.Analysis.Solver.fullGenLapack)
+            {
+                _resultType = "-fullGenLapack";
+            }
+
+            return _resultType;
+        }
+
+    }
 }

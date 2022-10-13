@@ -301,6 +301,13 @@ namespace Alpaca4d
             Transient
         }
 
+        public enum Solver
+        {
+            genBandArpack,
+            symmBandLapack,
+            fullGenLapack,
+		}
+
         public Analysis()
         {
         }

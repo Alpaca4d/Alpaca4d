@@ -32,7 +32,7 @@ namespace Alpaca4d.Gh
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Vibration Modes", "Vibration Modes", "", GH_ParamAccess.item, 1);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddTextParameter("Solver", "Solver", "-genBandArpack, -symmBandLapack, -fullGenLapack", GH_ParamAccess.item, "-fullGenLapack");
+            pManager.AddTextParameter("Solver", "Solver", "Connect a 'ValueList'\n-genBandArpack \n-symmBandLapack \n-genBandArpack", GH_ParamAccess.item, "-fullGenLapack");
             pManager[pManager.ParamCount-1].Optional = true;
         }
 
@@ -125,6 +125,23 @@ namespace Alpaca4d.Gh
             DA.SetDataList(3, period);
             DA.SetDataList(4, frequencies);
         }
+
+        protected override void BeforeSolveInstance()
+        {
+            var resultTypes = new List<string>();
+
+            var _resultTypes = new List<Analysis.Solver> { Analysis.Solver.genBandArpack, Analysis.Solver.symmBandLapack, Analysis.Solver.fullGenLapack };
+
+            foreach(Analysis.Solver solver in _resultTypes)
+			{
+                var result = Alpaca4d.Helper.EnumHelper.SolverTypeConvert(solver);
+                resultTypes.Add(result);
+            }
+
+            ValueListUtils.updateValueLists(this, 2, resultTypes, null);
+
+        }
+
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
