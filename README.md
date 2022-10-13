@@ -1,5 +1,5 @@
 # Alpaca4d
-<img src="Images/Logo.png" alt="drawing" width="300"/>
+<img src="Logo.png" alt="drawing" width="300"/>
 
 __Alpaca4d__ is a Grasshopper plugin which has been developed on top of __*OpenSees*__. It lets you analyse beam, shell and brick elements through Static, Modal and Ground Motion Analysis.
 

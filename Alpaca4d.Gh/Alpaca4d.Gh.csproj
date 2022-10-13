@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Version>1.0</Version>
+    <Title>Alpaca4d</Title>
+    <Description>Description of Alpaca4d</Description>
+    <TargetExt>.gha</TargetExt>
+    <BaseOutputPath></BaseOutputPath>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <Compile Remove="09_Visualization\**" />
+    <Compile Remove="Recorder\**" />
+    <Compile Remove="TimeSeries\**" />
+    <EmbeddedResource Remove="09_Visualization\**" />
+    <EmbeddedResource Remove="Recorder\**" />
+    <EmbeddedResource Remove="TimeSeries\**" />
+    <None Remove="09_Visualization\**" />
+    <None Remove="Recorder\**" />
+    <None Remove="TimeSeries\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.4.1" />
+    <PackageReference Include="Eto.HtmlRenderer" Version="0.3.0" />
+    <PackageReference Include="Grasshopper" Version="7.18.22124.3001" IncludeAssets="compile;build" />
+    <PackageReference Include="HDF5-CSharp" Version="1.13.4" />
+    <PackageReference Include="RhinoCommon" Version="7.18.22124.3001" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="03_Constraint\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Alpaca.Core\Alpaca.Core.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="RhinoCommon" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="License.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">
+    <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
+    <StartArguments></StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+
+</Project>
