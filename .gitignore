@@ -1,2 +1,13 @@
 
 .DS_Store
+# Binaries
+bin/
+obj/
+packages/
+*.nupkg
+
+# Local files
+.vs/
+.vscode/
+*.csproj.user
+*.mpco

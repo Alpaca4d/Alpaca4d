@@ -192,7 +192,7 @@ namespace Alpaca4d
         }
         public string WriteTcl()
         {
-            return $"{Type} {Tol} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
+            return $"test {Type} {Tol} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
         }
 
     }

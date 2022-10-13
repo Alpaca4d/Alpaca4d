@@ -24,7 +24,7 @@ namespace Alpaca4d.Forms
 
             var centerScreen = Eto.Forms.Screen.DisplayBounds.Center;
             windows.Location = new Eto.Drawing.Point((int)centerScreen.X - windows.Size.Width / 2, (int)centerScreen.Y - windows.Size.Height / 2);
-            windows.Icon = new Eto.Drawing.Icon(@"C:\GitHub\OpenSeesGh\Alpaca4d.Gh\Resources\Tab.png");
+            windows.Icon = new Eto.Drawing.Icon(@"C:\GitHub\Alpaca4d\Alpaca4d.Gh\Resources\Tab.png");
 
             var imageView = new Eto.Forms.ImageView();
             var imagePaths = System.IO.Directory.GetFiles(Alpaca4d.Application.GhAlpacaFolder, "*_adv.png", System.IO.SearchOption.AllDirectories);
