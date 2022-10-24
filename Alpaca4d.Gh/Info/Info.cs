@@ -66,7 +66,7 @@ namespace Alpaca4d
             license.Add("You are free to use this program, but everything is subject to the OpenSees license terms.");
             license.Add("");
             license.Add("LICENSE TERMS");
-            license.Add(Alpaca4d.Application.ReadLicense());
+            license.Add(Alpaca4d.Gh.Properties.Resources.License);
 
             // Finally assign the spiral to the output parameter.
             DA.SetDataList(0, license);

@@ -25,13 +25,6 @@ namespace Alpaca4d
         {
 
         }
-        public static string ReadLicense()
-        {
-            string openSeesPath = System.IO.Path.Combine(Application.OpenSeesFolder, @"License.txt");
-            var license = System.IO.File.ReadAllText(openSeesPath);
-
-            return license;
-        }
 
     }
 }

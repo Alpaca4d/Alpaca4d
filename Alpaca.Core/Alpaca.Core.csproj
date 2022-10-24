@@ -35,11 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Eto, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Eto.Forms.2.4.1\lib\netstandard1.0\Eto.dll</HintPath>
-    </Reference>
-    <Reference Include="Eto.HtmlRenderer, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Eto.HtmlRenderer.0.3.0\lib\net45\Eto.HtmlRenderer.dll</HintPath>
+    <Reference Include="Eto, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Eto.Forms.2.7.1\lib\netstandard2.0\Eto.dll</HintPath>
     </Reference>
     <Reference Include="HDF.PInvoke.1.10, Version=1.10.612.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HDF.PInvoke.1.10.1.10.612\lib\netstandard2.0\HDF.PInvoke.1.10.dll</HintPath>
@@ -51,6 +48,10 @@
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -166,6 +167,7 @@
     <Compile Include="Utils\Forms.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -185,10 +187,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\HDF.PInvoke.1.10.1.10.612\build\net461\HDF.PInvoke.1.10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HDF.PInvoke.1.10.1.10.612\build\net461\HDF.PInvoke.1.10.targets'))" />
-    <Error Condition="!Exists('..\packages\Eto.Forms.2.4.1\build\Eto.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eto.Forms.2.4.1\build\Eto.Forms.targets'))" />
+    <Error Condition="!Exists('..\packages\Eto.Forms.2.7.1\build\Eto.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eto.Forms.2.7.1\build\Eto.Forms.targets'))" />
   </Target>
   <Import Project="..\packages\HDF.PInvoke.1.10.1.10.612\build\net461\HDF.PInvoke.1.10.targets" Condition="Exists('..\packages\HDF.PInvoke.1.10.1.10.612\build\net461\HDF.PInvoke.1.10.targets')" />
   <Import Project="..\packages\RhinoCommon.7.18.22124.3001\build\RhinoCommon.targets" Condition="Exists('..\packages\RhinoCommon.7.18.22124.3001\build\RhinoCommon.targets')" />
   <Import Project="..\packages\Grasshopper.7.18.22124.3001\build\Grasshopper.targets" Condition="Exists('..\packages\Grasshopper.7.18.22124.3001\build\Grasshopper.targets')" />
-  <Import Project="..\packages\Eto.Forms.2.4.1\build\Eto.Forms.targets" Condition="Exists('..\packages\Eto.Forms.2.4.1\build\Eto.Forms.targets')" />
+  <Import Project="..\packages\Eto.Forms.2.7.1\build\Eto.Forms.targets" Condition="Exists('..\packages\Eto.Forms.2.7.1\build\Eto.Forms.targets')" />
 </Project>

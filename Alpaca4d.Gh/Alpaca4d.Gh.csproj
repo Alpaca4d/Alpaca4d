@@ -22,8 +22,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.4.1" />
-    <PackageReference Include="Eto.HtmlRenderer" Version="0.3.0" />
     <PackageReference Include="Grasshopper" Version="7.18.22124.3001" IncludeAssets="compile;build" />
     <PackageReference Include="HDF5-CSharp" Version="1.13.4" />
     <PackageReference Include="RhinoCommon" Version="7.18.22124.3001" />
@@ -57,12 +55,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="Eto">
-      <HintPath>..\packages\Eto.Forms.2.4.1\lib\netstandard1.0\Eto.dll</HintPath>
-    </Reference>
-    <Reference Include="Eto.HtmlRenderer">
-      <HintPath>..\packages\Eto.HtmlRenderer.0.3.0\lib\net45\Eto.HtmlRenderer.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   

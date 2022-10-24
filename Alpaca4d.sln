@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.Gh", "Alpaca4d.Gh\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca.Core", "Alpaca.Core\Alpaca.Core.csproj", "{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{E4B5C26E-2130-4B87-9968-0B9FD9628276}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,9 +21,6 @@ Global
 		{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4B5C26E-2130-4B87-9968-0B9FD9628276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4B5C26E-2130-4B87-9968-0B9FD9628276}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4B5C26E-2130-4B87-9968-0B9FD9628276}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -531,6 +531,17 @@ namespace Alpaca4d.Gh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copyright @ 1999,2000 The Regents of the University of California. All Rights Reserved.
+        ///
+        ///The Regents grants permission, without fee and without a written license agreement, for (a) use, reproduction, modification, and distribution of this software and its documentation by educational, research, and non-profit entities for noncommercial purposes only; and (b) use, reproduction and modification of this software by other entities for internal purposes only. The above copyright notice, this paragraph and the  [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Line_load {
