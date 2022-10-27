@@ -195,7 +195,7 @@ namespace Alpaca4d
 
             return result;
         }
-        private static Mesh CreateLoftClosed(IList<Polyline> polylines, List<double> deformation = null, Color? colors = null)
+        private static Mesh CreateLoftClosed(IList<Polyline> polylines)
         {
             Mesh result = new Mesh();
             var verts = result.Vertices;
@@ -228,6 +228,120 @@ namespace Alpaca4d
 
             return result;
         }
+
+
+
+        public static Mesh CreateLoft(IList<Polyline> polylines, List<double> deformation = null, List<Color> iColors = null, double? min = null, double? max = null)
+        {
+            if (Enumerable.All(polylines, p => p.IsClosed))
+                return CreateLoftClosed(polylines, deformation, iColors, min, max);
+            else
+                return CreateLoftOpen(polylines, deformation, iColors, min, max);
+        }
+        private static Mesh CreateLoftClosed(IList<Polyline> polylines, List<double> deformation, List<Color> iColors, double? min, double? max)
+        {
+            // find the total range of displacement
+
+            var d = new SortedDictionary<double, System.Drawing.Color>();
+
+            var numberOfColors = iColors.Count;
+            var range = max - max;
+            var diff = (max - min) / (numberOfColors - 1);
+
+            var start = min;
+            foreach (var color in iColors)
+            {
+                d.Add((double)start, color);
+                start += diff;
+            }
+
+
+            Mesh result = new Mesh();
+            var verts = result.Vertices;
+            var faces = result.Faces;
+            var clrs = result.VertexColors;
+
+            int ny = polylines.Count;
+            int nx = Enumerable.Min(polylines, p => p.Count) - 1;
+            int n;
+
+            // add vertices
+            for (int i = 0; i < ny; i++)
+            {
+                var poly = polylines[i];
+
+                for (int j = 0; j < nx; j++)
+                {
+                    verts.Add(poly[j]);
+                    var clr = Alpaca4d.Colors.GetColor(deformation[i], d);
+                    clrs.Add(clr);
+                }
+            }
+
+            // add faces
+            for (int i = 0; i < ny - 1; i++)
+            {
+                n = i * nx;
+
+                for (int j0 = 0; j0 < nx; j0++)
+                {
+                    int j1 = (j0 + 1) % nx;
+                    faces.AddFace(n + j0, n + j1, n + j1 + nx, n + j0 + nx);
+                }
+            }
+
+            return result;
+        }
+        private static Mesh CreateLoftOpen(IList<Polyline> polylines, List<double> deformation, List<Color> iColors, double? min, double? max)
+        {
+
+            var d = new SortedDictionary<double, System.Drawing.Color>();
+
+            var numberOfColors = iColors.Count;
+            var range = max - max;
+            var diff = (max - min) / (numberOfColors - 1);
+
+            var start = min;
+            foreach (var color in iColors)
+            {
+                d.Add((double)start, color);
+                start += diff;
+            }
+
+            Mesh result = new Mesh();
+            var verts = result.Vertices;
+            var faces = result.Faces;
+            var clrs = result.VertexColors;
+
+            int ny = polylines.Count;
+            int nx = Enumerable.Min(polylines, p => p.Count);
+            int n;
+
+            // add vertices
+            for (int i = 0; i < ny; i++)
+            {
+                var poly = polylines[i];
+
+                for (int j = 0; j < nx; j++)
+                {
+                    verts.Add(poly[j]);
+                    var clr = Alpaca4d.Colors.GetColor(deformation[i], d);
+                    clrs.Add(clr);
+                }
+            }
+
+            // add faces
+            for (int i = 0; i < ny - 1; i++)
+            {
+                n = i * nx;
+
+                for (int j = 0; j < nx - 1; j++)
+                    faces.AddFace(n + j, n + j + 1, n + j + nx + 1, n + j + nx);
+            }
+
+            return result;
+        }
+
         private static List<Mesh> MeshToShell(Mesh mesh)
         {
             mesh.Unweld(0, true);

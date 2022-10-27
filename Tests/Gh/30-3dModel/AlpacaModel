@@ -1,0 +1,2525 @@
+model BasicBuilder -ndm 3 -ndf 6
+node 1 -8 7 0 -mass 0 0 0 0 0 0
+node 2 -8 7 5 -mass 0 0 0 0 0 0
+node 3 8 1 0 -mass 0 0 0 0 0 0
+node 4 8 1 5 -mass 0 0 0 0 0 0
+node 5 2 -10 0 -mass 0 0 0 0 0 0
+node 6 2 -10 5 -mass 0 0 0 0 0 0
+node 7 6 -2 0 -mass 0 0 0 0 0 0
+node 8 6 -2 5 -mass 0 0 0 0 0 0
+node 9 -1 -10 0 -mass 0 0 0 0 0 0
+node 10 -1 -10 5 -mass 0 0 0 0 0 0
+node 11 -6 -2 0 -mass 0 0 0 0 0 0
+node 12 -6 -2 5 -mass 0 0 0 0 0 0
+node 13 8 -3 0 -mass 0 0 0 0 0 0
+node 14 8 -3 5 -mass 0 0 0 0 0 0
+node 15 -6 -8 0 -mass 0 0 0 0 0 0
+node 16 -6 -8 5 -mass 0 0 0 0 0 0
+node 17 9 6 0 -mass 0 0 0 0 0 0
+node 18 9 6 5 -mass 0 0 0 0 0 0
+node 19 -4 4 0 -mass 0 0 0 0 0 0
+node 20 -4 4 5 -mass 0 0 0 0 0 0
+node 21 -10 -10 0 -mass 0 0 0 0 0 0
+node 22 -9 -10 0 -mass 0 0 0 0 0 0
+node 23 -9 -9 0 -mass 0 0 0 0 0 0
+node 24 -10 -9 0 -mass 0 0 0 0 0 0
+node 25 -8 -10 0 -mass 0 0 0 0 0 0
+node 26 -8 -9 0 -mass 0 0 0 0 0 0
+node 27 -7 -10 0 -mass 0 0 0 0 0 0
+node 28 -7 -9 0 -mass 0 0 0 0 0 0
+node 29 -6 -10 0 -mass 0 0 0 0 0 0
+node 30 -6 -9 0 -mass 0 0 0 0 0 0
+node 31 -5 -10 0 -mass 0 0 0 0 0 0
+node 32 -5 -9 0 -mass 0 0 0 0 0 0
+node 33 -4 -10 0 -mass 0 0 0 0 0 0
+node 34 -4 -9 0 -mass 0 0 0 0 0 0
+node 35 -3 -10 0 -mass 0 0 0 0 0 0
+node 36 -3 -9 0 -mass 0 0 0 0 0 0
+node 37 -2 -10 0 -mass 0 0 0 0 0 0
+node 38 -2 -9 0 -mass 0 0 0 0 0 0
+node 39 -1 -9 0 -mass 0 0 0 0 0 0
+node 40 0 -10 0 -mass 0 0 0 0 0 0
+node 41 0 -9 0 -mass 0 0 0 0 0 0
+node 42 1 -10 0 -mass 0 0 0 0 0 0
+node 43 1 -9 0 -mass 0 0 0 0 0 0
+node 44 2 -9 0 -mass 0 0 0 0 0 0
+node 45 3 -10 0 -mass 0 0 0 0 0 0
+node 46 3 -9 0 -mass 0 0 0 0 0 0
+node 47 4 -10 0 -mass 0 0 0 0 0 0
+node 48 4 -9 0 -mass 0 0 0 0 0 0
+node 49 5 -10 0 -mass 0 0 0 0 0 0
+node 50 5 -9 0 -mass 0 0 0 0 0 0
+node 51 6 -10 0 -mass 0 0 0 0 0 0
+node 52 6 -9 0 -mass 0 0 0 0 0 0
+node 53 7 -10 0 -mass 0 0 0 0 0 0
+node 54 7 -9 0 -mass 0 0 0 0 0 0
+node 55 8 -10 0 -mass 0 0 0 0 0 0
+node 56 8 -9 0 -mass 0 0 0 0 0 0
+node 57 9 -10 0 -mass 0 0 0 0 0 0
+node 58 9 -9 0 -mass 0 0 0 0 0 0
+node 59 10 -10 0 -mass 0 0 0 0 0 0
+node 60 10 -9 0 -mass 0 0 0 0 0 0
+node 61 -9 -8 0 -mass 0 0 0 0 0 0
+node 62 -10 -8 0 -mass 0 0 0 0 0 0
+node 63 -8 -8 0 -mass 0 0 0 0 0 0
+node 64 -7 -8 0 -mass 0 0 0 0 0 0
+node 65 -5 -8 0 -mass 0 0 0 0 0 0
+node 66 -4 -8 0 -mass 0 0 0 0 0 0
+node 67 -3 -8 0 -mass 0 0 0 0 0 0
+node 68 -2 -8 0 -mass 0 0 0 0 0 0
+node 69 -1 -8 0 -mass 0 0 0 0 0 0
+node 70 0 -8 0 -mass 0 0 0 0 0 0
+node 71 1 -8 0 -mass 0 0 0 0 0 0
+node 72 2 -8 0 -mass 0 0 0 0 0 0
+node 73 3 -8 0 -mass 0 0 0 0 0 0
+node 74 4 -8 0 -mass 0 0 0 0 0 0
+node 75 5 -8 0 -mass 0 0 0 0 0 0
+node 76 6 -8 0 -mass 0 0 0 0 0 0
+node 77 7 -8 0 -mass 0 0 0 0 0 0
+node 78 8 -8 0 -mass 0 0 0 0 0 0
+node 79 9 -8 0 -mass 0 0 0 0 0 0
+node 80 10 -8 0 -mass 0 0 0 0 0 0
+node 81 -9 -7 0 -mass 0 0 0 0 0 0
+node 82 -10 -7 0 -mass 0 0 0 0 0 0
+node 83 -8 -7 0 -mass 0 0 0 0 0 0
+node 84 -7 -7 0 -mass 0 0 0 0 0 0
+node 85 -6 -7 0 -mass 0 0 0 0 0 0
+node 86 -5 -7 0 -mass 0 0 0 0 0 0
+node 87 -4 -7 0 -mass 0 0 0 0 0 0
+node 88 -3 -7 0 -mass 0 0 0 0 0 0
+node 89 -2 -7 0 -mass 0 0 0 0 0 0
+node 90 -1 -7 0 -mass 0 0 0 0 0 0
+node 91 0 -7 0 -mass 0 0 0 0 0 0
+node 92 1 -7 0 -mass 0 0 0 0 0 0
+node 93 2 -7 0 -mass 0 0 0 0 0 0
+node 94 3 -7 0 -mass 0 0 0 0 0 0
+node 95 4 -7 0 -mass 0 0 0 0 0 0
+node 96 5 -7 0 -mass 0 0 0 0 0 0
+node 97 6 -7 0 -mass 0 0 0 0 0 0
+node 98 7 -7 0 -mass 0 0 0 0 0 0
+node 99 8 -7 0 -mass 0 0 0 0 0 0
+node 100 9 -7 0 -mass 0 0 0 0 0 0
+node 101 10 -7 0 -mass 0 0 0 0 0 0
+node 102 -9 -6 0 -mass 0 0 0 0 0 0
+node 103 -10 -6 0 -mass 0 0 0 0 0 0
+node 104 -8 -6 0 -mass 0 0 0 0 0 0
+node 105 -7 -6 0 -mass 0 0 0 0 0 0
+node 106 -6 -6 0 -mass 0 0 0 0 0 0
+node 107 -5 -6 0 -mass 0 0 0 0 0 0
+node 108 -4 -6 0 -mass 0 0 0 0 0 0
+node 109 -3 -6 0 -mass 0 0 0 0 0 0
+node 110 -2 -6 0 -mass 0 0 0 0 0 0
+node 111 -1 -6 0 -mass 0 0 0 0 0 0
+node 112 0 -6 0 -mass 0 0 0 0 0 0
+node 113 1 -6 0 -mass 0 0 0 0 0 0
+node 114 2 -6 0 -mass 0 0 0 0 0 0
+node 115 3 -6 0 -mass 0 0 0 0 0 0
+node 116 4 -6 0 -mass 0 0 0 0 0 0
+node 117 5 -6 0 -mass 0 0 0 0 0 0
+node 118 6 -6 0 -mass 0 0 0 0 0 0
+node 119 7 -6 0 -mass 0 0 0 0 0 0
+node 120 8 -6 0 -mass 0 0 0 0 0 0
+node 121 9 -6 0 -mass 0 0 0 0 0 0
+node 122 10 -6 0 -mass 0 0 0 0 0 0
+node 123 -9 -5 0 -mass 0 0 0 0 0 0
+node 124 -10 -5 0 -mass 0 0 0 0 0 0
+node 125 -8 -5 0 -mass 0 0 0 0 0 0
+node 126 -7 -5 0 -mass 0 0 0 0 0 0
+node 127 -6 -5 0 -mass 0 0 0 0 0 0
+node 128 -5 -5 0 -mass 0 0 0 0 0 0
+node 129 -4 -5 0 -mass 0 0 0 0 0 0
+node 130 -3 -5 0 -mass 0 0 0 0 0 0
+node 131 -2 -5 0 -mass 0 0 0 0 0 0
+node 132 -1 -5 0 -mass 0 0 0 0 0 0
+node 133 0 -5 0 -mass 0 0 0 0 0 0
+node 134 1 -5 0 -mass 0 0 0 0 0 0
+node 135 2 -5 0 -mass 0 0 0 0 0 0
+node 136 3 -5 0 -mass 0 0 0 0 0 0
+node 137 4 -5 0 -mass 0 0 0 0 0 0
+node 138 5 -5 0 -mass 0 0 0 0 0 0
+node 139 6 -5 0 -mass 0 0 0 0 0 0
+node 140 7 -5 0 -mass 0 0 0 0 0 0
+node 141 8 -5 0 -mass 0 0 0 0 0 0
+node 142 9 -5 0 -mass 0 0 0 0 0 0
+node 143 10 -5 0 -mass 0 0 0 0 0 0
+node 144 -9 -4 0 -mass 0 0 0 0 0 0
+node 145 -10 -4 0 -mass 0 0 0 0 0 0
+node 146 -8 -4 0 -mass 0 0 0 0 0 0
+node 147 -7 -4 0 -mass 0 0 0 0 0 0
+node 148 -6 -4 0 -mass 0 0 0 0 0 0
+node 149 -5 -4 0 -mass 0 0 0 0 0 0
+node 150 -4 -4 0 -mass 0 0 0 0 0 0
+node 151 -3 -4 0 -mass 0 0 0 0 0 0
+node 152 -2 -4 0 -mass 0 0 0 0 0 0
+node 153 -1 -4 0 -mass 0 0 0 0 0 0
+node 154 0 -4 0 -mass 0 0 0 0 0 0
+node 155 1 -4 0 -mass 0 0 0 0 0 0
+node 156 2 -4 0 -mass 0 0 0 0 0 0
+node 157 3 -4 0 -mass 0 0 0 0 0 0
+node 158 4 -4 0 -mass 0 0 0 0 0 0
+node 159 5 -4 0 -mass 0 0 0 0 0 0
+node 160 6 -4 0 -mass 0 0 0 0 0 0
+node 161 7 -4 0 -mass 0 0 0 0 0 0
+node 162 8 -4 0 -mass 0 0 0 0 0 0
+node 163 9 -4 0 -mass 0 0 0 0 0 0
+node 164 10 -4 0 -mass 0 0 0 0 0 0
+node 165 -9 -3 0 -mass 0 0 0 0 0 0
+node 166 -10 -3 0 -mass 0 0 0 0 0 0
+node 167 -8 -3 0 -mass 0 0 0 0 0 0
+node 168 -7 -3 0 -mass 0 0 0 0 0 0
+node 169 -6 -3 0 -mass 0 0 0 0 0 0
+node 170 -5 -3 0 -mass 0 0 0 0 0 0
+node 171 -4 -3 0 -mass 0 0 0 0 0 0
+node 172 -3 -3 0 -mass 0 0 0 0 0 0
+node 173 -2 -3 0 -mass 0 0 0 0 0 0
+node 174 -1 -3 0 -mass 0 0 0 0 0 0
+node 175 0 -3 0 -mass 0 0 0 0 0 0
+node 176 1 -3 0 -mass 0 0 0 0 0 0
+node 177 2 -3 0 -mass 0 0 0 0 0 0
+node 178 3 -3 0 -mass 0 0 0 0 0 0
+node 179 4 -3 0 -mass 0 0 0 0 0 0
+node 180 5 -3 0 -mass 0 0 0 0 0 0
+node 181 6 -3 0 -mass 0 0 0 0 0 0
+node 182 7 -3 0 -mass 0 0 0 0 0 0
+node 183 9 -3 0 -mass 0 0 0 0 0 0
+node 184 10 -3 0 -mass 0 0 0 0 0 0
+node 185 -9 -2 0 -mass 0 0 0 0 0 0
+node 186 -10 -2 0 -mass 0 0 0 0 0 0
+node 187 -8 -2 0 -mass 0 0 0 0 0 0
+node 188 -7 -2 0 -mass 0 0 0 0 0 0
+node 189 -5 -2 0 -mass 0 0 0 0 0 0
+node 190 -4 -2 0 -mass 0 0 0 0 0 0
+node 191 -3 -2 0 -mass 0 0 0 0 0 0
+node 192 -2 -2 0 -mass 0 0 0 0 0 0
+node 193 -1 -2 0 -mass 0 0 0 0 0 0
+node 194 0 -2 0 -mass 0 0 0 0 0 0
+node 195 1 -2 0 -mass 0 0 0 0 0 0
+node 196 2 -2 0 -mass 0 0 0 0 0 0
+node 197 3 -2 0 -mass 0 0 0 0 0 0
+node 198 4 -2 0 -mass 0 0 0 0 0 0
+node 199 5 -2 0 -mass 0 0 0 0 0 0
+node 200 7 -2 0 -mass 0 0 0 0 0 0
+node 201 8 -2 0 -mass 0 0 0 0 0 0
+node 202 9 -2 0 -mass 0 0 0 0 0 0
+node 203 10 -2 0 -mass 0 0 0 0 0 0
+node 204 -9 -1 0 -mass 0 0 0 0 0 0
+node 205 -10 -1 0 -mass 0 0 0 0 0 0
+node 206 -8 -1 0 -mass 0 0 0 0 0 0
+node 207 -7 -1 0 -mass 0 0 0 0 0 0
+node 208 -6 -1 0 -mass 0 0 0 0 0 0
+node 209 -5 -1 0 -mass 0 0 0 0 0 0
+node 210 -4 -1 0 -mass 0 0 0 0 0 0
+node 211 -3 -1 0 -mass 0 0 0 0 0 0
+node 212 -2 -1 0 -mass 0 0 0 0 0 0
+node 213 -1 -1 0 -mass 0 0 0 0 0 0
+node 214 0 -1 0 -mass 0 0 0 0 0 0
+node 215 1 -1 0 -mass 0 0 0 0 0 0
+node 216 2 -1 0 -mass 0 0 0 0 0 0
+node 217 3 -1 0 -mass 0 0 0 0 0 0
+node 218 4 -1 0 -mass 0 0 0 0 0 0
+node 219 5 -1 0 -mass 0 0 0 0 0 0
+node 220 6 -1 0 -mass 0 0 0 0 0 0
+node 221 7 -1 0 -mass 0 0 0 0 0 0
+node 222 8 -1 0 -mass 0 0 0 0 0 0
+node 223 9 -1 0 -mass 0 0 0 0 0 0
+node 224 10 -1 0 -mass 0 0 0 0 0 0
+node 225 -9 0 0 -mass 0 0 0 0 0 0
+node 226 -10 0 0 -mass 0 0 0 0 0 0
+node 227 -8 0 0 -mass 0 0 0 0 0 0
+node 228 -7 0 0 -mass 0 0 0 0 0 0
+node 229 -6 0 0 -mass 0 0 0 0 0 0
+node 230 -5 0 0 -mass 0 0 0 0 0 0
+node 231 -4 0 0 -mass 0 0 0 0 0 0
+node 232 -3 0 0 -mass 0 0 0 0 0 0
+node 233 -2 0 0 -mass 0 0 0 0 0 0
+node 234 -1 0 0 -mass 0 0 0 0 0 0
+node 235 0 0 0 -mass 0 0 0 0 0 0
+node 236 1 0 0 -mass 0 0 0 0 0 0
+node 237 2 0 0 -mass 0 0 0 0 0 0
+node 238 3 0 0 -mass 0 0 0 0 0 0
+node 239 4 0 0 -mass 0 0 0 0 0 0
+node 240 5 0 0 -mass 0 0 0 0 0 0
+node 241 6 0 0 -mass 0 0 0 0 0 0
+node 242 7 0 0 -mass 0 0 0 0 0 0
+node 243 8 0 0 -mass 0 0 0 0 0 0
+node 244 9 0 0 -mass 0 0 0 0 0 0
+node 245 10 0 0 -mass 0 0 0 0 0 0
+node 246 -9 1 0 -mass 0 0 0 0 0 0
+node 247 -10 1 0 -mass 0 0 0 0 0 0
+node 248 -8 1 0 -mass 0 0 0 0 0 0
+node 249 -7 1 0 -mass 0 0 0 0 0 0
+node 250 -6 1 0 -mass 0 0 0 0 0 0
+node 251 -5 1 0 -mass 0 0 0 0 0 0
+node 252 -4 1 0 -mass 0 0 0 0 0 0
+node 253 -3 1 0 -mass 0 0 0 0 0 0
+node 254 -2 1 0 -mass 0 0 0 0 0 0
+node 255 -1 1 0 -mass 0 0 0 0 0 0
+node 256 0 1 0 -mass 0 0 0 0 0 0
+node 257 1 1 0 -mass 0 0 0 0 0 0
+node 258 2 1 0 -mass 0 0 0 0 0 0
+node 259 3 1 0 -mass 0 0 0 0 0 0
+node 260 4 1 0 -mass 0 0 0 0 0 0
+node 261 5 1 0 -mass 0 0 0 0 0 0
+node 262 6 1 0 -mass 0 0 0 0 0 0
+node 263 7 1 0 -mass 0 0 0 0 0 0
+node 264 9 1 0 -mass 0 0 0 0 0 0
+node 265 10 1 0 -mass 0 0 0 0 0 0
+node 266 -9 2 0 -mass 0 0 0 0 0 0
+node 267 -10 2 0 -mass 0 0 0 0 0 0
+node 268 -8 2 0 -mass 0 0 0 0 0 0
+node 269 -7 2 0 -mass 0 0 0 0 0 0
+node 270 -6 2 0 -mass 0 0 0 0 0 0
+node 271 -5 2 0 -mass 0 0 0 0 0 0
+node 272 -4 2 0 -mass 0 0 0 0 0 0
+node 273 -3 2 0 -mass 0 0 0 0 0 0
+node 274 -2 2 0 -mass 0 0 0 0 0 0
+node 275 -1 2 0 -mass 0 0 0 0 0 0
+node 276 0 2 0 -mass 0 0 0 0 0 0
+node 277 1 2 0 -mass 0 0 0 0 0 0
+node 278 2 2 0 -mass 0 0 0 0 0 0
+node 279 3 2 0 -mass 0 0 0 0 0 0
+node 280 4 2 0 -mass 0 0 0 0 0 0
+node 281 5 2 0 -mass 0 0 0 0 0 0
+node 282 6 2 0 -mass 0 0 0 0 0 0
+node 283 7 2 0 -mass 0 0 0 0 0 0
+node 284 8 2 0 -mass 0 0 0 0 0 0
+node 285 9 2 0 -mass 0 0 0 0 0 0
+node 286 10 2 0 -mass 0 0 0 0 0 0
+node 287 -9 3 0 -mass 0 0 0 0 0 0
+node 288 -10 3 0 -mass 0 0 0 0 0 0
+node 289 -8 3 0 -mass 0 0 0 0 0 0
+node 290 -7 3 0 -mass 0 0 0 0 0 0
+node 291 -6 3 0 -mass 0 0 0 0 0 0
+node 292 -5 3 0 -mass 0 0 0 0 0 0
+node 293 -4 3 0 -mass 0 0 0 0 0 0
+node 294 -3 3 0 -mass 0 0 0 0 0 0
+node 295 -2 3 0 -mass 0 0 0 0 0 0
+node 296 -1 3 0 -mass 0 0 0 0 0 0
+node 297 0 3 0 -mass 0 0 0 0 0 0
+node 298 1 3 0 -mass 0 0 0 0 0 0
+node 299 2 3 0 -mass 0 0 0 0 0 0
+node 300 3 3 0 -mass 0 0 0 0 0 0
+node 301 4 3 0 -mass 0 0 0 0 0 0
+node 302 5 3 0 -mass 0 0 0 0 0 0
+node 303 6 3 0 -mass 0 0 0 0 0 0
+node 304 7 3 0 -mass 0 0 0 0 0 0
+node 305 8 3 0 -mass 0 0 0 0 0 0
+node 306 9 3 0 -mass 0 0 0 0 0 0
+node 307 10 3 0 -mass 0 0 0 0 0 0
+node 308 -9 4 0 -mass 0 0 0 0 0 0
+node 309 -10 4 0 -mass 0 0 0 0 0 0
+node 310 -8 4 0 -mass 0 0 0 0 0 0
+node 311 -7 4 0 -mass 0 0 0 0 0 0
+node 312 -6 4 0 -mass 0 0 0 0 0 0
+node 313 -5 4 0 -mass 0 0 0 0 0 0
+node 314 -3 4 0 -mass 0 0 0 0 0 0
+node 315 -2 4 0 -mass 0 0 0 0 0 0
+node 316 -1 4 0 -mass 0 0 0 0 0 0
+node 317 0 4 0 -mass 0 0 0 0 0 0
+node 318 1 4 0 -mass 0 0 0 0 0 0
+node 319 2 4 0 -mass 0 0 0 0 0 0
+node 320 3 4 0 -mass 0 0 0 0 0 0
+node 321 4 4 0 -mass 0 0 0 0 0 0
+node 322 5 4 0 -mass 0 0 0 0 0 0
+node 323 6 4 0 -mass 0 0 0 0 0 0
+node 324 7 4 0 -mass 0 0 0 0 0 0
+node 325 8 4 0 -mass 0 0 0 0 0 0
+node 326 9 4 0 -mass 0 0 0 0 0 0
+node 327 10 4 0 -mass 0 0 0 0 0 0
+node 328 -9 5 0 -mass 0 0 0 0 0 0
+node 329 -10 5 0 -mass 0 0 0 0 0 0
+node 330 -8 5 0 -mass 0 0 0 0 0 0
+node 331 -7 5 0 -mass 0 0 0 0 0 0
+node 332 -6 5 0 -mass 0 0 0 0 0 0
+node 333 -5 5 0 -mass 0 0 0 0 0 0
+node 334 -4 5 0 -mass 0 0 0 0 0 0
+node 335 -3 5 0 -mass 0 0 0 0 0 0
+node 336 -2 5 0 -mass 0 0 0 0 0 0
+node 337 -1 5 0 -mass 0 0 0 0 0 0
+node 338 0 5 0 -mass 0 0 0 0 0 0
+node 339 1 5 0 -mass 0 0 0 0 0 0
+node 340 2 5 0 -mass 0 0 0 0 0 0
+node 341 3 5 0 -mass 0 0 0 0 0 0
+node 342 4 5 0 -mass 0 0 0 0 0 0
+node 343 5 5 0 -mass 0 0 0 0 0 0
+node 344 6 5 0 -mass 0 0 0 0 0 0
+node 345 7 5 0 -mass 0 0 0 0 0 0
+node 346 8 5 0 -mass 0 0 0 0 0 0
+node 347 9 5 0 -mass 0 0 0 0 0 0
+node 348 10 5 0 -mass 0 0 0 0 0 0
+node 349 -9 6 0 -mass 0 0 0 0 0 0
+node 350 -10 6 0 -mass 0 0 0 0 0 0
+node 351 -8 6 0 -mass 0 0 0 0 0 0
+node 352 -7 6 0 -mass 0 0 0 0 0 0
+node 353 -6 6 0 -mass 0 0 0 0 0 0
+node 354 -5 6 0 -mass 0 0 0 0 0 0
+node 355 -4 6 0 -mass 0 0 0 0 0 0
+node 356 -3 6 0 -mass 0 0 0 0 0 0
+node 357 -2 6 0 -mass 0 0 0 0 0 0
+node 358 -1 6 0 -mass 0 0 0 0 0 0
+node 359 0 6 0 -mass 0 0 0 0 0 0
+node 360 1 6 0 -mass 0 0 0 0 0 0
+node 361 2 6 0 -mass 0 0 0 0 0 0
+node 362 3 6 0 -mass 0 0 0 0 0 0
+node 363 4 6 0 -mass 0 0 0 0 0 0
+node 364 5 6 0 -mass 0 0 0 0 0 0
+node 365 6 6 0 -mass 0 0 0 0 0 0
+node 366 7 6 0 -mass 0 0 0 0 0 0
+node 367 8 6 0 -mass 0 0 0 0 0 0
+node 368 10 6 0 -mass 0 0 0 0 0 0
+node 369 -9 7 0 -mass 0 0 0 0 0 0
+node 370 -10 7 0 -mass 0 0 0 0 0 0
+node 371 -7 7 0 -mass 0 0 0 0 0 0
+node 372 -6 7 0 -mass 0 0 0 0 0 0
+node 373 -5 7 0 -mass 0 0 0 0 0 0
+node 374 -4 7 0 -mass 0 0 0 0 0 0
+node 375 -3 7 0 -mass 0 0 0 0 0 0
+node 376 -2 7 0 -mass 0 0 0 0 0 0
+node 377 -1 7 0 -mass 0 0 0 0 0 0
+node 378 0 7 0 -mass 0 0 0 0 0 0
+node 379 1 7 0 -mass 0 0 0 0 0 0
+node 380 2 7 0 -mass 0 0 0 0 0 0
+node 381 3 7 0 -mass 0 0 0 0 0 0
+node 382 4 7 0 -mass 0 0 0 0 0 0
+node 383 5 7 0 -mass 0 0 0 0 0 0
+node 384 6 7 0 -mass 0 0 0 0 0 0
+node 385 7 7 0 -mass 0 0 0 0 0 0
+node 386 8 7 0 -mass 0 0 0 0 0 0
+node 387 9 7 0 -mass 0 0 0 0 0 0
+node 388 10 7 0 -mass 0 0 0 0 0 0
+node 389 -9 8 0 -mass 0 0 0 0 0 0
+node 390 -10 8 0 -mass 0 0 0 0 0 0
+node 391 -8 8 0 -mass 0 0 0 0 0 0
+node 392 -7 8 0 -mass 0 0 0 0 0 0
+node 393 -6 8 0 -mass 0 0 0 0 0 0
+node 394 -5 8 0 -mass 0 0 0 0 0 0
+node 395 -4 8 0 -mass 0 0 0 0 0 0
+node 396 -3 8 0 -mass 0 0 0 0 0 0
+node 397 -2 8 0 -mass 0 0 0 0 0 0
+node 398 -1 8 0 -mass 0 0 0 0 0 0
+node 399 0 8 0 -mass 0 0 0 0 0 0
+node 400 1 8 0 -mass 0 0 0 0 0 0
+node 401 2 8 0 -mass 0 0 0 0 0 0
+node 402 3 8 0 -mass 0 0 0 0 0 0
+node 403 4 8 0 -mass 0 0 0 0 0 0
+node 404 5 8 0 -mass 0 0 0 0 0 0
+node 405 6 8 0 -mass 0 0 0 0 0 0
+node 406 7 8 0 -mass 0 0 0 0 0 0
+node 407 8 8 0 -mass 0 0 0 0 0 0
+node 408 9 8 0 -mass 0 0 0 0 0 0
+node 409 10 8 0 -mass 0 0 0 0 0 0
+node 410 -9 9 0 -mass 0 0 0 0 0 0
+node 411 -10 9 0 -mass 0 0 0 0 0 0
+node 412 -8 9 0 -mass 0 0 0 0 0 0
+node 413 -7 9 0 -mass 0 0 0 0 0 0
+node 414 -6 9 0 -mass 0 0 0 0 0 0
+node 415 -5 9 0 -mass 0 0 0 0 0 0
+node 416 -4 9 0 -mass 0 0 0 0 0 0
+node 417 -3 9 0 -mass 0 0 0 0 0 0
+node 418 -2 9 0 -mass 0 0 0 0 0 0
+node 419 -1 9 0 -mass 0 0 0 0 0 0
+node 420 0 9 0 -mass 0 0 0 0 0 0
+node 421 1 9 0 -mass 0 0 0 0 0 0
+node 422 2 9 0 -mass 0 0 0 0 0 0
+node 423 3 9 0 -mass 0 0 0 0 0 0
+node 424 4 9 0 -mass 0 0 0 0 0 0
+node 425 5 9 0 -mass 0 0 0 0 0 0
+node 426 6 9 0 -mass 0 0 0 0 0 0
+node 427 7 9 0 -mass 0 0 0 0 0 0
+node 428 8 9 0 -mass 0 0 0 0 0 0
+node 429 9 9 0 -mass 0 0 0 0 0 0
+node 430 10 9 0 -mass 0 0 0 0 0 0
+node 431 -9 10 0 -mass 0 0 0 0 0 0
+node 432 -10 10 0 -mass 0 0 0 0 0 0
+node 433 -8 10 0 -mass 0 0 0 0 0 0
+node 434 -7 10 0 -mass 0 0 0 0 0 0
+node 435 -6 10 0 -mass 0 0 0 0 0 0
+node 436 -5 10 0 -mass 0 0 0 0 0 0
+node 437 -4 10 0 -mass 0 0 0 0 0 0
+node 438 -3 10 0 -mass 0 0 0 0 0 0
+node 439 -2 10 0 -mass 0 0 0 0 0 0
+node 440 -1 10 0 -mass 0 0 0 0 0 0
+node 441 0 10 0 -mass 0 0 0 0 0 0
+node 442 1 10 0 -mass 0 0 0 0 0 0
+node 443 2 10 0 -mass 0 0 0 0 0 0
+node 444 3 10 0 -mass 0 0 0 0 0 0
+node 445 4 10 0 -mass 0 0 0 0 0 0
+node 446 5 10 0 -mass 0 0 0 0 0 0
+node 447 6 10 0 -mass 0 0 0 0 0 0
+node 448 7 10 0 -mass 0 0 0 0 0 0
+node 449 8 10 0 -mass 0 0 0 0 0 0
+node 450 9 10 0 -mass 0 0 0 0 0 0
+node 451 10 10 0 -mass 0 0 0 0 0 0
+fix 432 1 1 1 1 1 1
+fix 21 1 1 1 1 1 1
+fix 59 1 1 1 1 1 1
+fix 451 1 1 1 1 1 1
+nDMaterial ElasticIsotropic 1 210000000000 0.3 78500
+uniaxialMaterial Elastic 2 210000000000 0 210000000000
+section PlateFiber 1 1 0.3
+section Elastic 2 210000000000 0.0343999999999998 0.00159498666666666 0.000529786666666666 80760000000 0.00123127317829457 0.9 0.9
+element ASDShellQ4 1 21 22 23 24 1
+element ASDShellQ4 2 22 25 26 23 1
+element ASDShellQ4 3 25 27 28 26 1
+element ASDShellQ4 4 27 29 30 28 1
+element ASDShellQ4 5 29 31 32 30 1
+element ASDShellQ4 6 31 33 34 32 1
+element ASDShellQ4 7 33 35 36 34 1
+element ASDShellQ4 8 35 37 38 36 1
+element ASDShellQ4 9 37 9 39 38 1
+element ASDShellQ4 10 9 40 41 39 1
+element ASDShellQ4 11 40 42 43 41 1
+element ASDShellQ4 12 42 5 44 43 1
+element ASDShellQ4 13 5 45 46 44 1
+element ASDShellQ4 14 45 47 48 46 1
+element ASDShellQ4 15 47 49 50 48 1
+element ASDShellQ4 16 49 51 52 50 1
+element ASDShellQ4 17 51 53 54 52 1
+element ASDShellQ4 18 53 55 56 54 1
+element ASDShellQ4 19 55 57 58 56 1
+element ASDShellQ4 20 57 59 60 58 1
+element ASDShellQ4 21 24 23 61 62 1
+element ASDShellQ4 22 23 26 63 61 1
+element ASDShellQ4 23 26 28 64 63 1
+element ASDShellQ4 24 28 30 15 64 1
+element ASDShellQ4 25 30 32 65 15 1
+element ASDShellQ4 26 32 34 66 65 1
+element ASDShellQ4 27 34 36 67 66 1
+element ASDShellQ4 28 36 38 68 67 1
+element ASDShellQ4 29 38 39 69 68 1
+element ASDShellQ4 30 39 41 70 69 1
+element ASDShellQ4 31 41 43 71 70 1
+element ASDShellQ4 32 43 44 72 71 1
+element ASDShellQ4 33 44 46 73 72 1
+element ASDShellQ4 34 46 48 74 73 1
+element ASDShellQ4 35 48 50 75 74 1
+element ASDShellQ4 36 50 52 76 75 1
+element ASDShellQ4 37 52 54 77 76 1
+element ASDShellQ4 38 54 56 78 77 1
+element ASDShellQ4 39 56 58 79 78 1
+element ASDShellQ4 40 58 60 80 79 1
+element ASDShellQ4 41 62 61 81 82 1
+element ASDShellQ4 42 61 63 83 81 1
+element ASDShellQ4 43 63 64 84 83 1
+element ASDShellQ4 44 64 15 85 84 1
+element ASDShellQ4 45 15 65 86 85 1
+element ASDShellQ4 46 65 66 87 86 1
+element ASDShellQ4 47 66 67 88 87 1
+element ASDShellQ4 48 67 68 89 88 1
+element ASDShellQ4 49 68 69 90 89 1
+element ASDShellQ4 50 69 70 91 90 1
+element ASDShellQ4 51 70 71 92 91 1
+element ASDShellQ4 52 71 72 93 92 1
+element ASDShellQ4 53 72 73 94 93 1
+element ASDShellQ4 54 73 74 95 94 1
+element ASDShellQ4 55 74 75 96 95 1
+element ASDShellQ4 56 75 76 97 96 1
+element ASDShellQ4 57 76 77 98 97 1
+element ASDShellQ4 58 77 78 99 98 1
+element ASDShellQ4 59 78 79 100 99 1
+element ASDShellQ4 60 79 80 101 100 1
+element ASDShellQ4 61 82 81 102 103 1
+element ASDShellQ4 62 81 83 104 102 1
+element ASDShellQ4 63 83 84 105 104 1
+element ASDShellQ4 64 84 85 106 105 1
+element ASDShellQ4 65 85 86 107 106 1
+element ASDShellQ4 66 86 87 108 107 1
+element ASDShellQ4 67 87 88 109 108 1
+element ASDShellQ4 68 88 89 110 109 1
+element ASDShellQ4 69 89 90 111 110 1
+element ASDShellQ4 70 90 91 112 111 1
+element ASDShellQ4 71 91 92 113 112 1
+element ASDShellQ4 72 92 93 114 113 1
+element ASDShellQ4 73 93 94 115 114 1
+element ASDShellQ4 74 94 95 116 115 1
+element ASDShellQ4 75 95 96 117 116 1
+element ASDShellQ4 76 96 97 118 117 1
+element ASDShellQ4 77 97 98 119 118 1
+element ASDShellQ4 78 98 99 120 119 1
+element ASDShellQ4 79 99 100 121 120 1
+element ASDShellQ4 80 100 101 122 121 1
+element ASDShellQ4 81 103 102 123 124 1
+element ASDShellQ4 82 102 104 125 123 1
+element ASDShellQ4 83 104 105 126 125 1
+element ASDShellQ4 84 105 106 127 126 1
+element ASDShellQ4 85 106 107 128 127 1
+element ASDShellQ4 86 107 108 129 128 1
+element ASDShellQ4 87 108 109 130 129 1
+element ASDShellQ4 88 109 110 131 130 1
+element ASDShellQ4 89 110 111 132 131 1
+element ASDShellQ4 90 111 112 133 132 1
+element ASDShellQ4 91 112 113 134 133 1
+element ASDShellQ4 92 113 114 135 134 1
+element ASDShellQ4 93 114 115 136 135 1
+element ASDShellQ4 94 115 116 137 136 1
+element ASDShellQ4 95 116 117 138 137 1
+element ASDShellQ4 96 117 118 139 138 1
+element ASDShellQ4 97 118 119 140 139 1
+element ASDShellQ4 98 119 120 141 140 1
+element ASDShellQ4 99 120 121 142 141 1
+element ASDShellQ4 100 121 122 143 142 1
+element ASDShellQ4 101 124 123 144 145 1
+element ASDShellQ4 102 123 125 146 144 1
+element ASDShellQ4 103 125 126 147 146 1
+element ASDShellQ4 104 126 127 148 147 1
+element ASDShellQ4 105 127 128 149 148 1
+element ASDShellQ4 106 128 129 150 149 1
+element ASDShellQ4 107 129 130 151 150 1
+element ASDShellQ4 108 130 131 152 151 1
+element ASDShellQ4 109 131 132 153 152 1
+element ASDShellQ4 110 132 133 154 153 1
+element ASDShellQ4 111 133 134 155 154 1
+element ASDShellQ4 112 134 135 156 155 1
+element ASDShellQ4 113 135 136 157 156 1
+element ASDShellQ4 114 136 137 158 157 1
+element ASDShellQ4 115 137 138 159 158 1
+element ASDShellQ4 116 138 139 160 159 1
+element ASDShellQ4 117 139 140 161 160 1
+element ASDShellQ4 118 140 141 162 161 1
+element ASDShellQ4 119 141 142 163 162 1
+element ASDShellQ4 120 142 143 164 163 1
+element ASDShellQ4 121 145 144 165 166 1
+element ASDShellQ4 122 144 146 167 165 1
+element ASDShellQ4 123 146 147 168 167 1
+element ASDShellQ4 124 147 148 169 168 1
+element ASDShellQ4 125 148 149 170 169 1
+element ASDShellQ4 126 149 150 171 170 1
+element ASDShellQ4 127 150 151 172 171 1
+element ASDShellQ4 128 151 152 173 172 1
+element ASDShellQ4 129 152 153 174 173 1
+element ASDShellQ4 130 153 154 175 174 1
+element ASDShellQ4 131 154 155 176 175 1
+element ASDShellQ4 132 155 156 177 176 1
+element ASDShellQ4 133 156 157 178 177 1
+element ASDShellQ4 134 157 158 179 178 1
+element ASDShellQ4 135 158 159 180 179 1
+element ASDShellQ4 136 159 160 181 180 1
+element ASDShellQ4 137 160 161 182 181 1
+element ASDShellQ4 138 161 162 13 182 1
+element ASDShellQ4 139 162 163 183 13 1
+element ASDShellQ4 140 163 164 184 183 1
+element ASDShellQ4 141 166 165 185 186 1
+element ASDShellQ4 142 165 167 187 185 1
+element ASDShellQ4 143 167 168 188 187 1
+element ASDShellQ4 144 168 169 11 188 1
+element ASDShellQ4 145 169 170 189 11 1
+element ASDShellQ4 146 170 171 190 189 1
+element ASDShellQ4 147 171 172 191 190 1
+element ASDShellQ4 148 172 173 192 191 1
+element ASDShellQ4 149 173 174 193 192 1
+element ASDShellQ4 150 174 175 194 193 1
+element ASDShellQ4 151 175 176 195 194 1
+element ASDShellQ4 152 176 177 196 195 1
+element ASDShellQ4 153 177 178 197 196 1
+element ASDShellQ4 154 178 179 198 197 1
+element ASDShellQ4 155 179 180 199 198 1
+element ASDShellQ4 156 180 181 7 199 1
+element ASDShellQ4 157 181 182 200 7 1
+element ASDShellQ4 158 182 13 201 200 1
+element ASDShellQ4 159 13 183 202 201 1
+element ASDShellQ4 160 183 184 203 202 1
+element ASDShellQ4 161 186 185 204 205 1
+element ASDShellQ4 162 185 187 206 204 1
+element ASDShellQ4 163 187 188 207 206 1
+element ASDShellQ4 164 188 11 208 207 1
+element ASDShellQ4 165 11 189 209 208 1
+element ASDShellQ4 166 189 190 210 209 1
+element ASDShellQ4 167 190 191 211 210 1
+element ASDShellQ4 168 191 192 212 211 1
+element ASDShellQ4 169 192 193 213 212 1
+element ASDShellQ4 170 193 194 214 213 1
+element ASDShellQ4 171 194 195 215 214 1
+element ASDShellQ4 172 195 196 216 215 1
+element ASDShellQ4 173 196 197 217 216 1
+element ASDShellQ4 174 197 198 218 217 1
+element ASDShellQ4 175 198 199 219 218 1
+element ASDShellQ4 176 199 7 220 219 1
+element ASDShellQ4 177 7 200 221 220 1
+element ASDShellQ4 178 200 201 222 221 1
+element ASDShellQ4 179 201 202 223 222 1
+element ASDShellQ4 180 202 203 224 223 1
+element ASDShellQ4 181 205 204 225 226 1
+element ASDShellQ4 182 204 206 227 225 1
+element ASDShellQ4 183 206 207 228 227 1
+element ASDShellQ4 184 207 208 229 228 1
+element ASDShellQ4 185 208 209 230 229 1
+element ASDShellQ4 186 209 210 231 230 1
+element ASDShellQ4 187 210 211 232 231 1
+element ASDShellQ4 188 211 212 233 232 1
+element ASDShellQ4 189 212 213 234 233 1
+element ASDShellQ4 190 213 214 235 234 1
+element ASDShellQ4 191 214 215 236 235 1
+element ASDShellQ4 192 215 216 237 236 1
+element ASDShellQ4 193 216 217 238 237 1
+element ASDShellQ4 194 217 218 239 238 1
+element ASDShellQ4 195 218 219 240 239 1
+element ASDShellQ4 196 219 220 241 240 1
+element ASDShellQ4 197 220 221 242 241 1
+element ASDShellQ4 198 221 222 243 242 1
+element ASDShellQ4 199 222 223 244 243 1
+element ASDShellQ4 200 223 224 245 244 1
+element ASDShellQ4 201 226 225 246 247 1
+element ASDShellQ4 202 225 227 248 246 1
+element ASDShellQ4 203 227 228 249 248 1
+element ASDShellQ4 204 228 229 250 249 1
+element ASDShellQ4 205 229 230 251 250 1
+element ASDShellQ4 206 230 231 252 251 1
+element ASDShellQ4 207 231 232 253 252 1
+element ASDShellQ4 208 232 233 254 253 1
+element ASDShellQ4 209 233 234 255 254 1
+element ASDShellQ4 210 234 235 256 255 1
+element ASDShellQ4 211 235 236 257 256 1
+element ASDShellQ4 212 236 237 258 257 1
+element ASDShellQ4 213 237 238 259 258 1
+element ASDShellQ4 214 238 239 260 259 1
+element ASDShellQ4 215 239 240 261 260 1
+element ASDShellQ4 216 240 241 262 261 1
+element ASDShellQ4 217 241 242 263 262 1
+element ASDShellQ4 218 242 243 3 263 1
+element ASDShellQ4 219 243 244 264 3 1
+element ASDShellQ4 220 244 245 265 264 1
+element ASDShellQ4 221 247 246 266 267 1
+element ASDShellQ4 222 246 248 268 266 1
+element ASDShellQ4 223 248 249 269 268 1
+element ASDShellQ4 224 249 250 270 269 1
+element ASDShellQ4 225 250 251 271 270 1
+element ASDShellQ4 226 251 252 272 271 1
+element ASDShellQ4 227 252 253 273 272 1
+element ASDShellQ4 228 253 254 274 273 1
+element ASDShellQ4 229 254 255 275 274 1
+element ASDShellQ4 230 255 256 276 275 1
+element ASDShellQ4 231 256 257 277 276 1
+element ASDShellQ4 232 257 258 278 277 1
+element ASDShellQ4 233 258 259 279 278 1
+element ASDShellQ4 234 259 260 280 279 1
+element ASDShellQ4 235 260 261 281 280 1
+element ASDShellQ4 236 261 262 282 281 1
+element ASDShellQ4 237 262 263 283 282 1
+element ASDShellQ4 238 263 3 284 283 1
+element ASDShellQ4 239 3 264 285 284 1
+element ASDShellQ4 240 264 265 286 285 1
+element ASDShellQ4 241 267 266 287 288 1
+element ASDShellQ4 242 266 268 289 287 1
+element ASDShellQ4 243 268 269 290 289 1
+element ASDShellQ4 244 269 270 291 290 1
+element ASDShellQ4 245 270 271 292 291 1
+element ASDShellQ4 246 271 272 293 292 1
+element ASDShellQ4 247 272 273 294 293 1
+element ASDShellQ4 248 273 274 295 294 1
+element ASDShellQ4 249 274 275 296 295 1
+element ASDShellQ4 250 275 276 297 296 1
+element ASDShellQ4 251 276 277 298 297 1
+element ASDShellQ4 252 277 278 299 298 1
+element ASDShellQ4 253 278 279 300 299 1
+element ASDShellQ4 254 279 280 301 300 1
+element ASDShellQ4 255 280 281 302 301 1
+element ASDShellQ4 256 281 282 303 302 1
+element ASDShellQ4 257 282 283 304 303 1
+element ASDShellQ4 258 283 284 305 304 1
+element ASDShellQ4 259 284 285 306 305 1
+element ASDShellQ4 260 285 286 307 306 1
+element ASDShellQ4 261 288 287 308 309 1
+element ASDShellQ4 262 287 289 310 308 1
+element ASDShellQ4 263 289 290 311 310 1
+element ASDShellQ4 264 290 291 312 311 1
+element ASDShellQ4 265 291 292 313 312 1
+element ASDShellQ4 266 292 293 19 313 1
+element ASDShellQ4 267 293 294 314 19 1
+element ASDShellQ4 268 294 295 315 314 1
+element ASDShellQ4 269 295 296 316 315 1
+element ASDShellQ4 270 296 297 317 316 1
+element ASDShellQ4 271 297 298 318 317 1
+element ASDShellQ4 272 298 299 319 318 1
+element ASDShellQ4 273 299 300 320 319 1
+element ASDShellQ4 274 300 301 321 320 1
+element ASDShellQ4 275 301 302 322 321 1
+element ASDShellQ4 276 302 303 323 322 1
+element ASDShellQ4 277 303 304 324 323 1
+element ASDShellQ4 278 304 305 325 324 1
+element ASDShellQ4 279 305 306 326 325 1
+element ASDShellQ4 280 306 307 327 326 1
+element ASDShellQ4 281 309 308 328 329 1
+element ASDShellQ4 282 308 310 330 328 1
+element ASDShellQ4 283 310 311 331 330 1
+element ASDShellQ4 284 311 312 332 331 1
+element ASDShellQ4 285 312 313 333 332 1
+element ASDShellQ4 286 313 19 334 333 1
+element ASDShellQ4 287 19 314 335 334 1
+element ASDShellQ4 288 314 315 336 335 1
+element ASDShellQ4 289 315 316 337 336 1
+element ASDShellQ4 290 316 317 338 337 1
+element ASDShellQ4 291 317 318 339 338 1
+element ASDShellQ4 292 318 319 340 339 1
+element ASDShellQ4 293 319 320 341 340 1
+element ASDShellQ4 294 320 321 342 341 1
+element ASDShellQ4 295 321 322 343 342 1
+element ASDShellQ4 296 322 323 344 343 1
+element ASDShellQ4 297 323 324 345 344 1
+element ASDShellQ4 298 324 325 346 345 1
+element ASDShellQ4 299 325 326 347 346 1
+element ASDShellQ4 300 326 327 348 347 1
+element ASDShellQ4 301 329 328 349 350 1
+element ASDShellQ4 302 328 330 351 349 1
+element ASDShellQ4 303 330 331 352 351 1
+element ASDShellQ4 304 331 332 353 352 1
+element ASDShellQ4 305 332 333 354 353 1
+element ASDShellQ4 306 333 334 355 354 1
+element ASDShellQ4 307 334 335 356 355 1
+element ASDShellQ4 308 335 336 357 356 1
+element ASDShellQ4 309 336 337 358 357 1
+element ASDShellQ4 310 337 338 359 358 1
+element ASDShellQ4 311 338 339 360 359 1
+element ASDShellQ4 312 339 340 361 360 1
+element ASDShellQ4 313 340 341 362 361 1
+element ASDShellQ4 314 341 342 363 362 1
+element ASDShellQ4 315 342 343 364 363 1
+element ASDShellQ4 316 343 344 365 364 1
+element ASDShellQ4 317 344 345 366 365 1
+element ASDShellQ4 318 345 346 367 366 1
+element ASDShellQ4 319 346 347 17 367 1
+element ASDShellQ4 320 347 348 368 17 1
+element ASDShellQ4 321 350 349 369 370 1
+element ASDShellQ4 322 349 351 1 369 1
+element ASDShellQ4 323 351 352 371 1 1
+element ASDShellQ4 324 352 353 372 371 1
+element ASDShellQ4 325 353 354 373 372 1
+element ASDShellQ4 326 354 355 374 373 1
+element ASDShellQ4 327 355 356 375 374 1
+element ASDShellQ4 328 356 357 376 375 1
+element ASDShellQ4 329 357 358 377 376 1
+element ASDShellQ4 330 358 359 378 377 1
+element ASDShellQ4 331 359 360 379 378 1
+element ASDShellQ4 332 360 361 380 379 1
+element ASDShellQ4 333 361 362 381 380 1
+element ASDShellQ4 334 362 363 382 381 1
+element ASDShellQ4 335 363 364 383 382 1
+element ASDShellQ4 336 364 365 384 383 1
+element ASDShellQ4 337 365 366 385 384 1
+element ASDShellQ4 338 366 367 386 385 1
+element ASDShellQ4 339 367 17 387 386 1
+element ASDShellQ4 340 17 368 388 387 1
+element ASDShellQ4 341 370 369 389 390 1
+element ASDShellQ4 342 369 1 391 389 1
+element ASDShellQ4 343 1 371 392 391 1
+element ASDShellQ4 344 371 372 393 392 1
+element ASDShellQ4 345 372 373 394 393 1
+element ASDShellQ4 346 373 374 395 394 1
+element ASDShellQ4 347 374 375 396 395 1
+element ASDShellQ4 348 375 376 397 396 1
+element ASDShellQ4 349 376 377 398 397 1
+element ASDShellQ4 350 377 378 399 398 1
+element ASDShellQ4 351 378 379 400 399 1
+element ASDShellQ4 352 379 380 401 400 1
+element ASDShellQ4 353 380 381 402 401 1
+element ASDShellQ4 354 381 382 403 402 1
+element ASDShellQ4 355 382 383 404 403 1
+element ASDShellQ4 356 383 384 405 404 1
+element ASDShellQ4 357 384 385 406 405 1
+element ASDShellQ4 358 385 386 407 406 1
+element ASDShellQ4 359 386 387 408 407 1
+element ASDShellQ4 360 387 388 409 408 1
+element ASDShellQ4 361 390 389 410 411 1
+element ASDShellQ4 362 389 391 412 410 1
+element ASDShellQ4 363 391 392 413 412 1
+element ASDShellQ4 364 392 393 414 413 1
+element ASDShellQ4 365 393 394 415 414 1
+element ASDShellQ4 366 394 395 416 415 1
+element ASDShellQ4 367 395 396 417 416 1
+element ASDShellQ4 368 396 397 418 417 1
+element ASDShellQ4 369 397 398 419 418 1
+element ASDShellQ4 370 398 399 420 419 1
+element ASDShellQ4 371 399 400 421 420 1
+element ASDShellQ4 372 400 401 422 421 1
+element ASDShellQ4 373 401 402 423 422 1
+element ASDShellQ4 374 402 403 424 423 1
+element ASDShellQ4 375 403 404 425 424 1
+element ASDShellQ4 376 404 405 426 425 1
+element ASDShellQ4 377 405 406 427 426 1
+element ASDShellQ4 378 406 407 428 427 1
+element ASDShellQ4 379 407 408 429 428 1
+element ASDShellQ4 380 408 409 430 429 1
+element ASDShellQ4 381 411 410 431 432 1
+element ASDShellQ4 382 410 412 433 431 1
+element ASDShellQ4 383 412 413 434 433 1
+element ASDShellQ4 384 413 414 435 434 1
+element ASDShellQ4 385 414 415 436 435 1
+element ASDShellQ4 386 415 416 437 436 1
+element ASDShellQ4 387 416 417 438 437 1
+element ASDShellQ4 388 417 418 439 438 1
+element ASDShellQ4 389 418 419 440 439 1
+element ASDShellQ4 390 419 420 441 440 1
+element ASDShellQ4 391 420 421 442 441 1
+element ASDShellQ4 392 421 422 443 442 1
+element ASDShellQ4 393 422 423 444 443 1
+element ASDShellQ4 394 423 424 445 444 1
+element ASDShellQ4 395 424 425 446 445 1
+element ASDShellQ4 396 425 426 447 446 1
+element ASDShellQ4 397 426 427 448 447 1
+element ASDShellQ4 398 427 428 449 448 1
+element ASDShellQ4 399 428 429 450 449 1
+element ASDShellQ4 400 429 430 451 450 1
+geomTransf Linear 401 1 0 0
+element forceBeamColumn 401 1 2 401 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 402 1 0 0
+element forceBeamColumn 402 3 4 402 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 403 1 0 0
+element forceBeamColumn 403 5 6 403 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 404 1 0 0
+element forceBeamColumn 404 7 8 404 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 405 1 0 0
+element forceBeamColumn 405 9 10 405 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 406 1 0 0
+element forceBeamColumn 406 11 12 406 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 407 1 0 0
+element forceBeamColumn 407 13 14 407 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 408 1 0 0
+element forceBeamColumn 408 15 16 408 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 409 1 0 0
+element forceBeamColumn 409 17 18 409 NewtonCotes 2 5 -mass 2700.39999999999
+geomTransf Linear 410 1 0 0
+element forceBeamColumn 410 19 20 410 NewtonCotes 2 5 -mass 2700.39999999999
+timeSeries Constant 1 -factor 1
+pattern Plain 1 1 {
+	load 2 0 0 0 0 0 0
+	load 4 0 0 0 0 0 0
+	load 6 0 0 0 0 0 0
+	load 8 0 0 0 0 0 0
+	load 10 0 0 0 0 0 0
+	load 12 0 0 0 0 0 0
+	load 14 0 0 0 0 0 0
+	load 16 0 0 0 0 0 0
+	load 18 0 0 0 0 0 0
+	load 20 0 0 0 0 0 0
+}
+timeSeries Linear 2 -factor 1
+pattern Plain 2 2 {
+	load 21 0 0 -5887.5 0 0 0
+	load 22 0 0 -5887.5 0 0 0
+	load 23 0 0 -5887.5 0 0 0
+	load 24 0 0 -5887.5 0 0 0
+	load 22 0 0 -5887.5 0 0 0
+	load 25 0 0 -5887.5 0 0 0
+	load 26 0 0 -5887.5 0 0 0
+	load 23 0 0 -5887.5 0 0 0
+	load 25 0 0 -5887.5 0 0 0
+	load 27 0 0 -5887.5 0 0 0
+	load 28 0 0 -5887.5 0 0 0
+	load 26 0 0 -5887.5 0 0 0
+	load 27 0 0 -5887.5 0 0 0
+	load 29 0 0 -5887.5 0 0 0
+	load 30 0 0 -5887.5 0 0 0
+	load 28 0 0 -5887.5 0 0 0
+	load 29 0 0 -5887.5 0 0 0
+	load 31 0 0 -5887.5 0 0 0
+	load 32 0 0 -5887.5 0 0 0
+	load 30 0 0 -5887.5 0 0 0
+	load 31 0 0 -5887.5 0 0 0
+	load 33 0 0 -5887.5 0 0 0
+	load 34 0 0 -5887.5 0 0 0
+	load 32 0 0 -5887.5 0 0 0
+	load 33 0 0 -5887.5 0 0 0
+	load 35 0 0 -5887.5 0 0 0
+	load 36 0 0 -5887.5 0 0 0
+	load 34 0 0 -5887.5 0 0 0
+	load 35 0 0 -5887.5 0 0 0
+	load 37 0 0 -5887.5 0 0 0
+	load 38 0 0 -5887.5 0 0 0
+	load 36 0 0 -5887.5 0 0 0
+	load 37 0 0 -5887.5 0 0 0
+	load 9 0 0 -5887.5 0 0 0
+	load 39 0 0 -5887.5 0 0 0
+	load 38 0 0 -5887.5 0 0 0
+	load 9 0 0 -5887.5 0 0 0
+	load 40 0 0 -5887.5 0 0 0
+	load 41 0 0 -5887.5 0 0 0
+	load 39 0 0 -5887.5 0 0 0
+	load 40 0 0 -5887.5 0 0 0
+	load 42 0 0 -5887.5 0 0 0
+	load 43 0 0 -5887.5 0 0 0
+	load 41 0 0 -5887.5 0 0 0
+	load 42 0 0 -5887.5 0 0 0
+	load 5 0 0 -5887.5 0 0 0
+	load 44 0 0 -5887.5 0 0 0
+	load 43 0 0 -5887.5 0 0 0
+	load 5 0 0 -5887.5 0 0 0
+	load 45 0 0 -5887.5 0 0 0
+	load 46 0 0 -5887.5 0 0 0
+	load 44 0 0 -5887.5 0 0 0
+	load 45 0 0 -5887.5 0 0 0
+	load 47 0 0 -5887.5 0 0 0
+	load 48 0 0 -5887.5 0 0 0
+	load 46 0 0 -5887.5 0 0 0
+	load 47 0 0 -5887.5 0 0 0
+	load 49 0 0 -5887.5 0 0 0
+	load 50 0 0 -5887.5 0 0 0
+	load 48 0 0 -5887.5 0 0 0
+	load 49 0 0 -5887.5 0 0 0
+	load 51 0 0 -5887.5 0 0 0
+	load 52 0 0 -5887.5 0 0 0
+	load 50 0 0 -5887.5 0 0 0
+	load 51 0 0 -5887.5 0 0 0
+	load 53 0 0 -5887.5 0 0 0
+	load 54 0 0 -5887.5 0 0 0
+	load 52 0 0 -5887.5 0 0 0
+	load 53 0 0 -5887.5 0 0 0
+	load 55 0 0 -5887.5 0 0 0
+	load 56 0 0 -5887.5 0 0 0
+	load 54 0 0 -5887.5 0 0 0
+	load 55 0 0 -5887.5 0 0 0
+	load 57 0 0 -5887.5 0 0 0
+	load 58 0 0 -5887.5 0 0 0
+	load 56 0 0 -5887.5 0 0 0
+	load 57 0 0 -5887.5 0 0 0
+	load 59 0 0 -5887.5 0 0 0
+	load 60 0 0 -5887.5 0 0 0
+	load 58 0 0 -5887.5 0 0 0
+	load 24 0 0 -5887.5 0 0 0
+	load 23 0 0 -5887.5 0 0 0
+	load 61 0 0 -5887.5 0 0 0
+	load 62 0 0 -5887.5 0 0 0
+	load 23 0 0 -5887.5 0 0 0
+	load 26 0 0 -5887.5 0 0 0
+	load 63 0 0 -5887.5 0 0 0
+	load 61 0 0 -5887.5 0 0 0
+	load 26 0 0 -5887.5 0 0 0
+	load 28 0 0 -5887.5 0 0 0
+	load 64 0 0 -5887.5 0 0 0
+	load 63 0 0 -5887.5 0 0 0
+	load 28 0 0 -5887.5 0 0 0
+	load 30 0 0 -5887.5 0 0 0
+	load 15 0 0 -5887.5 0 0 0
+	load 64 0 0 -5887.5 0 0 0
+	load 30 0 0 -5887.5 0 0 0
+	load 32 0 0 -5887.5 0 0 0
+	load 65 0 0 -5887.5 0 0 0
+	load 15 0 0 -5887.5 0 0 0
+	load 32 0 0 -5887.5 0 0 0
+	load 34 0 0 -5887.5 0 0 0
+	load 66 0 0 -5887.5 0 0 0
+	load 65 0 0 -5887.5 0 0 0
+	load 34 0 0 -5887.5 0 0 0
+	load 36 0 0 -5887.5 0 0 0
+	load 67 0 0 -5887.5 0 0 0
+	load 66 0 0 -5887.5 0 0 0
+	load 36 0 0 -5887.5 0 0 0
+	load 38 0 0 -5887.5 0 0 0
+	load 68 0 0 -5887.5 0 0 0
+	load 67 0 0 -5887.5 0 0 0
+	load 38 0 0 -5887.5 0 0 0
+	load 39 0 0 -5887.5 0 0 0
+	load 69 0 0 -5887.5 0 0 0
+	load 68 0 0 -5887.5 0 0 0
+	load 39 0 0 -5887.5 0 0 0
+	load 41 0 0 -5887.5 0 0 0
+	load 70 0 0 -5887.5 0 0 0
+	load 69 0 0 -5887.5 0 0 0
+	load 41 0 0 -5887.5 0 0 0
+	load 43 0 0 -5887.5 0 0 0
+	load 71 0 0 -5887.5 0 0 0
+	load 70 0 0 -5887.5 0 0 0
+	load 43 0 0 -5887.5 0 0 0
+	load 44 0 0 -5887.5 0 0 0
+	load 72 0 0 -5887.5 0 0 0
+	load 71 0 0 -5887.5 0 0 0
+	load 44 0 0 -5887.5 0 0 0
+	load 46 0 0 -5887.5 0 0 0
+	load 73 0 0 -5887.5 0 0 0
+	load 72 0 0 -5887.5 0 0 0
+	load 46 0 0 -5887.5 0 0 0
+	load 48 0 0 -5887.5 0 0 0
+	load 74 0 0 -5887.5 0 0 0
+	load 73 0 0 -5887.5 0 0 0
+	load 48 0 0 -5887.5 0 0 0
+	load 50 0 0 -5887.5 0 0 0
+	load 75 0 0 -5887.5 0 0 0
+	load 74 0 0 -5887.5 0 0 0
+	load 50 0 0 -5887.5 0 0 0
+	load 52 0 0 -5887.5 0 0 0
+	load 76 0 0 -5887.5 0 0 0
+	load 75 0 0 -5887.5 0 0 0
+	load 52 0 0 -5887.5 0 0 0
+	load 54 0 0 -5887.5 0 0 0
+	load 77 0 0 -5887.5 0 0 0
+	load 76 0 0 -5887.5 0 0 0
+	load 54 0 0 -5887.5 0 0 0
+	load 56 0 0 -5887.5 0 0 0
+	load 78 0 0 -5887.5 0 0 0
+	load 77 0 0 -5887.5 0 0 0
+	load 56 0 0 -5887.5 0 0 0
+	load 58 0 0 -5887.5 0 0 0
+	load 79 0 0 -5887.5 0 0 0
+	load 78 0 0 -5887.5 0 0 0
+	load 58 0 0 -5887.5 0 0 0
+	load 60 0 0 -5887.5 0 0 0
+	load 80 0 0 -5887.5 0 0 0
+	load 79 0 0 -5887.5 0 0 0
+	load 62 0 0 -5887.5 0 0 0
+	load 61 0 0 -5887.5 0 0 0
+	load 81 0 0 -5887.5 0 0 0
+	load 82 0 0 -5887.5 0 0 0
+	load 61 0 0 -5887.5 0 0 0
+	load 63 0 0 -5887.5 0 0 0
+	load 83 0 0 -5887.5 0 0 0
+	load 81 0 0 -5887.5 0 0 0
+	load 63 0 0 -5887.5 0 0 0
+	load 64 0 0 -5887.5 0 0 0
+	load 84 0 0 -5887.5 0 0 0
+	load 83 0 0 -5887.5 0 0 0
+	load 64 0 0 -5887.5 0 0 0
+	load 15 0 0 -5887.5 0 0 0
+	load 85 0 0 -5887.5 0 0 0
+	load 84 0 0 -5887.5 0 0 0
+	load 15 0 0 -5887.5 0 0 0
+	load 65 0 0 -5887.5 0 0 0
+	load 86 0 0 -5887.5 0 0 0
+	load 85 0 0 -5887.5 0 0 0
+	load 65 0 0 -5887.5 0 0 0
+	load 66 0 0 -5887.5 0 0 0
+	load 87 0 0 -5887.5 0 0 0
+	load 86 0 0 -5887.5 0 0 0
+	load 66 0 0 -5887.5 0 0 0
+	load 67 0 0 -5887.5 0 0 0
+	load 88 0 0 -5887.5 0 0 0
+	load 87 0 0 -5887.5 0 0 0
+	load 67 0 0 -5887.5 0 0 0
+	load 68 0 0 -5887.5 0 0 0
+	load 89 0 0 -5887.5 0 0 0
+	load 88 0 0 -5887.5 0 0 0
+	load 68 0 0 -5887.5 0 0 0
+	load 69 0 0 -5887.5 0 0 0
+	load 90 0 0 -5887.5 0 0 0
+	load 89 0 0 -5887.5 0 0 0
+	load 69 0 0 -5887.5 0 0 0
+	load 70 0 0 -5887.5 0 0 0
+	load 91 0 0 -5887.5 0 0 0
+	load 90 0 0 -5887.5 0 0 0
+	load 70 0 0 -5887.5 0 0 0
+	load 71 0 0 -5887.5 0 0 0
+	load 92 0 0 -5887.5 0 0 0
+	load 91 0 0 -5887.5 0 0 0
+	load 71 0 0 -5887.5 0 0 0
+	load 72 0 0 -5887.5 0 0 0
+	load 93 0 0 -5887.5 0 0 0
+	load 92 0 0 -5887.5 0 0 0
+	load 72 0 0 -5887.5 0 0 0
+	load 73 0 0 -5887.5 0 0 0
+	load 94 0 0 -5887.5 0 0 0
+	load 93 0 0 -5887.5 0 0 0
+	load 73 0 0 -5887.5 0 0 0
+	load 74 0 0 -5887.5 0 0 0
+	load 95 0 0 -5887.5 0 0 0
+	load 94 0 0 -5887.5 0 0 0
+	load 74 0 0 -5887.5 0 0 0
+	load 75 0 0 -5887.5 0 0 0
+	load 96 0 0 -5887.5 0 0 0
+	load 95 0 0 -5887.5 0 0 0
+	load 75 0 0 -5887.5 0 0 0
+	load 76 0 0 -5887.5 0 0 0
+	load 97 0 0 -5887.5 0 0 0
+	load 96 0 0 -5887.5 0 0 0
+	load 76 0 0 -5887.5 0 0 0
+	load 77 0 0 -5887.5 0 0 0
+	load 98 0 0 -5887.5 0 0 0
+	load 97 0 0 -5887.5 0 0 0
+	load 77 0 0 -5887.5 0 0 0
+	load 78 0 0 -5887.5 0 0 0
+	load 99 0 0 -5887.5 0 0 0
+	load 98 0 0 -5887.5 0 0 0
+	load 78 0 0 -5887.5 0 0 0
+	load 79 0 0 -5887.5 0 0 0
+	load 100 0 0 -5887.5 0 0 0
+	load 99 0 0 -5887.5 0 0 0
+	load 79 0 0 -5887.5 0 0 0
+	load 80 0 0 -5887.5 0 0 0
+	load 101 0 0 -5887.5 0 0 0
+	load 100 0 0 -5887.5 0 0 0
+	load 82 0 0 -5887.5 0 0 0
+	load 81 0 0 -5887.5 0 0 0
+	load 102 0 0 -5887.5 0 0 0
+	load 103 0 0 -5887.5 0 0 0
+	load 81 0 0 -5887.5 0 0 0
+	load 83 0 0 -5887.5 0 0 0
+	load 104 0 0 -5887.5 0 0 0
+	load 102 0 0 -5887.5 0 0 0
+	load 83 0 0 -5887.5 0 0 0
+	load 84 0 0 -5887.5 0 0 0
+	load 105 0 0 -5887.5 0 0 0
+	load 104 0 0 -5887.5 0 0 0
+	load 84 0 0 -5887.5 0 0 0
+	load 85 0 0 -5887.5 0 0 0
+	load 106 0 0 -5887.5 0 0 0
+	load 105 0 0 -5887.5 0 0 0
+	load 85 0 0 -5887.5 0 0 0
+	load 86 0 0 -5887.5 0 0 0
+	load 107 0 0 -5887.5 0 0 0
+	load 106 0 0 -5887.5 0 0 0
+	load 86 0 0 -5887.5 0 0 0
+	load 87 0 0 -5887.5 0 0 0
+	load 108 0 0 -5887.5 0 0 0
+	load 107 0 0 -5887.5 0 0 0
+	load 87 0 0 -5887.5 0 0 0
+	load 88 0 0 -5887.5 0 0 0
+	load 109 0 0 -5887.5 0 0 0
+	load 108 0 0 -5887.5 0 0 0
+	load 88 0 0 -5887.5 0 0 0
+	load 89 0 0 -5887.5 0 0 0
+	load 110 0 0 -5887.5 0 0 0
+	load 109 0 0 -5887.5 0 0 0
+	load 89 0 0 -5887.5 0 0 0
+	load 90 0 0 -5887.5 0 0 0
+	load 111 0 0 -5887.5 0 0 0
+	load 110 0 0 -5887.5 0 0 0
+	load 90 0 0 -5887.5 0 0 0
+	load 91 0 0 -5887.5 0 0 0
+	load 112 0 0 -5887.5 0 0 0
+	load 111 0 0 -5887.5 0 0 0
+	load 91 0 0 -5887.5 0 0 0
+	load 92 0 0 -5887.5 0 0 0
+	load 113 0 0 -5887.5 0 0 0
+	load 112 0 0 -5887.5 0 0 0
+	load 92 0 0 -5887.5 0 0 0
+	load 93 0 0 -5887.5 0 0 0
+	load 114 0 0 -5887.5 0 0 0
+	load 113 0 0 -5887.5 0 0 0
+	load 93 0 0 -5887.5 0 0 0
+	load 94 0 0 -5887.5 0 0 0
+	load 115 0 0 -5887.5 0 0 0
+	load 114 0 0 -5887.5 0 0 0
+	load 94 0 0 -5887.5 0 0 0
+	load 95 0 0 -5887.5 0 0 0
+	load 116 0 0 -5887.5 0 0 0
+	load 115 0 0 -5887.5 0 0 0
+	load 95 0 0 -5887.5 0 0 0
+	load 96 0 0 -5887.5 0 0 0
+	load 117 0 0 -5887.5 0 0 0
+	load 116 0 0 -5887.5 0 0 0
+	load 96 0 0 -5887.5 0 0 0
+	load 97 0 0 -5887.5 0 0 0
+	load 118 0 0 -5887.5 0 0 0
+	load 117 0 0 -5887.5 0 0 0
+	load 97 0 0 -5887.5 0 0 0
+	load 98 0 0 -5887.5 0 0 0
+	load 119 0 0 -5887.5 0 0 0
+	load 118 0 0 -5887.5 0 0 0
+	load 98 0 0 -5887.5 0 0 0
+	load 99 0 0 -5887.5 0 0 0
+	load 120 0 0 -5887.5 0 0 0
+	load 119 0 0 -5887.5 0 0 0
+	load 99 0 0 -5887.5 0 0 0
+	load 100 0 0 -5887.5 0 0 0
+	load 121 0 0 -5887.5 0 0 0
+	load 120 0 0 -5887.5 0 0 0
+	load 100 0 0 -5887.5 0 0 0
+	load 101 0 0 -5887.5 0 0 0
+	load 122 0 0 -5887.5 0 0 0
+	load 121 0 0 -5887.5 0 0 0
+	load 103 0 0 -5887.5 0 0 0
+	load 102 0 0 -5887.5 0 0 0
+	load 123 0 0 -5887.5 0 0 0
+	load 124 0 0 -5887.5 0 0 0
+	load 102 0 0 -5887.5 0 0 0
+	load 104 0 0 -5887.5 0 0 0
+	load 125 0 0 -5887.5 0 0 0
+	load 123 0 0 -5887.5 0 0 0
+	load 104 0 0 -5887.5 0 0 0
+	load 105 0 0 -5887.5 0 0 0
+	load 126 0 0 -5887.5 0 0 0
+	load 125 0 0 -5887.5 0 0 0
+	load 105 0 0 -5887.5 0 0 0
+	load 106 0 0 -5887.5 0 0 0
+	load 127 0 0 -5887.5 0 0 0
+	load 126 0 0 -5887.5 0 0 0
+	load 106 0 0 -5887.5 0 0 0
+	load 107 0 0 -5887.5 0 0 0
+	load 128 0 0 -5887.5 0 0 0
+	load 127 0 0 -5887.5 0 0 0
+	load 107 0 0 -5887.5 0 0 0
+	load 108 0 0 -5887.5 0 0 0
+	load 129 0 0 -5887.5 0 0 0
+	load 128 0 0 -5887.5 0 0 0
+	load 108 0 0 -5887.5 0 0 0
+	load 109 0 0 -5887.5 0 0 0
+	load 130 0 0 -5887.5 0 0 0
+	load 129 0 0 -5887.5 0 0 0
+	load 109 0 0 -5887.5 0 0 0
+	load 110 0 0 -5887.5 0 0 0
+	load 131 0 0 -5887.5 0 0 0
+	load 130 0 0 -5887.5 0 0 0
+	load 110 0 0 -5887.5 0 0 0
+	load 111 0 0 -5887.5 0 0 0
+	load 132 0 0 -5887.5 0 0 0
+	load 131 0 0 -5887.5 0 0 0
+	load 111 0 0 -5887.5 0 0 0
+	load 112 0 0 -5887.5 0 0 0
+	load 133 0 0 -5887.5 0 0 0
+	load 132 0 0 -5887.5 0 0 0
+	load 112 0 0 -5887.5 0 0 0
+	load 113 0 0 -5887.5 0 0 0
+	load 134 0 0 -5887.5 0 0 0
+	load 133 0 0 -5887.5 0 0 0
+	load 113 0 0 -5887.5 0 0 0
+	load 114 0 0 -5887.5 0 0 0
+	load 135 0 0 -5887.5 0 0 0
+	load 134 0 0 -5887.5 0 0 0
+	load 114 0 0 -5887.5 0 0 0
+	load 115 0 0 -5887.5 0 0 0
+	load 136 0 0 -5887.5 0 0 0
+	load 135 0 0 -5887.5 0 0 0
+	load 115 0 0 -5887.5 0 0 0
+	load 116 0 0 -5887.5 0 0 0
+	load 137 0 0 -5887.5 0 0 0
+	load 136 0 0 -5887.5 0 0 0
+	load 116 0 0 -5887.5 0 0 0
+	load 117 0 0 -5887.5 0 0 0
+	load 138 0 0 -5887.5 0 0 0
+	load 137 0 0 -5887.5 0 0 0
+	load 117 0 0 -5887.5 0 0 0
+	load 118 0 0 -5887.5 0 0 0
+	load 139 0 0 -5887.5 0 0 0
+	load 138 0 0 -5887.5 0 0 0
+	load 118 0 0 -5887.5 0 0 0
+	load 119 0 0 -5887.5 0 0 0
+	load 140 0 0 -5887.5 0 0 0
+	load 139 0 0 -5887.5 0 0 0
+	load 119 0 0 -5887.5 0 0 0
+	load 120 0 0 -5887.5 0 0 0
+	load 141 0 0 -5887.5 0 0 0
+	load 140 0 0 -5887.5 0 0 0
+	load 120 0 0 -5887.5 0 0 0
+	load 121 0 0 -5887.5 0 0 0
+	load 142 0 0 -5887.5 0 0 0
+	load 141 0 0 -5887.5 0 0 0
+	load 121 0 0 -5887.5 0 0 0
+	load 122 0 0 -5887.5 0 0 0
+	load 143 0 0 -5887.5 0 0 0
+	load 142 0 0 -5887.5 0 0 0
+	load 124 0 0 -5887.5 0 0 0
+	load 123 0 0 -5887.5 0 0 0
+	load 144 0 0 -5887.5 0 0 0
+	load 145 0 0 -5887.5 0 0 0
+	load 123 0 0 -5887.5 0 0 0
+	load 125 0 0 -5887.5 0 0 0
+	load 146 0 0 -5887.5 0 0 0
+	load 144 0 0 -5887.5 0 0 0
+	load 125 0 0 -5887.5 0 0 0
+	load 126 0 0 -5887.5 0 0 0
+	load 147 0 0 -5887.5 0 0 0
+	load 146 0 0 -5887.5 0 0 0
+	load 126 0 0 -5887.5 0 0 0
+	load 127 0 0 -5887.5 0 0 0
+	load 148 0 0 -5887.5 0 0 0
+	load 147 0 0 -5887.5 0 0 0
+	load 127 0 0 -5887.5 0 0 0
+	load 128 0 0 -5887.5 0 0 0
+	load 149 0 0 -5887.5 0 0 0
+	load 148 0 0 -5887.5 0 0 0
+	load 128 0 0 -5887.5 0 0 0
+	load 129 0 0 -5887.5 0 0 0
+	load 150 0 0 -5887.5 0 0 0
+	load 149 0 0 -5887.5 0 0 0
+	load 129 0 0 -5887.5 0 0 0
+	load 130 0 0 -5887.5 0 0 0
+	load 151 0 0 -5887.5 0 0 0
+	load 150 0 0 -5887.5 0 0 0
+	load 130 0 0 -5887.5 0 0 0
+	load 131 0 0 -5887.5 0 0 0
+	load 152 0 0 -5887.5 0 0 0
+	load 151 0 0 -5887.5 0 0 0
+	load 131 0 0 -5887.5 0 0 0
+	load 132 0 0 -5887.5 0 0 0
+	load 153 0 0 -5887.5 0 0 0
+	load 152 0 0 -5887.5 0 0 0
+	load 132 0 0 -5887.5 0 0 0
+	load 133 0 0 -5887.5 0 0 0
+	load 154 0 0 -5887.5 0 0 0
+	load 153 0 0 -5887.5 0 0 0
+	load 133 0 0 -5887.5 0 0 0
+	load 134 0 0 -5887.5 0 0 0
+	load 155 0 0 -5887.5 0 0 0
+	load 154 0 0 -5887.5 0 0 0
+	load 134 0 0 -5887.5 0 0 0
+	load 135 0 0 -5887.5 0 0 0
+	load 156 0 0 -5887.5 0 0 0
+	load 155 0 0 -5887.5 0 0 0
+	load 135 0 0 -5887.5 0 0 0
+	load 136 0 0 -5887.5 0 0 0
+	load 157 0 0 -5887.5 0 0 0
+	load 156 0 0 -5887.5 0 0 0
+	load 136 0 0 -5887.5 0 0 0
+	load 137 0 0 -5887.5 0 0 0
+	load 158 0 0 -5887.5 0 0 0
+	load 157 0 0 -5887.5 0 0 0
+	load 137 0 0 -5887.5 0 0 0
+	load 138 0 0 -5887.5 0 0 0
+	load 159 0 0 -5887.5 0 0 0
+	load 158 0 0 -5887.5 0 0 0
+	load 138 0 0 -5887.5 0 0 0
+	load 139 0 0 -5887.5 0 0 0
+	load 160 0 0 -5887.5 0 0 0
+	load 159 0 0 -5887.5 0 0 0
+	load 139 0 0 -5887.5 0 0 0
+	load 140 0 0 -5887.5 0 0 0
+	load 161 0 0 -5887.5 0 0 0
+	load 160 0 0 -5887.5 0 0 0
+	load 140 0 0 -5887.5 0 0 0
+	load 141 0 0 -5887.5 0 0 0
+	load 162 0 0 -5887.5 0 0 0
+	load 161 0 0 -5887.5 0 0 0
+	load 141 0 0 -5887.5 0 0 0
+	load 142 0 0 -5887.5 0 0 0
+	load 163 0 0 -5887.5 0 0 0
+	load 162 0 0 -5887.5 0 0 0
+	load 142 0 0 -5887.5 0 0 0
+	load 143 0 0 -5887.5 0 0 0
+	load 164 0 0 -5887.5 0 0 0
+	load 163 0 0 -5887.5 0 0 0
+	load 145 0 0 -5887.5 0 0 0
+	load 144 0 0 -5887.5 0 0 0
+	load 165 0 0 -5887.5 0 0 0
+	load 166 0 0 -5887.5 0 0 0
+	load 144 0 0 -5887.5 0 0 0
+	load 146 0 0 -5887.5 0 0 0
+	load 167 0 0 -5887.5 0 0 0
+	load 165 0 0 -5887.5 0 0 0
+	load 146 0 0 -5887.5 0 0 0
+	load 147 0 0 -5887.5 0 0 0
+	load 168 0 0 -5887.5 0 0 0
+	load 167 0 0 -5887.5 0 0 0
+	load 147 0 0 -5887.5 0 0 0
+	load 148 0 0 -5887.5 0 0 0
+	load 169 0 0 -5887.5 0 0 0
+	load 168 0 0 -5887.5 0 0 0
+	load 148 0 0 -5887.5 0 0 0
+	load 149 0 0 -5887.5 0 0 0
+	load 170 0 0 -5887.5 0 0 0
+	load 169 0 0 -5887.5 0 0 0
+	load 149 0 0 -5887.5 0 0 0
+	load 150 0 0 -5887.5 0 0 0
+	load 171 0 0 -5887.5 0 0 0
+	load 170 0 0 -5887.5 0 0 0
+	load 150 0 0 -5887.5 0 0 0
+	load 151 0 0 -5887.5 0 0 0
+	load 172 0 0 -5887.5 0 0 0
+	load 171 0 0 -5887.5 0 0 0
+	load 151 0 0 -5887.5 0 0 0
+	load 152 0 0 -5887.5 0 0 0
+	load 173 0 0 -5887.5 0 0 0
+	load 172 0 0 -5887.5 0 0 0
+	load 152 0 0 -5887.5 0 0 0
+	load 153 0 0 -5887.5 0 0 0
+	load 174 0 0 -5887.5 0 0 0
+	load 173 0 0 -5887.5 0 0 0
+	load 153 0 0 -5887.5 0 0 0
+	load 154 0 0 -5887.5 0 0 0
+	load 175 0 0 -5887.5 0 0 0
+	load 174 0 0 -5887.5 0 0 0
+	load 154 0 0 -5887.5 0 0 0
+	load 155 0 0 -5887.5 0 0 0
+	load 176 0 0 -5887.5 0 0 0
+	load 175 0 0 -5887.5 0 0 0
+	load 155 0 0 -5887.5 0 0 0
+	load 156 0 0 -5887.5 0 0 0
+	load 177 0 0 -5887.5 0 0 0
+	load 176 0 0 -5887.5 0 0 0
+	load 156 0 0 -5887.5 0 0 0
+	load 157 0 0 -5887.5 0 0 0
+	load 178 0 0 -5887.5 0 0 0
+	load 177 0 0 -5887.5 0 0 0
+	load 157 0 0 -5887.5 0 0 0
+	load 158 0 0 -5887.5 0 0 0
+	load 179 0 0 -5887.5 0 0 0
+	load 178 0 0 -5887.5 0 0 0
+	load 158 0 0 -5887.5 0 0 0
+	load 159 0 0 -5887.5 0 0 0
+	load 180 0 0 -5887.5 0 0 0
+	load 179 0 0 -5887.5 0 0 0
+	load 159 0 0 -5887.5 0 0 0
+	load 160 0 0 -5887.5 0 0 0
+	load 181 0 0 -5887.5 0 0 0
+	load 180 0 0 -5887.5 0 0 0
+	load 160 0 0 -5887.5 0 0 0
+	load 161 0 0 -5887.5 0 0 0
+	load 182 0 0 -5887.5 0 0 0
+	load 181 0 0 -5887.5 0 0 0
+	load 161 0 0 -5887.5 0 0 0
+	load 162 0 0 -5887.5 0 0 0
+	load 13 0 0 -5887.5 0 0 0
+	load 182 0 0 -5887.5 0 0 0
+	load 162 0 0 -5887.5 0 0 0
+	load 163 0 0 -5887.5 0 0 0
+	load 183 0 0 -5887.5 0 0 0
+	load 13 0 0 -5887.5 0 0 0
+	load 163 0 0 -5887.5 0 0 0
+	load 164 0 0 -5887.5 0 0 0
+	load 184 0 0 -5887.5 0 0 0
+	load 183 0 0 -5887.5 0 0 0
+	load 166 0 0 -5887.5 0 0 0
+	load 165 0 0 -5887.5 0 0 0
+	load 185 0 0 -5887.5 0 0 0
+	load 186 0 0 -5887.5 0 0 0
+	load 165 0 0 -5887.5 0 0 0
+	load 167 0 0 -5887.5 0 0 0
+	load 187 0 0 -5887.5 0 0 0
+	load 185 0 0 -5887.5 0 0 0
+	load 167 0 0 -5887.5 0 0 0
+	load 168 0 0 -5887.5 0 0 0
+	load 188 0 0 -5887.5 0 0 0
+	load 187 0 0 -5887.5 0 0 0
+	load 168 0 0 -5887.5 0 0 0
+	load 169 0 0 -5887.5 0 0 0
+	load 11 0 0 -5887.5 0 0 0
+	load 188 0 0 -5887.5 0 0 0
+	load 169 0 0 -5887.5 0 0 0
+	load 170 0 0 -5887.5 0 0 0
+	load 189 0 0 -5887.5 0 0 0
+	load 11 0 0 -5887.5 0 0 0
+	load 170 0 0 -5887.5 0 0 0
+	load 171 0 0 -5887.5 0 0 0
+	load 190 0 0 -5887.5 0 0 0
+	load 189 0 0 -5887.5 0 0 0
+	load 171 0 0 -5887.5 0 0 0
+	load 172 0 0 -5887.5 0 0 0
+	load 191 0 0 -5887.5 0 0 0
+	load 190 0 0 -5887.5 0 0 0
+	load 172 0 0 -5887.5 0 0 0
+	load 173 0 0 -5887.5 0 0 0
+	load 192 0 0 -5887.5 0 0 0
+	load 191 0 0 -5887.5 0 0 0
+	load 173 0 0 -5887.5 0 0 0
+	load 174 0 0 -5887.5 0 0 0
+	load 193 0 0 -5887.5 0 0 0
+	load 192 0 0 -5887.5 0 0 0
+	load 174 0 0 -5887.5 0 0 0
+	load 175 0 0 -5887.5 0 0 0
+	load 194 0 0 -5887.5 0 0 0
+	load 193 0 0 -5887.5 0 0 0
+	load 175 0 0 -5887.5 0 0 0
+	load 176 0 0 -5887.5 0 0 0
+	load 195 0 0 -5887.5 0 0 0
+	load 194 0 0 -5887.5 0 0 0
+	load 176 0 0 -5887.5 0 0 0
+	load 177 0 0 -5887.5 0 0 0
+	load 196 0 0 -5887.5 0 0 0
+	load 195 0 0 -5887.5 0 0 0
+	load 177 0 0 -5887.5 0 0 0
+	load 178 0 0 -5887.5 0 0 0
+	load 197 0 0 -5887.5 0 0 0
+	load 196 0 0 -5887.5 0 0 0
+	load 178 0 0 -5887.5 0 0 0
+	load 179 0 0 -5887.5 0 0 0
+	load 198 0 0 -5887.5 0 0 0
+	load 197 0 0 -5887.5 0 0 0
+	load 179 0 0 -5887.5 0 0 0
+	load 180 0 0 -5887.5 0 0 0
+	load 199 0 0 -5887.5 0 0 0
+	load 198 0 0 -5887.5 0 0 0
+	load 180 0 0 -5887.5 0 0 0
+	load 181 0 0 -5887.5 0 0 0
+	load 7 0 0 -5887.5 0 0 0
+	load 199 0 0 -5887.5 0 0 0
+	load 181 0 0 -5887.5 0 0 0
+	load 182 0 0 -5887.5 0 0 0
+	load 200 0 0 -5887.5 0 0 0
+	load 7 0 0 -5887.5 0 0 0
+	load 182 0 0 -5887.5 0 0 0
+	load 13 0 0 -5887.5 0 0 0
+	load 201 0 0 -5887.5 0 0 0
+	load 200 0 0 -5887.5 0 0 0
+	load 13 0 0 -5887.5 0 0 0
+	load 183 0 0 -5887.5 0 0 0
+	load 202 0 0 -5887.5 0 0 0
+	load 201 0 0 -5887.5 0 0 0
+	load 183 0 0 -5887.5 0 0 0
+	load 184 0 0 -5887.5 0 0 0
+	load 203 0 0 -5887.5 0 0 0
+	load 202 0 0 -5887.5 0 0 0
+	load 186 0 0 -5887.5 0 0 0
+	load 185 0 0 -5887.5 0 0 0
+	load 204 0 0 -5887.5 0 0 0
+	load 205 0 0 -5887.5 0 0 0
+	load 185 0 0 -5887.5 0 0 0
+	load 187 0 0 -5887.5 0 0 0
+	load 206 0 0 -5887.5 0 0 0
+	load 204 0 0 -5887.5 0 0 0
+	load 187 0 0 -5887.5 0 0 0
+	load 188 0 0 -5887.5 0 0 0
+	load 207 0 0 -5887.5 0 0 0
+	load 206 0 0 -5887.5 0 0 0
+	load 188 0 0 -5887.5 0 0 0
+	load 11 0 0 -5887.5 0 0 0
+	load 208 0 0 -5887.5 0 0 0
+	load 207 0 0 -5887.5 0 0 0
+	load 11 0 0 -5887.5 0 0 0
+	load 189 0 0 -5887.5 0 0 0
+	load 209 0 0 -5887.5 0 0 0
+	load 208 0 0 -5887.5 0 0 0
+	load 189 0 0 -5887.5 0 0 0
+	load 190 0 0 -5887.5 0 0 0
+	load 210 0 0 -5887.5 0 0 0
+	load 209 0 0 -5887.5 0 0 0
+	load 190 0 0 -5887.5 0 0 0
+	load 191 0 0 -5887.5 0 0 0
+	load 211 0 0 -5887.5 0 0 0
+	load 210 0 0 -5887.5 0 0 0
+	load 191 0 0 -5887.5 0 0 0
+	load 192 0 0 -5887.5 0 0 0
+	load 212 0 0 -5887.5 0 0 0
+	load 211 0 0 -5887.5 0 0 0
+	load 192 0 0 -5887.5 0 0 0
+	load 193 0 0 -5887.5 0 0 0
+	load 213 0 0 -5887.5 0 0 0
+	load 212 0 0 -5887.5 0 0 0
+	load 193 0 0 -5887.5 0 0 0
+	load 194 0 0 -5887.5 0 0 0
+	load 214 0 0 -5887.5 0 0 0
+	load 213 0 0 -5887.5 0 0 0
+	load 194 0 0 -5887.5 0 0 0
+	load 195 0 0 -5887.5 0 0 0
+	load 215 0 0 -5887.5 0 0 0
+	load 214 0 0 -5887.5 0 0 0
+	load 195 0 0 -5887.5 0 0 0
+	load 196 0 0 -5887.5 0 0 0
+	load 216 0 0 -5887.5 0 0 0
+	load 215 0 0 -5887.5 0 0 0
+	load 196 0 0 -5887.5 0 0 0
+	load 197 0 0 -5887.5 0 0 0
+	load 217 0 0 -5887.5 0 0 0
+	load 216 0 0 -5887.5 0 0 0
+	load 197 0 0 -5887.5 0 0 0
+	load 198 0 0 -5887.5 0 0 0
+	load 218 0 0 -5887.5 0 0 0
+	load 217 0 0 -5887.5 0 0 0
+	load 198 0 0 -5887.5 0 0 0
+	load 199 0 0 -5887.5 0 0 0
+	load 219 0 0 -5887.5 0 0 0
+	load 218 0 0 -5887.5 0 0 0
+	load 199 0 0 -5887.5 0 0 0
+	load 7 0 0 -5887.5 0 0 0
+	load 220 0 0 -5887.5 0 0 0
+	load 219 0 0 -5887.5 0 0 0
+	load 7 0 0 -5887.5 0 0 0
+	load 200 0 0 -5887.5 0 0 0
+	load 221 0 0 -5887.5 0 0 0
+	load 220 0 0 -5887.5 0 0 0
+	load 200 0 0 -5887.5 0 0 0
+	load 201 0 0 -5887.5 0 0 0
+	load 222 0 0 -5887.5 0 0 0
+	load 221 0 0 -5887.5 0 0 0
+	load 201 0 0 -5887.5 0 0 0
+	load 202 0 0 -5887.5 0 0 0
+	load 223 0 0 -5887.5 0 0 0
+	load 222 0 0 -5887.5 0 0 0
+	load 202 0 0 -5887.5 0 0 0
+	load 203 0 0 -5887.5 0 0 0
+	load 224 0 0 -5887.5 0 0 0
+	load 223 0 0 -5887.5 0 0 0
+	load 205 0 0 -5887.5 0 0 0
+	load 204 0 0 -5887.5 0 0 0
+	load 225 0 0 -5887.5 0 0 0
+	load 226 0 0 -5887.5 0 0 0
+	load 204 0 0 -5887.5 0 0 0
+	load 206 0 0 -5887.5 0 0 0
+	load 227 0 0 -5887.5 0 0 0
+	load 225 0 0 -5887.5 0 0 0
+	load 206 0 0 -5887.5 0 0 0
+	load 207 0 0 -5887.5 0 0 0
+	load 228 0 0 -5887.5 0 0 0
+	load 227 0 0 -5887.5 0 0 0
+	load 207 0 0 -5887.5 0 0 0
+	load 208 0 0 -5887.5 0 0 0
+	load 229 0 0 -5887.5 0 0 0
+	load 228 0 0 -5887.5 0 0 0
+	load 208 0 0 -5887.5 0 0 0
+	load 209 0 0 -5887.5 0 0 0
+	load 230 0 0 -5887.5 0 0 0
+	load 229 0 0 -5887.5 0 0 0
+	load 209 0 0 -5887.5 0 0 0
+	load 210 0 0 -5887.5 0 0 0
+	load 231 0 0 -5887.5 0 0 0
+	load 230 0 0 -5887.5 0 0 0
+	load 210 0 0 -5887.5 0 0 0
+	load 211 0 0 -5887.5 0 0 0
+	load 232 0 0 -5887.5 0 0 0
+	load 231 0 0 -5887.5 0 0 0
+	load 211 0 0 -5887.5 0 0 0
+	load 212 0 0 -5887.5 0 0 0
+	load 233 0 0 -5887.5 0 0 0
+	load 232 0 0 -5887.5 0 0 0
+	load 212 0 0 -5887.5 0 0 0
+	load 213 0 0 -5887.5 0 0 0
+	load 234 0 0 -5887.5 0 0 0
+	load 233 0 0 -5887.5 0 0 0
+	load 213 0 0 -5887.5 0 0 0
+	load 214 0 0 -5887.5 0 0 0
+	load 235 0 0 -5887.5 0 0 0
+	load 234 0 0 -5887.5 0 0 0
+	load 214 0 0 -5887.5 0 0 0
+	load 215 0 0 -5887.5 0 0 0
+	load 236 0 0 -5887.5 0 0 0
+	load 235 0 0 -5887.5 0 0 0
+	load 215 0 0 -5887.5 0 0 0
+	load 216 0 0 -5887.5 0 0 0
+	load 237 0 0 -5887.5 0 0 0
+	load 236 0 0 -5887.5 0 0 0
+	load 216 0 0 -5887.5 0 0 0
+	load 217 0 0 -5887.5 0 0 0
+	load 238 0 0 -5887.5 0 0 0
+	load 237 0 0 -5887.5 0 0 0
+	load 217 0 0 -5887.5 0 0 0
+	load 218 0 0 -5887.5 0 0 0
+	load 239 0 0 -5887.5 0 0 0
+	load 238 0 0 -5887.5 0 0 0
+	load 218 0 0 -5887.5 0 0 0
+	load 219 0 0 -5887.5 0 0 0
+	load 240 0 0 -5887.5 0 0 0
+	load 239 0 0 -5887.5 0 0 0
+	load 219 0 0 -5887.5 0 0 0
+	load 220 0 0 -5887.5 0 0 0
+	load 241 0 0 -5887.5 0 0 0
+	load 240 0 0 -5887.5 0 0 0
+	load 220 0 0 -5887.5 0 0 0
+	load 221 0 0 -5887.5 0 0 0
+	load 242 0 0 -5887.5 0 0 0
+	load 241 0 0 -5887.5 0 0 0
+	load 221 0 0 -5887.5 0 0 0
+	load 222 0 0 -5887.5 0 0 0
+	load 243 0 0 -5887.5 0 0 0
+	load 242 0 0 -5887.5 0 0 0
+	load 222 0 0 -5887.5 0 0 0
+	load 223 0 0 -5887.5 0 0 0
+	load 244 0 0 -5887.5 0 0 0
+	load 243 0 0 -5887.5 0 0 0
+	load 223 0 0 -5887.5 0 0 0
+	load 224 0 0 -5887.5 0 0 0
+	load 245 0 0 -5887.5 0 0 0
+	load 244 0 0 -5887.5 0 0 0
+	load 226 0 0 -5887.5 0 0 0
+	load 225 0 0 -5887.5 0 0 0
+	load 246 0 0 -5887.5 0 0 0
+	load 247 0 0 -5887.5 0 0 0
+	load 225 0 0 -5887.5 0 0 0
+	load 227 0 0 -5887.5 0 0 0
+	load 248 0 0 -5887.5 0 0 0
+	load 246 0 0 -5887.5 0 0 0
+	load 227 0 0 -5887.5 0 0 0
+	load 228 0 0 -5887.5 0 0 0
+	load 249 0 0 -5887.5 0 0 0
+	load 248 0 0 -5887.5 0 0 0
+	load 228 0 0 -5887.5 0 0 0
+	load 229 0 0 -5887.5 0 0 0
+	load 250 0 0 -5887.5 0 0 0
+	load 249 0 0 -5887.5 0 0 0
+	load 229 0 0 -5887.5 0 0 0
+	load 230 0 0 -5887.5 0 0 0
+	load 251 0 0 -5887.5 0 0 0
+	load 250 0 0 -5887.5 0 0 0
+	load 230 0 0 -5887.5 0 0 0
+	load 231 0 0 -5887.5 0 0 0
+	load 252 0 0 -5887.5 0 0 0
+	load 251 0 0 -5887.5 0 0 0
+	load 231 0 0 -5887.5 0 0 0
+	load 232 0 0 -5887.5 0 0 0
+	load 253 0 0 -5887.5 0 0 0
+	load 252 0 0 -5887.5 0 0 0
+	load 232 0 0 -5887.5 0 0 0
+	load 233 0 0 -5887.5 0 0 0
+	load 254 0 0 -5887.5 0 0 0
+	load 253 0 0 -5887.5 0 0 0
+	load 233 0 0 -5887.5 0 0 0
+	load 234 0 0 -5887.5 0 0 0
+	load 255 0 0 -5887.5 0 0 0
+	load 254 0 0 -5887.5 0 0 0
+	load 234 0 0 -5887.5 0 0 0
+	load 235 0 0 -5887.5 0 0 0
+	load 256 0 0 -5887.5 0 0 0
+	load 255 0 0 -5887.5 0 0 0
+	load 235 0 0 -5887.5 0 0 0
+	load 236 0 0 -5887.5 0 0 0
+	load 257 0 0 -5887.5 0 0 0
+	load 256 0 0 -5887.5 0 0 0
+	load 236 0 0 -5887.5 0 0 0
+	load 237 0 0 -5887.5 0 0 0
+	load 258 0 0 -5887.5 0 0 0
+	load 257 0 0 -5887.5 0 0 0
+	load 237 0 0 -5887.5 0 0 0
+	load 238 0 0 -5887.5 0 0 0
+	load 259 0 0 -5887.5 0 0 0
+	load 258 0 0 -5887.5 0 0 0
+	load 238 0 0 -5887.5 0 0 0
+	load 239 0 0 -5887.5 0 0 0
+	load 260 0 0 -5887.5 0 0 0
+	load 259 0 0 -5887.5 0 0 0
+	load 239 0 0 -5887.5 0 0 0
+	load 240 0 0 -5887.5 0 0 0
+	load 261 0 0 -5887.5 0 0 0
+	load 260 0 0 -5887.5 0 0 0
+	load 240 0 0 -5887.5 0 0 0
+	load 241 0 0 -5887.5 0 0 0
+	load 262 0 0 -5887.5 0 0 0
+	load 261 0 0 -5887.5 0 0 0
+	load 241 0 0 -5887.5 0 0 0
+	load 242 0 0 -5887.5 0 0 0
+	load 263 0 0 -5887.5 0 0 0
+	load 262 0 0 -5887.5 0 0 0
+	load 242 0 0 -5887.5 0 0 0
+	load 243 0 0 -5887.5 0 0 0
+	load 3 0 0 -5887.5 0 0 0
+	load 263 0 0 -5887.5 0 0 0
+	load 243 0 0 -5887.5 0 0 0
+	load 244 0 0 -5887.5 0 0 0
+	load 264 0 0 -5887.5 0 0 0
+	load 3 0 0 -5887.5 0 0 0
+	load 244 0 0 -5887.5 0 0 0
+	load 245 0 0 -5887.5 0 0 0
+	load 265 0 0 -5887.5 0 0 0
+	load 264 0 0 -5887.5 0 0 0
+	load 247 0 0 -5887.5 0 0 0
+	load 246 0 0 -5887.5 0 0 0
+	load 266 0 0 -5887.5 0 0 0
+	load 267 0 0 -5887.5 0 0 0
+	load 246 0 0 -5887.5 0 0 0
+	load 248 0 0 -5887.5 0 0 0
+	load 268 0 0 -5887.5 0 0 0
+	load 266 0 0 -5887.5 0 0 0
+	load 248 0 0 -5887.5 0 0 0
+	load 249 0 0 -5887.5 0 0 0
+	load 269 0 0 -5887.5 0 0 0
+	load 268 0 0 -5887.5 0 0 0
+	load 249 0 0 -5887.5 0 0 0
+	load 250 0 0 -5887.5 0 0 0
+	load 270 0 0 -5887.5 0 0 0
+	load 269 0 0 -5887.5 0 0 0
+	load 250 0 0 -5887.5 0 0 0
+	load 251 0 0 -5887.5 0 0 0
+	load 271 0 0 -5887.5 0 0 0
+	load 270 0 0 -5887.5 0 0 0
+	load 251 0 0 -5887.5 0 0 0
+	load 252 0 0 -5887.5 0 0 0
+	load 272 0 0 -5887.5 0 0 0
+	load 271 0 0 -5887.5 0 0 0
+	load 252 0 0 -5887.5 0 0 0
+	load 253 0 0 -5887.5 0 0 0
+	load 273 0 0 -5887.5 0 0 0
+	load 272 0 0 -5887.5 0 0 0
+	load 253 0 0 -5887.5 0 0 0
+	load 254 0 0 -5887.5 0 0 0
+	load 274 0 0 -5887.5 0 0 0
+	load 273 0 0 -5887.5 0 0 0
+	load 254 0 0 -5887.5 0 0 0
+	load 255 0 0 -5887.5 0 0 0
+	load 275 0 0 -5887.5 0 0 0
+	load 274 0 0 -5887.5 0 0 0
+	load 255 0 0 -5887.5 0 0 0
+	load 256 0 0 -5887.5 0 0 0
+	load 276 0 0 -5887.5 0 0 0
+	load 275 0 0 -5887.5 0 0 0
+	load 256 0 0 -5887.5 0 0 0
+	load 257 0 0 -5887.5 0 0 0
+	load 277 0 0 -5887.5 0 0 0
+	load 276 0 0 -5887.5 0 0 0
+	load 257 0 0 -5887.5 0 0 0
+	load 258 0 0 -5887.5 0 0 0
+	load 278 0 0 -5887.5 0 0 0
+	load 277 0 0 -5887.5 0 0 0
+	load 258 0 0 -5887.5 0 0 0
+	load 259 0 0 -5887.5 0 0 0
+	load 279 0 0 -5887.5 0 0 0
+	load 278 0 0 -5887.5 0 0 0
+	load 259 0 0 -5887.5 0 0 0
+	load 260 0 0 -5887.5 0 0 0
+	load 280 0 0 -5887.5 0 0 0
+	load 279 0 0 -5887.5 0 0 0
+	load 260 0 0 -5887.5 0 0 0
+	load 261 0 0 -5887.5 0 0 0
+	load 281 0 0 -5887.5 0 0 0
+	load 280 0 0 -5887.5 0 0 0
+	load 261 0 0 -5887.5 0 0 0
+	load 262 0 0 -5887.5 0 0 0
+	load 282 0 0 -5887.5 0 0 0
+	load 281 0 0 -5887.5 0 0 0
+	load 262 0 0 -5887.5 0 0 0
+	load 263 0 0 -5887.5 0 0 0
+	load 283 0 0 -5887.5 0 0 0
+	load 282 0 0 -5887.5 0 0 0
+	load 263 0 0 -5887.5 0 0 0
+	load 3 0 0 -5887.5 0 0 0
+	load 284 0 0 -5887.5 0 0 0
+	load 283 0 0 -5887.5 0 0 0
+	load 3 0 0 -5887.5 0 0 0
+	load 264 0 0 -5887.5 0 0 0
+	load 285 0 0 -5887.5 0 0 0
+	load 284 0 0 -5887.5 0 0 0
+	load 264 0 0 -5887.5 0 0 0
+	load 265 0 0 -5887.5 0 0 0
+	load 286 0 0 -5887.5 0 0 0
+	load 285 0 0 -5887.5 0 0 0
+	load 267 0 0 -5887.5 0 0 0
+	load 266 0 0 -5887.5 0 0 0
+	load 287 0 0 -5887.5 0 0 0
+	load 288 0 0 -5887.5 0 0 0
+	load 266 0 0 -5887.5 0 0 0
+	load 268 0 0 -5887.5 0 0 0
+	load 289 0 0 -5887.5 0 0 0
+	load 287 0 0 -5887.5 0 0 0
+	load 268 0 0 -5887.5 0 0 0
+	load 269 0 0 -5887.5 0 0 0
+	load 290 0 0 -5887.5 0 0 0
+	load 289 0 0 -5887.5 0 0 0
+	load 269 0 0 -5887.5 0 0 0
+	load 270 0 0 -5887.5 0 0 0
+	load 291 0 0 -5887.5 0 0 0
+	load 290 0 0 -5887.5 0 0 0
+	load 270 0 0 -5887.5 0 0 0
+	load 271 0 0 -5887.5 0 0 0
+	load 292 0 0 -5887.5 0 0 0
+	load 291 0 0 -5887.5 0 0 0
+	load 271 0 0 -5887.5 0 0 0
+	load 272 0 0 -5887.5 0 0 0
+	load 293 0 0 -5887.5 0 0 0
+	load 292 0 0 -5887.5 0 0 0
+	load 272 0 0 -5887.5 0 0 0
+	load 273 0 0 -5887.5 0 0 0
+	load 294 0 0 -5887.5 0 0 0
+	load 293 0 0 -5887.5 0 0 0
+	load 273 0 0 -5887.5 0 0 0
+	load 274 0 0 -5887.5 0 0 0
+	load 295 0 0 -5887.5 0 0 0
+	load 294 0 0 -5887.5 0 0 0
+	load 274 0 0 -5887.5 0 0 0
+	load 275 0 0 -5887.5 0 0 0
+	load 296 0 0 -5887.5 0 0 0
+	load 295 0 0 -5887.5 0 0 0
+	load 275 0 0 -5887.5 0 0 0
+	load 276 0 0 -5887.5 0 0 0
+	load 297 0 0 -5887.5 0 0 0
+	load 296 0 0 -5887.5 0 0 0
+	load 276 0 0 -5887.5 0 0 0
+	load 277 0 0 -5887.5 0 0 0
+	load 298 0 0 -5887.5 0 0 0
+	load 297 0 0 -5887.5 0 0 0
+	load 277 0 0 -5887.5 0 0 0
+	load 278 0 0 -5887.5 0 0 0
+	load 299 0 0 -5887.5 0 0 0
+	load 298 0 0 -5887.5 0 0 0
+	load 278 0 0 -5887.5 0 0 0
+	load 279 0 0 -5887.5 0 0 0
+	load 300 0 0 -5887.5 0 0 0
+	load 299 0 0 -5887.5 0 0 0
+	load 279 0 0 -5887.5 0 0 0
+	load 280 0 0 -5887.5 0 0 0
+	load 301 0 0 -5887.5 0 0 0
+	load 300 0 0 -5887.5 0 0 0
+	load 280 0 0 -5887.5 0 0 0
+	load 281 0 0 -5887.5 0 0 0
+	load 302 0 0 -5887.5 0 0 0
+	load 301 0 0 -5887.5 0 0 0
+	load 281 0 0 -5887.5 0 0 0
+	load 282 0 0 -5887.5 0 0 0
+	load 303 0 0 -5887.5 0 0 0
+	load 302 0 0 -5887.5 0 0 0
+	load 282 0 0 -5887.5 0 0 0
+	load 283 0 0 -5887.5 0 0 0
+	load 304 0 0 -5887.5 0 0 0
+	load 303 0 0 -5887.5 0 0 0
+	load 283 0 0 -5887.5 0 0 0
+	load 284 0 0 -5887.5 0 0 0
+	load 305 0 0 -5887.5 0 0 0
+	load 304 0 0 -5887.5 0 0 0
+	load 284 0 0 -5887.5 0 0 0
+	load 285 0 0 -5887.5 0 0 0
+	load 306 0 0 -5887.5 0 0 0
+	load 305 0 0 -5887.5 0 0 0
+	load 285 0 0 -5887.5 0 0 0
+	load 286 0 0 -5887.5 0 0 0
+	load 307 0 0 -5887.5 0 0 0
+	load 306 0 0 -5887.5 0 0 0
+	load 288 0 0 -5887.5 0 0 0
+	load 287 0 0 -5887.5 0 0 0
+	load 308 0 0 -5887.5 0 0 0
+	load 309 0 0 -5887.5 0 0 0
+	load 287 0 0 -5887.5 0 0 0
+	load 289 0 0 -5887.5 0 0 0
+	load 310 0 0 -5887.5 0 0 0
+	load 308 0 0 -5887.5 0 0 0
+	load 289 0 0 -5887.5 0 0 0
+	load 290 0 0 -5887.5 0 0 0
+	load 311 0 0 -5887.5 0 0 0
+	load 310 0 0 -5887.5 0 0 0
+	load 290 0 0 -5887.5 0 0 0
+	load 291 0 0 -5887.5 0 0 0
+	load 312 0 0 -5887.5 0 0 0
+	load 311 0 0 -5887.5 0 0 0
+	load 291 0 0 -5887.5 0 0 0
+	load 292 0 0 -5887.5 0 0 0
+	load 313 0 0 -5887.5 0 0 0
+	load 312 0 0 -5887.5 0 0 0
+	load 292 0 0 -5887.5 0 0 0
+	load 293 0 0 -5887.5 0 0 0
+	load 19 0 0 -5887.5 0 0 0
+	load 313 0 0 -5887.5 0 0 0
+	load 293 0 0 -5887.5 0 0 0
+	load 294 0 0 -5887.5 0 0 0
+	load 314 0 0 -5887.5 0 0 0
+	load 19 0 0 -5887.5 0 0 0
+	load 294 0 0 -5887.5 0 0 0
+	load 295 0 0 -5887.5 0 0 0
+	load 315 0 0 -5887.5 0 0 0
+	load 314 0 0 -5887.5 0 0 0
+	load 295 0 0 -5887.5 0 0 0
+	load 296 0 0 -5887.5 0 0 0
+	load 316 0 0 -5887.5 0 0 0
+	load 315 0 0 -5887.5 0 0 0
+	load 296 0 0 -5887.5 0 0 0
+	load 297 0 0 -5887.5 0 0 0
+	load 317 0 0 -5887.5 0 0 0
+	load 316 0 0 -5887.5 0 0 0
+	load 297 0 0 -5887.5 0 0 0
+	load 298 0 0 -5887.5 0 0 0
+	load 318 0 0 -5887.5 0 0 0
+	load 317 0 0 -5887.5 0 0 0
+	load 298 0 0 -5887.5 0 0 0
+	load 299 0 0 -5887.5 0 0 0
+	load 319 0 0 -5887.5 0 0 0
+	load 318 0 0 -5887.5 0 0 0
+	load 299 0 0 -5887.5 0 0 0
+	load 300 0 0 -5887.5 0 0 0
+	load 320 0 0 -5887.5 0 0 0
+	load 319 0 0 -5887.5 0 0 0
+	load 300 0 0 -5887.5 0 0 0
+	load 301 0 0 -5887.5 0 0 0
+	load 321 0 0 -5887.5 0 0 0
+	load 320 0 0 -5887.5 0 0 0
+	load 301 0 0 -5887.5 0 0 0
+	load 302 0 0 -5887.5 0 0 0
+	load 322 0 0 -5887.5 0 0 0
+	load 321 0 0 -5887.5 0 0 0
+	load 302 0 0 -5887.5 0 0 0
+	load 303 0 0 -5887.5 0 0 0
+	load 323 0 0 -5887.5 0 0 0
+	load 322 0 0 -5887.5 0 0 0
+	load 303 0 0 -5887.5 0 0 0
+	load 304 0 0 -5887.5 0 0 0
+	load 324 0 0 -5887.5 0 0 0
+	load 323 0 0 -5887.5 0 0 0
+	load 304 0 0 -5887.5 0 0 0
+	load 305 0 0 -5887.5 0 0 0
+	load 325 0 0 -5887.5 0 0 0
+	load 324 0 0 -5887.5 0 0 0
+	load 305 0 0 -5887.5 0 0 0
+	load 306 0 0 -5887.5 0 0 0
+	load 326 0 0 -5887.5 0 0 0
+	load 325 0 0 -5887.5 0 0 0
+	load 306 0 0 -5887.5 0 0 0
+	load 307 0 0 -5887.5 0 0 0
+	load 327 0 0 -5887.5 0 0 0
+	load 326 0 0 -5887.5 0 0 0
+	load 309 0 0 -5887.5 0 0 0
+	load 308 0 0 -5887.5 0 0 0
+	load 328 0 0 -5887.5 0 0 0
+	load 329 0 0 -5887.5 0 0 0
+	load 308 0 0 -5887.5 0 0 0
+	load 310 0 0 -5887.5 0 0 0
+	load 330 0 0 -5887.5 0 0 0
+	load 328 0 0 -5887.5 0 0 0
+	load 310 0 0 -5887.5 0 0 0
+	load 311 0 0 -5887.5 0 0 0
+	load 331 0 0 -5887.5 0 0 0
+	load 330 0 0 -5887.5 0 0 0
+	load 311 0 0 -5887.5 0 0 0
+	load 312 0 0 -5887.5 0 0 0
+	load 332 0 0 -5887.5 0 0 0
+	load 331 0 0 -5887.5 0 0 0
+	load 312 0 0 -5887.5 0 0 0
+	load 313 0 0 -5887.5 0 0 0
+	load 333 0 0 -5887.5 0 0 0
+	load 332 0 0 -5887.5 0 0 0
+	load 313 0 0 -5887.5 0 0 0
+	load 19 0 0 -5887.5 0 0 0
+	load 334 0 0 -5887.5 0 0 0
+	load 333 0 0 -5887.5 0 0 0
+	load 19 0 0 -5887.5 0 0 0
+	load 314 0 0 -5887.5 0 0 0
+	load 335 0 0 -5887.5 0 0 0
+	load 334 0 0 -5887.5 0 0 0
+	load 314 0 0 -5887.5 0 0 0
+	load 315 0 0 -5887.5 0 0 0
+	load 336 0 0 -5887.5 0 0 0
+	load 335 0 0 -5887.5 0 0 0
+	load 315 0 0 -5887.5 0 0 0
+	load 316 0 0 -5887.5 0 0 0
+	load 337 0 0 -5887.5 0 0 0
+	load 336 0 0 -5887.5 0 0 0
+	load 316 0 0 -5887.5 0 0 0
+	load 317 0 0 -5887.5 0 0 0
+	load 338 0 0 -5887.5 0 0 0
+	load 337 0 0 -5887.5 0 0 0
+	load 317 0 0 -5887.5 0 0 0
+	load 318 0 0 -5887.5 0 0 0
+	load 339 0 0 -5887.5 0 0 0
+	load 338 0 0 -5887.5 0 0 0
+	load 318 0 0 -5887.5 0 0 0
+	load 319 0 0 -5887.5 0 0 0
+	load 340 0 0 -5887.5 0 0 0
+	load 339 0 0 -5887.5 0 0 0
+	load 319 0 0 -5887.5 0 0 0
+	load 320 0 0 -5887.5 0 0 0
+	load 341 0 0 -5887.5 0 0 0
+	load 340 0 0 -5887.5 0 0 0
+	load 320 0 0 -5887.5 0 0 0
+	load 321 0 0 -5887.5 0 0 0
+	load 342 0 0 -5887.5 0 0 0
+	load 341 0 0 -5887.5 0 0 0
+	load 321 0 0 -5887.5 0 0 0
+	load 322 0 0 -5887.5 0 0 0
+	load 343 0 0 -5887.5 0 0 0
+	load 342 0 0 -5887.5 0 0 0
+	load 322 0 0 -5887.5 0 0 0
+	load 323 0 0 -5887.5 0 0 0
+	load 344 0 0 -5887.5 0 0 0
+	load 343 0 0 -5887.5 0 0 0
+	load 323 0 0 -5887.5 0 0 0
+	load 324 0 0 -5887.5 0 0 0
+	load 345 0 0 -5887.5 0 0 0
+	load 344 0 0 -5887.5 0 0 0
+	load 324 0 0 -5887.5 0 0 0
+	load 325 0 0 -5887.5 0 0 0
+	load 346 0 0 -5887.5 0 0 0
+	load 345 0 0 -5887.5 0 0 0
+	load 325 0 0 -5887.5 0 0 0
+	load 326 0 0 -5887.5 0 0 0
+	load 347 0 0 -5887.5 0 0 0
+	load 346 0 0 -5887.5 0 0 0
+	load 326 0 0 -5887.5 0 0 0
+	load 327 0 0 -5887.5 0 0 0
+	load 348 0 0 -5887.5 0 0 0
+	load 347 0 0 -5887.5 0 0 0
+	load 329 0 0 -5887.5 0 0 0
+	load 328 0 0 -5887.5 0 0 0
+	load 349 0 0 -5887.5 0 0 0
+	load 350 0 0 -5887.5 0 0 0
+	load 328 0 0 -5887.5 0 0 0
+	load 330 0 0 -5887.5 0 0 0
+	load 351 0 0 -5887.5 0 0 0
+	load 349 0 0 -5887.5 0 0 0
+	load 330 0 0 -5887.5 0 0 0
+	load 331 0 0 -5887.5 0 0 0
+	load 352 0 0 -5887.5 0 0 0
+	load 351 0 0 -5887.5 0 0 0
+	load 331 0 0 -5887.5 0 0 0
+	load 332 0 0 -5887.5 0 0 0
+	load 353 0 0 -5887.5 0 0 0
+	load 352 0 0 -5887.5 0 0 0
+	load 332 0 0 -5887.5 0 0 0
+	load 333 0 0 -5887.5 0 0 0
+	load 354 0 0 -5887.5 0 0 0
+	load 353 0 0 -5887.5 0 0 0
+	load 333 0 0 -5887.5 0 0 0
+	load 334 0 0 -5887.5 0 0 0
+	load 355 0 0 -5887.5 0 0 0
+	load 354 0 0 -5887.5 0 0 0
+	load 334 0 0 -5887.5 0 0 0
+	load 335 0 0 -5887.5 0 0 0
+	load 356 0 0 -5887.5 0 0 0
+	load 355 0 0 -5887.5 0 0 0
+	load 335 0 0 -5887.5 0 0 0
+	load 336 0 0 -5887.5 0 0 0
+	load 357 0 0 -5887.5 0 0 0
+	load 356 0 0 -5887.5 0 0 0
+	load 336 0 0 -5887.5 0 0 0
+	load 337 0 0 -5887.5 0 0 0
+	load 358 0 0 -5887.5 0 0 0
+	load 357 0 0 -5887.5 0 0 0
+	load 337 0 0 -5887.5 0 0 0
+	load 338 0 0 -5887.5 0 0 0
+	load 359 0 0 -5887.5 0 0 0
+	load 358 0 0 -5887.5 0 0 0
+	load 338 0 0 -5887.5 0 0 0
+	load 339 0 0 -5887.5 0 0 0
+	load 360 0 0 -5887.5 0 0 0
+	load 359 0 0 -5887.5 0 0 0
+	load 339 0 0 -5887.5 0 0 0
+	load 340 0 0 -5887.5 0 0 0
+	load 361 0 0 -5887.5 0 0 0
+	load 360 0 0 -5887.5 0 0 0
+	load 340 0 0 -5887.5 0 0 0
+	load 341 0 0 -5887.5 0 0 0
+	load 362 0 0 -5887.5 0 0 0
+	load 361 0 0 -5887.5 0 0 0
+	load 341 0 0 -5887.5 0 0 0
+	load 342 0 0 -5887.5 0 0 0
+	load 363 0 0 -5887.5 0 0 0
+	load 362 0 0 -5887.5 0 0 0
+	load 342 0 0 -5887.5 0 0 0
+	load 343 0 0 -5887.5 0 0 0
+	load 364 0 0 -5887.5 0 0 0
+	load 363 0 0 -5887.5 0 0 0
+	load 343 0 0 -5887.5 0 0 0
+	load 344 0 0 -5887.5 0 0 0
+	load 365 0 0 -5887.5 0 0 0
+	load 364 0 0 -5887.5 0 0 0
+	load 344 0 0 -5887.5 0 0 0
+	load 345 0 0 -5887.5 0 0 0
+	load 366 0 0 -5887.5 0 0 0
+	load 365 0 0 -5887.5 0 0 0
+	load 345 0 0 -5887.5 0 0 0
+	load 346 0 0 -5887.5 0 0 0
+	load 367 0 0 -5887.5 0 0 0
+	load 366 0 0 -5887.5 0 0 0
+	load 346 0 0 -5887.5 0 0 0
+	load 347 0 0 -5887.5 0 0 0
+	load 17 0 0 -5887.5 0 0 0
+	load 367 0 0 -5887.5 0 0 0
+	load 347 0 0 -5887.5 0 0 0
+	load 348 0 0 -5887.5 0 0 0
+	load 368 0 0 -5887.5 0 0 0
+	load 17 0 0 -5887.5 0 0 0
+	load 350 0 0 -5887.5 0 0 0
+	load 349 0 0 -5887.5 0 0 0
+	load 369 0 0 -5887.5 0 0 0
+	load 370 0 0 -5887.5 0 0 0
+	load 349 0 0 -5887.5 0 0 0
+	load 351 0 0 -5887.5 0 0 0
+	load 1 0 0 -5887.5 0 0 0
+	load 369 0 0 -5887.5 0 0 0
+	load 351 0 0 -5887.5 0 0 0
+	load 352 0 0 -5887.5 0 0 0
+	load 371 0 0 -5887.5 0 0 0
+	load 1 0 0 -5887.5 0 0 0
+	load 352 0 0 -5887.5 0 0 0
+	load 353 0 0 -5887.5 0 0 0
+	load 372 0 0 -5887.5 0 0 0
+	load 371 0 0 -5887.5 0 0 0
+	load 353 0 0 -5887.5 0 0 0
+	load 354 0 0 -5887.5 0 0 0
+	load 373 0 0 -5887.5 0 0 0
+	load 372 0 0 -5887.5 0 0 0
+	load 354 0 0 -5887.5 0 0 0
+	load 355 0 0 -5887.5 0 0 0
+	load 374 0 0 -5887.5 0 0 0
+	load 373 0 0 -5887.5 0 0 0
+	load 355 0 0 -5887.5 0 0 0
+	load 356 0 0 -5887.5 0 0 0
+	load 375 0 0 -5887.5 0 0 0
+	load 374 0 0 -5887.5 0 0 0
+	load 356 0 0 -5887.5 0 0 0
+	load 357 0 0 -5887.5 0 0 0
+	load 376 0 0 -5887.5 0 0 0
+	load 375 0 0 -5887.5 0 0 0
+	load 357 0 0 -5887.5 0 0 0
+	load 358 0 0 -5887.5 0 0 0
+	load 377 0 0 -5887.5 0 0 0
+	load 376 0 0 -5887.5 0 0 0
+	load 358 0 0 -5887.5 0 0 0
+	load 359 0 0 -5887.5 0 0 0
+	load 378 0 0 -5887.5 0 0 0
+	load 377 0 0 -5887.5 0 0 0
+	load 359 0 0 -5887.5 0 0 0
+	load 360 0 0 -5887.5 0 0 0
+	load 379 0 0 -5887.5 0 0 0
+	load 378 0 0 -5887.5 0 0 0
+	load 360 0 0 -5887.5 0 0 0
+	load 361 0 0 -5887.5 0 0 0
+	load 380 0 0 -5887.5 0 0 0
+	load 379 0 0 -5887.5 0 0 0
+	load 361 0 0 -5887.5 0 0 0
+	load 362 0 0 -5887.5 0 0 0
+	load 381 0 0 -5887.5 0 0 0
+	load 380 0 0 -5887.5 0 0 0
+	load 362 0 0 -5887.5 0 0 0
+	load 363 0 0 -5887.5 0 0 0
+	load 382 0 0 -5887.5 0 0 0
+	load 381 0 0 -5887.5 0 0 0
+	load 363 0 0 -5887.5 0 0 0
+	load 364 0 0 -5887.5 0 0 0
+	load 383 0 0 -5887.5 0 0 0
+	load 382 0 0 -5887.5 0 0 0
+	load 364 0 0 -5887.5 0 0 0
+	load 365 0 0 -5887.5 0 0 0
+	load 384 0 0 -5887.5 0 0 0
+	load 383 0 0 -5887.5 0 0 0
+	load 365 0 0 -5887.5 0 0 0
+	load 366 0 0 -5887.5 0 0 0
+	load 385 0 0 -5887.5 0 0 0
+	load 384 0 0 -5887.5 0 0 0
+	load 366 0 0 -5887.5 0 0 0
+	load 367 0 0 -5887.5 0 0 0
+	load 386 0 0 -5887.5 0 0 0
+	load 385 0 0 -5887.5 0 0 0
+	load 367 0 0 -5887.5 0 0 0
+	load 17 0 0 -5887.5 0 0 0
+	load 387 0 0 -5887.5 0 0 0
+	load 386 0 0 -5887.5 0 0 0
+	load 17 0 0 -5887.5 0 0 0
+	load 368 0 0 -5887.5 0 0 0
+	load 388 0 0 -5887.5 0 0 0
+	load 387 0 0 -5887.5 0 0 0
+	load 370 0 0 -5887.5 0 0 0
+	load 369 0 0 -5887.5 0 0 0
+	load 389 0 0 -5887.5 0 0 0
+	load 390 0 0 -5887.5 0 0 0
+	load 369 0 0 -5887.5 0 0 0
+	load 1 0 0 -5887.5 0 0 0
+	load 391 0 0 -5887.5 0 0 0
+	load 389 0 0 -5887.5 0 0 0
+	load 1 0 0 -5887.5 0 0 0
+	load 371 0 0 -5887.5 0 0 0
+	load 392 0 0 -5887.5 0 0 0
+	load 391 0 0 -5887.5 0 0 0
+	load 371 0 0 -5887.5 0 0 0
+	load 372 0 0 -5887.5 0 0 0
+	load 393 0 0 -5887.5 0 0 0
+	load 392 0 0 -5887.5 0 0 0
+	load 372 0 0 -5887.5 0 0 0
+	load 373 0 0 -5887.5 0 0 0
+	load 394 0 0 -5887.5 0 0 0
+	load 393 0 0 -5887.5 0 0 0
+	load 373 0 0 -5887.5 0 0 0
+	load 374 0 0 -5887.5 0 0 0
+	load 395 0 0 -5887.5 0 0 0
+	load 394 0 0 -5887.5 0 0 0
+	load 374 0 0 -5887.5 0 0 0
+	load 375 0 0 -5887.5 0 0 0
+	load 396 0 0 -5887.5 0 0 0
+	load 395 0 0 -5887.5 0 0 0
+	load 375 0 0 -5887.5 0 0 0
+	load 376 0 0 -5887.5 0 0 0
+	load 397 0 0 -5887.5 0 0 0
+	load 396 0 0 -5887.5 0 0 0
+	load 376 0 0 -5887.5 0 0 0
+	load 377 0 0 -5887.5 0 0 0
+	load 398 0 0 -5887.5 0 0 0
+	load 397 0 0 -5887.5 0 0 0
+	load 377 0 0 -5887.5 0 0 0
+	load 378 0 0 -5887.5 0 0 0
+	load 399 0 0 -5887.5 0 0 0
+	load 398 0 0 -5887.5 0 0 0
+	load 378 0 0 -5887.5 0 0 0
+	load 379 0 0 -5887.5 0 0 0
+	load 400 0 0 -5887.5 0 0 0
+	load 399 0 0 -5887.5 0 0 0
+	load 379 0 0 -5887.5 0 0 0
+	load 380 0 0 -5887.5 0 0 0
+	load 401 0 0 -5887.5 0 0 0
+	load 400 0 0 -5887.5 0 0 0
+	load 380 0 0 -5887.5 0 0 0
+	load 381 0 0 -5887.5 0 0 0
+	load 402 0 0 -5887.5 0 0 0
+	load 401 0 0 -5887.5 0 0 0
+	load 381 0 0 -5887.5 0 0 0
+	load 382 0 0 -5887.5 0 0 0
+	load 403 0 0 -5887.5 0 0 0
+	load 402 0 0 -5887.5 0 0 0
+	load 382 0 0 -5887.5 0 0 0
+	load 383 0 0 -5887.5 0 0 0
+	load 404 0 0 -5887.5 0 0 0
+	load 403 0 0 -5887.5 0 0 0
+	load 383 0 0 -5887.5 0 0 0
+	load 384 0 0 -5887.5 0 0 0
+	load 405 0 0 -5887.5 0 0 0
+	load 404 0 0 -5887.5 0 0 0
+	load 384 0 0 -5887.5 0 0 0
+	load 385 0 0 -5887.5 0 0 0
+	load 406 0 0 -5887.5 0 0 0
+	load 405 0 0 -5887.5 0 0 0
+	load 385 0 0 -5887.5 0 0 0
+	load 386 0 0 -5887.5 0 0 0
+	load 407 0 0 -5887.5 0 0 0
+	load 406 0 0 -5887.5 0 0 0
+	load 386 0 0 -5887.5 0 0 0
+	load 387 0 0 -5887.5 0 0 0
+	load 408 0 0 -5887.5 0 0 0
+	load 407 0 0 -5887.5 0 0 0
+	load 387 0 0 -5887.5 0 0 0
+	load 388 0 0 -5887.5 0 0 0
+	load 409 0 0 -5887.5 0 0 0
+	load 408 0 0 -5887.5 0 0 0
+	load 390 0 0 -5887.5 0 0 0
+	load 389 0 0 -5887.5 0 0 0
+	load 410 0 0 -5887.5 0 0 0
+	load 411 0 0 -5887.5 0 0 0
+	load 389 0 0 -5887.5 0 0 0
+	load 391 0 0 -5887.5 0 0 0
+	load 412 0 0 -5887.5 0 0 0
+	load 410 0 0 -5887.5 0 0 0
+	load 391 0 0 -5887.5 0 0 0
+	load 392 0 0 -5887.5 0 0 0
+	load 413 0 0 -5887.5 0 0 0
+	load 412 0 0 -5887.5 0 0 0
+	load 392 0 0 -5887.5 0 0 0
+	load 393 0 0 -5887.5 0 0 0
+	load 414 0 0 -5887.5 0 0 0
+	load 413 0 0 -5887.5 0 0 0
+	load 393 0 0 -5887.5 0 0 0
+	load 394 0 0 -5887.5 0 0 0
+	load 415 0 0 -5887.5 0 0 0
+	load 414 0 0 -5887.5 0 0 0
+	load 394 0 0 -5887.5 0 0 0
+	load 395 0 0 -5887.5 0 0 0
+	load 416 0 0 -5887.5 0 0 0
+	load 415 0 0 -5887.5 0 0 0
+	load 395 0 0 -5887.5 0 0 0
+	load 396 0 0 -5887.5 0 0 0
+	load 417 0 0 -5887.5 0 0 0
+	load 416 0 0 -5887.5 0 0 0
+	load 396 0 0 -5887.5 0 0 0
+	load 397 0 0 -5887.5 0 0 0
+	load 418 0 0 -5887.5 0 0 0
+	load 417 0 0 -5887.5 0 0 0
+	load 397 0 0 -5887.5 0 0 0
+	load 398 0 0 -5887.5 0 0 0
+	load 419 0 0 -5887.5 0 0 0
+	load 418 0 0 -5887.5 0 0 0
+	load 398 0 0 -5887.5 0 0 0
+	load 399 0 0 -5887.5 0 0 0
+	load 420 0 0 -5887.5 0 0 0
+	load 419 0 0 -5887.5 0 0 0
+	load 399 0 0 -5887.5 0 0 0
+	load 400 0 0 -5887.5 0 0 0
+	load 421 0 0 -5887.5 0 0 0
+	load 420 0 0 -5887.5 0 0 0
+	load 400 0 0 -5887.5 0 0 0
+	load 401 0 0 -5887.5 0 0 0
+	load 422 0 0 -5887.5 0 0 0
+	load 421 0 0 -5887.5 0 0 0
+	load 401 0 0 -5887.5 0 0 0
+	load 402 0 0 -5887.5 0 0 0
+	load 423 0 0 -5887.5 0 0 0
+	load 422 0 0 -5887.5 0 0 0
+	load 402 0 0 -5887.5 0 0 0
+	load 403 0 0 -5887.5 0 0 0
+	load 424 0 0 -5887.5 0 0 0
+	load 423 0 0 -5887.5 0 0 0
+	load 403 0 0 -5887.5 0 0 0
+	load 404 0 0 -5887.5 0 0 0
+	load 425 0 0 -5887.5 0 0 0
+	load 424 0 0 -5887.5 0 0 0
+	load 404 0 0 -5887.5 0 0 0
+	load 405 0 0 -5887.5 0 0 0
+	load 426 0 0 -5887.5 0 0 0
+	load 425 0 0 -5887.5 0 0 0
+	load 405 0 0 -5887.5 0 0 0
+	load 406 0 0 -5887.5 0 0 0
+	load 427 0 0 -5887.5 0 0 0
+	load 426 0 0 -5887.5 0 0 0
+	load 406 0 0 -5887.5 0 0 0
+	load 407 0 0 -5887.5 0 0 0
+	load 428 0 0 -5887.5 0 0 0
+	load 427 0 0 -5887.5 0 0 0
+	load 407 0 0 -5887.5 0 0 0
+	load 408 0 0 -5887.5 0 0 0
+	load 429 0 0 -5887.5 0 0 0
+	load 428 0 0 -5887.5 0 0 0
+	load 408 0 0 -5887.5 0 0 0
+	load 409 0 0 -5887.5 0 0 0
+	load 430 0 0 -5887.5 0 0 0
+	load 429 0 0 -5887.5 0 0 0
+	load 411 0 0 -5887.5 0 0 0
+	load 410 0 0 -5887.5 0 0 0
+	load 431 0 0 -5887.5 0 0 0
+	load 432 0 0 -5887.5 0 0 0
+	load 410 0 0 -5887.5 0 0 0
+	load 412 0 0 -5887.5 0 0 0
+	load 433 0 0 -5887.5 0 0 0
+	load 431 0 0 -5887.5 0 0 0
+	load 412 0 0 -5887.5 0 0 0
+	load 413 0 0 -5887.5 0 0 0
+	load 434 0 0 -5887.5 0 0 0
+	load 433 0 0 -5887.5 0 0 0
+	load 413 0 0 -5887.5 0 0 0
+	load 414 0 0 -5887.5 0 0 0
+	load 435 0 0 -5887.5 0 0 0
+	load 434 0 0 -5887.5 0 0 0
+	load 414 0 0 -5887.5 0 0 0
+	load 415 0 0 -5887.5 0 0 0
+	load 436 0 0 -5887.5 0 0 0
+	load 435 0 0 -5887.5 0 0 0
+	load 415 0 0 -5887.5 0 0 0
+	load 416 0 0 -5887.5 0 0 0
+	load 437 0 0 -5887.5 0 0 0
+	load 436 0 0 -5887.5 0 0 0
+	load 416 0 0 -5887.5 0 0 0
+	load 417 0 0 -5887.5 0 0 0
+	load 438 0 0 -5887.5 0 0 0
+	load 437 0 0 -5887.5 0 0 0
+	load 417 0 0 -5887.5 0 0 0
+	load 418 0 0 -5887.5 0 0 0
+	load 439 0 0 -5887.5 0 0 0
+	load 438 0 0 -5887.5 0 0 0
+	load 418 0 0 -5887.5 0 0 0
+	load 419 0 0 -5887.5 0 0 0
+	load 440 0 0 -5887.5 0 0 0
+	load 439 0 0 -5887.5 0 0 0
+	load 419 0 0 -5887.5 0 0 0
+	load 420 0 0 -5887.5 0 0 0
+	load 441 0 0 -5887.5 0 0 0
+	load 440 0 0 -5887.5 0 0 0
+	load 420 0 0 -5887.5 0 0 0
+	load 421 0 0 -5887.5 0 0 0
+	load 442 0 0 -5887.5 0 0 0
+	load 441 0 0 -5887.5 0 0 0
+	load 421 0 0 -5887.5 0 0 0
+	load 422 0 0 -5887.5 0 0 0
+	load 443 0 0 -5887.5 0 0 0
+	load 442 0 0 -5887.5 0 0 0
+	load 422 0 0 -5887.5 0 0 0
+	load 423 0 0 -5887.5 0 0 0
+	load 444 0 0 -5887.5 0 0 0
+	load 443 0 0 -5887.5 0 0 0
+	load 423 0 0 -5887.5 0 0 0
+	load 424 0 0 -5887.5 0 0 0
+	load 445 0 0 -5887.5 0 0 0
+	load 444 0 0 -5887.5 0 0 0
+	load 424 0 0 -5887.5 0 0 0
+	load 425 0 0 -5887.5 0 0 0
+	load 446 0 0 -5887.5 0 0 0
+	load 445 0 0 -5887.5 0 0 0
+	load 425 0 0 -5887.5 0 0 0
+	load 426 0 0 -5887.5 0 0 0
+	load 447 0 0 -5887.5 0 0 0
+	load 446 0 0 -5887.5 0 0 0
+	load 426 0 0 -5887.5 0 0 0
+	load 427 0 0 -5887.5 0 0 0
+	load 448 0 0 -5887.5 0 0 0
+	load 447 0 0 -5887.5 0 0 0
+	load 427 0 0 -5887.5 0 0 0
+	load 428 0 0 -5887.5 0 0 0
+	load 449 0 0 -5887.5 0 0 0
+	load 448 0 0 -5887.5 0 0 0
+	load 428 0 0 -5887.5 0 0 0
+	load 429 0 0 -5887.5 0 0 0
+	load 450 0 0 -5887.5 0 0 0
+	load 449 0 0 -5887.5 0 0 0
+	load 429 0 0 -5887.5 0 0 0
+	load 430 0 0 -5887.5 0 0 0
+	load 451 0 0 -5887.5 0 0 0
+	load 450 0 0 -5887.5 0 0 0
+	load 1 0 0 -6750.99999999997 0 0 0
+	load 2 0 0 -6750.99999999997 0 0 0
+	load 3 0 0 -6750.99999999997 0 0 0
+	load 4 0 0 -6750.99999999997 0 0 0
+	load 5 0 0 -6750.99999999997 0 0 0
+	load 6 0 0 -6750.99999999997 0 0 0
+	load 7 0 0 -6750.99999999997 0 0 0
+	load 8 0 0 -6750.99999999997 0 0 0
+	load 9 0 0 -6750.99999999997 0 0 0
+	load 10 0 0 -6750.99999999997 0 0 0
+	load 11 0 0 -6750.99999999997 0 0 0
+	load 12 0 0 -6750.99999999997 0 0 0
+	load 13 0 0 -6750.99999999997 0 0 0
+	load 14 0 0 -6750.99999999997 0 0 0
+	load 15 0 0 -6750.99999999997 0 0 0
+	load 16 0 0 -6750.99999999997 0 0 0
+	load 17 0 0 -6750.99999999997 0 0 0
+	load 18 0 0 -6750.99999999997 0 0 0
+	load 19 0 0 -6750.99999999997 0 0 0
+	load 20 0 0 -6750.99999999997 0 0 0
+}
+recorder mpco recorder.mpco -N  displacement rotation reactionForce reactionMoment -E  force stresses section.force
+constraints Transformation
+numberer RCM
+system BandGen
+test EnergyIncr 1E-08 10 0 2 
+algorithm Linear
+integrator LoadControl 1   
+analysis Static
+analyze 5    wipe

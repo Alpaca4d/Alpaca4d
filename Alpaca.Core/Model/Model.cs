@@ -223,6 +223,56 @@ namespace Alpaca4d
             return beamDefModel;
         }
 
+
+        // 3d visualisation
+        // WIP
+        public List<Mesh> DeformedBeam(int step, double scale, List<System.Drawing.Color> colors, double min, double max)
+        {
+            var dispDictionary = this.NodalDisplacements(step);
+
+            var beamDefModel = new List<Mesh>();
+
+            foreach (var beam in this.Beams)
+            {
+                var beamCurve = beam.Curve;
+
+                var startVector = new Rhino.Geometry.Vector3d(dispDictionary[(int)beam.INode]) * scale;
+                var endvector = new Rhino.Geometry.Vector3d(dispDictionary[(int)beam.JNode]) * scale;
+                
+
+                var beamDeformed = new Rhino.Geometry.LineCurve(beamCurve.PointAtStart + startVector, beamCurve.PointAtEnd + endvector);
+
+                var curve = beamDeformed;
+                var section = beam.Section.Curves[0];
+
+                var localY = beam.GeomTransf.LocalY;
+                var localZ = beam.GeomTransf.LocalZ;
+                var planeStart = new Rhino.Geometry.Plane(curve.PointAtStart, localZ, localY);
+                var planeEnd = new Rhino.Geometry.Plane(curve.PointAtEnd, localZ, localY);
+
+                var transfEnd = Rhino.Geometry.Transform.PlaneToPlane(Plane.WorldXY, planeStart);
+                var transfStart = Rhino.Geometry.Transform.PlaneToPlane(Plane.WorldXY, planeEnd);
+
+                var sectionStart = section.DuplicateCurve();
+                var sectionEnd = section.DuplicateCurve();
+
+                sectionStart.Transform(transfStart);
+                sectionEnd.Transform(transfEnd);
+
+
+                var polyStart = sectionStart.ToPolyline(0, 0, 0, 0).ToPolyline();
+                var polyEnd = sectionEnd.ToPolyline(0, 0, 0, 0).ToPolyline();
+                var sections = new List<Rhino.Geometry.Polyline> { polyStart, polyEnd };
+
+                var beamMesh = Alpaca4d.Utils.CreateLoft(sections, new List<double> { startVector.Length, endvector.Length }, colors, min, max);
+
+                beamDefModel.Add(beamMesh);
+            }
+
+
+            return beamDefModel;
+        }
+
         public List<Mesh> DeformedShell(int step, double scale, List<System.Drawing.Color> colors)
         {
             var dispDictionary = this.NodalDisplacements(step);

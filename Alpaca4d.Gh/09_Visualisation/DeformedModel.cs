@@ -31,6 +31,8 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddColourParameter("Colors", "Colors", "", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
+            pManager.AddIntervalParameter("Range", "Range", "", GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -59,22 +61,25 @@ namespace Alpaca4d.Gh
             double scale = 1.0;
             DA.GetData(2, ref scale);
 
+            Rhino.Geometry.Interval domain = new Rhino.Geometry.Interval();
+            DA.GetData(4, ref domain);
+
             List<System.Drawing.Color> colors = new List<System.Drawing.Color>();
             List<Mesh> mesh = null;
             List<Mesh> bricks = null;
-            List<Curve> lines = null;
+            List<Mesh> lines = null;
 
             if (DA.GetDataList(3, colors))
 			{
                 mesh = model.DeformedShell(step, scale, colors);
-                lines = model.DeformedBeam(step, scale);
+                lines = model.DeformedBeam(step, scale, colors, domain.Min, domain.Max);
                 bricks = model.DeformedBrick(step, scale, colors);
             }
 			else
 			{
                 colors = Alpaca4d.Colors.Gradient(11);
                 mesh = model.DeformedShell(step, scale, colors);
-                lines = model.DeformedBeam(step, scale);
+                lines = model.DeformedBeam(step, scale, colors, domain.Min, domain.Max);
                 bricks = model.DeformedBrick(step, scale, colors);
             }
 

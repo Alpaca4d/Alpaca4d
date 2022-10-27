@@ -16,14 +16,14 @@ namespace Alpaca4d
     public partial class Colors
     {
 
-        internal static byte interpolate(byte a, byte b, double p)
+        public static byte interpolate(byte a, byte b, double p)
         {
             return (byte)(a * (1 - p) + b * p);
         }
 
-        internal static Color GetColor(double v, SortedDictionary<double, Color> d)
+        public static Color GetColor(double v, SortedDictionary<double, Color> d)
         {
-            KeyValuePair<double, Color> kvp_previous = new KeyValuePair<double, Color>(-1, Color.Black);
+            KeyValuePair<double, Color> kvp_previous = new KeyValuePair<double, Color>(-1, d.Values.First());
             foreach (KeyValuePair<double, Color> kvp in d)
             {
                 if (kvp.Key > v)
@@ -44,7 +44,7 @@ namespace Alpaca4d
                 kvp_previous = kvp;
             }
 
-            return Color.Black;
+            return d.Values.Last();
         }
 
         public static List<System.Drawing.Color> Gradient(int index)
