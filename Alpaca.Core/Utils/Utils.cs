@@ -245,7 +245,7 @@ namespace Alpaca4d
             var d = new SortedDictionary<double, System.Drawing.Color>();
 
             var numberOfColors = iColors.Count;
-            var range = max - max;
+
             var diff = (max - min) / (numberOfColors - 1);
 
             var start = min;

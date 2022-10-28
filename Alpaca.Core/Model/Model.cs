@@ -236,6 +236,9 @@ namespace Alpaca4d
             {
                 var beamCurve = beam.Curve;
 
+                var startVctr = new Rhino.Geometry.Vector3d(dispDictionary[(int)beam.INode]);
+                var endVctr = new Rhino.Geometry.Vector3d(dispDictionary[(int)beam.JNode]);
+
                 var startVector = new Rhino.Geometry.Vector3d(dispDictionary[(int)beam.INode]) * scale;
                 var endvector = new Rhino.Geometry.Vector3d(dispDictionary[(int)beam.JNode]) * scale;
                 
@@ -264,7 +267,7 @@ namespace Alpaca4d
                 var polyEnd = sectionEnd.ToPolyline(0, 0, 0, 0).ToPolyline();
                 var sections = new List<Rhino.Geometry.Polyline> { polyStart, polyEnd };
 
-                var beamMesh = Alpaca4d.Utils.CreateLoft(sections, new List<double> { startVector.Length, endvector.Length }, colors, min, max);
+                var beamMesh = Alpaca4d.Utils.CreateLoft(sections, new List<double> { startVctr.Length, endVctr.Length }, colors, min, max);
 
                 beamDefModel.Add(beamMesh);
             }
