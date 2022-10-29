@@ -35,9 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Eto, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Eto.Forms.2.7.1\lib\netstandard2.0\Eto.dll</HintPath>
-    </Reference>
     <Reference Include="HDF.PInvoke.1.10, Version=1.10.612.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HDF.PInvoke.1.10.1.10.612\lib\netstandard2.0\HDF.PInvoke.1.10.dll</HintPath>
     </Reference>
@@ -164,7 +161,6 @@
     <Compile Include="Constraint\RigidDiaphragm.cs" />
     <Compile Include="Visualisation\Geometries.cs" />
     <Compile Include="Loads\Load.cs" />
-    <Compile Include="Utils\Forms.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

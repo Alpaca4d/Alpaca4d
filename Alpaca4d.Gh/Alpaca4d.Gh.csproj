@@ -51,7 +51,406 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Remove="Resources\Analysis settings %28Alpaca4d%29.png" />
+    <None Remove="Resources\ASD ShellQ4 %28Alpaca4d%29.png" />
+    <None Remove="Resources\Assemble Model %28Alpaca4d%29.png" />
+    <None Remove="Resources\Beam Forces %28Alpaca4d%29.png" />
+    <None Remove="Resources\BeamForcesDiagram %28Alpaca4d%29.png" />
+    <None Remove="Resources\Bending Prestress %28Alpaca4d%29.png" />
+    <None Remove="Resources\brick Disp %28Alpaca4d%29.png" />
+    <None Remove="Resources\Brick Stresses %28Alpaca4d%29.png" />
+    <None Remove="Resources\Buy Me a Coffee.png" />
+    <None Remove="Resources\Capture Viewport %28Alpaca4d%29.png" />
+    <None Remove="Resources\Central Difference %28Alpaca4d%29.png" />
+    <None Remove="Resources\Circular cross section.png" />
+    <None Remove="Resources\Colors %28Alpaca4d%29.png" />
+    <None Remove="Resources\concreate01.png" />
+    <None Remove="Resources\concreate02.png" />
+    <None Remove="Resources\Constant Time Series %28Alpaca4d%29.png" />
+    <None Remove="Resources\Counter %28Alpaca4d%29.png" />
+    <None Remove="Resources\defModel.png" />
+    <None Remove="Resources\Deformed Model %28Alpaca4d%29.png" />
+    <None Remove="Resources\Deserialize %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble Beam Element %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble Brick Element %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble CrossSection %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble Load %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble Material %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble Model %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble Shell Element %28Alpaca4d%29.png" />
+    <None Remove="Resources\Disassemble_Beam.png" />
+    <None Remove="Resources\disassemble_load.png" />
+    <None Remove="Resources\disassemble_material.png" />
+    <None Remove="Resources\dissassemble.png" />
+    <None Remove="Resources\Elastic Isotropic Material %28Alpaca4d%29.png" />
+    <None Remove="Resources\Elastic Orthotropic Material %28Alpaca4d%29.png" />
+    <None Remove="Resources\Equal DOF %28Alpaca4d%29.png" />
+    <None Remove="Resources\Fiber Aggregated%28Alpaca4d%29.png" />
+    <None Remove="Resources\Fiber Point %28Alpaca4d%29.png" />
+    <None Remove="Resources\Fiber section %28Alpaca4d%29.png" />
+    <None Remove="Resources\Force Beam Column %28Alpaca4d%29.png" />
+    <None Remove="Resources\Force Beam Column Attributes %28Alpaca4d%29.png" />
+    <None Remove="Resources\formatengineers.png" />
+    <None Remove="Resources\Four Node Tetrahedron %28Alpaca4d%29.png" />
+    <None Remove="Resources\Generic Section %28Alpaca4d%29.png" />
+    <None Remove="Resources\Gravity Load %28Alpaca4d%29.png" />
+    <None Remove="Resources\I Section %28Alpaca4d%29.png" />
+    <None Remove="Resources\Karamba to Alpaca %28Alpaca4d%29.png" />
+    <None Remove="Resources\layer %28Alpaca4d%29.png" />
+    <None Remove="Resources\Layered Shell %28Alpaca4d%29.png" />
+    <None Remove="Resources\Legend %28Alpaca4d%29.png" />
+    <None Remove="Resources\Line load.png" />
+    <None Remove="Resources\Linear Time Series %28Alpaca4d%29.png" />
+    <None Remove="Resources\Load Control Integrator %28Alpaca4d%29.png" />
+    <None Remove="Resources\Logo.png" />
+    <None Remove="Resources\Mass Point %28Alpaca4d%29.png" />
+    <None Remove="Resources\Mesh Loft %28Alpaca4d%29.png" />
+    <None Remove="Resources\Mesh Series to Brick %28Alpaca4d%29.png" />
+    <None Remove="Resources\meshForces.png" />
+    <None Remove="Resources\MeshLoad %28Alpaca4d%29.png" />
+    <None Remove="Resources\MinMax.png" />
+    <None Remove="Resources\MinMax2.png" />
+    <None Remove="Resources\Modal Analysis Report %28Alpaca4d%29.png" />
+    <None Remove="Resources\modalView.png" />
+    <None Remove="Resources\model View %28Alpaca4d%29.png" />
+    <None Remove="Resources\Moment Curvature Model %28Alpaca4d%29.png" />
+    <None Remove="Resources\Newmark Integrator %28Alpaca4d%29.png" />
+    <None Remove="Resources\Nodal Displacements %28Alpaca4d%29.png" />
+    <None Remove="Resources\Patch %28Alpaca4d%29.png" />
+    <None Remove="Resources\Path Time Series %28Alpaca4d%29.png" />
+    <None Remove="Resources\Patreon Supporter %28Alpaca4d%29.png" />
+    <None Remove="Resources\Periodic Time Series %28Alpaca4d%29.png" />
+    <None Remove="Resources\Plate Fiber %28Alpaca4d%29.png" />
+    <None Remove="Resources\Point Load %28Alpaca4d%29.png" />
+    <None Remove="Resources\Rayleigh Damping %28Alpaca4d%29.png" />
+    <None Remove="Resources\Reaction Forces %28Alpaca4d%29.png" />
+    <None Remove="Resources\Read Time History %28Alpaca4d%29.png" />
+    <None Remove="Resources\Rectangular Hollow cross section %28Alpaca4d%29.png" />
+    <None Remove="Resources\Rectangular Section %28Alpaca4d%29.png" />
+    <None Remove="Resources\reinforcing steel material.png" />
+    <None Remove="Resources\Response Spectrum %28Alpaca4d%29.png" />
+    <None Remove="Resources\Rigid Diaphgram %28Alpaca4d%29.png" />
+    <None Remove="Resources\Run Analysis %28Alpaca4d%29.png" />
+    <None Remove="Resources\Run Natural Vibration Analysis %28Alpaca4d%29.png" />
+    <None Remove="Resources\Serialize.png" />
+    <None Remove="Resources\Shell MITC4 %28Alpaca4d%29.png" />
+    <None Remove="Resources\shellDisp.png" />
+    <None Remove="Resources\shellStress.png" />
+    <None Remove="Resources\Sponsors\become a sponsor.png" />
+    <None Remove="Resources\SSP brick %28Alpaca4d%29.png" />
+    <None Remove="Resources\Steel Properties %28Alpaca4d%29.png" />
+    <None Remove="Resources\stressShell.png" />
+    <None Remove="Resources\Support %28Alpaca4d%29.png" />
+    <None Remove="Resources\Tab.png" />
+    <None Remove="Resources\Text to model %28Alpaca4d%29.png" />
+    <None Remove="Resources\Timber beam utilisation %28Alpaca4d%29.png" />
+    <None Remove="Resources\Timber Properties %28Alpaca4d%29.png" />
+    <None Remove="Resources\uniaxial Elastic Material %28Alpaca4d%29.png" />
+    <None Remove="Resources\Uniaxial Material_steal01.png" />
+    <None Remove="Resources\Uniaxial Material_steal02.png" />
+    <None Remove="Resources\Uniform excitation.png" />
+    <None Remove="Resources\View Brick Stresses %28Alpaca4d%29.png" />
     <None Remove="RhinoCommon" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Analysis settings (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ASD ShellQ4 (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Assemble Model (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Beam Forces (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\BeamForcesDiagram (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Bending Prestress (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\brick Disp (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Brick Stresses (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Buy Me a Coffee.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Capture Viewport (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Central Difference (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Circular cross section.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Colors (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\concreate01.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\concreate02.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Constant Time Series (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Counter (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\defModel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Deformed Model (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Deserialize (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble Beam Element (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble Brick Element (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble CrossSection (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble Load (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble Material (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble Model (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble Shell Element (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Disassemble_Beam.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\disassemble_load.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\disassemble_material.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\dissassemble.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Elastic Isotropic Material (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Elastic Orthotropic Material (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Equal DOF (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Fiber Aggregated(Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Fiber Point (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Fiber section (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Force Beam Column (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Force Beam Column Attributes (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Sponsors\become a sponsor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Sponsors\formatengineers.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Four Node Tetrahedron (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Generic Section (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Gravity Load (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\I Section (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Karamba to Alpaca (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\layer (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Layered Shell (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Legend (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Line load.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Linear Time Series (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Load Control Integrator (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Mass Point (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Mesh Loft (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Mesh Series to Brick (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\meshForces.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MeshLoad (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MinMax.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MinMax2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Modal Analysis Report (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\modalView.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\model View (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Moment Curvature Model (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Newmark Integrator (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Nodal Displacements (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Patch (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Path Time Series (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Patreon Supporter (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Periodic Time Series (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Plate Fiber (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Point Load (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Rayleigh Damping (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Reaction Forces (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Read Time History (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Rectangular Hollow cross section (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Rectangular Section (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\reinforcing steel material.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Response Spectrum (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Rigid Diaphgram (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Run Analysis (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Run Natural Vibration Analysis (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Serialize.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Shell MITC4 (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\shellDisp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\shellStress.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SSP brick (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Steel Properties (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\stressShell.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Support (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Tab.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Text to model (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Timber beam utilisation (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Timber Properties (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\uniaxial Elastic Material (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Uniaxial Material_steal01.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Uniaxial Material_steal02.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Uniform excitation.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\View Brick Stresses (Alpaca4d).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>

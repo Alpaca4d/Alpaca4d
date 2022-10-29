@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Eto;
 using Eto.Forms;
 using Eto.Drawing;
+using System.Reflection;
 
-namespace Alpaca4d.Forms
+namespace Alpaca4d.Gh.Forms
 {
     public partial class Advertise
     {
@@ -27,10 +28,14 @@ namespace Alpaca4d.Forms
             windows.Icon = new Eto.Drawing.Icon(@"C:\GitHub\Alpaca4d\Alpaca4d.Gh\Resources\Tab.png");
 
             var imageView = new Eto.Forms.ImageView();
-            var imagePaths = System.IO.Directory.GetFiles(Alpaca4d.Application.GhAlpacaFolder, "*_adv.png", System.IO.SearchOption.AllDirectories);
-            var index = new Random().Next(imagePaths.Count());
 
-            imageView.Image = new Eto.Drawing.Bitmap(imagePaths.ElementAt(index));
+            Assembly.GetCallingAssembly();
+            //var imagePaths = System.IO.Directory.GetFiles(Alpaca4d.Application.GhAlpacaFolder, "*_adv.png", System.IO.SearchOption.AllDirectories);
+            //var index = new Random().Next(imagePaths.Count());Alpaca4d.Gh.Resources.Sponsors.formatengineers
+
+            imageView.Image = Eto.Drawing.Bitmap.FromResource("Alpaca4d.Gh.Resources.Sponsors.become a sponsor.png");
+            // add button to send an email
+            //imageView.Image = new Eto.Drawing.Bitmap(imagePaths.ElementAt(index));
 
             windows.Content = imageView;
             windows.Show();

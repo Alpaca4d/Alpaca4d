@@ -64,6 +64,13 @@ namespace Alpaca4d.Gh
             string solver = "";
             DA.GetData(2, ref solver);
 
+
+            if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+            {
+                new Alpaca4d.Gh.Forms.Advertise();
+            }
+
+
             // create a shallow copy
             var analysisModel = model.ShallowCopy();
             analysisModel.Tcl = new List<string>(analysisModel.Tcl);
