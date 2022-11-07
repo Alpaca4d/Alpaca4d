@@ -43,7 +43,7 @@ namespace Alpaca4d.Gh
             var polys = curves.ConvertAll(crv =>
             {
                 if (!crv.TryGetPolyline(out Polyline poly))
-                    throw new ArgumentException();
+                    throw new Exception("Input Curve is not 'Line' or 'Polyline'");
 
                 return poly;
             });

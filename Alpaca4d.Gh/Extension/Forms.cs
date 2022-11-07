@@ -31,7 +31,6 @@ namespace Alpaca4d.Gh.Forms
 
             Assembly.GetCallingAssembly();
             //var imagePaths = System.IO.Directory.GetFiles(Alpaca4d.Application.GhAlpacaFolder, "*_adv.png", System.IO.SearchOption.AllDirectories);
-            //var index = new Random().Next(imagePaths.Count());Alpaca4d.Gh.Resources.Sponsors.formatengineers
 
             imageView.Image = Eto.Drawing.Bitmap.FromResource("Alpaca4d.Gh.Resources.Sponsors.become a sponsor.png");
             // add button to send an email
