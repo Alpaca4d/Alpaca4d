@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("TimeSeriesType", "TimeSeriesType", "Constant, Linear", GH_ParamAccess.item, "Constant");
-            pManager.AddNumberParameter("GFactor", "GFactor", "", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("GFactor", "GFactor", "", GH_ParamAccess.item, 9.81);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -47,21 +47,21 @@ namespace Alpaca4d.Gh
             var timeSeriesType = "Constant";
             DA.GetData(0, ref timeSeriesType);
 
-            var gFactor = 1.0;
+            var gFactor = 9.81;
             DA.GetData(1, ref gFactor);
 
             Alpaca4d.Generic.ITimeSeries timeSeries = null;
             if (timeSeriesType == TimeSeriesType.Constant.ToString())
-                timeSeries = new Alpaca4d.TimeSeries.Constant(gFactor);
+                timeSeries = new Alpaca4d.TimeSeries.Constant(1);
             else if (timeSeriesType == TimeSeriesType.Linear.ToString())
-                timeSeries = new Alpaca4d.TimeSeries.Linear(gFactor);
+                timeSeries = new Alpaca4d.TimeSeries.Linear(1);
             else
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"{timeSeriesType} does not exist!");
                 return;
             }
 
-            var load = new Alpaca4d.Loads.Gravity(timeSeries);
+            var load = new Alpaca4d.Loads.Gravity(gFactor ,timeSeries);
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, load);
         }

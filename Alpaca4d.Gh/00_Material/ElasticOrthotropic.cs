@@ -41,7 +41,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("vzx", "vzx", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Rho", "Rho", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Rho", "Rho", "Unit Mass - Density", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 

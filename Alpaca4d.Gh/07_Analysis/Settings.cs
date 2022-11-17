@@ -62,7 +62,7 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var damping = "";
+            Alpaca4d.Damping damping = null;
             DA.GetData(0, ref damping);
 
             ///
@@ -129,7 +129,7 @@ namespace Alpaca4d.Gh
             }
 
             
-            var settings = new Settings(constraintObj, numbererObj, systemObj, test, algorithmObj, integrator, analysisObj, analysisStep);
+            var settings = new Settings(constraintObj, numbererObj, systemObj, test, algorithmObj, integrator, analysisObj, analysisStep, damping);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, settings);

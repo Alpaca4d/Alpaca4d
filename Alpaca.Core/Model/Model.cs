@@ -276,19 +276,16 @@ namespace Alpaca4d
             return beamDefModel;
         }
 
-        public List<Mesh> DeformedShell(int step, double scale, List<System.Drawing.Color> colors)
+        public List<Mesh> DeformedShell(int step, double scale, List<System.Drawing.Color> colors, double min, double max)
         {
             var dispDictionary = this.NodalDisplacements(step);
 
             // find the total range of displacement
             var disp = dispDictionary.Values.Select(x => x.Length);
-            var min = disp.Min();
-            var max = disp.Max();
 
             var d = new SortedDictionary<double, System.Drawing.Color>();
 
             var numberOfColors = colors.Count;
-            var range = max - max;
             var diff = (max - min) / (numberOfColors-1);
 
             var start = min;
@@ -334,20 +331,16 @@ namespace Alpaca4d
             return shellDefModel;
         }
 
-        public List<Mesh> DeformedBrick(int step, double scale, List<System.Drawing.Color> colors)
+        public List<Mesh> DeformedBrick(int step, double scale, List<System.Drawing.Color> colors, double min, double max)
         {
             var dispDictionary = this.NodalDisplacements(step);
 
-
             // find the total range of displacement
             var disp = dispDictionary.Values.Select(x => x.Length);
-            var min = disp.Min();
-            var max = disp.Max();
 
             var d = new SortedDictionary<double, System.Drawing.Color>();
 
             var numberOfColors = colors.Count;
-            var range = max - max;
             var diff = (max - min) / (numberOfColors - 1);
 
             var start = min;
@@ -651,8 +644,8 @@ namespace Alpaca4d
                     mass += (massDens * length);
                     if (gravityLoad != null)
                     {
-                        var gravityPointLoadStart = new Alpaca4d.Loads.PointLoad((int)beam.INode, gravityLoad.TimeSeries.CFactor * new Rhino.Geometry.Vector3d(0, 0, (double)-(massDens * length / 2)), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
-                        var gravityPointLoadEnd = new Alpaca4d.Loads.PointLoad((int)beam.JNode, gravityLoad.TimeSeries.CFactor * new Rhino.Geometry.Vector3d(0, 0, (double)-(massDens * length / 2)), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
+                        var gravityPointLoadStart = new Alpaca4d.Loads.PointLoad((int)beam.INode, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, (double)-(massDens * length / 2)), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
+                        var gravityPointLoadEnd = new Alpaca4d.Loads.PointLoad((int)beam.JNode, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, (double)-(massDens * length / 2)), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
 
                         gravityPointLoadStart.Ndf = 6;
                         gravityPointLoadEnd.Ndf = 6;

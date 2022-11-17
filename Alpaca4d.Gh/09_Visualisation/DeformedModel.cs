@@ -3,7 +3,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Alpaca4d.TimeSeries;
 
 namespace Alpaca4d.Gh
@@ -61,8 +61,26 @@ namespace Alpaca4d.Gh
             double scale = 1.0;
             DA.GetData(2, ref scale);
 
+            double min;
+            double max;
             Rhino.Geometry.Interval domain = new Rhino.Geometry.Interval();
-            DA.GetData(4, ref domain);
+            if(!DA.GetData(4, ref domain))
+            {
+                var value = model.NodalDisplacements(step).Values;
+                min = value.Select(x => x.Length).Min();
+                max = value.Select(x => x.Length).Max();
+            }
+            else
+            {
+                min = domain.Min;
+                max = domain.Max;
+            }
+
+
+
+            //value.
+            //min = dispDictionary.Values.Min().Length;
+
 
             List<System.Drawing.Color> colors = new List<System.Drawing.Color>();
             List<Mesh> mesh = null;
@@ -71,16 +89,16 @@ namespace Alpaca4d.Gh
 
             if (DA.GetDataList(3, colors))
 			{
-                mesh = model.DeformedShell(step, scale, colors);
-                lines = model.DeformedBeam(step, scale, colors, domain.Min, domain.Max);
-                bricks = model.DeformedBrick(step, scale, colors);
+                mesh = model.DeformedShell(step, scale, colors, min, max);
+                lines = model.DeformedBeam(step, scale, colors, min, max);
+                bricks = model.DeformedBrick(step, scale, colors, min, max);
             }
 			else
 			{
                 colors = Alpaca4d.Colors.Gradient(11);
-                mesh = model.DeformedShell(step, scale, colors);
-                lines = model.DeformedBeam(step, scale, colors, domain.Min, domain.Max);
-                bricks = model.DeformedBrick(step, scale, colors);
+                mesh = model.DeformedShell(step, scale, colors, min, max);
+                lines = model.DeformedBeam(step, scale, colors, min, max);
+                bricks = model.DeformedBrick(step, scale, colors, min, max);
             }
 
             // Finally assign the spiral to the output parameter.

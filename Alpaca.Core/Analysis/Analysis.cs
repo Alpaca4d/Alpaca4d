@@ -41,6 +41,8 @@ namespace Alpaca4d
         public override string WriteTcl()
         {
             string tclText = "";
+            if(Damping != null)
+                tclText += this.Damping.WriteTcl();
             tclText += this.Constraint.WriteTcl();
             tclText += this.Numberer.WriteTcl();
             tclText += this.SystemEquation.WriteTcl();
@@ -49,8 +51,6 @@ namespace Alpaca4d
             tclText += this.Integrator.WriteTcl();
             tclText += this.Analysis.WriteTcl();
             tclText += this.AnalysisStep.WriteTcl();
-            if(Damping != null)
-                tclText += this.Damping.WriteTcl();
             return tclText;
         }
     }
@@ -390,7 +390,7 @@ namespace Alpaca4d
 
         public string WriteTcl()
         {
-            return $"rayleigh {this.AlphaM} {this.BetaKCurr} {this.BetaKInit} {this.BetaKComm}";
+            return $"rayleigh {this.AlphaM} {this.BetaKCurr} {this.BetaKInit} {this.BetaKComm}\n";
         }
     }
 }

@@ -12,17 +12,17 @@ namespace Alpaca4d.Loads
     {
         public LoadType Type { get; set; } = LoadType.Gravity;
         public ITimeSeries TimeSeries { get; set; }
-        //public double GFactor { get; set; }
+        public double GFactor { get; set; }
 
         public Gravity()
         {
         }
 
-        //public Gravity(double gFactor, ITimeSeries timeSeries)
-        //{
-        //    this.GFactor = gFactor;
-        //    this.TimeSeries = timeSeries;
-        //}
+        public Gravity(double gFactor, ITimeSeries timeSeries)
+        {
+            this.GFactor = gFactor;
+            this.TimeSeries = timeSeries;
+        }
 
         public Gravity(ITimeSeries timeSeries)
         {

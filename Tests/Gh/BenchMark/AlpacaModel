@@ -1,0 +1,71 @@
+model BasicBuilder -ndm 3 -ndf 6
+node 1 0 0 0 -mass 0 0 0 0 0 0
+node 2 0 0 0.5 -mass 0 0 0 0 0 0
+node 3 0 0 1 -mass 0 0 0 0 0 0
+node 4 0 0 1.5 -mass 0 0 0 0 0 0
+node 5 0 0 2 -mass 0 0 0 0 0 0
+node 6 0 0 2.5 -mass 0 0 0 0 0 0
+node 7 0 0 3 -mass 0 0 0 0 0 0
+node 8 0 0 3.5 -mass 0 0 0 0 0 0
+node 9 0 0 4 -mass 0 0 0 0 0 0
+node 10 0 0 4.5 -mass 0 0 0 0 0 0
+node 11 0 0 5 -mass 0 0 0 0 0 0
+node 12 0 0 5.5 -mass 0 0 0 0 0 0
+node 13 0 0 6 -mass 0 0 0 0 0 0
+node 14 0 0 6.5 -mass 0 0 0 0 0 0
+node 15 0 0 7 -mass 0 0 0 0 0 0
+node 16 0 0 7.5 -mass 0 0 0 0 0 0
+node 17 0 0 8 -mass 0 0 0 0 0 0
+node 18 0 0 8.5 -mass 0 0 0 0 0 0
+node 19 0 0 9 -mass 0 0 0 0 0 0
+node 20 0 0 9.5 -mass 0 0 0 0 0 0
+node 21 0 0 10 -mass 0 0 0 0 0 0
+fix 1 1 1 1 1 1 1
+uniaxialMaterial Elastic 1 210000000000 0 210000000000
+section Elastic 1 210000000000 0.00439822971502571 1.08306406732508E-05 1.08306406732508E-05 80760000000 2.16612813465016E-05 0.9 0.9
+geomTransf Linear 1 1 0 0
+element forceBeamColumn 1 1 2 1 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 2 1 0 0
+element forceBeamColumn 2 2 3 2 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 3 1 0 0
+element forceBeamColumn 3 3 4 3 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 4 1 0 0
+element forceBeamColumn 4 4 5 4 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 5 1 0 0
+element forceBeamColumn 5 5 6 5 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 6 1 0 0
+element forceBeamColumn 6 6 7 6 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 7 1 0 0
+element forceBeamColumn 7 7 8 7 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 8 1 0 0
+element forceBeamColumn 8 8 9 8 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 9 1 0 0
+element forceBeamColumn 9 9 10 9 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 10 1 0 0
+element forceBeamColumn 10 10 11 10 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 11 1 0 0
+element forceBeamColumn 11 11 12 11 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 12 1 0 0
+element forceBeamColumn 12 12 13 12 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 13 1 0 0
+element forceBeamColumn 13 13 14 13 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 14 1 0 0
+element forceBeamColumn 14 14 15 14 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 15 1 0 0
+element forceBeamColumn 15 15 16 15 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 16 1 0 0
+element forceBeamColumn 16 16 17 16 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 17 1 0 0
+element forceBeamColumn 17 17 18 17 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 18 1 0 0
+element forceBeamColumn 18 18 19 18 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 19 1 0 0
+element forceBeamColumn 19 19 20 19 NewtonCotes 1 5 -mass 345.261032629518
+geomTransf Linear 20 1 0 0
+element forceBeamColumn 20 20 21 20 NewtonCotes 1 5 -mass 345.261032629518
+recorder mpco recorder_eigen.mpco -N  modesOfVibration modesOfVibrationRotational -E 
+set lambdaN [eigen -fullGenLapack 12]
+puts "$lambdaN"
+modalProperties -file "ModalReport.txt" -unorm
+record
+wipe

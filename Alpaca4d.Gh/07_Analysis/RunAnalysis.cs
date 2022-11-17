@@ -83,12 +83,12 @@ namespace Alpaca4d.Gh
 
             analysisModel.Recorders = new List<IRecorder>();
 
+            analysisModel.Settings = settings;
             // Recorder
             var recorder = new Alpaca4d.Recorder();
             if (settings.Analysis.Type == Analysis.AnalysisType.Static)
             {
                 recorder = Alpaca4d.Recorder.MpcoStatic(recorderName);
-                analysisModel.Settings = settings;
                 analysisModel.IsStatic = true;
             }
 

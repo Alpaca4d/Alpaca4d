@@ -13,7 +13,13 @@ namespace Alpaca4d.Gh
     {
         public Damping()
           : base("Damping (Alpaca4d)", "Damping",
-            "",
+            " This command is used to assign damping to all previously-defined elements and nodes. When using rayleigh damping in OpenSees, the damping matrix for an element or node, D is specified as a combination of stiffness and mass-proportional damping matrices:" +
+                "\nD = alphaM * M + [betaKcurrent * Kcurrent] + [betaKinit * Kinit] + [betaKcomm * KlastCommit]" +
+                "\nxDamp = 0.05;                        # 5% damping ratio" +
+                "\nalphaM = 0.00;                      # M-prop damping;                               alphaM*M" +
+                "\nbetaKcurrent = 0.00;             # K-proportional damping;                       beatKcurr*KCurrent" +
+                "\nbetaKinit = 0.00;                   # initial-stiffness proportional damping;       beatKinit*Kinit" +
+                "\nbetaKcomm = 2.*xDamp/omega;         # K-prop. damping parameter;                    betaKcomm*KlastCommitt",
             "Alpaca4d", "07_Analysis")
         {
             // Draw a Description Underneath the component
@@ -23,13 +29,13 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("AlphaM", "AlphaM", "", GH_ParamAccess.item, 0.0);
+            pManager.AddNumberParameter("AlphaM", "AlphaM", "factor applied to elements or nodes mass matrix", GH_ParamAccess.item, 0.0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("BetaKCurr", "BetaKCurr", "", GH_ParamAccess.item, 0.0);
+            pManager.AddNumberParameter("BetaKCurr", "BetaKCurr", "factor applied to elements current stiffness matrix.", GH_ParamAccess.item, 0.0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("BetaKInit", "BetaKInit", "", GH_ParamAccess.item, 0.0);
+            pManager.AddNumberParameter("BetaKInit", "BetaKInit", "factor applied to elements initial stiffness matrix.", GH_ParamAccess.item, 0.0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("BetaKComm", "BetaKComm", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("BetaKComm", "BetaKComm", "factor applied to elements committed stiffness matrix.", GH_ParamAccess.item);
         }
 
         /// <summary>
