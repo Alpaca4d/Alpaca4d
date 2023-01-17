@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Alpaca4d
 {
@@ -10,8 +11,9 @@ namespace Alpaca4d
     {
         public static readonly List<string> Intro = new List<string>(){""};
 
-        public static readonly string GhCompFolder = Grasshopper.Folders.DefaultAssemblyFolder;
-        public static readonly string GhAlpacaFolder = System.IO.Path.Combine(GhCompFolder, @"Alpaca4d");
+
+        public static readonly string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+        public static readonly string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
         public static readonly string OpenSeesFolder = System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers");
 
         public static readonly string OpenSees = System.IO.Path.Combine(OpenSeesFolder, @"opensees.bat");
