@@ -24,13 +24,13 @@ namespace Alpaca4d.Section
                 return area;
             }
         }
-        public double AlphaY => 5.0 / 6;
-        public double AlphaZ => 5.0 / 6;
+        public double AlphaY => 5.0 / 6.0;
+        public double AlphaZ => 5.0 / 6.0;
         public double Izz
         {
             get
             {
-                double iZZ = this.Width * Math.Pow(this.Height, 3);
+                double iZZ = this.Width * Math.Pow(this.Height, 3) / 12.0;
                 return iZZ;
             }
         }
@@ -39,7 +39,7 @@ namespace Alpaca4d.Section
         {
             get
             {
-                double iYY = Math.Pow(this.Width, 3) * this.Height;
+                double iYY = Math.Pow(this.Width, 3) * this.Height / 12.0;
                 return iYY;
             }
         }

@@ -36,7 +36,7 @@ namespace Alpaca4d.Gh
 		}
 
 
-		public static void updateValueLists(GH_Component component, int input_ind, List<string> names, List<int> values = null, GH_ValueListMode list_mode = GH_ValueListMode.CheckList)
+		public static void updateValueLists(GH_Component component, int input_ind, List<string> names, List<int> values = null, GH_ValueListMode list_mode = GH_ValueListMode.DropDown)
 		{
 			if (names.Count == 0)
 			{

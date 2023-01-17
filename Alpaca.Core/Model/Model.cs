@@ -517,7 +517,7 @@ namespace Alpaca4d
             Process process = new Process();
             // Configure the process using the StartInfo properties.
             process.StartInfo.FileName = openSeesPath;
-            process.StartInfo.Arguments = this.FileName;
+            process.StartInfo.Arguments = "\"" + this.FileName + "\"";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
@@ -840,8 +840,7 @@ namespace Alpaca4d
                 if (item.Type == Alpaca4d.Loads.LoadType.Gravity)
                 {
                     // Gravity Load will be use later to calculate the equivalent Gravity Load
-                    gravityLoad = (Alpaca4d.Loads.Gravity)item;
-                    this.CreateGravityLoad(gravityLoad);
+                    this.CreateGravityLoad( (Alpaca4d.Loads.Gravity)item );
                 }
                 else if (item.Type == Alpaca4d.Loads.LoadType.PointLoad)
                 {
