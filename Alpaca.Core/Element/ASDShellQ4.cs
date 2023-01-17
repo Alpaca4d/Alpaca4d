@@ -51,9 +51,16 @@ namespace Alpaca4d.Element
         }
         public override string WriteTcl()
         {
-            string tcl = $"element ASDShellQ4 {this.Id} {this.IndexNodes[0]} {this.IndexNodes[1]} {this.IndexNodes[2]} {this.IndexNodes[3]} {this.Section.Id}\n";
-
-            return tcl;
+            if(this.IndexNodes != null)
+            {
+                string tcl = $"element ASDShellQ4 {this.Id} {this.IndexNodes[0]} {this.IndexNodes[1]} {this.IndexNodes[2]} {this.IndexNodes[3]} {this.Section.Id}\n";
+                return tcl;
+            }
+            else
+            {
+                string tcl = $"element ASDShellQ4";
+                return tcl;
+            }
         }
     }
 }

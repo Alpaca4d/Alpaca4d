@@ -24,7 +24,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "02_Element")
         {
             // Draw a Description Underneath the component
-            this.Message = $"SDShellQ4(Alpaca4d)";
+            this.Message = $"ASDShellQ4(Alpaca4d)";
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Mesh mesh = null;
-            DA.GetData(0, ref mesh);
+            Mesh _mesh = null;
+            DA.GetData(0, ref _mesh);
 
             IMultiDimensionSection section = null;
             DA.GetData(1, ref section);
@@ -65,18 +65,33 @@ namespace Alpaca4d.Gh
                 color = Color.IndianRed;
             }
 
-            if(mesh.Vertices.Count == 4)
-            {
-                var element = new Alpaca4d.Element.ASDShellQ4(mesh, section);
-                element.Color = color;
 
-                DA.SetData(0, element);
-            }
-            else if (mesh.Vertices.Count == 3)
+            var meshes = new List<Mesh>();
+
+            if (_mesh.Faces.Count > 0)
             {
-                var element = new Alpaca4d.Element.ShellDKGT(mesh, section);
-                element.Color = color;
-                DA.SetData(0, element);
+                meshes = Utils.ExplodeMesh(_mesh);
+            }
+            else
+            {
+                meshes.Add(_mesh);
+            }
+
+            foreach(var mesh in meshes)
+            {
+                if(mesh.Vertices.Count == 4)
+                {
+                    var element = new Alpaca4d.Element.ASDShellQ4(mesh, section);
+                    element.Color = color;
+
+                    DA.SetData(0, element);
+                }
+                else if (mesh.Vertices.Count == 3)
+                {
+                    var element = new Alpaca4d.Element.ShellDKGT(mesh, section);
+                    element.Color = color;
+                    DA.SetData(0, element);
+                }
             }
         }
 
