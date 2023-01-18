@@ -291,8 +291,11 @@ namespace Alpaca4d
             var start = min;
             foreach (var color in colors)
 			{
-                d.Add(start, color);
-                start += diff;
+                if(!d.ContainsKey(start))
+                {
+                    d.Add(start, color);
+                    start += diff;
+                }
 			}
 
             var shellDefModel = new List<Mesh>();
@@ -346,8 +349,11 @@ namespace Alpaca4d
             var start = min;
             foreach (var color in colors)
             {
-                d.Add(start, color);
-                start += diff;
+                if (!d.ContainsKey(start))
+                {
+                    d.Add(start, color);
+                    start += diff;
+                }
             }
 
 

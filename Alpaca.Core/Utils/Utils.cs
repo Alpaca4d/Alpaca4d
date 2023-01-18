@@ -250,8 +250,11 @@ namespace Alpaca4d
             var start = min;
             foreach (var color in iColors)
             {
-                d.Add((double)start, color);
-                start += diff;
+                if (!d.ContainsKey((double)start))
+                {
+                    d.Add((double)start, color);
+                    start += diff;
+                }
             }
 
 

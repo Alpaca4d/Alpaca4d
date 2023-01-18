@@ -141,60 +141,53 @@ namespace Alpaca4d.Gh
                 {
                     var point = pointLoad.Pos;
                     var magnitude = pointLoad.Force * _loadsScale;
-                    var line = new Rhino.Geometry.Line(point, magnitude);
-                    var vector = new Vector3d(point.X - line.ToNurbsCurve().PointAtEnd.X, point.Y - line.ToNurbsCurve().PointAtEnd.Y, point.Z - line.ToNurbsCurve().PointAtEnd.Z);
-                    var translation = Rhino.Geometry.Transform.Translation(vector);
-                    line.Transform(translation);
-                    args.Display.DrawArrow(line, System.Drawing.Color.IndianRed, 24, 0);
+                    VisualisePointLoad(args, point, magnitude);
                 }
 
                 foreach (var pointLoad in _model.GravityPointLoad)
                 {
                     var point = pointLoad.Pos;
                     var magnitude = pointLoad.Force * _loadsScale;
-                    var line = new Rhino.Geometry.Line(point, magnitude);
-                    var vector = new Vector3d(point.X - line.ToNurbsCurve().PointAtEnd.X, point.Y - line.ToNurbsCurve().PointAtEnd.Y, point.Z - line.ToNurbsCurve().PointAtEnd.Z);
-                    var translation = Rhino.Geometry.Transform.Translation(vector);
-                    line.Transform(translation);
-                    args.Display.DrawArrow(line, System.Drawing.Color.Blue, 24, 0);
+                    VisualisePointLoad(args, point, magnitude);
                 }
                 // visualise MeshLoad
                 foreach(var meshLoad in _model.MeshLoad)
                 {
-                    var meshGeometry = meshLoad.Element.Mesh;
-
-
-                    var forceValue = meshLoad.GlobalForce.Length;
-                    var unitVector = meshLoad.GlobalForce / forceValue;
-                    var meshPos = meshGeometry.Offset(forceValue * _loadsScale, true, unitVector);
-                    meshPos.Faces.DeleteFaces(new List<int>(1));
-                    var color = System.Drawing.Color.OrangeRed;
-                    var material = new Rhino.Display.DisplayMaterial(color, color, color, color, 0.00, 0.80);
-
-                    args.Display.DrawMeshShaded(meshPos, material);
-                    args.Display.DrawMeshWires(meshPos, System.Drawing.Color.OrangeRed, 2);
-                    args.Display.DrawMeshVertices(meshPos, System.Drawing.Color.Black);
-                    
+                    if (meshLoad.Element == null)
+                    {
+                        foreach (var shell in _model.Shells)
+                        {
+                            var meshGeometry = shell.Mesh; ;
+                            var forceValue = meshLoad.GlobalForce.Length;
+                            var unitVector = meshLoad.GlobalForce / forceValue;
+                            VisualiseMeshLoad(args, meshGeometry, forceValue, unitVector);
+                        }
+                    }
+                    else
+                    {
+                        var meshGeometry = meshLoad.Element.Mesh;
+                        var forceValue = meshLoad.GlobalForce.Length;
+                        var unitVector = meshLoad.GlobalForce / forceValue;
+                        VisualiseMeshLoad(args, meshGeometry, forceValue, unitVector);
+                    }
                 }
                 // visualise LineLoad
                 foreach(var lineLoad in _model.LineLoad)
 				{
-                    var lineGeometry = lineLoad.Element.Curve;
-
-                    var forceVector = lineLoad.GlobalForce;
-
-                    var color = System.Drawing.Color.DarkSeaGreen;
-
-                    int division = 6;
-                    for(double value = 0.0; value <= 1.00; value +=  1.0/division)
-					{
-                        var point = lineGeometry.PointAtNormalizedLength(value);
-                        var magnitude = forceVector * _loadsScale;
-                        var line = new Rhino.Geometry.Line(point, magnitude);
-                        var vector = new Vector3d(point.X - line.ToNurbsCurve().PointAtEnd.X, point.Y - line.ToNurbsCurve().PointAtEnd.Y, point.Z - line.ToNurbsCurve().PointAtEnd.Z);
-                        var translation = Rhino.Geometry.Transform.Translation(vector);
-                        line.Transform(translation);
-                        args.Display.DrawArrow(line, color, 24, 0);
+                    if(lineLoad.Element != null)
+                    {
+                        var lineGeometry = lineLoad.Element.Curve;
+                        var forceVector = lineLoad.GlobalForce;
+                        VisualiseLineLoad(args, lineGeometry, forceVector);
+                    }
+                    else
+                    {
+                        foreach (var beam in _model.Beams)
+                        {
+                            var lineGeometry = beam.Curve;
+                            var forceVector = lineLoad.GlobalForce;
+                            VisualiseLineLoad(args, lineGeometry, forceVector);
+                        }
                     }
                 }
             }
@@ -303,6 +296,46 @@ namespace Alpaca4d.Gh
             //args.Display.Draw2dText("Z", System.Drawing.Color.Black, center + zPos, true, 36);
         }
 
+        private void VisualisePointLoad(IGH_PreviewArgs args, Point3d position, Vector3d magnitude)
+        {
+            if (magnitude.Length > 0)
+            {
+                var line = new Rhino.Geometry.Line(position, magnitude);
+                var vector = new Vector3d(position.X - line.ToNurbsCurve().PointAtEnd.X, position.Y - line.ToNurbsCurve().PointAtEnd.Y, position.Z - line.ToNurbsCurve().PointAtEnd.Z);
+                var translation = Rhino.Geometry.Transform.Translation(vector);
+                line.Transform(translation);
+                args.Display.DrawArrow(line, System.Drawing.Color.IndianRed, 24, 0);
+            }
+        }
+
+        private void VisualiseLineLoad(IGH_PreviewArgs args, Curve lineGeometry, Vector3d forceVector)
+        {
+            var color = System.Drawing.Color.DarkSeaGreen;
+
+            int division = 6;
+            for (double value = 0.0; value <= 1.00; value += 1.0 / division)
+            {
+                var point = lineGeometry.PointAtNormalizedLength(value);
+                var magnitude = forceVector * _loadsScale;
+                var line = new Rhino.Geometry.Line(point, magnitude);
+                var vector = new Vector3d(point.X - line.ToNurbsCurve().PointAtEnd.X, point.Y - line.ToNurbsCurve().PointAtEnd.Y, point.Z - line.ToNurbsCurve().PointAtEnd.Z);
+                var translation = Rhino.Geometry.Transform.Translation(vector);
+                line.Transform(translation);
+                args.Display.DrawArrow(line, color, 24, 0);
+            }
+        }
+
+        private void VisualiseMeshLoad(IGH_PreviewArgs args, Mesh meshGeometry, double forceValue, Vector3d unitVector)
+        {
+            var meshPos = meshGeometry.Offset(forceValue * _loadsScale, true, unitVector);
+            meshPos.Faces.DeleteFaces(new List<int>(1));
+            var color = System.Drawing.Color.OrangeRed;
+            var material = new Rhino.Display.DisplayMaterial(color, color, color, color, 0.00, 0.80);
+
+            args.Display.DrawMeshShaded(meshPos, material);
+            args.Display.DrawMeshWires(meshPos, System.Drawing.Color.OrangeRed, 2);
+            args.Display.DrawMeshVertices(meshPos, System.Drawing.Color.Black);
+        }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.model_View__Alpaca4d_;
