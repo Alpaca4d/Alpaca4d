@@ -62,7 +62,7 @@ namespace Alpaca4d.Gh
             IUniaxialMaterial material = null;
 
 
-            if (!DA.GetData(0, ref secName)) return;
+            DA.GetData(0, ref secName);
             if (!DA.GetData(1, ref area)) return;
             if (!DA.GetData(2, ref iZZ)) return;
             if (!DA.GetData(3, ref iYY)) return;
