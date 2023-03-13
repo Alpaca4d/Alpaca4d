@@ -10,6 +10,7 @@ namespace Alpaca4d.TimeSeries
 {
     public partial class Constant : EntityBase, ITimeSeries, ISerialize
     {
+        public static Dictionary<double, Constant> _timeSeriesCache = new Dictionary<double, Constant>();
         public TimeSeriesType Type => TimeSeriesType.Constant;
         public double CFactor { get; set; }
         public int Id { get; set; }
@@ -17,6 +18,15 @@ namespace Alpaca4d.TimeSeries
         public Constant (double cFactor = 1.0)
         {
             this.CFactor = cFactor;
+        }
+
+        public static Constant Default(double cFactor = 1.0)
+        {
+            if (!_timeSeriesCache.ContainsKey(cFactor))
+            {
+                _timeSeriesCache[cFactor] = new Constant(cFactor);
+            }
+            return _timeSeriesCache[cFactor];
         }
 
         public List<double> DrawSeries()

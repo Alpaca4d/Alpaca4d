@@ -52,7 +52,7 @@ namespace Alpaca4d.Gh
             var force = Vector3d.Zero;
             DA.GetData(1, ref force);
 
-            Alpaca4d.Generic.ITimeSeries timeSeries = new Alpaca4d.TimeSeries.Constant();
+            Alpaca4d.Generic.ITimeSeries timeSeries = Alpaca4d.TimeSeries.Constant.Default();
             DA.GetData(2, ref timeSeries);
 
             bool local = false;

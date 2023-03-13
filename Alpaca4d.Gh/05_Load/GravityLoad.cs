@@ -24,9 +24,15 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("TimeSeriesType", "TimeSeriesType", "Constant, Linear", GH_ParamAccess.item, "Constant");
+            pManager.AddTextParameter("TimeSeriesType", "TimeSeriesType", "Connect a 'ValueList'\nConstant, Linear", GH_ParamAccess.item, "Constant");
             pManager.AddNumberParameter("GFactor", "GFactor", "", GH_ParamAccess.item, 9.81);
             pManager[pManager.ParamCount - 1].Optional = true;
+        }
+
+        protected override void BeforeSolveInstance()
+        {
+            List<string> resultTypes = new List<string> { "Constant", "Linear" };
+            ValueListUtils.updateValueLists(this, 0, resultTypes, null);
         }
 
         /// <summary>

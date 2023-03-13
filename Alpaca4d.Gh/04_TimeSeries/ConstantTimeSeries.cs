@@ -48,7 +48,6 @@ namespace Alpaca4d.Gh
 
             if (!DA.GetData(0, ref cFactor)) return;
 
-
             var timeSeries = new Alpaca4d.TimeSeries.Constant(cFactor);
             var graph = timeSeries.DrawSeries();
 

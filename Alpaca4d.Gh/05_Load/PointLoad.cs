@@ -51,13 +51,12 @@ namespace Alpaca4d.Gh
             var force = Vector3d.Zero;
             var moment = Vector3d.Zero;
 
-            Alpaca4d.Generic.ITimeSeries timeSeries = new Alpaca4d.TimeSeries.Constant();
-
+            Alpaca4d.Generic.ITimeSeries timeSeries = Alpaca4d.TimeSeries.Constant.Default();
 
             if (!DA.GetData(0, ref pos)) return;
             if (!DA.GetData(1, ref force)) return;
-            if (!DA.GetData(2, ref moment)) return;
 
+            DA.GetData(2, ref moment);
             DA.GetData(3, ref timeSeries);
 
             var load = new Alpaca4d.Loads.PointLoad(pos, force, moment, timeSeries);
