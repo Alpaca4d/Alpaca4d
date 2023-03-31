@@ -19,8 +19,8 @@ namespace Alpaca4d.Gh
         /// new tabs/panels will automatically be created.
         /// </summary>
         public ASDShellQ4()
-          : base("ASD ShellQ4 (Alpaca4d)", "ASDQ4",
-            "Construct a ASDShellQ4 element",
+          : base("ASD ShellQ4 (Alpaca4d)", "ASDQ4/DKGT",
+            "Construct a ASDShellQ4 element or DKGT Shell",
             "Alpaca4d", "02_Element")
         {
             // Draw a Description Underneath the component
@@ -79,18 +79,23 @@ namespace Alpaca4d.Gh
 
             foreach(var mesh in meshes)
             {
+                var elements = new List<Alpaca4d.Generic.IShell>();
+
                 if(mesh.Vertices.Count == 4)
                 {
                     var element = new Alpaca4d.Element.ASDShellQ4(mesh, section);
                     element.Color = color;
 
-                    DA.SetData(0, element);
+                    elements.Add(element);
+                    DA.SetDataList(0, elements);
                 }
                 else if (mesh.Vertices.Count == 3)
                 {
                     var element = new Alpaca4d.Element.ShellDKGT(mesh, section);
                     element.Color = color;
-                    DA.SetData(0, element);
+
+                    elements.Add(element);
+                    DA.SetDataList(0, elements);
                 }
             }
         }

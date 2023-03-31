@@ -468,6 +468,15 @@ namespace Alpaca4d.Result
                         vyz.Add((double)table.Data.GetValue(i, j));
                     }
 
+                    fxx.RemoveAt(0);
+                    fyy.RemoveAt(0);
+                    fxy.RemoveAt(0);
+                    mxx.RemoveAt(0);
+                    myy.RemoveAt(0);
+                    mxy.RemoveAt(0);
+                    vxz.RemoveAt(0);
+                    vyz.RemoveAt(0);
+
                     fxxNested.Add(fxx);
                     fyyNested.Add(fyy);
                     fxyNested.Add(fxy);
@@ -567,6 +576,17 @@ namespace Alpaca4d.Result
                     {
                         vyz.Add((double)table.Data.GetValue(i, j));
                     }
+
+                    // remove first item as it is the force/stress in the center of the shell
+
+                    fxx.RemoveAt(0);
+                    fyy.RemoveAt(0);
+                    fxy.RemoveAt(0);
+                    mxx.RemoveAt(0);
+                    myy.RemoveAt(0);
+                    mxy.RemoveAt(0);
+                    vxz.RemoveAt(0);
+                    vyz.RemoveAt(0);
 
                     fxxNested.Add(fxx);
                     fyyNested.Add(fyy);
