@@ -468,4 +468,14 @@
     <StartAction>Program</StartAction>
   </PropertyGroup>
 
+  <Target Name="AfterBuild">
+    <MakeDir Directories="$(appdata)\Grasshopper\Libraries\Alpaca4d\" />
+    <ItemGroup>
+      <Dlls Include="$(OutDir)*.dll" />
+      <Ghas Include="$(OutDir)Alpaca4d.Gh.gha" />
+    </ItemGroup>
+    <Copy SourceFiles="@(Dlls)" DestinationFolder="$(appdata)\Grasshopper\Libraries\Alpaca4d\" />
+    <Copy SourceFiles="@(Ghas)" DestinationFolder="$(appdata)\Grasshopper\Libraries\Alpaca4d\" />
+  </Target>
+
 </Project>
