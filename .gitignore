@@ -11,4 +11,6 @@ packages/
 .vscode/
 *.csproj.user
 *.mpco
+.mpco
 *.mpco
+*AlpacaModel
