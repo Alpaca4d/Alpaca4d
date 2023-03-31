@@ -414,7 +414,7 @@ namespace Alpaca4d.Result
             groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
 
             table = Hdf5.Read2DTable<double>(groupId, name);
-            var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Count();
+            var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ShellDKGT).Count();
 
             try
             {
@@ -514,7 +514,7 @@ namespace Alpaca4d.Result
             groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
 
             table = Hdf5.Read2DTable<double>(groupId, name);
-            var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Count();
+            var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ShellDKGT).Count();
 
             try
             {
