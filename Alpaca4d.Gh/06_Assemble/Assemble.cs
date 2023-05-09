@@ -40,7 +40,7 @@ namespace Alpaca4d.Gh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
-            pManager.Register_DoubleParam("MassForce", "MassForce", "");
+            pManager.Register_DoubleParam("Mass", "Mass", "");
         }
 
         /// <summary>
