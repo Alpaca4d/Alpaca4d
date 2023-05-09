@@ -31,7 +31,7 @@ namespace Alpaca4d
     public class License : GH_Component
     {
         public License()
-          : base("License (Alpaca4d)", "License",
+          : base(" License (Alpaca4d)", "License",
             "License",
             "Alpaca4d", " Info")
         {
