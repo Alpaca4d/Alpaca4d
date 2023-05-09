@@ -38,8 +38,6 @@ namespace Alpaca4d.Gh
 
             pManager.AddBooleanParameter("MinMax", "MinMax", "", GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
-
-
         }
 
         /// <summary>
