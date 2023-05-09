@@ -837,8 +837,6 @@ namespace Alpaca4d
             /////////
             /// Loads
             /////////
-            var gravityLoad = new Alpaca4d.Loads.Gravity();
-
             var myLoads = new List<ILoad>();
 
             foreach (var item in this.Loads)
