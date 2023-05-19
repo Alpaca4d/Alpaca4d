@@ -69,8 +69,8 @@ namespace Alpaca4d.Section
             get
             {
                 var curves = new List<Curve>();
-                var width = new Interval(-Width, Width);
-                var heigth = new Interval(-Height, Height);
+                var width = new Interval(-Width/2, Width/2);
+                var heigth = new Interval(-Height/2, Height/2);
                 curves.Add(new Rhino.Geometry.Rectangle3d(Rhino.Geometry.Plane.WorldXY, width, heigth).ToNurbsCurve());
                 return curves;
             }

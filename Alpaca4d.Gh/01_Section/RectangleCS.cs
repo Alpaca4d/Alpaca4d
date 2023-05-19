@@ -50,7 +50,7 @@ namespace Alpaca4d.Gh
             DA.GetData(0, ref secName);
             DA.GetData(1, ref width);
             DA.GetData(2, ref height);
-            DA.GetData(3, ref material);
+            if (!DA.GetData(3, ref material)) { return; };
 
 
             var section = new Alpaca4d.Section.RectangleCS(secName, width, height, material);

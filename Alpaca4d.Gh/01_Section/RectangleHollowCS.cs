@@ -59,7 +59,7 @@ namespace Alpaca4d.Gh
             DA.GetData(3, ref web);
             DA.GetData(4, ref topFlange);
             DA.GetData(5, ref bottomFlange);
-            DA.GetData(6, ref material);
+            if (!DA.GetData(6, ref material)) { return; };
 
             var section = new Alpaca4d.Section.RectangleHollowCS(secName, width, height, web, topFlange, bottomFlange, material);
 
