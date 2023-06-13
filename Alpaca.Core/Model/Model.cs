@@ -673,7 +673,7 @@ namespace Alpaca4d
                     {
                         foreach (var index in shell.IndexNodes)
                         {
-                            var gravityPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.TimeSeries.CFactor * new Rhino.Geometry.Vector3d(0, 0, -(areaDensity * meshArea / (shell.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
+                            var gravityPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, -(areaDensity * meshArea / (shell.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
                             gravityPointLoad.Ndf = 6;
                             gravityPointLoad.Pos = this.UniquePoints[(int)index -1];
                             this.GravityPointLoad.Add(gravityPointLoad);
@@ -707,7 +707,7 @@ namespace Alpaca4d
                     {
                         foreach (var index in brick.IndexNodes)
                         {
-                            var gravityPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.TimeSeries.CFactor * new Rhino.Geometry.Vector3d(0, 0, -(density * meshVolume / (brick.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
+                            var gravityPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, -(density * meshVolume / (brick.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
                             gravityPointLoad.Ndf = 3;
                             gravityPointLoad.Pos = this.UniquePoints[(int)index -1];
                             this.GravityPointLoad.Add(gravityPointLoad);

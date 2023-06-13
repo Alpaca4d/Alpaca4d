@@ -47,8 +47,8 @@ namespace Alpaca4d
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error: " + ex.Message);
                         DA.SetData(0, "An error occur!");
+                        throw new Exception("Error: " + ex.Message);
                     }
                 }
             }
