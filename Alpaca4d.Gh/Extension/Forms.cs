@@ -13,6 +13,11 @@ namespace Alpaca4d.Gh.Forms
     public partial class Advertise
     {
         public static int NumberOfElements = 10;
+
+        public static DateTime licenseDate = new DateTime(2023, 7, 30);
+
+
+
         public Advertise()
         {
             var windows = new Eto.Forms.Form();

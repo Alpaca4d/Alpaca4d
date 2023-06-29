@@ -58,9 +58,13 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(0, ref model)) return;
             if (!DA.GetData(1, ref settings)) return;
 
-            if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+
+            if(DateTime.Now > Forms.Advertise.licenseDate)
             {
-                new Alpaca4d.Gh.Forms.Advertise();
+                if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+                {
+                    new Alpaca4d.Gh.Forms.Advertise();
+                }
             }
 
             // create a shallow copy
