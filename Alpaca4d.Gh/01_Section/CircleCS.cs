@@ -61,7 +61,7 @@ namespace Alpaca4d.Gh
             DA.GetData(0, ref secName);
             DA.GetData(1, ref d);
             DA.GetData(2, ref t);
-            if( !DA.GetData(3, ref material)) { return; };
+            DA.GetData(3, ref material);
 
 
             var section = new Alpaca4d.Section.CircleCS(secName, d, t, material);

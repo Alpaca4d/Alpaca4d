@@ -57,7 +57,7 @@ namespace Alpaca4d.Gh
 
             DA.GetData(0, ref secName);
             DA.GetData(1, ref thickness);
-            if (!DA.GetData(2, ref material)) { return; };
+            DA.GetData(2, ref material);
 
 
             var section = new Alpaca4d.Section.PlateFiberSection(secName, thickness, material);

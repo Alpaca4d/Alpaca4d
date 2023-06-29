@@ -59,7 +59,7 @@ namespace Alpaca4d.Gh
             double j = 0.00;
             double alphaY = 0.00;
             double alphaZ = 0.00;
-            IUniaxialMaterial material = null;
+            IUniaxialMaterial material = Alpaca4d.Material.UniaxialMaterialElastic.Steel;
 
 
             DA.GetData(0, ref secName);
@@ -69,7 +69,7 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(4, ref j)) return;
             if (!DA.GetData(5, ref alphaY)) return;
             if (!DA.GetData(6, ref alphaZ)) return;
-            if (!DA.GetData(7, ref material)) return;
+            DA.GetData(7, ref material);
 
 
             var section = new Alpaca4d.Section.ElasticSection(secName, area, iZZ, iYY, j, alphaY, alphaZ, material);
