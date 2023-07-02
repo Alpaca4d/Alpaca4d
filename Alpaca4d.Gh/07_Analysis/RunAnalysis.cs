@@ -71,14 +71,20 @@ namespace Alpaca4d.Gh
             var analysisModel = model.ShallowCopy();
             analysisModel.Tcl = new List<string>(analysisModel.Tcl);
 
+
             bool fileExist = OnPingDocument().IsFilePathDefined;
             if (!fileExist)
             {
-                throw new Exception("Have you saved the Grasshopper script?");
+                // hops issue
+                var folderPath = System.IO.Directory.GetCurrentDirectory();
+                System.IO.Directory.SetCurrentDirectory(folderPath);
             }
-            var filePath = OnPingDocument().FilePath;
-            var currentDir = System.IO.Path.GetDirectoryName(filePath);
-            System.IO.Directory.SetCurrentDirectory(currentDir);
+            else
+            {
+                var filePath = OnPingDocument().FilePath;
+                var currentDir = System.IO.Path.GetDirectoryName(filePath);
+                System.IO.Directory.SetCurrentDirectory(currentDir);
+            }
 
             string recorderName = "recorder.mpco";
 
