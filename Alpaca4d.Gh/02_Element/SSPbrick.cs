@@ -59,7 +59,10 @@ namespace Alpaca4d.Gh
                 color = Color.PaleVioletRed;
             }
 
-            var element = new Alpaca4d.Element.SSPbrick(mesh, material);
+
+            var _mesh = Utils.CleanHexahedron(mesh);
+
+            var element = new Alpaca4d.Element.SSPbrick(_mesh, material);
             element.Color = color;
 
             DA.SetData(0, element);

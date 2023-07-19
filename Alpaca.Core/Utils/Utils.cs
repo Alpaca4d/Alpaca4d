@@ -350,7 +350,7 @@ namespace Alpaca4d
             var myMesh = mesh.ExplodeAtUnweldedEdges();
 
             var newMeshes = new List<Mesh>();
-            foreach(var explodedMesh in myMesh)
+            foreach (var explodedMesh in myMesh)
             {
                 newMeshes.Add(explodedMesh);
             }
@@ -366,19 +366,19 @@ namespace Alpaca4d
 
             a.Unweld(0, true);
             var b = a.ExplodeAtUnweldedEdges();
-            if(b.Count() > 0)
+            if (b.Count() > 0)
             {
-                foreach(var Mesh in MeshList)
+                foreach (var Mesh in MeshList)
                 {
                     var shellWrapper = MeshToShell(Mesh);
                     meshExpl.Add(shellWrapper);
                 }
 
-                for(int index1 = 0; index1 < MeshList.Count()-1; index1++)
+                for (int index1 = 0; index1 < MeshList.Count() - 1; index1++)
                 {
                     for (int index2 = 0; index2 < meshExpl[0].Count(); index2++)
                     {
-                        if(meshExpl[index1][index2].Vertices.Count == 4)
+                        if (meshExpl[index1][index2].Vertices.Count == 4)
                         {
                             var vertix1 = meshExpl[index1][index2].Vertices[0];
                             var vertix2 = meshExpl[index1][index2].Vertices[1];
@@ -459,7 +459,7 @@ namespace Alpaca4d
         {
             var lines = System.IO.File.ReadAllLines(filepath);
             (var points, var supports, var lineGeometry, var meshShell, var meshBrick) = Utils.TextToGeometry(lines.ToList());
-            
+
             return (points, supports, lineGeometry, meshShell, meshBrick);
         }
 
@@ -628,5 +628,283 @@ namespace Alpaca4d
 
             return (points, supports, lineGeometry, meshShell, meshBrick);
         }
+
+
+        public static Mesh CleanHexahedron(Mesh brick)
+        {
+            brick.FaceNormals.ComputeFaceNormals();
+
+            // Find the center face and normal
+            Point3d faceCenter = brick.Faces.GetFaceCenter(0);
+            Vector3d faceNormal = brick.FaceNormals[0];
+
+            List<Point3d> polyCurvePts = new List<Point3d>();
+            List<int> firstFace = new List<int>();
+
+            foreach (int item in brick.Faces.GetTopologicalVertices(0))
+            {
+                polyCurvePts.Add(brick.Vertices[item]);
+                firstFace.Add(item);
+            }
+
+            Curve faceEdge = Curve.CreateControlPointCurve(polyCurvePts, 1);
+
+            // Find the number of intersections to determine if the normal is pointing outside
+            Line line = new Line(faceCenter, faceCenter + (1000 * faceNormal));
+            line.Extend(0.001, 0.001);
+            var intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(brick, line);
+            int result = intersections.Length;
+
+            if (result > 1)
+            {
+                faceNormal.Reverse();
+            }
+
+            CurveOrientation orientation = faceEdge.ClosedCurveOrientation(faceNormal);
+
+            List<int> secondFace = new List<int>();
+
+            foreach (int item in brick.Faces.GetTopologicalVertices(0))
+            {
+                int[] indices = brick.Vertices.GetConnectedVertices(item);
+                foreach (int i in indices)
+                {
+                    if (!brick.Faces.GetTopologicalVertices(0).Contains(i))
+                    {
+                        secondFace.Add(i);
+                    }
+                }
+            }
+
+            if (orientation != CurveOrientation.Clockwise)
+            {
+                firstFace.Reverse();
+                secondFace.Reverse();
+            }
+
+            // Create new brick
+            Mesh newBrick = new Mesh();
+
+            foreach (int index in firstFace)
+            {
+                newBrick.Vertices.Add(brick.Vertices[index]);
+            }
+
+            foreach (int index in secondFace)
+            {
+                newBrick.Vertices.Add(brick.Vertices[index]);
+            }
+
+            newBrick.Faces.AddFace(0, 1, 2, 3);
+            newBrick.Faces.AddFace(4, 5, 6, 7);
+            newBrick.Faces.AddFace(1, 2, 6, 5);
+            newBrick.Faces.AddFace(0, 3, 7, 4);
+            newBrick.Faces.AddFace(0, 1, 5, 4);
+            newBrick.Faces.AddFace(3, 2, 6, 7);
+
+            newBrick.FaceNormals.ComputeFaceNormals();
+            newBrick.UnifyNormals();
+
+            return newBrick;
+        }
+
+
+        public static Mesh CleanTetrahedron(Mesh iMesh)
+        {
+            Point3d[] iPoints = iMesh.Vertices.ToPoint3dArray();
+
+            List<Point3d> iPoint = new List<Point3d>();
+            foreach (Point3d pt in iPoints)
+            {
+                iPoint.Add(pt);
+            }
+
+            Mesh tets = new Mesh();
+
+            foreach (Point3d pt in iPoint)
+            {
+                tets.Vertices.Add(pt);
+            }
+
+            tets.Faces.AddFace(0, 2, 1);
+            tets.Faces.AddFace(0, 2, 3);
+            tets.Faces.AddFace(0, 3, 1);
+            tets.Faces.AddFace(1, 3, 2);
+
+            tets.FaceNormals.ComputeFaceNormals();
+
+            // find the center face and normal
+            Point3d faceCenter = tets.Faces.GetFaceCenter(0);
+            Vector3d faceNormal = tets.FaceNormals[0];
+
+            List<Point3d> polyCurvePt = new List<Point3d>();
+            polyCurvePt.AddRange(iPoint.GetRange(0, 3));
+            polyCurvePt.Add(iPoint[0]);
+            Curve faceEdge = new Polyline(polyCurvePt).ToNurbsCurve();
+
+            // find number of intersection to understand if the normal is pointing outside
+            Line line = new Line(faceCenter, faceCenter + (1000 * faceNormal));
+            line.Extend(0.001, 0.001);
+            var intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(tets, line);
+            int result = intersections.Length;
+            Console.WriteLine(result);
+
+            if (result > 1)
+            {
+                faceNormal.Reverse();
+            }
+
+            CurveOrientation orientation = faceEdge.ClosedCurveOrientation(faceNormal);
+
+            if (orientation != CurveOrientation.Clockwise)
+            {
+                // change the order if it is anticlockwise
+                Mesh newTets = new Mesh();
+
+                newTets.Vertices.Add(iPoint[0]);
+                newTets.Vertices.Add(iPoint[2]);
+                newTets.Vertices.Add(iPoint[1]);
+                newTets.Vertices.Add(iPoint[3]);
+
+                newTets.Faces.AddFace(0, 2, 1);
+                newTets.Faces.AddFace(0, 2, 3);
+                newTets.Faces.AddFace(0, 3, 1);
+                newTets.Faces.AddFace(1, 3, 2);
+
+                newTets.FaceNormals.ComputeFaceNormals();
+                newTets.UnifyNormals();
+
+                return newTets;
+            }
+            else
+            {
+                return tets;
+            }
+        }
+
+        public static List<Curve> Explode(Curve curve, bool recursive = false)
+        {
+            List<Curve> list = new List<Curve>();
+            CurveSegments(list, curve, recursive);
+            return list;
+        }
+
+        internal static bool CurveSegments(List<Curve> list, Curve curve, bool recursive)
+        {
+            if (curve == null)
+            {
+                return false;
+            }
+            PolyCurve polyCurve = curve as PolyCurve;
+            if (polyCurve != null)
+            {
+                if (recursive)
+                {
+                    polyCurve.RemoveNesting();
+                }
+                Curve[] array = polyCurve.Explode();
+                if (array == null)
+                {
+                    return false;
+                }
+                if (array.Length == 0)
+                {
+                    return false;
+                }
+                if (recursive)
+                {
+                    Curve[] array2 = array;
+                    for (int i = 0; i < array2.Length; i++)
+                    {
+                        Curve curve2 = array2[i];
+                        CurveSegments(list, curve2, recursive);
+                    }
+                }
+                else
+                {
+                    Curve[] array3 = array;
+                    for (int j = 0; j < array3.Length; j++)
+                    {
+                        Curve item = array3[j];
+                        list.Add(item);
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                PolylineCurve polylineCurve = curve as PolylineCurve;
+                if (polylineCurve != null)
+                {
+                    for (int k = 0; k < polylineCurve.PointCount - 1; k++)
+                    {
+                        list.Add(new LineCurve(polylineCurve.Point(k), polylineCurve.Point(k + 1)));
+                    }
+                    return true;
+                }
+                Polyline polyline;
+                if (curve.TryGetPolyline(out polyline))
+                {
+                    for (int l = 0; l < polyline.Count - 1; l++)
+                    {
+                        list.Add(new LineCurve(polyline[l], polyline[l + 1]));
+                    }
+                    return true;
+                }
+                LineCurve lineCurve = curve as LineCurve;
+                if (lineCurve != null)
+                {
+                    list.Add(lineCurve.DuplicateCurve());
+                    return true;
+                }
+                ArcCurve arcCurve = curve as ArcCurve;
+                if (arcCurve != null)
+                {
+                    list.Add(arcCurve.DuplicateCurve());
+                    return true;
+                }
+                return CurveSegments(list, curve.ToNurbsCurve());
+            }
+        }
+        private static bool CurveSegments(List<Curve> list, NurbsCurve nurbs)
+        {
+            int count = list.Count;
+            if (nurbs == null)
+            {
+                return false;
+            }
+            double num = nurbs.Domain.Min;
+            double max = nurbs.Domain.Max;
+            //double num2;
+            while (nurbs.GetNextDiscontinuity(Continuity.C1_locus_continuous, num, max, out double num2))
+            {
+                Interval interval = new Interval(num, num2);
+                num = num2;
+                if (interval.Length >= 1E-16)
+                {
+                    Curve curve = nurbs.Trim(interval);
+                    if (curve.IsValid)
+                    {
+                        list.Add(curve);
+                    }
+                }
+            }
+            Interval interval2 = new Interval(num, max);
+            if (interval2.Length > 1E-16)
+            {
+                Curve curve2 = nurbs.Trim(interval2);
+                if (curve2.IsValid)
+                {
+                    list.Add(curve2);
+                }
+            }
+            if (list.Count == count)
+            {
+                list.Add(nurbs);
+            }
+            return true;
+        }
+
+
     }
 }

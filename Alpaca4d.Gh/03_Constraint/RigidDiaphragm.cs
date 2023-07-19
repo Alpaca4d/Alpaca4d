@@ -23,7 +23,7 @@ namespace Alpaca4d.Gh
             pManager.AddPointParameter("SlavePoints", "SlavePoints", "Points which define a rigid diaphgram", GH_ParamAccess.list);
             pManager.AddPointParameter("MasterPoint", "MasterPoint", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Direction", "Direction", "Direction perpendicular to the rigid plane.\n1 - yz plane\n2-xz plane\n3 xy plane) ", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Direction", "Direction", "Direction perpendicular to the rigid plane.\n1 - yz plane\n2 - xz plane\n3 - xy plane) ", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
