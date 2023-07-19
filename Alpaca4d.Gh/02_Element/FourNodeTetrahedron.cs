@@ -66,7 +66,9 @@ namespace Alpaca4d.Gh
                 color = Color.IndianRed;
             }
 
-            var element = new Alpaca4d.Element.Tetrahedron(mesh, material);
+            var _mesh = Utils.CleanTetrahedron(mesh);
+
+            var element = new Alpaca4d.Element.Tetrahedron(_mesh, material);
             element.Color = color;
             DA.SetData(0, element);
         }

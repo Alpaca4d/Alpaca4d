@@ -12,6 +12,7 @@ namespace Alpaca4d.Generic
     {
         public double E { get; set; }
         public double G { get; set; }
+        public double Nu { get; set; }
         public int? Id { get; set; }
         public double? Rho { get; set; }
     }
