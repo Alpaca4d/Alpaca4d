@@ -9,8 +9,7 @@ using Rhino.Geometry;
 using Grasshopper;
 using Alpaca4d;
 using Alpaca4d.Helper;
-using HDF5CSharp;
-using HDF5CSharp.DataTypes;
+using PureHDF;
 
 namespace Alpaca4d.Result
 {
@@ -42,57 +41,61 @@ namespace Alpaca4d.Result
             var dataOutput = Enumerable.Empty<Rhino.Geometry.Vector3d>();
 
             string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name;
-            long groupId;
-            TabularData<double> table;
+
+            using var h5File = PureHDF.H5File.OpenRead(recorderPath);           
+            double[,] values;
+            //TabularData<double> table;
 
             var _resultType = Alpaca4d.Helper.EnumHelper.ResultTypeConvert(resultType);
             if (alpacaModel.IsModal == false)
             {
-                groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/");
-                name = $"STEP_{step}";
+                //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/");
+                var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/STEP_{step}");
+                var dimX = (long)dataset.Space.Dimensions[0];
+                var dimY = (long)dataset.Space.Dimensions[1];
+
+                values = dataset.Read<double>().ToArray2D(dimX, dimY);
             }
             else
             {
-                groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/STEP_0");
-                name = $"MODE_{step}";
+                var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_NODES/DISPLACEMENT/DATA/STEP_0");
+                var dimX = (long)dataset.Space.Dimensions[0];
+                var dimY = (long)dataset.Space.Dimensions[1];
+
+                values = dataset.Read<double>().ToArray2D(dimX, dimY);
             }
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
+
             try
             {
                 // read all data base
-                if(nodeIndex == null)
+                if (nodeIndex == null)
                 {
                     for (int i = 0; i < alpacaModel.Nodes.Count; i++)
                     {
-                        double x = (double)table.Data.GetValue(i, 0);
-                        double y = (double)table.Data.GetValue(i, 1);
-                        double z = (double)table.Data.GetValue(i, 2);
+                        double x = (double)values.GetValue(i, 0);
+                        double y = (double)values.GetValue(i, 1);
+                        double z = (double)values.GetValue(i, 2);
                         dataOutput = dataOutput.Append(new Rhino.Geometry.Vector3d(x, y, z));
                     }
-                    Hdf5.CloseGroup(groupId);
-                    Hdf5.CloseFile(fileId);
+                    h5File.Dispose();
                 }
                 // read value only for selected nodes
                 else
                 {
-                    foreach(int i in nodeIndex)
+                    foreach (int i in nodeIndex)
                     {
-                        double x = (double)table.Data.GetValue(i-1, 0);
-                        double y = (double)table.Data.GetValue(i-1, 1);
-                        double z = (double)table.Data.GetValue(i-1, 2);
+                        double x = (double)values.GetValue(i - 1, 0);
+                        double y = (double)values.GetValue(i - 1, 1);
+                        double z = (double)values.GetValue(i - 1, 2);
                         dataOutput = dataOutput.Append(new Rhino.Geometry.Vector3d(x, y, z));
                     }
-                    Hdf5.CloseGroup(groupId);
-                    Hdf5.CloseFile(fileId);
+                    h5File.Dispose();
                 }
             }
             catch
             {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+                h5File.Dispose();
 
                 throw new Exception($"STEP_{step} not defined!");
             }
@@ -118,76 +121,76 @@ namespace Alpaca4d.Result
             var vzNested = new List<List<double>>();
             var tNested = new List<List<double>>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
 
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            try
-            {
-                for (int i = 0; i < alpacaModel.Beams.Count; i++)
-                {
-                    var n = new List<double>();
-                    var mz = new List<double>();
-                    var vy = new List<double>();
-                    var my = new List<double>();
-                    var vz = new List<double>();
-                    var t = new List<double>();
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //try
+            //{
+            //    for (int i = 0; i < alpacaModel.Beams.Count; i++)
+            //    {
+            //        var n = new List<double>();
+            //        var mz = new List<double>();
+            //        var vy = new List<double>();
+            //        var my = new List<double>();
+            //        var vz = new List<double>();
+            //        var t = new List<double>();
 
-                    int SECTIONFORCES = 6;
-                    int integrationPoint = alpacaModel.Beams[i].BeamIntegration.IntegrationPoint;
-                    for (int j = 0; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6 )
-                    {
-                        n.Add( (double)table.Data.GetValue(i, j) );
-                    }
+            //        int SECTIONFORCES = 6;
+            //        int integrationPoint = alpacaModel.Beams[i].BeamIntegration.IntegrationPoint;
+            //        for (int j = 0; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+            //        {
+            //            n.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 1; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        mz.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 1; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+            //        {
+            //            mz.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 2; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        vy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 2; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+            //        {
+            //            vy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 3; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        my.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 3; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+            //        {
+            //            my.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 4; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        vz.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 5; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        t.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 4; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+            //        {
+            //            vz.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 5; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+            //        {
+            //            t.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    nNested.Add(n);
-                    mzNested.Add(mz);
-                    vyNested.Add(vy);
-                    myNested.Add(my);
-                    vzNested.Add(vz);
-                    tNested.Add(t);
-                }
+            //        nNested.Add(n);
+            //        mzNested.Add(mz);
+            //        vyNested.Add(vy);
+            //        myNested.Add(my);
+            //        vzNested.Add(vz);
+            //        tNested.Add(t);
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (nNested, mzNested, vyNested, myNested, vzNested, tNested);
         }
@@ -204,90 +207,90 @@ namespace Alpaca4d.Result
             var vxzNested = new List<List<double>>();
             var vyzNested = new List<List<double>>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
 
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            var asdq4ShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Count();
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //var asdq4ShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Count();
 
-            try
-            {
-                for (int i = 0; i < asdq4ShellNumber; i++)
-                {
-                    var fxx = new List<double>();
-                    var fyy = new List<double>();
-                    var fxy = new List<double>();
-                    var mxx = new List<double>();
-                    var myy = new List<double>();
-                    var mxy = new List<double>();
-                    var vxz = new List<double>();
-                    var vyz = new List<double>();
+            //try
+            //{
+            //    for (int i = 0; i < asdq4ShellNumber; i++)
+            //    {
+            //        var fxx = new List<double>();
+            //        var fyy = new List<double>();
+            //        var fxy = new List<double>();
+            //        var mxx = new List<double>();
+            //        var myy = new List<double>();
+            //        var mxy = new List<double>();
+            //        var vxz = new List<double>();
+            //        var vyz = new List<double>();
 
-                    int NUMBER_COMPONENTS = 8;
-                    int NUMBER_NODES = 4;
-                    for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        int NUMBER_COMPONENTS = 8;
+            //        int NUMBER_NODES = 4;
+            //        for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fyy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fyy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fxy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fxy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        myy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vxz.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vyz.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            myy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vxz.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vyz.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    fxxNested.Add(fxx);
-                    fyyNested.Add(fyy);
-                    fxyNested.Add(fxy);
-                    mxxNested.Add(mxx);
-                    myyNested.Add(myy);
-                    mxyNested.Add(mxy);
-                    vxzNested.Add(vxz);
-                    vyzNested.Add(vyz);
-                }
+            //        fxxNested.Add(fxx);
+            //        fyyNested.Add(fyy);
+            //        fxyNested.Add(fxy);
+            //        mxxNested.Add(mxx);
+            //        myyNested.Add(myy);
+            //        mxyNested.Add(mxy);
+            //        vxzNested.Add(vxz);
+            //        vyzNested.Add(vyz);
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (fxxNested, fyyNested, fxyNested, mxxNested, myyNested, mxyNested, vxzNested, vyzNested);
         }
@@ -304,90 +307,90 @@ namespace Alpaca4d.Result
             var vxzNested = new List<List<double>>();
             var vyzNested = new List<List<double>>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
 
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            var asdq4ShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Count();
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //var asdq4ShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Count();
 
-            try
-            {
-                for (int i = 0; i < asdq4ShellNumber; i++)
-                {
-                    var pxx = new List<double>();
-                    var pyy = new List<double>();
-                    var pxy = new List<double>();
-                    var mxx = new List<double>();
-                    var myy = new List<double>();
-                    var mxy = new List<double>();
-                    var vxz = new List<double>();
-                    var vyz = new List<double>();
+            //try
+            //{
+            //    for (int i = 0; i < asdq4ShellNumber; i++)
+            //    {
+            //        var pxx = new List<double>();
+            //        var pyy = new List<double>();
+            //        var pxy = new List<double>();
+            //        var mxx = new List<double>();
+            //        var myy = new List<double>();
+            //        var mxy = new List<double>();
+            //        var vxz = new List<double>();
+            //        var vyz = new List<double>();
 
-                    int NUMBER_COMPONENTS = 8;
-                    int NUMBER_NODES = 4;
-                    for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        pxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        int NUMBER_COMPONENTS = 8;
+            //        int NUMBER_NODES = 4;
+            //        for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            pxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        pyy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            pyy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        pxy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            pxy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        myy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vxz.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vyz.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            myy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vxz.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vyz.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    pxxNested.Add(pxx);
-                    pyyNested.Add(pyy);
-                    pxyNested.Add(pxy);
-                    mxxNested.Add(mxx);
-                    myyNested.Add(myy);
-                    mxyNested.Add(mxy);
-                    vxzNested.Add(vxz);
-                    vyzNested.Add(vyz);
-                }
+            //        pxxNested.Add(pxx);
+            //        pyyNested.Add(pyy);
+            //        pxyNested.Add(pxy);
+            //        mxxNested.Add(mxx);
+            //        myyNested.Add(myy);
+            //        mxyNested.Add(mxy);
+            //        vxzNested.Add(vxz);
+            //        vyzNested.Add(vyz);
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (pxxNested, pyyNested, pxyNested, mxxNested, myyNested, mxyNested, vxzNested, vyzNested);
         }
@@ -405,98 +408,98 @@ namespace Alpaca4d.Result
             var vxzNested = new List<List<double>>();
             var vyzNested = new List<List<double>>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ShellDKGT).Count();
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ShellDKGT).Count();
 
-            try
-            {
-                for (int i = 0; i < dkgtShellNumber; i++)
-                {
-                    var fxx = new List<double>();
-                    var fyy = new List<double>();
-                    var fxy = new List<double>();
-                    var mxx = new List<double>();
-                    var myy = new List<double>();
-                    var mxy = new List<double>();
-                    var vxz = new List<double>();
-                    var vyz = new List<double>();
+            //try
+            //{
+            //    for (int i = 0; i < dkgtShellNumber; i++)
+            //    {
+            //        var fxx = new List<double>();
+            //        var fyy = new List<double>();
+            //        var fxy = new List<double>();
+            //        var mxx = new List<double>();
+            //        var myy = new List<double>();
+            //        var mxy = new List<double>();
+            //        var vxz = new List<double>();
+            //        var vyz = new List<double>();
 
-                    int NUMBER_COMPONENTS = 8;
-                    int NUMBER_NODES = 4;
-                    for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        int NUMBER_COMPONENTS = 8;
+            //        int NUMBER_NODES = 4;
+            //        for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fyy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fyy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fxy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fxy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        myy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vxz.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vyz.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            myy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vxz.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vyz.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    fxx.RemoveAt(0);
-                    fyy.RemoveAt(0);
-                    fxy.RemoveAt(0);
-                    mxx.RemoveAt(0);
-                    myy.RemoveAt(0);
-                    mxy.RemoveAt(0);
-                    vxz.RemoveAt(0);
-                    vyz.RemoveAt(0);
+            //        fxx.RemoveAt(0);
+            //        fyy.RemoveAt(0);
+            //        fxy.RemoveAt(0);
+            //        mxx.RemoveAt(0);
+            //        myy.RemoveAt(0);
+            //        mxy.RemoveAt(0);
+            //        vxz.RemoveAt(0);
+            //        vyz.RemoveAt(0);
 
-                    fxxNested.Add(fxx);
-                    fyyNested.Add(fyy);
-                    fxyNested.Add(fxy);
-                    mxxNested.Add(mxx);
-                    myyNested.Add(myy);
-                    mxyNested.Add(mxy);
-                    vxzNested.Add(vxz);
-                    vyzNested.Add(vyz);
-                }
+            //        fxxNested.Add(fxx);
+            //        fyyNested.Add(fyy);
+            //        fxyNested.Add(fxy);
+            //        mxxNested.Add(mxx);
+            //        myyNested.Add(myy);
+            //        mxyNested.Add(mxy);
+            //        vxzNested.Add(vxz);
+            //        vyzNested.Add(vyz);
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (fxxNested, fyyNested, fxyNested, mxxNested, myyNested, mxyNested, vxzNested, vyzNested);
         }
@@ -514,100 +517,100 @@ namespace Alpaca4d.Result
             var vxzNested = new List<List<double>>();
             var vyzNested = new List<List<double>>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ShellDKGT).Count();
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //var dkgtShellNumber = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ShellDKGT).Count();
 
-            try
-            {
-                for (int i = 0; i < dkgtShellNumber; i++)
-                {
-                    var fxx = new List<double>();
-                    var fyy = new List<double>();
-                    var fxy = new List<double>();
-                    var mxx = new List<double>();
-                    var myy = new List<double>();
-                    var mxy = new List<double>();
-                    var vxz = new List<double>();
-                    var vyz = new List<double>();
+            //try
+            //{
+            //    for (int i = 0; i < dkgtShellNumber; i++)
+            //    {
+            //        var fxx = new List<double>();
+            //        var fyy = new List<double>();
+            //        var fxy = new List<double>();
+            //        var mxx = new List<double>();
+            //        var myy = new List<double>();
+            //        var mxy = new List<double>();
+            //        var vxz = new List<double>();
+            //        var vyz = new List<double>();
 
-                    int NUMBER_COMPONENTS = 8;
-                    int NUMBER_NODES = 4;
-                    for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        int NUMBER_COMPONENTS = 8;
+            //        int NUMBER_NODES = 4;
+            //        for (int j = 0; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fyy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 1; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fyy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        fxy.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 2; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            fxy.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxx.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 3; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxx.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        myy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        mxy.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vxz.Add((double)table.Data.GetValue(i, j));
-                    }
-                    for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
-                    {
-                        vyz.Add((double)table.Data.GetValue(i, j));
-                    }
+            //        for (int j = 4; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            myy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 5; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            mxy.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 6; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vxz.Add((double)table.Data.GetValue(i, j));
+            //        }
+            //        for (int j = 7; j < NUMBER_COMPONENTS * NUMBER_NODES; j += NUMBER_COMPONENTS)
+            //        {
+            //            vyz.Add((double)table.Data.GetValue(i, j));
+            //        }
 
-                    // remove first item as it is the force/stress in the center of the shell
+            //        // remove first item as it is the force/stress in the center of the shell
 
-                    fxx.RemoveAt(0);
-                    fyy.RemoveAt(0);
-                    fxy.RemoveAt(0);
-                    mxx.RemoveAt(0);
-                    myy.RemoveAt(0);
-                    mxy.RemoveAt(0);
-                    vxz.RemoveAt(0);
-                    vyz.RemoveAt(0);
+            //        fxx.RemoveAt(0);
+            //        fyy.RemoveAt(0);
+            //        fxy.RemoveAt(0);
+            //        mxx.RemoveAt(0);
+            //        myy.RemoveAt(0);
+            //        mxy.RemoveAt(0);
+            //        vxz.RemoveAt(0);
+            //        vyz.RemoveAt(0);
 
-                    fxxNested.Add(fxx);
-                    fyyNested.Add(fyy);
-                    fxyNested.Add(fxy);
-                    mxxNested.Add(mxx);
-                    myyNested.Add(myy);
-                    mxyNested.Add(mxy);
-                    vxzNested.Add(vxz);
-                    vyzNested.Add(vyz);
-                }
+            //        fxxNested.Add(fxx);
+            //        fyyNested.Add(fyy);
+            //        fxyNested.Add(fxy);
+            //        mxxNested.Add(mxx);
+            //        myyNested.Add(myy);
+            //        mxyNested.Add(mxy);
+            //        vxzNested.Add(vxz);
+            //        vyzNested.Add(vyz);
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (fxxNested, fyyNested, fxyNested, mxxNested, myyNested, mxyNested, vxzNested, vyzNested);
         }
@@ -632,40 +635,40 @@ namespace Alpaca4d.Result
             var sigma23 = new List<double>();
             var sigma13 = new List<double>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
 
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            var tetrahedronBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.FourNodeTetrahedron).Count();
-            try
-            {
-                for (int i = 0; i < tetrahedronBrickNumber; i++)
-                {
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //var tetrahedronBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.FourNodeTetrahedron).Count();
+            //try
+            //{
+            //    for (int i = 0; i < tetrahedronBrickNumber; i++)
+            //    {
 
-                    sigma11.Add((double)table.Data.GetValue(i, 0));
-                    sigma22.Add((double)table.Data.GetValue(i, 1));
-                    sigma33.Add((double)table.Data.GetValue(i, 2));
-                    sigma12.Add((double)table.Data.GetValue(i, 3));
-                    sigma23.Add((double)table.Data.GetValue(i, 4));
-                    sigma13.Add((double)table.Data.GetValue(i, 5));
-                }
+            //        sigma11.Add((double)table.Data.GetValue(i, 0));
+            //        sigma22.Add((double)table.Data.GetValue(i, 1));
+            //        sigma33.Add((double)table.Data.GetValue(i, 2));
+            //        sigma12.Add((double)table.Data.GetValue(i, 3));
+            //        sigma23.Add((double)table.Data.GetValue(i, 4));
+            //        sigma13.Add((double)table.Data.GetValue(i, 5));
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (sigma11, sigma22, sigma33, sigma12, sigma23, sigma13);
         }
@@ -681,40 +684,40 @@ namespace Alpaca4d.Result
             var sigma23 = new List<double>();
             var sigma13 = new List<double>();
 
-            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            long fileId = Hdf5.OpenFile(recorderPath, true);
-            string name = $"STEP_{step}";
-            long groupId;
-            TabularData<double> table;
+            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            //long fileId = Hdf5.OpenFile(recorderPath, true);
+            //string name = $"STEP_{step}";
+            //long groupId;
+            //TabularData<double> table;
 
-            // READ DATA
-            groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            //// READ DATA
+            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
 
-            table = Hdf5.Read2DTable<double>(groupId, name);
-            var sspBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.SSPBrick).Count();
-            try
-            {
-                for (int i = 0; i < sspBrickNumber; i++)
-                {
+            //table = Hdf5.Read2DTable<double>(groupId, name);
+            //var sspBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.SSPBrick).Count();
+            //try
+            //{
+            //    for (int i = 0; i < sspBrickNumber; i++)
+            //    {
 
-                    sigma11.Add((double)table.Data.GetValue(i, 0));
-                    sigma22.Add((double)table.Data.GetValue(i, 1));
-                    sigma33.Add((double)table.Data.GetValue(i, 2));
-                    sigma12.Add((double)table.Data.GetValue(i, 3));
-                    sigma23.Add((double)table.Data.GetValue(i, 4));
-                    sigma13.Add((double)table.Data.GetValue(i, 5));
-                }
+            //        sigma11.Add((double)table.Data.GetValue(i, 0));
+            //        sigma22.Add((double)table.Data.GetValue(i, 1));
+            //        sigma33.Add((double)table.Data.GetValue(i, 2));
+            //        sigma12.Add((double)table.Data.GetValue(i, 3));
+            //        sigma23.Add((double)table.Data.GetValue(i, 4));
+            //        sigma13.Add((double)table.Data.GetValue(i, 5));
+            //    }
 
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
-            }
-            catch
-            {
-                Hdf5.CloseGroup(groupId);
-                Hdf5.CloseFile(fileId);
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
+            //}
+            //catch
+            //{
+            //    Hdf5.CloseGroup(groupId);
+            //    Hdf5.CloseFile(fileId);
 
-                throw new Exception($"STEP_{step} not defined!");
-            }
+            //    throw new Exception($"STEP_{step} not defined!");
+            //}
 
             return (sigma11, sigma22, sigma33, sigma12, sigma23, sigma13);
         }

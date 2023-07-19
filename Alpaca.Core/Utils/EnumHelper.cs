@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using Rhino.Geometry;
 using Grasshopper;
 using Alpaca4d;
-using HDF5CSharp;
-using HDF5CSharp.DataTypes;
 using Alpaca4d.Result;
 
 namespace Alpaca4d.Helper

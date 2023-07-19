@@ -14,7 +14,7 @@ namespace Alpaca4d
 
         public static readonly string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static readonly string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
-        public static readonly string OpenSeesFolder = System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers/bin");
+        public static readonly string OpenSeesFolder = System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers\bin");
 
         public static readonly string OpenSees = System.IO.Path.Combine(OpenSeesFolder, @"OpenSees.exe");
         public static readonly string OpenSeesSP = System.IO.Path.Combine(OpenSeesFolder, @"openseessp.bat");
