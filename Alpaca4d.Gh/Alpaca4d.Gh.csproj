@@ -8,7 +8,11 @@
     <TargetExt>.gha</TargetExt>
     <BaseOutputPath></BaseOutputPath>
   </PropertyGroup>
-	
+
+  <PropertyGroup>     
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="09_Visualization\**" />
     <Compile Remove="Recorder\**" />
@@ -24,8 +28,8 @@
   <ItemGroup>
     <PackageReference Include="FemDesign.Core" Version="22.4.0" />
     <PackageReference Include="Grasshopper" Version="7.18.22124.3001" IncludeAssets="compile;build" />
-    <PackageReference Include="HDF5-CSharp" Version="1.13.4" />
     <PackageReference Include="RhinoCommon" Version="7.18.22124.3001" />
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
   </ItemGroup>
   
   <ItemGroup>
@@ -462,13 +466,22 @@
     <None Update="License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OpenSees-Solvers\bin\libiomp5md.dll">
+    <None Update="OpenSees-Solvers\mac\bin\OpenSees">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OpenSees-Solvers\bin\OpenSees.exe">
+    <None Update="OpenSees-Solvers\mac\lib\tcl8.6\init.tcl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OpenSees-Solvers\lib\tcl8.6\init.tcl">
+    <None Update="OpenSees-Solvers\win\bin\libiomp5md.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OpenSees-Solvers\win\bin\OpenSees.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OpenSees-Solvers\win\lib\tcl8.6\init.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OpenSees-Solvers\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Runtime.InteropServices;
+
 
 namespace Alpaca4d
 {
@@ -12,13 +14,34 @@ namespace Alpaca4d
         public static readonly List<string> Intro = new List<string>(){""};
 
 
-        public static readonly string assemblyLocation = Assembly.GetExecutingAssembly().Location;
-        public static readonly string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
-        public static readonly string OpenSeesFolder = System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers\bin");
+        public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+        public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
 
-        public static readonly string OpenSees = System.IO.Path.Combine(OpenSeesFolder, @"OpenSees.exe");
-        public static readonly string OpenSeesSP = System.IO.Path.Combine(OpenSeesFolder, @"openseessp.bat");
-        public static readonly string OpenSeesMP = System.IO.Path.Combine(OpenSeesFolder, @"openseesmp.bat");
+        
+        //public static readonly string OpenSeesFolder = System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers/bin");
+
+        public static string OpenSeesFolder
+        {
+            get
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers/win/bin");
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    return System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers/mac/bin");
+                }
+                else
+                {
+                    throw new Exception("Linux is not supported!");
+                }
+            }
+        }
+
+        public static string OpenSees = System.IO.Path.Combine(OpenSeesFolder, @"OpenSees");
+        //public static string OpenSeesSP = System.IO.Path.Combine(OpenSeesFolder, @"openseessp.bat");
+        //public static string OpenSeesMP = System.IO.Path.Combine(OpenSeesFolder, @"openseesmp.bat");
 
         public string CurrentDir { get; } = System.IO.Directory.GetCurrentDirectory();
         public string FileName { get; set; }
