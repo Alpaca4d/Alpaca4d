@@ -14,3 +14,5 @@ packages/
 .mpco
 *.mpco
 *AlpacaModel
+
+!**/Alpaca4d.Gh/OpenSees-Solvers/*
