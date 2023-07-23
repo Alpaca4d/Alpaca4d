@@ -40,8 +40,6 @@ namespace Alpaca4d
         }
 
         public static string OpenSees = System.IO.Path.Combine(OpenSeesFolder, @"OpenSees");
-        //public static string OpenSeesSP = System.IO.Path.Combine(OpenSeesFolder, @"openseessp.bat");
-        //public static string OpenSeesMP = System.IO.Path.Combine(OpenSeesFolder, @"openseesmp.bat");
 
         public string CurrentDir { get; } = System.IO.Directory.GetCurrentDirectory();
         public string FileName { get; set; }
