@@ -26,6 +26,12 @@ namespace Alpaca4d.Result
         MODES_OF_VIBRATION_R
     }
 
+    public enum ResultLocation
+    {
+        NODES,
+        ELEMENTS,
+    }
+
     public partial class Read
     {
         /// <summary>

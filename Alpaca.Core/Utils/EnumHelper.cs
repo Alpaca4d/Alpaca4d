@@ -31,6 +31,23 @@ namespace Alpaca4d.Helper
             return _resultType;
         }
 
+        public static string ResultLocationConvert(ResultLocation resultLocation)
+        {
+            string _resultLocation = "";
+
+            if (resultLocation == ResultLocation.NODES)
+            {
+                _resultLocation = "ON_NODES";
+            }
+            else if (resultLocation == ResultLocation.ELEMENTS)
+            {
+                _resultLocation = "ON_ELEMENTS";
+            }
+            else _resultLocation = resultLocation.ToString();
+
+            return _resultLocation;
+        }
+
         public static string SolverTypeConvert(Alpaca4d.Analysis.Solver resultType)
         {
             string _resultType = "";
