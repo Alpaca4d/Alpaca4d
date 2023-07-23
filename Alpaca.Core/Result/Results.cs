@@ -44,12 +44,10 @@ namespace Alpaca4d.Result
 
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);           
             double[,] values;
-            //TabularData<double> table;
 
             var _resultType = Alpaca4d.Helper.EnumHelper.ResultTypeConvert(resultType);
             if (alpacaModel.IsModal == false)
             {
-                //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/");
                 var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/STEP_{step}");
                 var dimX = (long)dataset.Space.Dimensions[0];
                 var dimY = (long)dataset.Space.Dimensions[1];
@@ -58,7 +56,7 @@ namespace Alpaca4d.Result
             }
             else
             {
-                var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_NODES/DISPLACEMENT/DATA/STEP_0");
+                var dataset = h5File.Dataset($"MODEL_STAGE[1]/RESULTS/ON_NODES/MODES_OF_VIBRATION(R)/DATA/STEP_0/MODE_{step}");
                 var dimX = (long)dataset.Space.Dimensions[0];
                 var dimY = (long)dataset.Space.Dimensions[1];
 

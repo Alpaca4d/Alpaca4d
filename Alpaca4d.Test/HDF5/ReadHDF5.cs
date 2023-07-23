@@ -13,7 +13,7 @@ namespace Alpaca4d.Test.HDF5
         public void TestMethod1()
         {
 
-            using var h5File = PureHDF.H5File.OpenRead(@"HDF5\recorder.hdf5");
+            using var h5File = PureHDF.H5File.OpenRead(@"HDF5/recorder.hdf5");
 
 
             // get nested group

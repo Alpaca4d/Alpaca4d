@@ -5,8 +5,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using HDF5CSharp;
-using HDF5CSharp.DataTypes;
 using Alpaca4d.Generic;
 using Alpaca4d.Result;
 
