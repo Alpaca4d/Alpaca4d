@@ -132,7 +132,7 @@ namespace Alpaca4d.Result
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
             double[,] values;
 
-            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/STEP_{step}");
             var dimX = (long)dataset.Space.Dimensions[0];
             var dimY = (long)dataset.Space.Dimensions[1];
 
@@ -215,7 +215,7 @@ namespace Alpaca4d.Result
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
             double[,] values;
 
-            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/STEP_{step}");
             var dimX = (long)dataset.Space.Dimensions[0];
             var dimY = (long)dataset.Space.Dimensions[1];
 
@@ -313,7 +313,7 @@ namespace Alpaca4d.Result
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
             double[,] values;
 
-            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/STEP_{step}");
             var dimX = (long)dataset.Space.Dimensions[0];
             var dimY = (long)dataset.Space.Dimensions[1];
 
@@ -413,7 +413,7 @@ namespace Alpaca4d.Result
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
             double[,] values;
 
-            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/");
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/STEP_{step}");
             var dimX = (long)dataset.Space.Dimensions[0];
             var dimY = (long)dataset.Space.Dimensions[1];
 
@@ -521,7 +521,7 @@ namespace Alpaca4d.Result
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
             double[,] values;
 
-            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/STEP_{step}");
             var dimX = (long)dataset.Space.Dimensions[0];
             var dimY = (long)dataset.Space.Dimensions[1];
 
@@ -633,40 +633,40 @@ namespace Alpaca4d.Result
             var sigma23 = new List<double>();
             var sigma13 = new List<double>();
 
-            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            //long fileId = Hdf5.OpenFile(recorderPath, true);
-            //string name = $"STEP_{step}";
-            //long groupId;
-            //TabularData<double> table;
 
-            //// READ DATA
-            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
 
-            //table = Hdf5.Read2DTable<double>(groupId, name);
-            //var tetrahedronBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.FourNodeTetrahedron).Count();
-            //try
-            //{
-            //    for (int i = 0; i < tetrahedronBrickNumber; i++)
-            //    {
+            using var h5File = PureHDF.H5File.OpenRead(recorderPath);
+            double[,] values;
 
-            //        sigma11.Add((double)table.Data.GetValue(i, 0));
-            //        sigma22.Add((double)table.Data.GetValue(i, 1));
-            //        sigma33.Add((double)table.Data.GetValue(i, 2));
-            //        sigma12.Add((double)table.Data.GetValue(i, 3));
-            //        sigma23.Add((double)table.Data.GetValue(i, 4));
-            //        sigma13.Add((double)table.Data.GetValue(i, 5));
-            //    }
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/STEP_{step}");
+            var dimX = (long)dataset.Space.Dimensions[0];
+            var dimY = (long)dataset.Space.Dimensions[1];
 
-            //    Hdf5.CloseGroup(groupId);
-            //    Hdf5.CloseFile(fileId);
-            //}
-            //catch
-            //{
-            //    Hdf5.CloseGroup(groupId);
-            //    Hdf5.CloseFile(fileId);
+            values = dataset.Read<double>().ToArray2D(dimX, dimY);
 
-            //    throw new Exception($"STEP_{step} not defined!");
-            //}
+
+            var tetrahedronBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.FourNodeTetrahedron).Count();
+            try
+            {
+                for (int i = 0; i < tetrahedronBrickNumber; i++)
+                {
+
+                    sigma11.Add((double)values.GetValue(i, 0));
+                    sigma22.Add((double)values.GetValue(i, 1));
+                    sigma33.Add((double)values.GetValue(i, 2));
+                    sigma12.Add((double)values.GetValue(i, 3));
+                    sigma23.Add((double)values.GetValue(i, 4));
+                    sigma13.Add((double)values.GetValue(i, 5));
+                }
+
+                h5File.Dispose();
+            }
+            catch
+            {
+                h5File.Dispose();
+                throw new Exception($"STEP_{step} not defined!");
+            }
 
             return (sigma11, sigma22, sigma33, sigma12, sigma23, sigma13);
         }
@@ -682,40 +682,38 @@ namespace Alpaca4d.Result
             var sigma23 = new List<double>();
             var sigma13 = new List<double>();
 
-            //string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
-            //long fileId = Hdf5.OpenFile(recorderPath, true);
-            //string name = $"STEP_{step}";
-            //long groupId;
-            //TabularData<double> table;
+            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
 
-            //// READ DATA
-            //groupId = Hdf5.CreateOrOpenGroup(fileId, $"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/");
+            using var h5File = PureHDF.H5File.OpenRead(recorderPath);
+            double[,] values;
 
-            //table = Hdf5.Read2DTable<double>(groupId, name);
-            //var sspBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.SSPBrick).Count();
-            //try
-            //{
-            //    for (int i = 0; i < sspBrickNumber; i++)
-            //    {
+            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/stresses/{resultType}/DATA/STEP_{step}");
+            var dimX = (long)dataset.Space.Dimensions[0];
+            var dimY = (long)dataset.Space.Dimensions[1];
 
-            //        sigma11.Add((double)table.Data.GetValue(i, 0));
-            //        sigma22.Add((double)table.Data.GetValue(i, 1));
-            //        sigma33.Add((double)table.Data.GetValue(i, 2));
-            //        sigma12.Add((double)table.Data.GetValue(i, 3));
-            //        sigma23.Add((double)table.Data.GetValue(i, 4));
-            //        sigma13.Add((double)table.Data.GetValue(i, 5));
-            //    }
+            values = dataset.Read<double>().ToArray2D(dimX, dimY);
 
-            //    Hdf5.CloseGroup(groupId);
-            //    Hdf5.CloseFile(fileId);
-            //}
-            //catch
-            //{
-            //    Hdf5.CloseGroup(groupId);
-            //    Hdf5.CloseFile(fileId);
+            var sspBrickNumber = alpacaModel.Bricks.Where(x => x.ElementClass == Element.ElementClass.SSPBrick).Count();
+            try
+            {
+                for (int i = 0; i < sspBrickNumber; i++)
+                {
 
-            //    throw new Exception($"STEP_{step} not defined!");
-            //}
+                    sigma11.Add((double)values.GetValue(i, 0));
+                    sigma22.Add((double)values.GetValue(i, 1));
+                    sigma33.Add((double)values.GetValue(i, 2));
+                    sigma12.Add((double)values.GetValue(i, 3));
+                    sigma23.Add((double)values.GetValue(i, 4));
+                    sigma13.Add((double)values.GetValue(i, 5));
+                }
+
+                h5File.Dispose();
+            }
+            catch
+            {
+                h5File.Dispose();
+                throw new Exception($"STEP_{step} not defined!");
+            }
 
             return (sigma11, sigma22, sigma33, sigma12, sigma23, sigma13);
         }
