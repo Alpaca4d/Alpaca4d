@@ -20,9 +20,9 @@ namespace Alpaca4d.Gh
 
 			public static readonly ValueListUtils.BracketC _nine = new ValueListUtils.BracketC();
 
-			public static Func<GH_ValueListItem, string> _nine__0_0;
+			public static Func<GH_ValueListItem, string> _nine__0_0 = null;
 
-			public static Func<GH_ValueListItem, string> _nine__0_1;
+			public static Func<GH_ValueListItem, string> _nine__0_1 = null;
 
 			internal string b__0_0(GH_ValueListItem x)
 			{
@@ -78,7 +78,6 @@ namespace Alpaca4d.Gh
 									}
 									goto IL_158;
 								}
-								goto IL_106;
 							}
 							goto IL_106;
 						IL_158:

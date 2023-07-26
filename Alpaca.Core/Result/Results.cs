@@ -200,7 +200,7 @@ namespace Alpaca4d.Result
 
         public static (List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>) ASDQ4Forces(Model alpacaModel, int step, string resultType = null)
         {
-            resultType = "203-UnknownMovableObject[201:0:0]";
+            resultType = "203-ASDShellQ4[201:0:0]";
             var fxxNested = new List<List<double>>();
             var fyyNested = new List<List<double>>();
             var fxyNested = new List<List<double>>();
@@ -298,7 +298,7 @@ namespace Alpaca4d.Result
 
         public static (List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>) ASDQ4Stresses(Model alpacaModel, int step, string resultType = null)
         {
-            resultType = "203-UnknownMovableObject[201:0:0]";
+            resultType = "203-ASDShellQ4[201:0:0]";
             var pxxNested = new List<List<double>>();
             var pyyNested = new List<List<double>>();
             var pxyNested = new List<List<double>>();
@@ -397,7 +397,7 @@ namespace Alpaca4d.Result
 
         public static (List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>) DKGTForces(Model alpacaModel, int step, string resultType = null)
         {
-            resultType = "167-UnknownMovableObject[103:0:0]"; // DKGT
+            resultType = "167-ShellDKGT[103:0:0]"; // DKGT
             //resultType = "168-UnknownMovableObject[103:0:0]"; // NLDKGT
             var fxxNested = new List<List<double>>();
             var fyyNested = new List<List<double>>();
@@ -505,8 +505,8 @@ namespace Alpaca4d.Result
 
         public static (List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>, List<List<double>>) DKGTStresses(Model alpacaModel, int step, string resultType = null)
         {
-            resultType = "167-UnknownMovableObject[103:0:0]"; // DKGT
-            //resultType = "168-UnknownMovableObject[103:0:0]"; // NLDKGT
+            resultType = "167-ShellDKGT[103:0:0]"; // DKGT
+            //resultType = "168-ShellNLDKGT[103:0:0]" // NLDKGT
             var fxxNested = new List<List<double>>();
             var fyyNested = new List<List<double>>();
             var fxyNested = new List<List<double>>();
