@@ -16,8 +16,6 @@ namespace Alpaca4d.Gh.Forms
 
         public static DateTime licenseDate = new DateTime(2023, 7, 30);
 
-
-
         public Advertise()
         {
             var windows = new Eto.Forms.Form();
