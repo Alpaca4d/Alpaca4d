@@ -59,11 +59,11 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(1, ref settings)) return;
 
 
-            if(DateTime.Now > Forms.Advertise.licenseDate)
+            if(DateTime.Now > Alpaca4d.License.License.FreeVersionDate)
             {
                 if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
                 {
-                    new Alpaca4d.Gh.Forms.Advertise();
+                    Alpaca4d.Gh.Forms.Advertise.Default();
                 }
             }
 

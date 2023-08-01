@@ -14,8 +14,6 @@ namespace Alpaca4d.Gh.Forms
     {
         public static int NumberOfElements = 10;
 
-        public static DateTime licenseDate = new DateTime(2023, 7, 30);
-
         public Advertise()
         {
             var windows = new Eto.Forms.Form();
@@ -38,6 +36,11 @@ namespace Alpaca4d.Gh.Forms
 
             windows.Content = imageView;
             windows.Show();
+        }
+
+        public static Advertise Default()
+        {
+            return new Advertise();
         }
     }
 }
