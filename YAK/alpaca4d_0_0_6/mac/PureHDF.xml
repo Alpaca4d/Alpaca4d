@@ -1,0 +1,1800 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PureHDF</name>
+    </assembly>
+    <members>
+        <member name="T:PureHDF.ArrayExtensions">
+            <summary>
+            Contains extensions to simplify the conversion of a 1-dimensional array to an up 6-simensional array.
+            </summary>
+        </member>
+        <member name="M:PureHDF.ArrayExtensions.ToArray2D``1(``0[],System.Int64,System.Int64)">
+            <summary>
+            Converts the 1-dimensional input array into a 2-dimensional output array by coping the data. See also <seealso href="https://github.com/Apollo3zehn/PureHDF#722-high-performance-method-2d-only">PureHDF</seealso> for a copy-free version.
+            </summary>
+            <typeparam name="T">The base type of the array to convert.</typeparam>
+            <param name="data">The array to convert.</param>
+            <param name="dim0">The size of dimension 0.</param>
+            <param name="dim1">The size of dimension 1.</param>
+            <returns>A 2-dimensional array.</returns>
+        </member>
+        <member name="M:PureHDF.ArrayExtensions.ToArray3D``1(``0[],System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Converts the 1-dimensional input array into a 3-dimensional output array by coping the data.
+            </summary>
+            <typeparam name="T">The base type of the array to convert.</typeparam>
+            <param name="data">The array to convert.</param>
+            <param name="dim0">The size of dimension 0.</param>
+            <param name="dim1">The size of dimension 1.</param>
+            <param name="dim2">The size of dimension 2.</param>
+            <returns>A 3-dimensional array.</returns>
+        </member>
+        <member name="M:PureHDF.ArrayExtensions.ToArray4D``1(``0[],System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Converts the 1-dimensional input array into a 4-dimensional output array by coping the data.
+            </summary>
+            <typeparam name="T">The base type of the array to convert.</typeparam>
+            <param name="data">The array to convert.</param>
+            <param name="dim0">The size of dimension 0.</param>
+            <param name="dim1">The size of dimension 1.</param>
+            <param name="dim2">The size of dimension 2.</param>
+            <param name="dim3">The size of dimension 3.</param>
+            <returns>A 4-dimensional array.</returns>
+        </member>
+        <member name="M:PureHDF.ArrayExtensions.ToArray5D``1(``0[],System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Converts the 1-dimensional input array into a 5-dimensional output array by coping the data.
+            </summary>
+            <typeparam name="T">The base type of the array to convert.</typeparam>
+            <param name="data">The array to convert.</param>
+            <param name="dim0">The size of dimension 0.</param>
+            <param name="dim1">The size of dimension 1.</param>
+            <param name="dim2">The size of dimension 2.</param>
+            <param name="dim3">The size of dimension 3.</param>
+            <param name="dim4">The size of dimension 4.</param>
+            <returns>A 5-dimensional array.</returns>
+        </member>
+        <member name="M:PureHDF.ArrayExtensions.ToArray6D``1(``0[],System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Converts the 1-dimensional input array into a 6-dimensional output array by coping the data.
+            </summary>
+            <typeparam name="T">The base type of the array to convert.</typeparam>
+            <param name="data">The array to convert.</param>
+            <param name="dim0">The size of dimension 0.</param>
+            <param name="dim1">The size of dimension 1.</param>
+            <param name="dim2">The size of dimension 2.</param>
+            <param name="dim3">The size of dimension 3.</param>
+            <param name="dim4">The size of dimension 4.</param>
+            <param name="dim5">The size of dimension 5.</param>
+            <returns>A 6-dimensional array.</returns>
+        </member>
+        <member name="T:PureHDF.H5Constants">
+            <summary>
+            A class to group constants.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5Constants.Unlimited">
+            <summary>
+            This constant is used to specify an unlimited dimension.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5DataLayoutClass">
+            <summary>
+            Specifies the data layout class.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataLayoutClass.Compact">
+            <summary>
+            The data is stored within the object's metadata.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataLayoutClass.Contiguous">
+            <summary>
+            THe data is stored as one contiguous block of data.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataLayoutClass.Chunked">
+            <summary>
+            The data is stored in chunks.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataLayoutClass.VirtualStorage">
+            <summary>
+            The data is a virtual view composed of other datasets.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5DataspaceType">
+            <summary>
+            The dataspace type.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataspaceType.Scalar">
+            <summary>
+            A scalar dataspace.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataspaceType.Simple">
+            <summary>
+            A simple dataspace.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataspaceType.Null">
+            <summary>
+            A null-dataspace.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5DataTypeClass">
+            <summary>
+            Specifies the data type class.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.FixedPoint">
+            <summary>
+            A fixed-point number.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.FloatingPoint">
+            <summary>
+            A floating-point number.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.Time">
+            <summary>
+            A time structure. Not supported.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.String">
+            <summary>
+            A string.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.BitField">
+            <summary>
+            A bitfield.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.Opaque">
+            <summary>
+            An opaque blob of bytes.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.Compound">
+            <summary>
+            A compound data type.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.Reference">
+            <summary>
+            A reference.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.Enumerated">
+            <summary>
+            An enumeration.
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.VariableLength">
+            <summary>
+            A variable-length data type (string or sequence).
+            </summary>
+        </member>
+        <member name="F:PureHDF.H5DataTypeClass.Array">
+            <summary>
+            An array data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5NameAttribute">
+            <summary>
+            Specifies the member name that is present in the HDF5 compound data type.
+            </summary>
+        </member>
+        <member name="M:PureHDF.H5NameAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.H5NameAttribute"/> class.
+            </summary>
+            <param name="name">The name of the member.</param>
+        </member>
+        <member name="P:PureHDF.H5NameAttribute.Name">
+            <summary>
+            Gets the name of the member.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5ObjectReference">
+            <summary>
+            An HDF5 object reference.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5RegionReference">
+            <summary>
+            An HDF5 region reference.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5SourceGeneratorAttribute">
+            <summary>
+            Indicates that the attributed partial class should be extended with generated bindings for the specified file.
+            </summary>
+        </member>
+        <member name="M:PureHDF.H5SourceGeneratorAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.H5SourceGeneratorAttribute"/> class.
+            </summary>
+            <param name="filePath">The path of the file to generate the bindings for.</param>
+        </member>
+        <member name="T:PureHDF.IDatasetStream">
+            <summary>
+            Contains a collection of optional methods to improve performance.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IDatasetStream.ReadDataset(System.Memory{System.Byte})">
+            <summary>
+            This method is called to indicate that actual data is being read (e.g. to determine if the request should be cached).
+            </summary>
+            <param name="buffer">The buffer to write the data into.</param>
+        </member>
+        <member name="M:PureHDF.IDatasetStream.ReadDatasetAsync(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            This method is called to indicate that actual data is being read (e.g. to determine if the request should be cached).
+            </summary>
+            <param name="buffer">The buffer to write the data into.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+        </member>
+        <member name="T:PureHDF.IH5AttributableObject">
+            <summary>
+            A base class for types that can hold HDF5 attributes.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5AttributableObject.Attributes">
+            <summary>
+            Gets an enumerable of the available attributes.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5AttributableObject.AttributesAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets an enumerable of the available attributes.
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5AttributableObject.Attribute(System.String)">
+            <summary>
+            Checks if the attribute with the specified <paramref name="name"/> exist.
+            </summary>
+            <param name="name">The name of the attribute.</param>
+            <returns>A boolean which indicates if the attribute exists.</returns>
+        </member>
+        <member name="M:PureHDF.IH5AttributableObject.AttributeAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks if the attribute with the specified <paramref name="name"/> exist.
+            </summary>
+            <param name="name">The name of the attribute.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A boolean which indicates if the attribute exists.</returns>
+        </member>
+        <member name="M:PureHDF.IH5AttributableObject.AttributeExists(System.String)">
+            <summary>
+            Gets the attribute named <paramref name="name"/>.
+            </summary>
+            <param name="name">The name of the attribute.</param>
+            <returns>The requested attribute.</returns>
+        </member>
+        <member name="M:PureHDF.IH5AttributableObject.AttributeExistsAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the attribute named <paramref name="name"/>.
+            </summary>
+            <param name="name">The name of the attribute.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested attribute.</returns>
+        </member>
+        <member name="T:PureHDF.IH5Attribute">
+            <summary>
+            An HDF5 attribute.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Attribute.Name">
+            <summary>
+            Gets the attribute name.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Attribute.Space">
+            <summary>
+            Gets the data space.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Attribute.Type">
+            <summary>
+            Gets the data type.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5Attribute.Read``1">
+            <summary>
+            Reads the data. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <returns>The read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Attribute.ReadCompound``1(System.Func{System.Reflection.FieldInfo,System.String})">
+            <summary>
+            Reads the compound data. The type parameter <typeparamref name="T"/> must match the <see langword="struct" /> constraint. Nested fields with nullable references are not supported.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="getName">An optional function to map the field names of <typeparamref name="T"/> to the member names of the HDF5 compound type.</param>
+            <returns>The read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Attribute.ReadCompound">
+            <summary>
+            Reads the compound data. This is the slowest but most flexible option to read compound data as no prior type knowledge is required.
+            </summary>
+            <returns>The read data as array of a dictionary with the keys corresponding to the compound member names and the values being the member data.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Attribute.ReadString">
+            <summary>
+            Reads the string data.
+            </summary>
+            <returns>The read data as array of <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:PureHDF.IH5CommitedDatatype">
+            <summary>
+            An HDF5 commited data type (also known as transient, shareable or named data type).
+            </summary>
+        </member>
+        <member name="T:PureHDF.IH5DataLayout">
+            <summary>
+            An HDF5 data layout.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataLayout.Class">
+            <summary>
+            Gets the data layout class.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataLayout.ChunkDimensions">
+            <summary>
+            Gets the chunk dimensions.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IH5Dataset">
+            <summary>
+            An HDF5 dataset.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataset.Space">
+            <summary>
+            Gets the data space.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataset.Type">
+            <summary>
+            Gets the data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataset.Layout">
+            <summary>
+            Gets the data layout.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataset.FillValue">
+            <summary>
+            Gets the fill value.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.Read(PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the data.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <see cref="T:System.Byte"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.Read``1(PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the data. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.Read``1(System.Memory{``0},PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the data. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="buffer">The destination memory buffer.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadCompound``1(System.Func{System.Reflection.FieldInfo,System.String},PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the compound data. The type parameter <typeparamref name="T"/> must match the <see langword="struct" /> constraint. Nested fields with nullable references are not supported.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="getName">An optional function to map the field names of <typeparamref name="T"/> to the member names of the HDF5 compound type.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadCompound(PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the compound data. This is the slowest but most flexible option to read compound data as no prior type knowledge is required.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the target memory.</param>
+            <param name="memoryDims">The dimensions of the target memory buffer.</param>
+            <returns>The read data as array of a dictionary with the keys corresponding to the compound member names and the values being the member data.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadString(PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the string data.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadAsync(PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <see cref="T:System.Byte"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadAsync``1(PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the target memory.</param>
+            <param name="memoryDims">The dimensions of the target memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadAsync``1(System.Memory{``0},PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="buffer">The destination memory buffer.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadCompoundAsync``1(System.Func{System.Reflection.FieldInfo,System.String},PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the compound data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. The type parameter <typeparamref name="T"/> must match the <see langword="struct" /> constraint. Nested fields with nullable references are not supported.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="getName">An optional function to map the field names of <typeparamref name="T"/> to the member names of the HDF5 compound type.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadCompoundAsync(PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the compound data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. This is the slowest but most flexible option to read compound data as no prior type knowledge is required.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of a dictionary with the keys corresponding to the compound member names and the values being the member data.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Dataset.ReadStringAsync(PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the string data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:PureHDF.IH5DatasetExtensions">
+            <summary>
+            Defines extensions methods for the <see cref="T:PureHDF.IH5Dataset" /> type.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5DatasetExtensions.AsQueryable``1(PureHDF.IH5Dataset,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Queries the data. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#43-experimental-iqueryable-1-dimensional-data-only">PureHDF</seealso>.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="dataset">The dataset to operate on.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>A queryable of type <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="T:PureHDF.IH5Dataspace">
+            <summary>
+            An HDF5 dataspace.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataspace.Rank">
+            <summary>
+            Gets the dataspace rank.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataspace.Type">
+            <summary>
+            Gets the dataspace type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataspace.Dimensions">
+            <summary>
+            Gets the dataspace dimensions.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Dataspace.MaxDimensions">
+            <summary>
+            Gets the maximum dataspace dimensions.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IFixedPointType">
+            <summary>
+            The fixed-point data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IFixedPointType.IsSigned">
+            <summary>
+            Gets a boolean which indicates if the data type is signed.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IFloatingPointType">
+            <summary>
+            The floating-point data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IStringType">
+            <summary>
+            The string data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IBitFieldType">
+            <summary>
+            The bitfield data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IOpaqueType">
+            <summary>
+            The opaque data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IOpaqueType.Tag">
+            <summary>
+            Gets a description for the opaque type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.CompoundMember">
+            <summary>
+            A compound member.
+            </summary>
+            <param name="Name">The member name.</param>
+            <param name="Offset">The offset of the member in the parent compound data type.</param>
+            <param name="Type">The member data type.</param>
+        </member>
+        <member name="M:PureHDF.CompoundMember.#ctor(System.String,System.Int32,PureHDF.IH5DataType)">
+            <summary>
+            A compound member.
+            </summary>
+            <param name="Name">The member name.</param>
+            <param name="Offset">The offset of the member in the parent compound data type.</param>
+            <param name="Type">The member data type.</param>
+        </member>
+        <member name="P:PureHDF.CompoundMember.Name">
+            <summary>The member name.</summary>
+        </member>
+        <member name="P:PureHDF.CompoundMember.Offset">
+            <summary>The offset of the member in the parent compound data type.</summary>
+        </member>
+        <member name="P:PureHDF.CompoundMember.Type">
+            <summary>The member data type.</summary>
+        </member>
+        <member name="T:PureHDF.ICompoundType">
+            <summary>
+            The compound data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.ICompoundType.Members">
+            <summary>
+            Gets an array of members.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IReferenceType">
+            <summary>
+            The reference data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IEnumerationType">
+            <summary>
+            The enumeration data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IVariableLengthType">
+            <summary>
+            The variable-length data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IArrayType">
+            <summary>
+            The array data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IArrayType.BaseType">
+            <summary>
+            Gets the base data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IH5DataType">
+            <summary>
+            An HDF5 data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Class">
+            <summary>
+            Gets the data type class.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Size">
+            <summary>
+            Gets the size of the data type in bytes.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.FixedPoint">
+            <summary>
+            Gets the fixed-point data type.
+            </summary>        
+        </member>
+        <member name="P:PureHDF.IH5DataType.FloatingPoint">
+            <summary>
+            Gets the floating-point data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.String">
+            <summary>
+            Gets the string data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.BitField">
+            <summary>
+            Gets the bitfield data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Opaque">
+            <summary>
+            Gets the opaque data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Compound">
+            <summary>
+            Gets the compound data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Reference">
+            <summary>
+            Gets the reference data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Enumeration">
+            <summary>
+            Gets the enumeration data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.VariableLength">
+            <summary>
+            Gets the variable-length data type.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5DataType.Array">
+            <summary>
+            Gets the array data type.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IH5FillValue">
+            <summary>
+            An HDF5 fill value.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5FillValue.Value">
+            <summary>
+            Gets the raw fill value as array of <see cref="T:System.Byte"/>.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5FillValue.GetValue``1">
+            <summary>
+            Gets the fill value as value of type <typeparamref name="T"/>. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IH5Group">
+            <summary>
+            An HDF5 group.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5Group.LinkExists(System.String)">
+            <summary>
+            Checks if the link with the specified <paramref name="path"/> exist.
+            </summary>
+            <param name="path">The path of the link.</param>
+            <returns>A boolean which indicates if the link exists.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.LinkExistsAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks if the link with the specified <paramref name="path"/> exist.
+            </summary>
+            <param name="path">The path of the link.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A boolean which indicates if the link exists.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.Get(System.String)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="path">The path of the object.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.GetAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="path">The path of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.Get(PureHDF.H5ObjectReference)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <param name="reference">The reference of the object.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.GetAsync(PureHDF.H5ObjectReference,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <param name="reference">The reference of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.Children">
+            <summary>
+            Gets an enumerable of the available children.
+            </summary>
+            <returns>An enumerable of the available children.</returns>
+        </member>
+        <member name="M:PureHDF.IH5Group.ChildrenAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets an enumerable of the available children.
+            </summary>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>An enumerable of the available children.</returns>
+        </member>
+        <member name="T:PureHDF.IH5GroupExtensions">
+            <summary>
+            Defines extensions methods for the <see cref="T:PureHDF.IH5Group" /> type.
+            </summary>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.Get``1(PureHDF.IH5Group,System.String)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.GetAsync``1(PureHDF.IH5Group,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.Get``1(PureHDF.IH5Group,PureHDF.H5ObjectReference)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="reference">The reference of the object.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.GetAsync``1(PureHDF.IH5Group,PureHDF.H5ObjectReference,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="reference">The reference of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.Group(PureHDF.IH5Group,System.String)">
+            <summary>
+            Gets the group that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <returns>The requested group.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.GroupAsync(PureHDF.IH5Group,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the group that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested group.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.Dataset(PureHDF.IH5Group,System.String)">
+            <summary>
+            Gets the dataset that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <returns>The requested dataset.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.DatasetAsync(PureHDF.IH5Group,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the dataset that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested dataset.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.CommitedDatatype(PureHDF.IH5Group,System.String)">
+            <summary>
+            Gets the commited data type that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <returns>The requested commited data type.</returns>
+        </member>
+        <member name="M:PureHDF.IH5GroupExtensions.CommitedDatatypeAsync(PureHDF.IH5Group,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the commited data type that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested commited data type.</returns>
+        </member>
+        <member name="T:PureHDF.IH5Object">
+            <summary>
+            A base class HDF5 objects.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5Object.Name">
+            <summary>
+            Gets the name.
+            </summary>
+        </member>
+        <member name="T:PureHDF.IH5UnresolvedLink">
+            <summary>
+            An HDF5 link that could not be resolved.
+            </summary>
+        </member>
+        <member name="P:PureHDF.IH5UnresolvedLink.Reason">
+            <summary>
+            Gets an exception that indicates the reason why the link could not be resolved.
+            </summary>
+        </member>
+        <member name="T:PureHDF.DelegateSelection">
+            <summary>
+            A selection which uses a delegate to get the information about how to walk through the data.
+            </summary>
+        </member>
+        <member name="M:PureHDF.DelegateSelection.#ctor(System.UInt64,System.Func{System.UInt64[],System.Collections.Generic.IEnumerable{PureHDF.Step}})">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.DelegateSelection"/> class.
+            </summary>
+            <param name="totalElementCount">The total number of elements which is used to preallocate the returned buffer.</param>
+            <param name="walker">The user-defined walker delegate.</param>
+        </member>
+        <member name="P:PureHDF.DelegateSelection.TotalElementCount">
+            <inheritdoc />
+        </member>
+        <member name="M:PureHDF.DelegateSelection.Walk(System.UInt64[])">
+            <inheritdoc />
+        </member>
+        <member name="T:PureHDF.HyperslabSelection">
+            <summary>
+            A hyperslab is a selection of elements from a hyper rectangle.
+            </summary>
+        </member>
+        <member name="M:PureHDF.HyperslabSelection.#ctor(System.UInt64,System.UInt64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.HyperslabSelection"/> instance of rank 1. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html#ga6adfdf1b95dc108a65bf66e97d38536d">hdfgroup.org</seealso>.
+            </summary>
+            <param name="start">The start coordinate of the block.</param>
+            <param name="block">The block size.</param>
+        </member>
+        <member name="M:PureHDF.HyperslabSelection.#ctor(System.UInt64,System.UInt64,System.UInt64,System.UInt64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.HyperslabSelection"/> instance of rank 1. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html#ga6adfdf1b95dc108a65bf66e97d38536d">hdfgroup.org</seealso>.
+            </summary>
+            <param name="start">The start coordinate of the block.</param>
+            <param name="stride">The number of elements to separate each block to be selected.</param>
+            <param name="count">The number of blocks to select.</param>
+            <param name="block">The block size.</param>
+        </member>
+        <member name="M:PureHDF.HyperslabSelection.#ctor(System.Int32,System.UInt64[],System.UInt64[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.HyperslabSelection"/> instance of rank <paramref name="rank"/>. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html#ga6adfdf1b95dc108a65bf66e97d38536d">hdfgroup.org</seealso>.
+            </summary>
+            <param name="rank">The rank of the selection.</param>
+            <param name="starts">The start coordinate of the block along each dimension.</param>
+            <param name="blocks">The block size along each dimension.</param>
+        </member>
+        <member name="M:PureHDF.HyperslabSelection.#ctor(System.Int32,System.UInt64[],System.UInt64[],System.UInt64[],System.UInt64[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.HyperslabSelection"/> instance of rank <paramref name="rank"/>. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html#ga6adfdf1b95dc108a65bf66e97d38536d">hdfgroup.org</seealso>.
+            </summary>
+            <param name="rank">The rank of the selection.</param>
+            <param name="starts">The start coordinate of the block along each dimension.</param>
+            <param name="strides">The number of elements to separate each block to be selected along each dimension.</param>
+            <param name="counts">The number of blocks to select along each dimension.</param>
+            <param name="blocks">The block size along each dimension.</param>
+        </member>
+        <member name="P:PureHDF.HyperslabSelection.Rank">
+            <summary>
+            Gets the rank of the selection.
+            </summary>
+        </member>
+        <member name="P:PureHDF.HyperslabSelection.TotalElementCount">
+            <inheritdoc />
+        </member>
+        <member name="M:PureHDF.HyperslabSelection.Walk(System.UInt64[])">
+            <inheritdoc />
+        </member>
+        <member name="T:PureHDF.PointSelection">
+            <summary>
+            A selection which uses a collection of points to select the data.
+            </summary>
+        </member>
+        <member name="M:PureHDF.PointSelection.#ctor(System.UInt64[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.PointSelection"/> class.
+            </summary>
+            <param name="points">The points to be selected.</param>
+        </member>
+        <member name="P:PureHDF.PointSelection.TotalElementCount">
+            <inheritdoc />
+        </member>
+        <member name="M:PureHDF.PointSelection.Walk(System.UInt64[])">
+            <inheritdoc />
+        </member>
+        <member name="T:PureHDF.Selection">
+            <summary>
+            A base class which represents a selection.
+            </summary>
+        </member>
+        <member name="P:PureHDF.Selection.TotalElementCount">
+            <summary>
+            Gets the total number of elements which is used to preallocate the returned buffer.
+            </summary>
+        </member>
+        <member name="M:PureHDF.Selection.Walk(System.UInt64[])">
+            <summary>
+            The walk function is used to walk through the dataset and select the requested data.
+            </summary>
+            <param name="limits">The dataset dimensions.</param>
+            <returns>An enumerable which provides a sequence of steps to select the requested data.</returns>
+        </member>
+        <member name="T:PureHDF.Step">
+            <summary>
+            Represents a single unit of data to be selected.
+            </summary>
+        </member>
+        <member name="P:PureHDF.Step.Coordinates">
+            <summary>
+            Gets or sets the data coordinates.
+            </summary>
+        </member>
+        <member name="P:PureHDF.Step.ElementCount">
+            <summary>
+            Gets or sets the number of elements to select along the fastest changing dimension.
+            </summary>
+        </member>
+        <member name="T:PureHDF.H5File">
+            <summary>
+            An HDF5 file object. This is the entry-point to work with HDF5 files.
+            </summary>
+        </member>
+        <member name="P:PureHDF.H5File.DefaultChunkCacheFactory">
+            <summary>
+            The default chunk cache factory.
+            </summary>
+        </member>
+        <member name="M:PureHDF.H5File.OpenRead(System.String)">
+            <summary>
+            Opens an HDF5 file for reading. Please see the <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.io.file.openread#remarks">Remarks</seealso> section for more information how the file is opened.
+            </summary>
+            <param name="filePath">The file to open.</param>
+        </member>
+        <member name="M:PureHDF.H5File.Open(System.String,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare,System.Boolean)">
+            <summary>
+            Opens an HDF5 file.
+            </summary>
+            <param name="filePath">The file to open.</param>
+            <param name="mode">A <see cref="T:System.IO.FileMode"/> value that specifies whether a file is created if one does not exist, and determines whether the contents of existing files are retained or overwritten.</param>
+            <param name="fileAccess">A <see cref="T:System.IO.FileAccess"/> value that specifies the operations that can be performed on the file.</param>
+            <param name="fileShare">A <see cref="T:System.IO.FileShare"/> value specifying the type of access other threads have to the file.</param>
+            <param name="useAsync">A boolean which indicates if the file be opened with the <see cref="F:System.IO.FileOptions.Asynchronous"/> flag.</param>
+        </member>
+        <member name="M:PureHDF.H5File.Open(System.IO.Stream,System.Boolean)">
+            <summary>
+            Opens an HDF5 stream.
+            </summary>
+            <param name="stream">The stream to use.</param>
+            <param name="leaveOpen">A boolean which indicates if the stream should be kept open when this class is disposed. The default is <see langword="false"/>.</param>
+            <returns></returns>
+        </member>
+        <member name="M:PureHDF.H5File.Open(System.IO.MemoryMappedFiles.MemoryMappedViewAccessor)">
+            <summary>
+            Opens an HDF5 memory-mapped file.
+            </summary>
+            <param name="accessor">The memory-mapped accessor to use.</param>
+            <returns></returns>
+        </member>
+        <member name="T:PureHDF.Filters.FilterFunction">
+            <summary>
+            A delegate which describes a filter function.
+            </summary>
+            <param name="flags">The filter flags.</param>
+            <param name="parameters">The filter parameters.</param>
+            <param name="buffer">The source buffer.</param>
+            <returns>The target buffer.</returns>
+        </member>
+        <member name="T:PureHDF.Filters.H5Filter">
+            <summary>
+            A class to manage filters.
+            </summary>
+        </member>
+        <member name="M:PureHDF.Filters.H5Filter.Register(PureHDF.Filters.H5FilterID,System.String,PureHDF.Filters.FilterFunction)">
+            <summary>
+            Registers a new filter.
+            </summary>
+            <param name="identifier">The filter identifier.</param>
+            <param name="name">The filter name.</param>
+            <param name="filterFunction">The filter function.</param>
+        </member>
+        <member name="T:PureHDF.Filters.H5FilterFlags">
+            <summary>
+            Specifies the filter flags.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterFlags.Decompress">
+            <summary>
+            A flag which indicates if the provided buffer should be decompressed.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterFlags.SkipEdc">
+            <summary>
+            A flag which indicates if EDC filters should be skipped.
+            </summary>
+        </member>
+        <member name="T:PureHDF.Filters.H5FilterID">
+            <summary>
+            Specifies the filter identifier.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.NA">
+            <summary>
+            No filter.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.Deflate">
+            <summary>
+            Deflation like gzip.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.Shuffle">
+            <summary>
+            Shuffle the data.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.Fletcher32">
+            <summary>
+            Fletcher32 checksum of EDC.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.Szip">
+            <summary>
+            Szip compression
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.Nbit">
+            <summary>
+            NBit compression.
+            </summary>
+        </member>
+        <member name="F:PureHDF.Filters.H5FilterID.ScaleOffset">
+            <summary>
+            Scale+offset compression.
+            </summary>
+        </member>
+        <member name="T:PureHDF.Filters.EndiannessConverterGeneric">
+            <summary>
+            A helper class to convert the endianness of data using hardware acceleration if available.
+            </summary>
+        </member>
+        <member name="M:PureHDF.Filters.EndiannessConverterGeneric.Convert(System.Int32,System.Span{System.Byte},System.Span{System.Byte})">
+            <summary>
+            Converts the endianness of the given source buffer into the destination buffer.
+            </summary>
+            <param name="bytesOfType">The number of bytes of the underlying data type.</param>
+            <param name="source">The source buffer.</param>
+            <param name="destination">The destination buffer.</param>
+        </member>
+        <member name="T:PureHDF.VOL.Native.H5DatasetAccess">
+            <summary>
+            A structure which controls how the dataset is accessed. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html">hdfgroup.org</seealso>
+            </summary>
+            <param name="ExternalFilePrefix">The external dataset storage file prefix. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html#title11">hdfgroup.org</seealso>.</param>
+            <param name="VirtualPrefix">The prefix to be applied to VDS source file paths. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html#title12">hdfgroup.org</seealso>.</param>
+            <param name="ChunkCacheFactory">The factory to create the chunk cache. If <see langword="null"/>, the factory of the <see cref="P:PureHDF.VOL.Native.INativeFile.ChunkCacheFactory"/> property is used.</param>
+        </member>
+        <member name="M:PureHDF.VOL.Native.H5DatasetAccess.#ctor(System.String,System.String,System.Func{PureHDF.VOL.Native.IChunkCache})">
+            <summary>
+            A structure which controls how the dataset is accessed. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html">hdfgroup.org</seealso>
+            </summary>
+            <param name="ExternalFilePrefix">The external dataset storage file prefix. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html#title11">hdfgroup.org</seealso>.</param>
+            <param name="VirtualPrefix">The prefix to be applied to VDS source file paths. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html#title12">hdfgroup.org</seealso>.</param>
+            <param name="ChunkCacheFactory">The factory to create the chunk cache. If <see langword="null"/>, the factory of the <see cref="P:PureHDF.VOL.Native.INativeFile.ChunkCacheFactory"/> property is used.</param>
+        </member>
+        <member name="P:PureHDF.VOL.Native.H5DatasetAccess.ExternalFilePrefix">
+            <summary>The external dataset storage file prefix. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html#title11">hdfgroup.org</seealso>.</summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.H5DatasetAccess.VirtualPrefix">
+            <summary>The prefix to be applied to VDS source file paths. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___d_a_p_l.html#title12">hdfgroup.org</seealso>.</summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.H5DatasetAccess.ChunkCacheFactory">
+            <summary>The factory to create the chunk cache. If <see langword="null"/>, the factory of the <see cref="P:PureHDF.VOL.Native.INativeFile.ChunkCacheFactory"/> property is used.</summary>
+        </member>
+        <member name="T:PureHDF.VOL.Native.H5LinkAccess">
+            <summary>
+            A structure which controls how the link is accessed. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___l_a_p_l.html">hdfgroup.org</seealso>.
+            <param name="ExternalLinkPrefix">The prefix to be applied to external link paths. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___l_a_p_l.html#gafa5eced13ba3a00cdd65669626dc7294">hdfgroup.org</seealso>.</param>
+            </summary>
+        </member>
+        <member name="M:PureHDF.VOL.Native.H5LinkAccess.#ctor(System.String)">
+            <summary>
+            A structure which controls how the link is accessed. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___l_a_p_l.html">hdfgroup.org</seealso>.
+            <param name="ExternalLinkPrefix">The prefix to be applied to external link paths. Reference: <seealso href="https://docs.hdfgroup.org/hdf5/v1_10/group___l_a_p_l.html#gafa5eced13ba3a00cdd65669626dc7294">hdfgroup.org</seealso>.</param>
+            </summary>
+        </member>
+        <member name="T:PureHDF.VOL.Native.IChunkCache">
+            <summary>
+            Caches chunks during a read operation.
+            </summary>
+        </member>
+        <member name="M:PureHDF.VOL.Native.IChunkCache.GetChunkAsync(System.UInt64[],System.Func{System.Threading.Tasks.Task{System.Memory{System.Byte}}})">
+            <summary>
+            Tries to get the chunk at the given position.
+            </summary>
+            <param name="indices">The chunk position.</param>
+            <param name="chunkLoader">The chunk load is used whenever the chunk is not already cached.</param>
+            <returns>The chunk.</returns>
+        </member>
+        <member name="T:PureHDF.VOL.Native.INativeFile">
+            <summary>
+            A native HDF5 file object. This is the entry-point to work with HDF5 files.
+            </summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.INativeFile.Path">
+            <summary>
+            Gets the path of the opened HDF5 file if loaded from the file system.
+            </summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.INativeFile.ChunkCacheFactory">
+            <summary>
+            Gets or sets the current chunk cache factory.
+            </summary>
+        </member>
+        <member name="T:PureHDF.VOL.Native.INativeGroup">
+            <summary>
+            An HDF5 group.
+            </summary>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.LinkExists(System.String,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Checks if the link with the specified <paramref name="path"/> exist.
+            </summary>
+            <param name="path">The path of the link.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>A boolean which indicates if the link exists.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.LinkExistsAsync(System.String,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Checks if the link with the specified <paramref name="path"/> exist.
+            </summary>
+            <param name="path">The path of the link.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A boolean which indicates if the link exists.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.Get(System.String,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.GetAsync(System.String,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.Get(PureHDF.H5ObjectReference,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <param name="reference">The reference of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.GetAsync(PureHDF.H5ObjectReference,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <param name="reference">The reference of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.Children(PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets an enumerable of the available children using the optionally specified <paramref name="linkAccess"/>.
+            </summary>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>An enumerable of the available children.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroup.ChildrenAsync(PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets an enumerable of the available children using the optionally specified <paramref name="linkAccess"/>.
+            </summary>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>An enumerable of the available children.</returns>
+        </member>
+        <member name="T:PureHDF.VOL.Native.INativeGroupExtensions">
+            <summary>
+            Defines extensions methods for the <see cref="T:PureHDF.VOL.Native.INativeGroup" /> type.
+            </summary>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.Get``1(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.GetAsync``1(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="path"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.Get``1(PureHDF.VOL.Native.INativeGroup,PureHDF.H5ObjectReference,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="reference">The reference of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.GetAsync``1(PureHDF.VOL.Native.INativeGroup,PureHDF.H5ObjectReference,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the object that is at the given <paramref name="reference"/>.
+            </summary>
+            <typeparam name="T">The return type of the object.</typeparam>
+            <param name="group">The group to operate on.</param>
+            <param name="reference">The reference of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested object.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.Group(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the group that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested group.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.GroupAsync(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the group that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested group.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.Dataset(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the dataset that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested dataset.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.DatasetAsync(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the dataset that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested dataset.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.CommitedDatatype(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess)">
+            <summary>
+            Gets the commited data type that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <returns>The requested commited data type.</returns>
+        </member>
+        <member name="M:PureHDF.VOL.Native.INativeGroupExtensions.CommitedDatatypeAsync(PureHDF.VOL.Native.INativeGroup,System.String,PureHDF.VOL.Native.H5LinkAccess,System.Threading.CancellationToken)">
+            <summary>
+            Gets the commited data type that is at the given <paramref name="path"/>.
+            </summary>
+            <param name="group">The group to operate on.</param>
+            <param name="path">The path of the object.</param>
+            <param name="linkAccess">The link access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>The requested commited data type.</returns>
+        </member>
+        <member name="T:PureHDF.VOL.Native.SimpleChunkCache">
+            <summary>
+            A simple chunk cache.
+            </summary>
+        </member>
+        <member name="M:PureHDF.VOL.Native.SimpleChunkCache.#ctor(System.Int32,System.UInt64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PureHDF.VOL.Native.SimpleChunkCache"/> class.
+            </summary>
+            <param name="chunkSlotCount">The number of chunks that can be hold in the cache at the same time.</param>
+            <param name="byteCount">The maximum size of the chunk cache in bytes.</param>
+        </member>
+        <member name="P:PureHDF.VOL.Native.SimpleChunkCache.ChunkSlotCount">
+            <summary>
+            Gets the number of chunks that can be hold in the cache at the same time.
+            </summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.SimpleChunkCache.ConsumedSlots">
+            <summary>
+            Gets the number of chunk slots that have already been consumed.
+            </summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.SimpleChunkCache.ByteCount">
+            <summary>
+            Gets the maximum size of the chunk cache in bytes.
+            </summary>
+        </member>
+        <member name="P:PureHDF.VOL.Native.SimpleChunkCache.ConsumedBytes">
+            <summary>
+            Gets the number of consumed bytes of the chunk cache.
+            </summary>
+        </member>
+        <member name="M:PureHDF.VOL.Native.SimpleChunkCache.GetChunkAsync(System.UInt64[],System.Func{System.Threading.Tasks.Task{System.Memory{System.Byte}}})">
+            <inheritdoc />
+        </member>
+        <member name="T:PureHDF.INativeDataset">
+            <summary>
+            A native HDF5 dataset.
+            </summary>
+        </member>
+        <member name="M:PureHDF.INativeDataset.AsQueryable``1(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Queries the data. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#43-experimental-iqueryable-1-dimensional-data-only">PureHDF</seealso>.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>A queryable of type <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.Read(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the data.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <returns>The read data as array of <see cref="T:System.Byte"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.Read``1(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the data. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.Read``1(System.Memory{``0},PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the data. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="buffer">The destination memory buffer.</param>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadCompound``1(PureHDF.VOL.Native.H5DatasetAccess,System.Func{System.Reflection.FieldInfo,System.String},PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the compound data. The type parameter <typeparamref name="T"/> must match the <see langword="struct" /> constraint. Nested fields with nullable references are not supported.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="getName">An optional function to map the field names of <typeparamref name="T"/> to the member names of the HDF5 compound type.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadCompound(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the compound data. This is the slowest but most flexible option to read compound data as no prior type knowledge is required.
+            </summary>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the target memory.</param>
+            <param name="memoryDims">The dimensions of the target memory buffer.</param>
+            <returns>The read data as array of a dictionary with the keys corresponding to the compound member names and the values being the member data.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadString(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[])">
+            <summary>
+            Reads the string data.
+            </summary>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <returns>The read data as array of <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadAsync(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>.
+            </summary>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <see cref="T:System.Byte"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadAsync``1(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the target memory.</param>
+            <param name="memoryDims">The dimensions of the target memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadAsync``1(System.Memory{``0},PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. The type parameter <typeparamref name="T"/> must match the <see langword="unmanaged" /> constraint.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="buffer">The destination memory buffer.</param>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadCompoundAsync``1(PureHDF.VOL.Native.H5DatasetAccess,System.Func{System.Reflection.FieldInfo,System.String},PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the compound data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. The type parameter <typeparamref name="T"/> must match the <see langword="struct" /> constraint. Nested fields with nullable references are not supported.
+            </summary>
+            <typeparam name="T">The type of the data to read.</typeparam>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="getName">An optional function to map the field names of <typeparamref name="T"/> to the member names of the HDF5 compound type.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadCompoundAsync(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the compound data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>. This is the slowest but most flexible option to read compound data as no prior type knowledge is required.
+            </summary>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of a dictionary with the keys corresponding to the compound member names and the values being the member data.</returns>
+        </member>
+        <member name="M:PureHDF.INativeDataset.ReadStringAsync(PureHDF.VOL.Native.H5DatasetAccess,PureHDF.Selection,PureHDF.Selection,System.UInt64[],System.Threading.CancellationToken)">
+            <summary>
+            Reads the string data asynchronously. More information: <seealso href="https://github.com/Apollo3zehn/PureHDF#8-asynchronous-data-access-net-6">PureHDF</seealso>.
+            </summary>
+            <param name="datasetAccess">The dataset access properties.</param>
+            <param name="fileSelection">The selection within the source HDF5 dataset.</param>
+            <param name="memorySelection">The selection within the destination memory.</param>
+            <param name="memoryDims">The dimensions of the destination memory buffer.</param>
+            <param name="cancellationToken">A token to cancel the current operation.</param>
+            <returns>A task which returns the read data as array of <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:System.Index">
+            <summary>Represent a type can be used to index a collection either from the start or the end.</summary>
+            <remarks>
+            Index is used by the C# compiler to support the new index syntax
+            <code>
+            int[] someArray = new int[5] { 1, 2, 3, 4, 5 } ;
+            int lastElement = someArray[^1]; // lastElement = 5
+            </code>
+            </remarks>
+        </member>
+        <member name="M:System.Index.#ctor(System.Int32,System.Boolean)">
+            <summary>Construct an Index using a value and indicating if the index is from the start or from the end.</summary>
+            <param name="value">The index value. it has to be zero or positive number.</param>
+            <param name="fromEnd">Indicating if the index is from the start or from the end.</param>
+            <remarks>
+            If the Index constructed from the end, index value 1 means pointing at the last element and index value 0 means pointing at beyond last element.
+            </remarks>
+        </member>
+        <member name="P:System.Index.Start">
+            <summary>Create an Index pointing at first element.</summary>
+        </member>
+        <member name="P:System.Index.End">
+            <summary>Create an Index pointing at beyond last element.</summary>
+        </member>
+        <member name="M:System.Index.FromStart(System.Int32)">
+            <summary>Create an Index from the start at the position indicated by the value.</summary>
+            <param name="value">The index value from the start.</param>
+        </member>
+        <member name="M:System.Index.FromEnd(System.Int32)">
+            <summary>Create an Index from the end at the position indicated by the value.</summary>
+            <param name="value">The index value from the end.</param>
+        </member>
+        <member name="P:System.Index.Value">
+            <summary>Returns the index value.</summary>
+        </member>
+        <member name="P:System.Index.IsFromEnd">
+            <summary>Indicates whether the index is from the start or the end.</summary>
+        </member>
+        <member name="M:System.Index.GetOffset(System.Int32)">
+            <summary>Calculate the offset from the start using the giving collection length.</summary>
+            <param name="length">The length of the collection that the Index will be used with. length has to be a positive value</param>
+            <remarks>
+            For performance reason, we don't validate the input length parameter and the returned offset value against negative values.
+            we don't validate either the returned offset is greater than the input length.
+            It is expected Index will be used with collections which always have non negative length/count. If the returned offset is negative and
+            then used to index a collection will get out of range exception which will be same affect as the validation.
+            </remarks>
+        </member>
+        <member name="M:System.Index.Equals(System.Object)">
+            <summary>Indicates whether the current Index object is equal to another object of the same type.</summary>
+            <param name="value">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.Equals(System.Index)">
+            <summary>Indicates whether the current Index object is equal to another Index object.</summary>
+            <param name="other">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.GetHashCode">
+            <summary>Returns the hash code for this instance.</summary>
+        </member>
+        <member name="M:System.Index.op_Implicit(System.Int32)~System.Index">
+            <summary>Converts integer number to an Index.</summary>
+        </member>
+        <member name="M:System.Index.ToString">
+            <summary>Converts the value of the current Index object to its equivalent string representation.</summary>
+        </member>
+        <member name="T:System.Range">
+            <summary>Represent a range has start and end indexes.</summary>
+            <remarks>
+            Range is used by the C# compiler to support the range syntax.
+            <code>
+            int[] someArray = new int[5] { 1, 2, 3, 4, 5 };
+            int[] subArray1 = someArray[0..2]; // { 1, 2 }
+            int[] subArray2 = someArray[1..^0]; // { 2, 3, 4, 5 }
+            </code>
+            </remarks>
+        </member>
+        <member name="P:System.Range.Start">
+            <summary>Represent the inclusive start index of the Range.</summary>
+        </member>
+        <member name="P:System.Range.End">
+            <summary>Represent the exclusive end index of the Range.</summary>
+        </member>
+        <member name="M:System.Range.#ctor(System.Index,System.Index)">
+            <summary>Construct a Range object using the start and end indexes.</summary>
+            <param name="start">Represent the inclusive start index of the range.</param>
+            <param name="end">Represent the exclusive end index of the range.</param>
+        </member>
+        <member name="M:System.Range.Equals(System.Object)">
+            <summary>Indicates whether the current Range object is equal to another object of the same type.</summary>
+            <param name="value">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Range.Equals(System.Range)">
+            <summary>Indicates whether the current Range object is equal to another Range object.</summary>
+            <param name="other">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Range.GetHashCode">
+            <summary>Returns the hash code for this instance.</summary>
+        </member>
+        <member name="M:System.Range.ToString">
+            <summary>Converts the value of the current Range object to its equivalent string representation.</summary>
+        </member>
+        <member name="M:System.Range.StartAt(System.Index)">
+            <summary>Create a Range object starting from start index to the end of the collection.</summary>
+        </member>
+        <member name="M:System.Range.EndAt(System.Index)">
+            <summary>Create a Range object starting from first element in the collection to the end Index.</summary>
+        </member>
+        <member name="P:System.Range.All">
+            <summary>Create a Range object starting from first element to the end.</summary>
+        </member>
+        <member name="M:System.Range.GetOffsetAndLength(System.Int32)">
+            <summary>Calculate the start offset and length of range object using a collection length.</summary>
+            <param name="length">The length of the collection that the range will be used with. length has to be a positive value.</param>
+            <remarks>
+            For performance reason, we don't validate the input length parameter against negative values.
+            It is expected Range will be used with collections which always have non negative length/count.
+            We validate the range is inside the length scope though.
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.RuntimeHelpers.GetSubArray``1(``0[],System.Range)">
+            <summary>
+            Slices the specified array using the specified range.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>Specifies that an output will not be null even if the corresponding type allows it. Specifies that an input argument was not null when the call returns.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified return value condition.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter may be null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified return value condition.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute">
+            <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with the associated parameter name.</summary>
+            <param name="parameterName">
+            The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>Gets the associated parameter name.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
+            <summary>Applied to a method that will never return under any circumstance.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified parameter value.</summary>
+            <param name="parameterValue">
+            The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
+            the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>Gets the condition parameter value.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with a field or property member.</summary>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>Initializes the attribute with the list of field and property members.</summary>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values when returning with the specified return value condition.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>Initializes the attribute with the specified return value condition and a field or property member.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>Initializes the attribute with the specified return value condition and list of field and property members.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+    </members>
+</doc>
