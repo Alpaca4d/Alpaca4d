@@ -1,7 +1,6 @@
 
 .DS_Store
 # Binaries
-bin/
 obj/
 packages/
 *.nupkg
@@ -15,4 +14,8 @@ packages/
 *.mpco
 *AlpacaModel
 
-!**/Alpaca4d.Gh/OpenSees-Solvers/*
+#!**/Alpaca4d.Gh/OpenSees-Solvers
+
+Alpaca.Core/bin/*
+Alpaca4d.Gh/bin/
+Alpaca4d.Test/bin/
