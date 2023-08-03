@@ -26,7 +26,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="FemDesign.Core" Version="22.4.0" />
     <PackageReference Include="Grasshopper" Version="7.18.22124.3001" IncludeAssets="compile;build" />
     <PackageReference Include="RhinoCommon" Version="7.18.22124.3001" />
     <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
