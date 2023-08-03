@@ -52,7 +52,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Alpaca.Core\Alpaca.Core.csproj" />
+    <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj" />
   </ItemGroup>
   
   <ItemGroup>

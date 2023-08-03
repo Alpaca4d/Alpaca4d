@@ -8,8 +8,8 @@
     <ProjectGuid>{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Alpaca.Core</RootNamespace>
-    <AssemblyName>Alpaca.Core</AssemblyName>
+    <RootNamespace>Alpaca4d.Core</RootNamespace>
+    <AssemblyName>Alpaca4d.Core</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -174,9 +174,7 @@
     <EmbeddedResource Include="Resources\Section\steel_section.json" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="License\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
