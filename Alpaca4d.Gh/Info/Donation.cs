@@ -35,7 +35,7 @@ namespace Alpaca4d
             bool donate = false;
             DA.GetData(0, ref donate);
 
-            string url = "https://www.paypal.com/paypalme/alpaca4d";
+            string url = "https://www.paypal.com/paypalme/marpelle";
 
             if (donate)
             {
