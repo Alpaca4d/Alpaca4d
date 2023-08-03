@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Alpaca4d.Gh
 {
@@ -15,7 +16,16 @@ namespace Alpaca4d.Gh
         public override Guid Id => new Guid("52A09029-AC68-4356-803D-724D05588549");
         public override string AuthorName => "Marco Pellegrino";
         public override string AuthorContact => "pellegrino.marco@icloud.com";
-        public override string AssemblyVersion => "0.0.6";
+
+        public override string AssemblyVersion
+        {
+            get
+            {
+                IEnumerable<AssemblyName> assembly = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Where(x => x.Name.Contains("Alpaca4d.Core"));
+                string assemblyVersion = assembly.First().Version?.ToString();
+                return assemblyVersion;
+            }
+        }
     }
 
     public class Alpaca4dCategoryIcon : Grasshopper.Kernel.GH_AssemblyPriority
