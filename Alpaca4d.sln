@@ -9,10 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca4d.Core", "Alpaca.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.Test", "Alpaca4d.Test\Alpaca4d.Test.csproj", "{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca4d.License", "Licensing\Alpaca4d.License\Alpaca4d.License.csproj", "{012D6E39-81BC-44CD-AD20-1880DC58111A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseObfuscation.Test", "Licensing\LicenseObfuscation.Test\LicenseObfuscation.Test.csproj", "{E9BB985B-C97E-4041-ABF1-3E42090CC5AC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,6 @@ Global
 		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{012D6E39-81BC-44CD-AD20-1880DC58111A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{012D6E39-81BC-44CD-AD20-1880DC58111A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{012D6E39-81BC-44CD-AD20-1880DC58111A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{012D6E39-81BC-44CD-AD20-1880DC58111A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9BB985B-C97E-4041-ABF1-3E42090CC5AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9BB985B-C97E-4041-ABF1-3E42090CC5AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9BB985B-C97E-4041-ABF1-3E42090CC5AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9BB985B-C97E-4041-ABF1-3E42090CC5AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
