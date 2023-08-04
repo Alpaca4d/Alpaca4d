@@ -35,6 +35,7 @@ namespace Alpaca4d.Gh.Forms
             //imageView.Image = new Eto.Drawing.Bitmap(imagePaths.ElementAt(index));
 
             windows.Content = imageView;
+            windows.BringToFront();
             windows.Show();
         }
 

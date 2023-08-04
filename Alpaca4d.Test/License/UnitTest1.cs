@@ -1,12 +1,10 @@
-﻿using LicenseObfuscation;
-using System.Linq;
-using System.Net.NetworkInformation;
+﻿using System.Net.NetworkInformation;
 using Alpaca4d.License;
 
-namespace LicenseObfuscation.Test;
-
-public class UnitTest1
+namespace Alpaca4d.Test.HDF5
 {
+    public class UnitTest1
+    {
     [TestMethod]
     public void Test1()
     {
@@ -94,4 +92,28 @@ public class UnitTest1
         Assert.IsFalse(res);
     }
 
+    [TestMethod]
+    public void Test6()
+    {
+        var isValid = LicenseIsValid();
+        Assert.IsTrue(isValid);
+    }
+
+    public bool LicenseIsValid()
+    {
+        var addresses = License.GetMacAddress();
+        var users = License.DeserializeBinary("data.bin");
+
+        foreach (var user in users)
+        {
+            foreach (var macAdress in addresses)
+            {
+                if ((macAdress == user.mac_address) && (user.expiring_date < DateTime.Now))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    }
 }

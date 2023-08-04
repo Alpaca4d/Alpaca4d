@@ -467,15 +467,15 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\Alpaca4d.Utils\data.bin" Link="data.bin">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  
-  <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   
+  <ItemGroup>
+    <None Include="..\Alpaca4d.Utils\data.bin">
+      <Link>data.bin</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <None Update="License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
