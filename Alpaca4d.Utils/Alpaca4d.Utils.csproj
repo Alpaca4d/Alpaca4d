@@ -88,9 +88,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Alpaca4d.License\Alpaca4d.License\Alpaca4d.License.csproj">
-      <Project>{55e9527c-ca9d-4be1-887d-d98357f04b32}</Project>
-      <Name>Alpaca4d.License</Name>
+    <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj">
+      <Project>{b5badcfa-479e-4e9c-8f17-1f4d77b4dee2}</Project>
+      <Name>Alpaca4d.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

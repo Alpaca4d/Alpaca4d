@@ -16,6 +16,8 @@ packages/
 
 #!**/Alpaca4d.Gh/OpenSees-Solvers
 
-Alpaca.Core/bin/*
+Alpaca.Core/bin/
 Alpaca4d.Gh/bin/
 Alpaca4d.Test/bin/
+Alpaca4d.Utils/bin/
+Alpaca4d.Utils/bin/

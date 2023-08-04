@@ -12,10 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca4d.Core", "Alpaca.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.Test", "Alpaca4d.Test\Alpaca4d.Test.csproj", "{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.License", "..\Alpaca4d.License\Alpaca4d.License\Alpaca4d.License.csproj", "{55E9527C-CA9D-4BE1-887D-D98357F04B32}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.License.Test", "..\Alpaca4d.License\Alpaca4d.License.Test\Alpaca4d.License.Test.csproj", "{700E3788-EF01-4C53-AF6B-14FD4CE0C854}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca4d.Utils", "Alpaca4d.Utils\Alpaca4d.Utils.csproj", "{2650D2A7-5DBC-432A-B182-223DBCCA3639}"
 EndProject
 Global
@@ -36,14 +32,6 @@ Global
 		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{55E9527C-CA9D-4BE1-887D-D98357F04B32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{55E9527C-CA9D-4BE1-887D-D98357F04B32}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{55E9527C-CA9D-4BE1-887D-D98357F04B32}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{55E9527C-CA9D-4BE1-887D-D98357F04B32}.Release|Any CPU.Build.0 = Release|Any CPU
-		{700E3788-EF01-4C53-AF6B-14FD4CE0C854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{700E3788-EF01-4C53-AF6B-14FD4CE0C854}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{700E3788-EF01-4C53-AF6B-14FD4CE0C854}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{700E3788-EF01-4C53-AF6B-14FD4CE0C854}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2650D2A7-5DBC-432A-B182-223DBCCA3639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2650D2A7-5DBC-432A-B182-223DBCCA3639}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2650D2A7-5DBC-432A-B182-223DBCCA3639}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -27,6 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="HDF5\recorder.hdf5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

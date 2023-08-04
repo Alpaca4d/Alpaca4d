@@ -13,7 +13,7 @@ namespace CreateLicense
         static void Main()
         {
             var jsonFilePath = "data.json";
-            var binaryFilePath = @"data.bin";
+            var binaryFilePath = @"..\..\data.bin";
 
             var binary = License.SerializeJsonToBinary(jsonFilePath);
             License.SerializeBinaryToFile(binaryFilePath, binary);
