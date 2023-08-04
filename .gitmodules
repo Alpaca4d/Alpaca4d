@@ -1,3 +1,3 @@
 [submodule "Licensing"]
-	path = Licensing
-	url = https://github.com/Alpaca4d/Licensing
+	path = Alpaca4d.License
+	url = https://github.com/Alpaca4d/Alpaca4d.License
