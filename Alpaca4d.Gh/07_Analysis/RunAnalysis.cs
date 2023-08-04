@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Alpaca4d;
 using Alpaca4d.Generic;
-
+using Alpaca4d.License;
 using Eto.Forms;
 
 namespace Alpaca4d.Gh
@@ -59,7 +59,8 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(1, ref settings)) return;
 
 
-            if(DateTime.Now > Alpaca4d.License.License.FreeVersionDate)
+            // license routine
+            if (!Alpaca4d.License.License.IsValid)
             {
                 if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
                 {

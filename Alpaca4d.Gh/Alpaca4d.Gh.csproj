@@ -52,6 +52,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj" />
+    <ProjectReference Include="..\Licensing\Alpaca4d.License\Alpaca4d.License.csproj" />
   </ItemGroup>
   
   <ItemGroup>
@@ -481,6 +482,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="OpenSees-Solvers\LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="data.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
