@@ -610,13 +610,13 @@ namespace Alpaca4d
             Rhino.Geometry.Point3d closestPointInThreeNDF = Rhino.Geometry.Point3d.Origin;
             Rhino.Geometry.Point3d closestPointInSixNDF = Rhino.Geometry.Point3d.Origin;
 
-            var uniquePoints = this.Supports.Select(x => x.Pos).ToHashSet();
+            //var uniquePoints = this.Supports.Select(x => x.Pos).ToHashSet();
 
-            if (uniquePoints.Count != this.Supports.Count)
-            {
-                var diff = this.Supports.Count - uniquePoints.Count;
-                throw new Exception($"{diff} duplicate support points found!");
-            }
+            //if (uniquePoints.Count != this.Supports.Count)
+            //{
+            //    var diff = this.Supports.Count - uniquePoints.Count;
+            //    throw new Exception($"{diff} duplicate support points found!");
+            //}
 
 
             foreach (var supportNode in this.Supports)
