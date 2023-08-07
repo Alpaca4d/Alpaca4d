@@ -24,7 +24,7 @@ namespace Alpaca4d
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    return System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers/win/bin");
+                    return System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers\win\bin");
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
