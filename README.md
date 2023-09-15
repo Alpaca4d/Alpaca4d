@@ -23,3 +23,9 @@ Alpaca4d use the <strong>MPCO recorder</strong> - written by M.Petracca, G.Camat
 
 #### Disclaimer
 The authors cannot be held responsible for the output and it should therefore always be used in combination with another finite element analysis package for validation and documentation.
+
+
+### License
+You are free to use this program, but everything is subject to the OpenSees license terms.  
+https://opensees.berkeley.edu/OpenSees/copyright.php
+
