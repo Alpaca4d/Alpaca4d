@@ -42,35 +42,63 @@ namespace Alpaca4d.Loads
         }
 
 
+        //public void SetTag(Model model)
+        //{
+        //    try
+        //    {
+        //        if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsThreeNDF, this.Pos)) < model.Tollerance)
+        //        {
+        //            this.Id = model.CloudPointThreeNDF.ClosestPoint(this.Pos) + 1;
+        //            this.Ndf = 3;
+        //        }
+        //        else if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsSixNDF, this.Pos)) < model.Tollerance)
+        //        {
+        //            this.Id = model.CloudPointSixNDF.ClosestPoint(this.Pos) + 1 + model.UniquePointsThreeNDF.Count();
+        //            this.Ndf = 6;
+
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsSixNDF, this.Pos)) < model.Tollerance)
+        //        {
+        //            this.Id = model.CloudPointSixNDF.ClosestPoint(this.Pos) + 1 + model.UniquePointsThreeNDF.Count();
+        //            this.Ndf = 6;
+        //        }
+        //        else if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsThreeNDF, this.Pos)) < model.Tollerance)
+        //        {
+        //            this.Id = model.CloudPointThreeNDF.ClosestPoint(this.Pos) + 1;
+        //            this.Ndf = 3;
+        //        }
+        //    }
+        //}
+
         public void SetTag(Model model)
         {
-            try
-            {
-                if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsThreeNDF, this.Pos)) < model.Tollerance)
-                {
-                    this.Id = model.CloudPointThreeNDF.ClosestPoint(this.Pos) + 1;
-                    this.Ndf = 3;
-                }
-                else if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsSixNDF, this.Pos)) < model.Tollerance)
-                {
-                    this.Id = model.CloudPointSixNDF.ClosestPoint(this.Pos) + 1 + model.UniquePointsThreeNDF.Count();
-                    this.Ndf = 6;
 
-                }
-            }
-            catch
-            {
-                if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsSixNDF, this.Pos)) < model.Tollerance)
+            if (model.UniquePointsThreeNDF.Count != 0)
                 {
-                    this.Id = model.CloudPointSixNDF.ClosestPoint(this.Pos) + 1 + model.UniquePointsThreeNDF.Count();
-                    this.Ndf = 6;
+                    var closestPointInThreeNDF = Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsThreeNDF, this.Pos);
+                    if (this.Pos.DistanceTo(closestPointInThreeNDF) < model.Tollerance)
+                    {
+                        this.Id = model.CloudPointThreeNDF.ClosestPoint(this.Pos) + 1;
+                        this.Ndf = 3;
+                    }
+                    else
+                        throw new Exception($"Point load at location '{this.Pos}' is not part of the model!");
                 }
-                else if (this.Pos.DistanceTo(Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsThreeNDF, this.Pos)) < model.Tollerance)
+
+                if (model.UniquePointsSixNDF.Count != 0)
                 {
-                    this.Id = model.CloudPointThreeNDF.ClosestPoint(this.Pos) + 1;
-                    this.Ndf = 3;
+                    var closestPointInSixNDF = Rhino.Collections.Point3dList.ClosestPointInList(model.UniquePointsSixNDF, this.Pos);
+                    if (this.Pos.DistanceTo(closestPointInSixNDF) <= model.Tollerance)
+                    {
+                        this.Id = model.CloudPointSixNDF.ClosestPoint(this.Pos) + 1 + model.UniquePointsThreeNDF.Count();
+                        this.Ndf = 6;
                 }
-            }
+                    else
+                        throw new Exception($"Point load at location '{this.Pos}' is not part of the model!");
+                }
         }
 
         public string WriteTcl()

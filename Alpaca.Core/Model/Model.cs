@@ -630,6 +630,8 @@ namespace Alpaca4d
                         this.ThreeNdfModel.Add(supportNode);
                         supportNode.SetNodeTag(this);
                     }
+                    else
+                        throw new Exception($"Support node at location '{supportNode.Pos}' is not part of the model!");
                 }
 
                 if (this.UniquePointsSixNDF.Count != 0)
@@ -641,6 +643,8 @@ namespace Alpaca4d
                         this.SixNdfModel.Add(supportNode);
                         supportNode.SetNodeTag(this);
                     }
+                    else
+                        throw new Exception($"Support node at location '{supportNode.Pos}' is not part of the model!");
                 }
 
                 this.Tcl.Add(supportNode.WriteTcl());
