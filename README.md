@@ -22,7 +22,7 @@ Alpaca4d use the <strong>MPCO recorder</strong> - written by M.Petracca, G.Camat
 <a href="https://asdeasoft.net/?home">ASDEA Software Technology</a>, Pescara Italy.
 
 #### Disclaimer
-The authors cannot be held responsible for the output and it should therefore always be used in combination with another finite element analysis package for validation and documentation.
+The authors cannot be held responsible for the output and it should therefore always be used in combination with another finite element analysis package for validation and documentation. 😃
 
 
 ### License
