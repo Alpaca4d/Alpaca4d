@@ -21,7 +21,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("Material Name", "MatName", "Material name", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
             pManager.AddNumberParameter("fco", "fco", "", GH_ParamAccess.item);
