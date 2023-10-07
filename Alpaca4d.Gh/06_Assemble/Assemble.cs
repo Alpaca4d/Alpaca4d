@@ -30,7 +30,9 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Constraint", "Constraint", "", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Tollerance", "Tollerance", "", GH_ParamAccess.item, 0.01);
+            pManager.AddGenericParameter("Recorder", "Recorder", "", GH_ParamAccess.list);
+            pManager[pManager.ParamCount - 1].Optional = true;
+            pManager.AddNumberParameter("Tolerance", "Tolerance", "", GH_ParamAccess.item, 0.01);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -54,17 +56,19 @@ namespace Alpaca4d.Gh
             var support = new List<Alpaca4d.Element.Support>();
             var load = new List<Alpaca4d.Generic.ILoad>();
             var constraint = new List<Alpaca4d.Generic.IConstraint>();
-            double tollerance = 0.01;
+            var recorder = new List<Alpaca4d.Generic.IRecorder>();
+            double tolerance = 0.01;
 
 
             if (!DA.GetDataList(0, element)) return;
             if (!DA.GetDataList(1, support)) return;
             DA.GetDataList(2, load);
             DA.GetDataList(3, constraint);
-            DA.GetData(4, ref tollerance);
+            DA.GetDataList(4, recorder);
+            DA.GetData(5, ref tolerance);
 
-            var model = new Model(element, support, load, constraint);
-            model.Tollerance = tollerance;
+            var model = new Model(element, support, load, constraint, recorder);
+            model.Tollerance = tolerance;
             model.Assemble();
             
             // Finally assign the spiral to the output parameter.
