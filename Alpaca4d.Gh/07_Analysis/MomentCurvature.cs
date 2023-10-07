@@ -1,16 +1,6 @@
-﻿using Grasshopper;
-using Grasshopper.Kernel;
-using Rhino.Geometry;
-using Rhino;
+﻿using Grasshopper.Kernel;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
-using Microsoft.CSharp.RuntimeBinder;
-using Alpaca4d;
-using Alpaca4d.Generic;
-
-using Eto.Forms;
 
 namespace Alpaca4d.Gh
 {
@@ -152,6 +142,13 @@ namespace Alpaca4d.Gh
             DA.SetDataList(5, ky);
             DA.SetDataList(6, kz);
             DA.SetData(7, fiberResult);
+        }
+
+
+        protected override void BeforeSolveInstance()
+        {
+            List<string> directions = new List<string> { "y", "z" };
+            ValueListUtils.updateValueLists(this, 2, directions, null);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.quinary;
