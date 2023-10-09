@@ -34,6 +34,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
+            pManager.Register_GenericParam("Model", "Model", "");
             pManager.Register_StringParam("Tcl", "Tcl", "");
         }
 
@@ -48,15 +49,18 @@ namespace Alpaca4d.Gh
             DA.GetData(0, ref _model);
 
             List<string> customCode = new List<string>();
-            DA.GetDataList(2, customCode);
+            DA.GetDataList(1, customCode);
 
 
-            var model = _model.ShallowCopy();
+            var analysisModel = _model.ShallowCopy();
+            analysisModel.Tcl = new List<string>(analysisModel.Tcl);
 
-            model.Tcl.AddRange(customCode);
+            analysisModel.Tcl.AddRange(customCode);
 
+            var tcl = analysisModel.Tcl;
             // Finally assign the spiral to the output parameter.
-            DA.SetData(0, model);
+            DA.SetData(0, analysisModel);
+            DA.SetDataList(1, tcl);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;

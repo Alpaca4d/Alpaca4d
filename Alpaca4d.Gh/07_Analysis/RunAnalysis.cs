@@ -69,6 +69,7 @@ namespace Alpaca4d.Gh
             }
 
             // create a shallow copy
+
             var analysisModel = model.ShallowCopy();
             analysisModel.Tcl = new List<string>(analysisModel.Tcl);
 
