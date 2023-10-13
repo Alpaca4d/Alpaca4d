@@ -10,7 +10,6 @@ namespace Alpaca4d.Gh
 {
     public class LinearLoad : GH_Component
     {
-        // Test 2
         public LinearLoad()
           : base("Linear Load (Alpaca4d)", "LinearLoad",
             "Construct a LinearLoad",
