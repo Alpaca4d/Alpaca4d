@@ -34,7 +34,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddBooleanParameter("Ry", "Ry", "Rotation along Y", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("RZ", "RZ", "Rotation along Z", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Rz", "Rz", "Rotation along Z", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 

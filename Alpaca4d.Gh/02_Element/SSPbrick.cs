@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
     {
         public SSPbrick()
           : base("SSP Brick (Alpaca4d)", "SSP",
-            "Construct a SSP Brick element",
+            "Construct a SSP (Stabilized Single Point) Brick element",
             "Alpaca4d", "02_Element")
         {
             // Draw a Description Underneath the component
