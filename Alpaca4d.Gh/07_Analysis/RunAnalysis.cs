@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
+using System.Windows.Forms;
 using Microsoft.CSharp.RuntimeBinder;
 using Alpaca4d;
 using Alpaca4d.Generic;
@@ -23,7 +24,23 @@ namespace Alpaca4d.Gh
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";
+            this._settings = true;
         }
+
+        public bool _settings { get; set; }
+
+        protected override void AppendAdditionalComponentMenuItems(System.Windows.Forms.ToolStripDropDown menu)
+        {
+            // Append the item to the menu, making sure it's always enabled and checked if Absolute is True.
+            ToolStripMenuItem item = Menu_AppendItem(menu, "Do not use settings", Menu_AbsoluteClicked, null, true, !_settings);
+        }
+
+        private void Menu_AbsoluteClicked(object sender, EventArgs e)
+        {
+            _settings = !_settings;
+            ExpireSolution(true);
+        }
+
 
         /// <summary>
         /// Registers all the input parameters for this component.
@@ -32,6 +49,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
             pManager.AddGenericParameter("Settings", "Settings", "", GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -52,12 +70,17 @@ namespace Alpaca4d.Gh
         {
 
             var model = new Model();
-            var settings = new Settings();
+            Settings settings = null;
 
 
             if (!DA.GetData(0, ref model)) return;
-            if (!DA.GetData(1, ref settings)) return;
-
+            
+            DA.GetData(1, ref settings);
+            if (_settings == true && settings == null)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Input parameter Settings failed to collect data");
+                return;
+            }
 
             // license routine
             if (!Alpaca4d.License.License.IsValid)
@@ -88,33 +111,36 @@ namespace Alpaca4d.Gh
                 System.IO.Directory.SetCurrentDirectory(currentDir);
             }
 
-            string recorderName = "recorder.mpco";
 
             analysisModel.FileName = System.IO.Path.GetFullPath("AlpacaModel");
 
 
-            analysisModel.Recorders = new List<IRecorder>();
 
-            analysisModel.Settings = settings;
-            // Recorder
-            var recorder = new Alpaca4d.Recorder();
-            if (settings.Analysis.Type == Analysis.AnalysisType.Static)
+            if(settings != null)
             {
-                recorder = Alpaca4d.Recorder.MpcoStatic(recorderName);
-                analysisModel.IsStatic = true;
+                string recorderName = "recorder.mpco";
+                analysisModel.Recorders = new List<IRecorder>();
+                analysisModel.Settings = settings;
+                // Recorder
+                var recorder = new Alpaca4d.Recorder();
+                if (settings.Analysis.Type == Analysis.AnalysisType.Static)
+                {
+                    recorder = Alpaca4d.Recorder.MpcoStatic(recorderName);
+                    analysisModel.IsStatic = true;
+                }
+
+                if (settings.Analysis.Type == Analysis.AnalysisType.Transient)
+                {
+                    recorder = Alpaca4d.Recorder.MpcoTransient(recorderName);
+                    analysisModel.IsTransient = true;
+                }
+                analysisModel.Recorders.Add(recorder);
+                analysisModel.Tcl.Add(recorder.WriteTcl());
+                // Settings
+                analysisModel.Tcl.Add(settings.WriteTcl());
+                analysisModel.Tcl.Add("wipe");
             }
 
-            if (settings.Analysis.Type == Analysis.AnalysisType.Transient)
-            {
-                recorder = Alpaca4d.Recorder.MpcoTransient(recorderName);
-                analysisModel.IsTransient = true;
-            }
-            analysisModel.Recorders.Add(recorder);
-            analysisModel.Tcl.Add(recorder.WriteTcl());
-
-            // Settings
-            analysisModel.Tcl.Add(settings.WriteTcl());
-            analysisModel.Tcl.Add("wipe");
 
             analysisModel.Serialise();
             (var output, var error) = ((string, string))analysisModel.RunOpenSees();

@@ -35,7 +35,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Model", "Model", "");
+            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
             pManager.Register_StringParam("Tcl", "Tcl", "");
         }
 
@@ -47,7 +47,7 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             Model _model = null;
-            if(DA.GetData(0, ref _model))
+            if(!DA.GetData(0, ref _model))
             {
                 _model = new Model();
                 _model.Tcl = new List<string>();
