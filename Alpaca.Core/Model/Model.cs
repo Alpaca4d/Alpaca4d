@@ -553,7 +553,7 @@ namespace Alpaca4d
             {
                 foreach(var line in this.Tcl)
                 {
-                    file.Write(line);
+                    file.WriteLine(line);
                 }
             }
         }
