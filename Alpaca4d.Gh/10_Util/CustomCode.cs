@@ -26,6 +26,7 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "Model to be serialized.", GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("CustomCode", "CustomCode", "", GH_ParamAccess.list);
         }
 
@@ -46,7 +47,11 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             Model _model = null;
-            DA.GetData(0, ref _model);
+            if(DA.GetData(0, ref _model))
+            {
+                _model = new Model();
+                _model.Tcl = new List<string>();
+            }
 
             List<string> customCode = new List<string>();
             DA.GetDataList(1, customCode);
