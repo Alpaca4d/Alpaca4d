@@ -15,7 +15,7 @@ namespace Alpaca4d.Gh
         public LayerFiber()
           : base("Layer Fiber (Alpaca4d)", "Layer Fiber",
             "Construct a LayerFiber",
-            "Alpaca4d", "01_Section")
+            "Alpaca4d", "MomentCurvature")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";
@@ -76,7 +76,7 @@ namespace Alpaca4d.Gh
                 args.Display.DrawDottedPolyline(points, System.Drawing.Color.Black, false);
             }
         }
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Layer__Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{4ED2C47B-F1DF-4A8A-AD93-CB0F3CCB375B}");
     }

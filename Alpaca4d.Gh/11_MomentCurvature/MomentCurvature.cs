@@ -9,7 +9,7 @@ namespace Alpaca4d.Gh
         public MomentCurvature()
           : base("MomentCurvature (Alpaca4d)", "MC",
             "",
-            "Alpaca4d", "07_Analysis")
+            "Alpaca4d", "MomentCurvature")
         {
             // Draw a Description Underneath the component
             this.Message = $"MomentCurvature\n(Alpaca4d)";
@@ -151,7 +151,7 @@ namespace Alpaca4d.Gh
             ValueListUtils.updateValueLists(this, 2, directions, null);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.quinary;
+        public override GH_Exposure Exposure => GH_Exposure.tertiary;
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Moment_Curvature_Model__Alpaca4d_;
 

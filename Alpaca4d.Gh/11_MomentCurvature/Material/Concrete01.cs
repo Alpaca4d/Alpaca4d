@@ -9,9 +9,9 @@ namespace Alpaca4d.Gh
     public class Concrete01 : GH_Component
     {
         public Concrete01()
-          : base("Concrete01 (Alpaca4d)", "Concrete01",
-            "Construct an Concrete01",
-            "Alpaca4d", "00_Material")
+          : base("Concrete01 (Alpaca4d)", "Concrete",
+            "Construct a concrete material with Zero Tensile Strength (Conrete01)",
+            "Alpaca4d", "MomentCurvature")
         {
             this.Message = $"{this.Name}";
         }
@@ -56,7 +56,7 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             string matName = null;
-            double fpco = 28;
+            double fpco = 28; 
             double fpcu = 35;
             double epsilonc0 = 0.002;
             double epsilonCu = 0.0035;
@@ -78,7 +78,7 @@ namespace Alpaca4d.Gh
 
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.concreate01;
 

@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace Alpaca4d.Gh
 {
-    public class ReinforcingSteel : GH_Component
+    public class Steel01 : GH_Component
     {
-        public ReinforcingSteel()
-          : base("ReinforcingSteel (Alpaca4d)", "ReinforcingSteel",
-            "Construct an ReinforcingSteel",
-            "Alpaca4d", "00_Material")
+        public Steel01()
+          : base("Steel01 (Alpaca4d)", "Steel01",
+            "Construct a Steel01",
+            "Alpaca4d", "MomentCurvature")
         {
             this.Message = $"{this.Name}";
         }
@@ -27,25 +27,23 @@ namespace Alpaca4d.Gh
             pManager.AddNumberParameter("fy", "fy", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("fu", "fu", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("E0", "E0", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Es", "Es", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("b", "b", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Esh", "Esh", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("a1", "a1", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("esh", "esh", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("a2", "a2", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("eult", "eult", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("a3", "a3", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddBooleanParameter("MinMax", "MinMax", "", GH_ParamAccess.item, false);
+            pManager.AddNumberParameter("a4", "a4", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-
-
         }
 
         /// <summary>
@@ -64,36 +62,35 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             string matName = null;
-            double fy = 319.300;
-            double fu = 469.560;
-            double es = 200000;
-            double esh = 0.0;
-            double epsilonSh = 0.001957;
-            double epsilonUlt = 0.0675;
-            bool minMax = false;
+            double fy = 319.3;
+            double e0 = 210000;
+            double b = 0.1;
+            double? a1 = null;
+            double? a2 = null;
+            double? a3 = null;
+            double? a4 = null;
 
 
             DA.GetData(0, ref matName);
             DA.GetData(1, ref fy);
-            DA.GetData(2, ref fu);
-            DA.GetData(3, ref es);
-            DA.GetData(4, ref esh);
-            DA.GetData(5, ref epsilonSh);
-            DA.GetData(6, ref epsilonUlt);
-            DA.GetData(7, ref minMax);
+            DA.GetData(2, ref e0);
+            DA.GetData(3, ref b);
+            DA.GetData(4, ref a1);
+            DA.GetData(5, ref a2);
+            DA.GetData(6, ref a3);
+            DA.GetData(7, ref a4);
 
 
-            var material = new Alpaca4d.Material.ReinforcingSteel(matName, fy, fu, es, esh, epsilonSh, epsilonUlt, minMax);
+            var material = new Alpaca4d.Material.Steel01(matName, fy, e0, b, a1, a2, a3, a4);
 
 
             DA.SetData(0, material);
-
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.reinforcing_steel_material;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Uniaxial_Material_steal01;
 
-        public override Guid ComponentGuid => new Guid("{47B04CA7-0F7E-4585-8F89-D31592E61394}");
+        public override Guid ComponentGuid => new Guid("{DEB86811-4429-426F-8A7B-02DF89C5A074}");
     }
 }

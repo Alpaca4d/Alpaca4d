@@ -22,7 +22,7 @@ namespace Alpaca4d.Gh
         public FiberSection()
           : base("Fiber Section (Alpaca4d)", "FiberSection",
             "Construct a FiberSection",
-            "Alpaca4d", "01_Section")
+            "Alpaca4d", "MomentCurvature")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";
@@ -144,7 +144,7 @@ namespace Alpaca4d.Gh
         }
 
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Fiber_Aggregated_Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{18cd5969-e0e4-4acf-9790-0af2c22cfeb9}");
     }
