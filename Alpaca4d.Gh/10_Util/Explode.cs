@@ -47,8 +47,9 @@ namespace Alpaca4d.Gh
             }
         }
 
-        public ExplodeAnythingComponent() : base("Explode", "Explode", "Explode anything you want to peek inside", "Alpaca4d", "10_Utility")
+        public ExplodeAnythingComponent() : base("Explode", "Explode", "Explode anything you want to peek inside", "Alpaca4d", "06_Assemble")
         {
+            this.Message = $"{this.NickName} \n{this.Category}";
         }
 
         public override void CreateAttributes()
@@ -56,12 +57,12 @@ namespace Alpaca4d.Gh
             this.m_attributes = new ExplodeAnythingComponentAttributes(this)
             {
                 ButtonResponder = new ExplodeAnythingComponentAttributes.ResponderEvent(this.MatchResponder),
-                ButtonText = "BOOM",
-                TextLine = new LongShortString
-                {
-                    Long = "NULL",
-                    Short = "NULL"
-                },
+                ButtonText = "Deconstruct",
+                //TextLine = new LongShortString
+                //{
+                //    Long = "NULL",
+                //    Short = "NULL"
+                //},
                 TextFont = new Font(GH_FontServer.ScriptSmall, FontStyle.Bold)
             };
         }
@@ -97,13 +98,13 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Object", "O", "Object to explode", 0);
+            pManager.AddGenericParameter("object", "object", "Object to explode", 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Type", "T", "Object Type", 0);
+            pManager.AddGenericParameter("Object Class", "T", "Object Class", 0);
             this.VariableParameterMaintenance();
         }
 
@@ -223,13 +224,10 @@ namespace Alpaca4d.Gh
                         }
                     }
                 }
-                base.Params.Output[0].NickName = "Type";
+
                 DA.SetData(0, type);
-                this.ThisAttribute.TextLine = new LongShortString
-                {
-                    Long = type.FullName,
-                    Short = type.Name
-                };
+
+                base.Params.Output[0].NickName = "Object Class";
             }
         }
 
@@ -277,13 +275,13 @@ namespace Alpaca4d.Gh
             }
         }
 
-        //public override void DrawViewportMeshes(IGH_PreviewArgs args)
-        //{
-        //}
+        public override void DrawViewportMeshes(IGH_PreviewArgs args)
+        {
+        }
 
-        //public override void DrawViewportWires(IGH_PreviewArgs args)
-        //{
-        //}
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+        }
     }
 
 
@@ -317,7 +315,7 @@ namespace Alpaca4d.Gh
             set;
         }
 
-        public ExplodeAnythingComponentAttributes.ResponderEvent ButtonResponder
+        public ResponderEvent ButtonResponder
         {
             get;
             set;
@@ -326,20 +324,20 @@ namespace Alpaca4d.Gh
         public ExplodeAnythingComponentAttributes(GH_Component owner) : base(owner)
         {
             this.attributeOwner = owner;
-            this.TextLine = new LongShortString
-            {
-                Long = "",
-                Short = ""
-            };
+            //this.TextLine = new LongShortString
+            //{
+            //    Long = "",
+            //    Short = ""
+            //};
             this.TextFont = GH_FontServer.Standard;
-            this.ButtonText = "Button";
+            this.ButtonText = "Deconstruct";
         }
 
         protected override void Layout()
         {
             base.Layout();
             Rectangle r = GH_Convert.ToRectangle(this.Bounds);
-            r.Height += 36;
+            r.Height += 16;
             this.Bounds = r;
             this.buttonRectangle = r;
             this.buttonRectangle.Y = this.buttonRectangle.Bottom - 20;
@@ -365,15 +363,15 @@ namespace Alpaca4d.Gh
                     LineAlignment = StringAlignment.Center,
                     Trimming = StringTrimming.EllipsisCharacter
                 };
-                bool flag2 = (float)GH_FontServer.StringWidth(this.TextLine.Long, this.TextFont) < this.Bounds.Width;
-                if (flag2)
-                {
-                    graphics.DrawString(this.TextLine.Long, this.TextFont, Brushes.Black, this.textRectangle, format);
-                }
-                else
-                {
-                    graphics.DrawString(this.TextLine.Short, this.TextFont, Brushes.Black, this.textRectangle, format);
-                }
+                //bool flag2 = (float)GH_FontServer.StringWidth(this.TextLine.Long, this.TextFont) < this.Bounds.Width;
+                //if (flag2)
+                //{
+                //    graphics.DrawString(this.TextLine.Long, this.TextFont, Brushes.Black, this.textRectangle, format);
+                //}
+                //else
+                //{
+                //    graphics.DrawString(this.TextLine.Short, this.TextFont, Brushes.Black, this.textRectangle, format);
+                //}
             }
         }
 
@@ -383,7 +381,7 @@ namespace Alpaca4d.Gh
             GH_ObjectResponse result;
             if (flag)
             {
-                bool flag2 = this.buttonRectangle.Contains( new System.Drawing.Point((int)e.CanvasLocation.X, (int)e.CanvasLocation.Y));
+                bool flag2 = this.buttonRectangle.Contains(new System.Drawing.Point((int)e.CanvasLocation.X, (int)e.CanvasLocation.Y));
                 if (flag2)
                 {
                     bool flag3 = this.ButtonResponder != null;
