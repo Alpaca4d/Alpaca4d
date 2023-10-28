@@ -47,7 +47,7 @@ namespace Alpaca4d.Gh
             }
         }
 
-        public DeconstructAnything() : base("Deconstruct", "Deconstruct", "Deconstruct any object", "Alpaca4d", "10_Utility")
+        public DeconstructAnything() : base("Deconstruct (Alpaca4d)", "Deconstruct", "Deconstruct any object", "Alpaca4d", "10_Utility")
         {
             this.Message = $"{this.NickName} \n{this.Category}";
         }
