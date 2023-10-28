@@ -18,7 +18,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "10_Utility")
         {
             // Draw a Description Underneath the component
-            this.Message = "Colors (Alpaca4d)";
+            this.Message = this.Name;
         }
 
         /// <summary>

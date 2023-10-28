@@ -12,10 +12,12 @@ namespace Alpaca4d
         /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
         public Benchmark()
-          : base("Benchmark", "Alpaca4d Benchmark",
+          : base("Benchmark (Alpaca4d)", "Benchmark",
               "Get website with Alpaca4d/OpenSees Benchmark",
               "Alpaca4d", " Info")
         {
+            // Draw a Description Underneath the component
+            this.Message = $"{this.NickName}\n{"Alpaca4d"}";
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -41,7 +43,7 @@ namespace Alpaca4d
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.tertiary;
         protected override System.Drawing.Bitmap Icon => null;
         public override Guid ComponentGuid => new Guid("{ea517ec2-0ee8-401b-aba6-e1c0ef34adcc}");
     }
