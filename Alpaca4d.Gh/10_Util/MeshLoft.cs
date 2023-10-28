@@ -18,7 +18,6 @@ namespace Alpaca4d.Gh
             this.Message = "Mesh Loft (Alpaca4d)";
         }
 
-
         /// <inheritdoc />
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
@@ -31,7 +30,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddMeshParameter("Mesh", "Mesh", "Lofted mesh", GH_ParamAccess.item);
         }
-
+        
 
         /// <inheritdoc />
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -63,6 +62,7 @@ namespace Alpaca4d.Gh
             get { return Properties.Resources.Mesh_Loft__Alpaca4d_; }
         }
 
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 

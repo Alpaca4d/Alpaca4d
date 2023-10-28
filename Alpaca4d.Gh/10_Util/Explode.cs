@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Attributes;
 
 namespace Alpaca4d.Gh
 {
-    public class ExplodeAnythingComponent : GH_Component, IGH_VariableParameterComponent
+    public class DeconstructAnything : GH_Component, IGH_VariableParameterComponent
     {
         private string typeName;
 
@@ -23,11 +23,11 @@ namespace Alpaca4d.Gh
 
         private PropertyInfo[] propertiesArr;
 
-        private ExplodeAnythingComponentAttributes ThisAttribute
+        private DeconstructAnythingAttributes ThisAttribute
         {
             get
             {
-                return this.m_attributes as ExplodeAnythingComponentAttributes;
+                return this.m_attributes as DeconstructAnythingAttributes;
             }
         }
 
@@ -47,16 +47,18 @@ namespace Alpaca4d.Gh
             }
         }
 
-        public ExplodeAnythingComponent() : base("Explode", "Explode", "Explode anything you want to peek inside", "Alpaca4d", "06_Assemble")
+        public DeconstructAnything() : base("Deconstruct", "Deconstruct", "Deconstruct any object", "Alpaca4d", "10_Utility")
         {
             this.Message = $"{this.NickName} \n{this.Category}";
         }
 
+        public override GH_Exposure Exposure => GH_Exposure.primary;
+
         public override void CreateAttributes()
         {
-            this.m_attributes = new ExplodeAnythingComponentAttributes(this)
+            this.m_attributes = new DeconstructAnythingAttributes(this)
             {
-                ButtonResponder = new ExplodeAnythingComponentAttributes.ResponderEvent(this.MatchResponder),
+                ButtonResponder = new DeconstructAnythingAttributes.ResponderEvent(this.MatchResponder),
                 ButtonText = "Deconstruct",
                 //TextLine = new LongShortString
                 //{
@@ -287,7 +289,7 @@ namespace Alpaca4d.Gh
 
 
 
-    internal class ExplodeAnythingComponentAttributes : GH_ComponentAttributes
+    internal class DeconstructAnythingAttributes : GH_ComponentAttributes
     {
         public delegate void ResponderEvent(object o, EventArgs e);
 
@@ -321,7 +323,7 @@ namespace Alpaca4d.Gh
             set;
         }
 
-        public ExplodeAnythingComponentAttributes(GH_Component owner) : base(owner)
+        public DeconstructAnythingAttributes(GH_Component owner) : base(owner)
         {
             this.attributeOwner = owner;
             //this.TextLine = new LongShortString
