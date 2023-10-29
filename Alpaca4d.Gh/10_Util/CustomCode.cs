@@ -69,7 +69,7 @@ namespace Alpaca4d.Gh
         }
 
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Custom_code__Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{4D46782D-0ABE-4097-8040-D9607C645165}");
     }
 }

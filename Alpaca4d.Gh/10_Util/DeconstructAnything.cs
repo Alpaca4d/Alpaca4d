@@ -31,13 +31,7 @@ namespace Alpaca4d.Gh
             }
         }
 
-        protected override Bitmap Icon
-        {
-            get
-            {
-                return null;
-            }
-        }
+        protected override Bitmap Icon => Properties.Resources.Deconstruct__Alpaca4d_;
 
         public override Guid ComponentGuid
         {
@@ -101,7 +95,6 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("object", "object", "Object to explode", 0);
-            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)

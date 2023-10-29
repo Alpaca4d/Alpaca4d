@@ -10,14 +10,13 @@ namespace Alpaca4d.Gh
     public class FiberStressStrain : GH_Component
     {
         public FiberStressStrain()
-          : base("Fiber Stress Strain (Alpaca4d)", "Fiber Stress Strain",
+          : base("Fiber Stress Strain (Alpaca4d)", "FBS",
             "Read the stress strain in a fiber",
-            "Alpaca4d", "08_NumericalOutput")
+            "Alpaca4d", "MomentCurvature")
         {
             // Draw a Description Underneath the component
-            this.Message = $"{this.Name}";
+            this.Message = $"Fiber Stress Strain\nAlpaca4d";
         }
-
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
@@ -48,13 +47,8 @@ namespace Alpaca4d.Gh
             DA.SetDataTree(2, stress);
         }
 
-
-        public override GH_Exposure Exposure => GH_Exposure.senary;
-
-
-        protected override System.Drawing.Bitmap Icon => null;
-
-
+        public override GH_Exposure Exposure => GH_Exposure.quarternary;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Fiber_Stress_Strain__Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{34dc5969-e0e4-4acf-9790-0af2c22cfeb9}");
     }
 }

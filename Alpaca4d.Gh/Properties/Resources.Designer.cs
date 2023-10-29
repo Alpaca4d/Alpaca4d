@@ -123,6 +123,16 @@ namespace Alpaca4d.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Benchmark__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("Benchmark (Alpaca4d)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Bending_Prestress__Alpaca4d_ {
             get {
                 object obj = ResourceManager.GetObject("Bending_Prestress__Alpaca4d_", resourceCulture);
@@ -236,6 +246,26 @@ namespace Alpaca4d.Gh.Properties {
         public static System.Drawing.Bitmap Counter__Alpaca4d_ {
             get {
                 object obj = ResourceManager.GetObject("Counter__Alpaca4d_", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Custom_code__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("Custom code (Alpaca4d)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Deconstruct__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("Deconstruct (Alpaca4d)", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -446,6 +476,16 @@ namespace Alpaca4d.Gh.Properties {
         public static System.Drawing.Bitmap Fiber_section__Alpaca4d_ {
             get {
                 object obj = ResourceManager.GetObject("Fiber_section__Alpaca4d_", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Fiber_Stress_Strain__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("Fiber Stress Strain (Alpaca4d)", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
