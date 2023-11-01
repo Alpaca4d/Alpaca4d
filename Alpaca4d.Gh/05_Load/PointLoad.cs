@@ -10,6 +10,7 @@ namespace Alpaca4d.Gh
 {
     public class PointLoad : GH_Component
     {
+        // Point load comment
         public PointLoad()
           : base("Point Load (Alpaca4d)", "Point Load",
             "Construct a PointLoad",

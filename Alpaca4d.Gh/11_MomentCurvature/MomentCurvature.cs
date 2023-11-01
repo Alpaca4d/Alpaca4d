@@ -1,16 +1,6 @@
-﻿using Grasshopper;
-using Grasshopper.Kernel;
-using Rhino.Geometry;
-using Rhino;
+﻿using Grasshopper.Kernel;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
-using Microsoft.CSharp.RuntimeBinder;
-using Alpaca4d;
-using Alpaca4d.Generic;
-
-using Eto.Forms;
 
 namespace Alpaca4d.Gh
 {
@@ -19,7 +9,7 @@ namespace Alpaca4d.Gh
         public MomentCurvature()
           : base("MomentCurvature (Alpaca4d)", "MC",
             "",
-            "Alpaca4d", "07_Analysis")
+            "Alpaca4d", "MomentCurvature")
         {
             // Draw a Description Underneath the component
             this.Message = $"MomentCurvature\n(Alpaca4d)";
@@ -154,7 +144,14 @@ namespace Alpaca4d.Gh
             DA.SetData(7, fiberResult);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.quinary;
+
+        protected override void BeforeSolveInstance()
+        {
+            List<string> directions = new List<string> { "y", "z" };
+            ValueListUtils.updateValueLists(this, 2, directions, null);
+        }
+
+        public override GH_Exposure Exposure => GH_Exposure.tertiary;
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Moment_Curvature_Model__Alpaca4d_;
 

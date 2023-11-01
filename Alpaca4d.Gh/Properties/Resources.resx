@@ -136,6 +136,9 @@
   <data name="become a sponsor" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sponsors\become a sponsor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Benchmark (Alpaca4d)" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Benchmark (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Bending_Prestress__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Bending Prestress (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -171,6 +174,12 @@
   </data>
   <data name="Counter__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Counter (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Custom code (Alpaca4d)" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Custom code (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Deconstruct (Alpaca4d)" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Deconstruct (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="defModel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\defModel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -231,6 +240,9 @@
   </data>
   <data name="Fiber Point (Alpaca4d)" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Fiber Point (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Fiber Stress Strain (Alpaca4d)" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Fiber Stress Strain (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Fiber_section__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Fiber section (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

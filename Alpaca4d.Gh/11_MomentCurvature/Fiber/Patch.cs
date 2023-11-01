@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
         public Patch()
           : base("Patch (Alpaca4d)", "Patch",
             "Construct a Patch",
-            "Alpaca4d", "01_Section")
+            "Alpaca4d", "MomentCurvature")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";
@@ -90,7 +90,7 @@ namespace Alpaca4d.Gh
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Patch__Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{49DDD2E0-99B5-4D14-976E-531481B07909}");
     }

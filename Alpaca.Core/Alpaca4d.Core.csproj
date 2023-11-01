@@ -181,6 +181,7 @@
     <Compile Include="Constraint\RigidDiaphragm.cs" />
     <Compile Include="Visualisation\Geometries.cs" />
     <Compile Include="Loads\Load.cs" />
+    <Compile Include="Extension\ObjectExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -190,6 +191,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Extension\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

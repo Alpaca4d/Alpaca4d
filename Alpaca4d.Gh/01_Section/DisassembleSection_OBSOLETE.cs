@@ -7,9 +7,9 @@ using Alpaca4d.Generic;
 
 namespace Alpaca4d.Gh
 {
-    public class DisassembleSection : GH_Component
+    public class DisassembleSection_OBSOLETE : GH_Component
     {
-        public DisassembleSection()
+        public DisassembleSection_OBSOLETE()
           : base("Disassemble Section (Alpaca4d)", "DS",
             "Disassemble a Section",
             "Alpaca4d", "01_Section")
@@ -88,7 +88,7 @@ namespace Alpaca4d.Gh
         /// each of which can be combined with the GH_Exposure.obscure flag, which 
         /// ensures the component will only be visible on panel dropdowns.
         /// </summary>
-        public override GH_Exposure Exposure => GH_Exposure.quarternary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.

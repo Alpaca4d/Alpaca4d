@@ -468,12 +468,13 @@
   
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   
   <ItemGroup>
     <None Include="..\Alpaca4d.Utils\data.bin">
       <Link>data.bin</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

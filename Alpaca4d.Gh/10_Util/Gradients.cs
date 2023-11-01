@@ -6,6 +6,7 @@ using Alpaca4d;
 using System.Collections.Generic;
 
 using Alpaca4d.TimeSeries;
+using Eto.Forms;
 
 namespace Alpaca4d.Gh
 {
@@ -17,7 +18,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "10_Utility")
         {
             // Draw a Description Underneath the component
-            this.Message = "Colors (Alpaca4d)";
+            this.Message = this.Name;
         }
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("GradientIndex", "Index", "gradIndex: An index refering to one of the following possible gradients: \n 0 - Orignal Ladybug\n1 - Nuanced Ladybug\n2 - Multi - colored Ladybug\n3 - Ecotect\n4 - Thermal Comfort Percentage\n5 - Thermal Comfort Colors\n6 - Shade Benefit / Harm\n7 - Shade Harm\n8 - Shade Benefit\n9 - CFD Colors\n10 - Radiation Benefit\n11 - Gsa10 Colour\n12 - Gsa9 Colour", GH_ParamAccess.item, 11);
+            pManager.AddIntegerParameter("GradientIndex", "Index", "gradIndex: An index refering to one of the following possible gradients: \n0 - Turbo\n1 - Viridis\n2 - Plasma\n3 - Inferno\n4 - Magma\n5 - Cool\n6 - Hot\n7 - Coolwarm\n8 - Spectral\n9 - Seismic\n10 - Batlow\n11 - Tokyo\n12 - Buda\n13 - Imola\n14 - Vik\n15 - Roma\n16 - Bam\n17 - Berlin", GH_ParamAccess.item, 2);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -44,7 +45,7 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int index = 11;
+            int index = 1;
 
             DA.GetData(0, ref index);
 
@@ -61,7 +62,7 @@ namespace Alpaca4d.Gh
         /// each of which can be combined with the GH_Exposure.obscure flag, which 
         /// ensures the component will only be visible on panel dropdowns.
         /// </summary>
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.

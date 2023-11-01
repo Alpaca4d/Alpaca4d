@@ -17,7 +17,7 @@ namespace Alpaca4d
             "Alpaca4d", " Info")
         {
             // Draw a Description Underneath the component
-            this.Message = $"{this.Name}";
+            this.Message = $"{this.NickName}\n{"Alpaca4d"}";
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -54,7 +54,7 @@ namespace Alpaca4d
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Patreon_Supporter__Alpaca4d_;
 

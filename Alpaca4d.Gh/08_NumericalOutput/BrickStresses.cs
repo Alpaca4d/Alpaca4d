@@ -38,12 +38,13 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Sigma11", "Sigma11", "");
-            pManager.Register_GenericParam("Sigma22", "Sigma22", "");
-            pManager.Register_GenericParam("Sigma33", "Sigma33", "");
-            pManager.Register_GenericParam("Sigma12", "Sigma12", "");
-            pManager.Register_GenericParam("Sigma23", "Sigma23", "");
-            pManager.Register_GenericParam("Sigma13", "Sigma13", "");
+            pManager.Register_GenericParam("Sigma11", "σ₁₁", "");
+            pManager.Register_GenericParam("Sigma22", "σ₂₂", "");
+            pManager.Register_GenericParam("Sigma33", "σ₃₃", "");
+            pManager.Register_GenericParam("Sigma12", "σ₁₂", "");
+            pManager.Register_GenericParam("Sigma23", "σ₂₃", "");
+            pManager.Register_GenericParam("Sigma13", "σ₁₃", "");
+            pManager.Register_DoubleParam("VonMises", "VonMises", "");
         }
 
         /// <summary>
@@ -87,13 +88,28 @@ namespace Alpaca4d.Gh
 
             var ids = alpacaModel.Bricks.Select(d => d.Id).ToList();
 
-            var sigma11 = tetraSigma11.Concat(sspSigma11).OrderBy(i => ids);
-            var sigma22 = tetraSigma22.Concat(sspSigma22).OrderBy(i => ids);
-            var sigma33 = tetraSigma33.Concat(sspSigma33).OrderBy(i => ids);
-            var sigma12 = tetraSigma12.Concat(sspSigma12).OrderBy(i => ids);
-            var sigma23 = tetraSigma23.Concat(sspSigma23).OrderBy(i => ids);
-            var sigma13 = tetraSigma13.Concat(sspSigma13).OrderBy(i => ids);
+            var sigma11 = tetraSigma11.Concat(sspSigma11).OrderBy(i => ids).ToList();
+            var sigma22 = tetraSigma22.Concat(sspSigma22).OrderBy(i => ids).ToList();
+            var sigma33 = tetraSigma33.Concat(sspSigma33).OrderBy(i => ids).ToList();
+            var sigma12 = tetraSigma12.Concat(sspSigma12).OrderBy(i => ids).ToList();
+            var sigma23 = tetraSigma23.Concat(sspSigma23).OrderBy(i => ids).ToList();
+            var sigma13 = tetraSigma13.Concat(sspSigma13).OrderBy(i => ids).ToList();
 
+            // Calculate Con Mises stress
+
+            List<double> vonMises = new List<double>();
+            
+            for (int i = 0; i < sigma11.Count(); i++) 
+            {
+                double _vonMises = Math.Sqrt(
+                0.5 * ((sigma11[i] - sigma22[i]) * (sigma11[i] - sigma22[i]) +
+                       (sigma22[i] - sigma33[i]) * (sigma22[i] - sigma33[i]) +
+                       (sigma33[i] - sigma11[i]) * (sigma33[i] - sigma11[i]) +
+                       6.0 * (sigma12[i] * sigma12[i] + sigma23[i] * sigma23[i] + sigma13[i] * sigma13[i]))
+                );
+
+                vonMises.Add(_vonMises);
+            }
 
             // Finally assign the spiral to the output parameter.
             DA.SetDataList(0, sigma11);
@@ -102,6 +118,7 @@ namespace Alpaca4d.Gh
             DA.SetDataList(3, sigma12);
             DA.SetDataList(4, sigma23);
             DA.SetDataList(5, sigma13);
+            DA.SetDataList(6, vonMises);
         }
 
 

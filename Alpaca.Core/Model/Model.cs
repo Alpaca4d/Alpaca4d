@@ -411,12 +411,13 @@ namespace Alpaca4d
 
         }
 
-        public Model(List<IElement> elements, List<Support> supports, List<ILoad> loads, List<IConstraint> constraints)
+        public Model(List<IElement> elements, List<Support> supports, List<ILoad> loads, List<IConstraint> constraints, List<IRecorder> recorders)
         {
             this.Elements = elements;
             this.Supports = supports;
             this.Loads = loads;
             this.Constraint = constraints;
+            this.Recorders = recorders;
         }
 
         public Model ShallowCopy()
@@ -552,7 +553,7 @@ namespace Alpaca4d
             {
                 foreach(var line in this.Tcl)
                 {
-                    file.Write(line);
+                    file.WriteLine(line);
                 }
             }
         }
