@@ -5,3 +5,5 @@
 - Zeno Zoppi
 - ずき す
 - Felipe Junqueira
+- Peter Bauer
+- Rameshwar Prasad
