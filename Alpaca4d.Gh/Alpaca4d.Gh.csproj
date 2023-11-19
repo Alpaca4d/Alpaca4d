@@ -474,7 +474,7 @@
   <ItemGroup>
     <None Include="..\Alpaca4d.Utils\data.bin">
       <Link>data.bin</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
