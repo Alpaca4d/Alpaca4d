@@ -8,7 +8,7 @@ namespace Alpaca4d.Test.HDF5
     [TestMethod]
     public void Test1()
     {
-        var users = License.DeserialiseJSON(@"data.json");
+        var users = Alpaca4d.License.License.DeserialiseJSON(@"data.json");
         Assert.IsNotNull(users);
         Assert.IsTrue(users.Count == 3);
         Assert.IsTrue(users[0].user_name == "marcopellegrino");
@@ -27,9 +27,9 @@ namespace Alpaca4d.Test.HDF5
         var jsonFilePath = "data.json";
         var binaryFilePath = "data.bin";
 
-        var binary = License.SerializeJsonToBinary(jsonFilePath);
-        License.SerializeBinaryToFile(binaryFilePath, binary);
-        var usersObj = License.DeserializeBinary(binaryFilePath);
+        var binary = Alpaca4d.License.License.SerializeJsonToBinary(jsonFilePath);
+            Alpaca4d.License.License.SerializeBinaryToFile(binaryFilePath, binary);
+        var usersObj = Alpaca4d.License.License.DeserializeBinary(binaryFilePath);
 
         var users = (List<User>)usersObj;
         Assert.IsNotNull(users);
@@ -57,7 +57,7 @@ namespace Alpaca4d.Test.HDF5
         bool res = false;
 
         var macAddress = NetworkInterface.GetAllNetworkInterfaces().Select(x => x.GetPhysicalAddress().ToString()).ToList();
-        var users = License.DeserializeBinary("data.bin");
+        var users = Alpaca4d.License.License.DeserializeBinary("data.bin");
 
         foreach (var user in users)
         {
@@ -78,7 +78,7 @@ namespace Alpaca4d.Test.HDF5
         bool res = false;
 
         var macAddress = new List<string> { "XXZZAASSDDQQ" };
-        var users = License.DeserializeBinary("data.bin");
+        var users = Alpaca4d.License.License.DeserializeBinary("data.bin");
 
         foreach (var user in users)
         {
@@ -101,8 +101,8 @@ namespace Alpaca4d.Test.HDF5
 
     public bool LicenseIsValid()
     {
-        var addresses = License.GetMacAddress();
-        var users = License.DeserializeBinary("data.bin");
+        var addresses = Alpaca4d.License.License.GetMacAddress();
+        var users = Alpaca4d.License.License.DeserializeBinary("data.bin");
 
         foreach (var user in users)
         {

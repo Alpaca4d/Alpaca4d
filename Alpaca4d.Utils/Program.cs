@@ -18,6 +18,7 @@ namespace CreateLicense
             var binary = License.SerializeJsonToBinary(jsonFilePath);
             License.SerializeBinaryToFile(binaryFilePath, binary);
             Console.WriteLine("data.bin created");
+            Console.ReadKey();
         }
     }
 }
