@@ -11,8 +11,6 @@ namespace Alpaca4d.License
 {
     public static class License
     {
-        public readonly static DateTime FreeVersionDate = new DateTime(2023, 8, 31);
-
         public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
         public static string licenseLocation = System.IO.Path.Combine(GhAlpacaFolder, @"data.bin");
@@ -23,8 +21,15 @@ namespace Alpaca4d.License
                 var addresses = GetMacAddress();
                 var users = License.DeserializeBinary(licenseLocation);
 
-                foreach(var user in users)
+                // check data.bin
+                foreach (var user in users)
                 {
+                    if(user.user_name == "FreeVersion")
+                    {
+                        if(DateTime.Now < user.expiring_date)
+                            return true;
+                    }
+
                     foreach(var macAdress in addresses)
                     {
                         if((macAdress == user.mac_address) && (DateTime.Now < user.expiring_date))
