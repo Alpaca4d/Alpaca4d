@@ -5,15 +5,16 @@ using System;
 using System.Collections.Generic;
 
 using Alpaca4d.TimeSeries;
+using Alpaca4d.Loads;
+using System.Linq;
 
 namespace Alpaca4d.Gh
 {
-    public class PointLoad : GH_Component
+    public class UniformExcitation : GH_Component
     {
-        // Point load comment
-        public PointLoad()
-          : base("Ground Motion (Alpaca4d)", "Ground Motion",
-            "Construct a GroundMotion",
+        public UniformExcitation()
+          : base("Uniform Excitation (Alpaca4d)", "Uniform Excitation",
+            "Construct a Uniform Excitation Load",
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
@@ -56,21 +57,22 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var pos = Point3d.Origin;
-            var force = Vector3d.Zero;
-            var moment = Vector3d.Zero;
+            string _direction = "X";
+            if (!DA.GetData(0, ref _direction)) return;
 
-            Alpaca4d.Generic.ITimeSeries timeSeries = Alpaca4d.TimeSeries.Constant.Default();
+            Alpaca4d.Generic.ITimeSeries timeSeries = null;
+            if (!DA.GetData(1, ref timeSeries)) return;
 
-            if (!DA.GetData(0, ref pos)) return;
-            if (!DA.GetData(1, ref force)) return;
+            double velocity = 0;
+            DA.GetData(2, ref velocity);
 
-            DA.GetData(2, ref moment);
-            DA.GetData(3, ref timeSeries);
+            double factor = 1;
+            DA.GetData(3, ref factor);
 
-            var load = new Alpaca4d.Loads.PointLoad(pos, force, moment, timeSeries);
+            var direction = (Alpaca4d.Loads.Direction)Enum.Parse(typeof(Alpaca4d.Loads.Direction), _direction, true);
 
-            // Finally assign the spiral to the output parameter.
+            var load = new Alpaca4d.Loads.UniformExcitation(direction, timeSeries, velocity, factor);
+
             DA.SetData(0, load);
         }
 
@@ -97,5 +99,14 @@ namespace Alpaca4d.Gh
         /// that use the old ID will partially fail during loading.
         /// </summary>
         public override Guid ComponentGuid => new Guid("{2064D9F5-EFCB-4D35-8389-3BEC2F87E413}");
+
+        protected override void BeforeSolveInstance()
+        {
+            List<string> directions;
+
+            directions = Enum.GetNames(typeof(Loads.Direction)).ToList();
+            ValueListUtils.updateValueLists(this, 0, directions, null);
+        }
+
     }
 }

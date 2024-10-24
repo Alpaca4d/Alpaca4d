@@ -897,10 +897,18 @@ namespace Alpaca4d
                 }
                 else if (item.Type == Alpaca4d.Loads.LoadType.Mass)
                     this.Mass.Add((Loads.MassLoad)item);
+                else if (item.Type == Alpaca4d.Loads.LoadType.UniformExcitation)
+                    continue;
                 else
                     throw new Exception("Type of Load not found");
             }
 
+
+            foreach (var item in this.Mass)
+            {
+                item.SetTag(this);
+                this.Tcl.Add(item.WriteTcl());
+            }
 
             foreach (var item in myLoads)
             {
@@ -927,11 +935,26 @@ namespace Alpaca4d
                 index++;
             }
 
-            foreach(var item in this.Mass)
+
+            #region UNIFORM EXCITATION
+            var uniformExcitationLoads = this.Loads.OfType<Alpaca4d.Loads.UniformExcitation>().ToList();
+
+            if (uniformExcitationLoads.Count > 1)
             {
-                item.SetTag(this);
-                this.Tcl.Add(item.WriteTcl());
+                throw new Exception("Only one UniformExcitation is allowed!");
             }
+            else if (uniformExcitationLoads.Count == 1)
+            {
+                var uniformExcitation = uniformExcitationLoads.FirstOrDefault();
+                uniformExcitation.Id = index;
+                uniformExcitation.TimeSeries.Id = index;
+
+                this.Tcl.Add(uniformExcitation.TimeSeries.WriteTcl());
+                this.Tcl.Add(uniformExcitation.WriteTcl());
+            }
+            #endregion
+
+
         }
     }
 }

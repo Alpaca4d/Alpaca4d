@@ -128,6 +128,14 @@ namespace Alpaca4d.Gh
                 // it is using the default value
             }
 
+            if(analysisObj.Type == Analysis.AnalysisType.Transient)
+            {
+                if(((Alpaca4d.AnalysisStep)analysisStep).Dt  == null)
+                {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Transient analysis requires an analysis step with Dt specified");
+                    return;
+                }
+            }
             
             var settings = new Settings(constraintObj, numbererObj, systemObj, test, algorithmObj, integrator, analysisObj, analysisStep, damping);
 

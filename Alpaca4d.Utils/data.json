@@ -10,16 +10,6 @@
         "expiring_date": "2099-01-01"
     },
     {
-        "user_name": "tomdiks",
-        "mac_address": "58CE2A4A67ED",
-        "expiring_date": "2099-01-01"
-    },
-    {
-        "user_name": "tomdiks",
-        "mac_address": "1C57DC79C54C",
-        "expiring_date": "2099-01-01"
-    },
-    {
         "user_name": "alessandrocoppola",
         "mac_address": "9C7BEF445773",
         "expiring_date": "2024-09-30"
@@ -42,7 +32,7 @@
     {
         "user_name": "FreeVersion",
         "mac_address": "",
-        "expiring_date": "2024-08-31"
+        "expiring_date": "2024-12-31"
     }
 
 ]

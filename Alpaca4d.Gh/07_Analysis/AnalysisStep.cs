@@ -26,13 +26,13 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddIntegerParameter("NumIncr", "NumIncr", "", GH_ParamAccess.item, 1);
-            pManager.AddNumberParameter("Dt", "Dt", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Dt", "Dt", "time-step increment", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("DtMin", "DtMin", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("DtMin", "DtMin", "Minimum time steps", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("DtMax", "DtMax", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("DtMax", "DtMax", "Maximum time steps", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Jd", "Jd", "", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Jd", "Jd", "Number of iterations user would like performed at each step", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -55,7 +55,7 @@ namespace Alpaca4d.Gh
             double? dt = null;
             double? dtMin = null;
             double? dtMax = null;
-            double? jD = null;
+            int? jD = null;
 
 
             if (!DA.GetData(0, ref cNumIncr)) return;

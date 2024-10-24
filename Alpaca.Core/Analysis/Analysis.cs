@@ -329,14 +329,14 @@ namespace Alpaca4d
         public double? Dt { get; set; }
         public double? DtMin { get; set; }
         public double? DtMax { get; set; }
-        public double? Jd { get; set; }
+        public int? Jd { get; set; }
 
         public AnalysisStep()
         {
 
         }
 
-        public AnalysisStep(int numIncr, double? dt = null, double? dtMin = null, double? dtMax = null, double? jD = null)
+        public AnalysisStep(int numIncr, double? dt = null, double? dtMin = null, double? dtMax = null, int? jD = null)
         {
             this.NumIncr = numIncr;
             this.Dt = dt;

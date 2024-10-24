@@ -145,6 +145,7 @@
     <Compile Include="Loads\MassPoint.cs" />
     <Compile Include="Loads\MeshLoad.cs" />
     <Compile Include="Loads\PointLoad.cs" />
+    <Compile Include="Loads\UniformExcitation.cs" />
     <Compile Include="Material\Concrete01.cs" />
     <Compile Include="Material\ElasticOrthotropicMaterial.cs" />
     <Compile Include="Material\ElasticIsotropicMaterial.cs" />
@@ -191,9 +192,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Extension\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
