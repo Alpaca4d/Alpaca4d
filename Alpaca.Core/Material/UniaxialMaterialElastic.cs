@@ -53,9 +53,5 @@ namespace Alpaca4d.Material
             string tclText = $"uniaxialMaterial Elastic {this.Id} {this.E} {this.Eta} {this.Eneg}\n";
             return tclText;
         }
-		public override string ToString()
-		{
-            return this.WriteTcl();
-        }
 	}
 }

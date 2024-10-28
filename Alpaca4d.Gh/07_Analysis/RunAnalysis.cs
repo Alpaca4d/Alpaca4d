@@ -12,11 +12,16 @@ using Alpaca4d;
 using Alpaca4d.Generic;
 using Alpaca4d.License;
 using Eto.Forms;
+using System.Diagnostics;
 
 namespace Alpaca4d.Gh
 {
     public class RunAnalysis : GH_Component
     {
+        private int counter = 0;
+        private DateTime? firstTimeRun = DateTime.Now;
+        private DateTime? lastTimeRun = null;
+
         public RunAnalysis()
           : base(" Run Analysis (Alpaca4d)", "RA",
             "",
@@ -68,7 +73,6 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-
             var model = new Model();
             Settings settings = null;
 
@@ -82,14 +86,25 @@ namespace Alpaca4d.Gh
                 return;
             }
 
-            // license routine
-            if (!Alpaca4d.License.License.IsValid)
+
+            // Update last run time to the current DateTime
+            lastTimeRun = DateTime.Now;
+
+            if (counter == 0 || lastTimeRun - firstTimeRun > TimeSpan.FromMinutes(5))
             {
-                if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+                // license routine
+                if (!Alpaca4d.License.License.IsValid)
                 {
-                    Alpaca4d.Gh.Forms.Advertise.Default();
+                    if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+                    {
+                        Alpaca4d.Gh.Forms.Advertise.Default();
+                    }
                 }
+                firstTimeRun = DateTime.Now;
+                counter++;
             }
+
+
 
             // create a shallow copy
 

@@ -171,6 +171,7 @@
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\EnumHelper.cs" />
     <Compile Include="Utils\Export.cs" />
+    <Compile Include="Utils\IdGenerator.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Recorder\Recorder.cs" />
     <Compile Include="Generic\IStructure.cs" />

@@ -19,22 +19,31 @@ namespace Alpaca4d.License
             get
             {
                 var addresses = GetMacAddress();
-                var users = License.DeserializeBinary(licenseLocation);
 
-                // check data.bin
-                foreach (var user in users)
+                try
                 {
-                    if(user.user_name == "FreeVersion")
-                    {
-                        if(DateTime.Now < user.expiring_date)
-                            return true;
-                    }
+                    // if data.bin does not exist, it raise exception
+                    var users = License.DeserializeBinary(licenseLocation);
 
-                    foreach(var macAdress in addresses)
+                    // check data.bin
+                    foreach (var user in users)
                     {
-                        if((macAdress == user.mac_address) && (DateTime.Now < user.expiring_date))
+                        if (user.user_name == "FreeVersion")
+                        {
+                            if (DateTime.Now < user.expiring_date)
                                 return true;
+                        }
+
+                        foreach (var macAdress in addresses)
+                        {
+                            if ((macAdress == user.mac_address) && (DateTime.Now < user.expiring_date))
+                                return true;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    return false;
                 }
                 return false;
             }

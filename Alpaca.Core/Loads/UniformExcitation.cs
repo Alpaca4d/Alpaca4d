@@ -4,14 +4,14 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Alpaca4d.Core.Utils;
 using Alpaca4d.Generic;
 
 namespace Alpaca4d.Loads
 {
     public partial class UniformExcitation : ILoad
     {
-        public int? Id { get; set; }
+        public int? Id { get; set; } = IdGenerator.GenerateId();
         public Direction Dof { get; set; } = Direction.X;
         public LoadType Type { get; set; } = LoadType.UniformExcitation;
         public ITimeSeries TimeSeries { get; set; }

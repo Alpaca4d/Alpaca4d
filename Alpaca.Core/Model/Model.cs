@@ -104,6 +104,11 @@ namespace Alpaca4d
                         throw new NotImplementedException($"{item.Type} has not been considered!");
                     }
                 }
+
+                foreach (var pointMass in this.Mass)
+                {
+                    mass += pointMass.TransMass.Z;
+                }
                 return mass;
             }
         }
@@ -253,8 +258,8 @@ namespace Alpaca4d
                 var planeStart = new Rhino.Geometry.Plane(curve.PointAtStart, localZ, localY);
                 var planeEnd = new Rhino.Geometry.Plane(curve.PointAtEnd, localZ, localY);
 
-                var transfEnd = Rhino.Geometry.Transform.PlaneToPlane(Plane.WorldXY, planeStart);
-                var transfStart = Rhino.Geometry.Transform.PlaneToPlane(Plane.WorldXY, planeEnd);
+                var transfStart = Rhino.Geometry.Transform.PlaneToPlane(Plane.WorldXY, planeStart);
+                var transfEnd = Rhino.Geometry.Transform.PlaneToPlane(Plane.WorldXY, planeEnd);
 
                 var sectionStart = section.DuplicateCurve();
                 var sectionEnd = section.DuplicateCurve();
@@ -924,15 +929,13 @@ namespace Alpaca4d
 
             var timeSeriesGroup = totalLoads.GroupBy(s => s.TimeSeries);
 
-            index = 1;
             foreach(var group in timeSeriesGroup)
             {
                 var timeSeries = group.Key;
                 if (timeSeries == null) { continue; }
                 timeSeries.Id = index;
-                var loadPattern = new Alpaca4d.Loads.LoadPattern(index, group.ToList(), Alpaca4d.Loads.PatternType.Plain, timeSeries);
+                var loadPattern = new Alpaca4d.Loads.LoadPattern(Alpaca4d.Loads.PatternType.Plain, timeSeries, group.ToList());
                 this.Tcl.Add(loadPattern.WriteTcl());
-                index++;
             }
 
 
@@ -946,7 +949,6 @@ namespace Alpaca4d
             else if (uniformExcitationLoads.Count == 1)
             {
                 var uniformExcitation = uniformExcitationLoads.FirstOrDefault();
-                uniformExcitation.Id = index;
                 uniformExcitation.TimeSeries.Id = index;
 
                 this.Tcl.Add(uniformExcitation.TimeSeries.WriteTcl());
