@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Alpaca4d.Core.Utils;
 using Alpaca4d.Generic;
 
 namespace Alpaca4d.Material
@@ -10,7 +11,7 @@ namespace Alpaca4d.Material
     public partial class ReinforcingSteel : EntityBase, IMaterial
     {
         public string MatName { get; set; }
-        public int? Id { get; set; }
+        public int? Id { get; set; } = IdGenerator.GenerateId();
         public double Fy { get; set; }
         public double Fu { get; set; }
         public double Es { get; set; }

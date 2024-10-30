@@ -30,10 +30,10 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Pattern", "Pattern", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("Pattern", "Pattern", "Connect a 'ValueList'\nPlain, UniformExcitation", GH_ParamAccess.item);
             pManager.AddGenericParameter("TimeSeries", "TimeSeries", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Loads", "Loads", "", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Loads", "Loads", "", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Factor", "Factor", "Constant factor", GH_ParamAccess.item, 1);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -61,7 +61,7 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(1, ref timeSeries)) return;
 
             List<ILoad> loads = new List<ILoad>();
-            DA.GetData(2, ref loads);
+            DA.GetDataList(2, loads);
 
             double factor = 1;
             DA.GetData(3, ref factor);
@@ -88,7 +88,7 @@ namespace Alpaca4d.Gh
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Uniform_excitation;
+        protected override System.Drawing.Bitmap Icon => null;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 

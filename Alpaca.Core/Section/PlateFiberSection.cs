@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Alpaca4d.Generic;
+using Alpaca4d.Core.Utils;
 
 namespace Alpaca4d.Section
 {
@@ -13,7 +13,7 @@ namespace Alpaca4d.Section
         public string SectionName { get; set; }
         public double Thickness { get; set; }
         public IMultiDimensionMaterial Material { get; set; }
-        public int? Id { get; set; }
+        public int? Id { get; set; } = IdGenerator.GenerateId();
 
         public PlateFiberSection(string sectionName, double thickness, IMultiDimensionMaterial material)
         {

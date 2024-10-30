@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Alpaca4d.Core.Utils;
 using Alpaca4d.Generic;
 
 namespace Alpaca4d.TimeSeries
@@ -13,7 +13,7 @@ namespace Alpaca4d.TimeSeries
         public static Dictionary<double, Constant> _timeSeriesCache = new Dictionary<double, Constant>();
         public TimeSeriesType Type => TimeSeriesType.Constant;
         public double CFactor { get; set; }
-        public int Id { get; set; }
+        public int Id { get; set; } = IdGenerator.GenerateId();
 
         public Constant (double cFactor = 1.0)
         {
@@ -46,7 +46,7 @@ namespace Alpaca4d.TimeSeries
     {
         public TimeSeriesType Type => TimeSeriesType.Linear;
         public double CFactor { get; set; }
-        public int Id { get; set; }
+        public int Id { get; set; } = IdGenerator.GenerateId();
 
         //Constructor
         public Linear()
@@ -73,7 +73,7 @@ namespace Alpaca4d.TimeSeries
 
     public partial class Trigonometric : EntityBase, ITimeSeries, ISerialize
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = IdGenerator.GenerateId();
         public TimeSeriesType Type => TimeSeriesType.Trigonometric;
         public double TStart { get; set; }
         public double TEnd { get; set; }
@@ -127,7 +127,7 @@ namespace Alpaca4d.TimeSeries
 
     public partial class Triangle : EntityBase, ITimeSeries, ISerialize
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = IdGenerator.GenerateId();
         public TimeSeriesType Type => TimeSeriesType.Triangle;
         public double TStart { get; set; }
         public double TEnd { get; set; }
@@ -163,7 +163,7 @@ namespace Alpaca4d.TimeSeries
 
     public partial class PathTimeSeries : EntityBase, ITimeSeries, ISerialize
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = IdGenerator.GenerateId();
         public TimeSeriesType Type => TimeSeriesType.Path;
         public double CFactor { get; set; }
         public List<double> Times { get; set; }

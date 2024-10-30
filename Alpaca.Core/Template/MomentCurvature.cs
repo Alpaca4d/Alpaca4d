@@ -31,12 +31,6 @@ namespace Alpaca4d.Template
             materialList.AddRange(fiber.Patches.Select(x => x.Material).Distinct());
             var uniqueMaterial = materialList.Distinct();
 
-            int index = 1;
-            foreach(var _material in uniqueMaterial)
-            {
-                _material.Id = index;
-                index++;
-            }
 
 
             var material = String.Join("", uniqueMaterial.Select(x => x.WriteTcl()));

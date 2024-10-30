@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Alpaca4d.Generic;
+using Alpaca4d.Core.Utils;
 
 namespace Alpaca4d.Section
 {
@@ -17,7 +18,7 @@ namespace Alpaca4d.Section
         public double J { get; set; }
         public double AlphaY { get; set; }
         public double AlphaZ { get; set; }
-        public int? Id { get; set; }
+        public int? Id { get; set; } = IdGenerator.GenerateId();
         public IUniaxialMaterial Material { get; set; }
         public List<Curve> Curves
         {

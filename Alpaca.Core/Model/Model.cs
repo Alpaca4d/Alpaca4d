@@ -9,6 +9,7 @@ using Alpaca4d.Element;
 using Alpaca4d.Material;
 using Alpaca4d.Generic;
 using Alpaca4d;
+using Alpaca4d.Loads;
 
 namespace Alpaca4d
 {
@@ -32,6 +33,7 @@ namespace Alpaca4d
         public List<IBrick> Bricks { get; set; } = new List<IBrick> { };
         public List<IElement> Elements { get; set; } = new List<IElement> { };
         public List<ForceBeamColumn> ForceBeamColumns { get; set; }
+        public List<LoadPattern> LoadPatterns { get; set; } = new List<LoadPattern> { };
         public List<ILoad> Loads { get; set; } = new List<ILoad> { };
         public List<Alpaca4d.Loads.PointLoad> PointLoad
         {
@@ -416,11 +418,11 @@ namespace Alpaca4d
 
         }
 
-        public Model(List<IElement> elements, List<Support> supports, List<ILoad> loads, List<IConstraint> constraints, List<IRecorder> recorders)
+        public Model(List<IElement> elements, List<Support> supports, List<LoadPattern> loads, List<IConstraint> constraints, List<IRecorder> recorders)
         {
             this.Elements = elements;
             this.Supports = supports;
-            this.Loads = loads;
+            this.LoadPatterns = loads;
             this.Constraint = constraints;
             this.Recorders = recorders;
         }
@@ -657,8 +659,10 @@ namespace Alpaca4d
             }
         }
 
-        private void CreateGravityLoad(Alpaca4d.Loads.Gravity gravityLoad = null)
+        private List<PointLoad> CreateGravityLoad(Alpaca4d.Loads.Gravity gravityLoad = null)
         {
+            var gravityPointLoad = new List<Alpaca4d.Loads.PointLoad>();
+
             double? mass = 0.00;
             foreach (var item in this.Elements)
             {
@@ -677,8 +681,8 @@ namespace Alpaca4d
                         gravityPointLoadEnd.Ndf = 6;
                         gravityPointLoadStart.Pos = this.UniquePoints[(int)beam.INode-1];
                         gravityPointLoadEnd.Pos = this.UniquePoints[(int)beam.JNode-1];
-                        this.GravityPointLoad.Add(gravityPointLoadStart);
-                        this.GravityPointLoad.Add(gravityPointLoadEnd);
+                        gravityPointLoad.Add(gravityPointLoadStart);
+                        gravityPointLoad.Add(gravityPointLoadEnd);
                     }
                 }
 
@@ -693,10 +697,10 @@ namespace Alpaca4d
                     {
                         foreach (var index in shell.IndexNodes)
                         {
-                            var gravityPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, -(areaDensity * meshArea / (shell.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
-                            gravityPointLoad.Ndf = 6;
-                            gravityPointLoad.Pos = this.UniquePoints[(int)index -1];
-                            this.GravityPointLoad.Add(gravityPointLoad);
+                            var gravityShellPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, -(areaDensity * meshArea / (shell.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
+                            gravityShellPointLoad.Ndf = 6;
+                            gravityShellPointLoad.Pos = this.UniquePoints[(int)index -1];
+                            gravityPointLoad.Add(gravityShellPointLoad);
 
                         }
                     }
@@ -727,14 +731,82 @@ namespace Alpaca4d
                     {
                         foreach (var index in brick.IndexNodes)
                         {
-                            var gravityPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, -(density * meshVolume / (brick.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
-                            gravityPointLoad.Ndf = 3;
-                            gravityPointLoad.Pos = this.UniquePoints[(int)index -1];
-                            this.GravityPointLoad.Add(gravityPointLoad);
+                            var gravityBrickPointLoad = new Alpaca4d.Loads.PointLoad(index, gravityLoad.GFactor * new Rhino.Geometry.Vector3d(0, 0, -(density * meshVolume / (brick.Mesh.Vertices.Count))), new Rhino.Geometry.Vector3d(0, 0, 0), gravityLoad.TimeSeries);
+                            gravityBrickPointLoad.Ndf = 3;
+                            gravityBrickPointLoad.Pos = this.UniquePoints[(int)index -1];
+                            gravityPointLoad.Add(gravityBrickPointLoad);
 
                         }
                     }
                 }
+            }
+
+            return gravityPointLoad;
+        }
+
+        private void addLoadPattern(List<LoadPattern> loadPatterns)
+        {
+            foreach (var loadPattern in loadPatterns)
+            {
+                var myLoads = new List<ILoad>();
+                foreach (var load in loadPattern.Load)
+                {
+                    if (load.Type == Alpaca4d.Loads.LoadType.PointLoad || load.Type == Alpaca4d.Loads.LoadType.DistributedLoad || load.Type == Alpaca4d.Loads.LoadType.MeshLoad)
+                    {
+                        load.SetTag(this);
+                    }
+                }
+
+                foreach(var item in loadPattern.Load)
+                {
+                    if (item.Type == Alpaca4d.Loads.LoadType.PointLoad)
+                    {
+                        myLoads.Add((Loads.PointLoad)item);
+                    }
+                    else if (item.Type == Alpaca4d.Loads.LoadType.DistributedLoad)
+                    {
+                        var lineLoad = (Alpaca4d.Loads.LineLoad)item;
+                        // Assign the load to all the elements if the user does not specify the elements.
+                        if (lineLoad.Element == null)
+                        {
+                            foreach (var beam in this.Beams)
+                            {
+                                lineLoad = new Alpaca4d.Loads.LineLoad(beam, lineLoad.GlobalForce, lineLoad.TimeSeries);
+                                myLoads.Add(lineLoad);
+                            }
+                        }
+                        else
+                            myLoads.Add(lineLoad);
+                    }
+                    else if (item.Type == Alpaca4d.Loads.LoadType.MeshLoad)
+                    {
+                        var meshLoad = (Alpaca4d.Loads.MeshLoad)item;
+                        // Assign the load to all the elements if the user does not specify the elements.
+                        if (meshLoad.Element == null)
+                        {
+                            foreach (var mesh in this.Shells)
+                            {
+                                meshLoad = new Alpaca4d.Loads.MeshLoad(mesh, meshLoad.GlobalForce, meshLoad.TimeSeries);
+                                myLoads.Add(meshLoad);
+                            }
+                        }
+                        else
+                            myLoads.Add(meshLoad);
+                    }
+                    else if (item.Type == Alpaca4d.Loads.LoadType.Gravity)
+                    {
+                        var gravityLoad = this.CreateGravityLoad((Alpaca4d.Loads.Gravity)item);
+                        myLoads.Concat(gravityLoad);
+                    }
+                    else if(item.Type == Alpaca4d.Loads.LoadType.UniformExcitation)
+                    {
+                        myLoads.Add((Loads.UniformExcitation)item);
+
+                    }
+                }
+                
+                var newLoadPattern = new LoadPattern(loadPattern.PatternType, loadPattern.TimeSeries, myLoads, loadPattern.Factor);
+                this.Tcl.Add(newLoadPattern.WriteTcl());
             }
         }
 
@@ -817,24 +889,18 @@ namespace Alpaca4d
             var uniqueSections = crossSections.Distinct().ToList();
             var uniqueMaterials = materials.Distinct().ToList();
 
-            int index = 1;
             foreach (var material in uniqueMaterials)
             {
-                material.Id = index;
-                index++;
                 this.Tcl.Add(material.WriteTcl());
             }
 
-            index = 1;
             foreach (var section in uniqueSections)
             {
-                section.Id = index;
-                index++;
                 this.Tcl.Add(section.WriteTcl());
             }
 
             // assign tag and node Index to element and shell
-            index = 1;
+            int index = 1;
             foreach(var element in this.Elements)
             {
                 element.SetTopologyRTree(this);
@@ -857,56 +923,9 @@ namespace Alpaca4d
             /////////
             /// Loads
             /////////
-            var myLoads = new List<ILoad>();
 
-            foreach (var item in this.Loads)
-            {
-                if (item.Type == Alpaca4d.Loads.LoadType.Gravity)
-                {
-                    // Gravity Load will be use later to calculate the equivalent Gravity Load
-                    this.CreateGravityLoad( (Alpaca4d.Loads.Gravity)item );
-                }
-                else if (item.Type == Alpaca4d.Loads.LoadType.PointLoad)
-                {
-                    myLoads.Add((Loads.PointLoad)item);
-                }
-                else if (item.Type == Alpaca4d.Loads.LoadType.DistributedLoad)
-                {
-                    var lineLoad = (Alpaca4d.Loads.LineLoad)item;
-                    // Assign the load to all the elements if the user does not specify the elements.
-                    if(lineLoad.Element == null)
-                    {
-                        foreach(var beam in this.Beams)
-                        {
-                            lineLoad = new Alpaca4d.Loads.LineLoad(beam, lineLoad.GlobalForce, lineLoad.TimeSeries);
-                            myLoads.Add(lineLoad);
-                        }
-                    }
-                    else
-                        myLoads.Add(lineLoad);
-                }
-                else if (item.Type == Alpaca4d.Loads.LoadType.MeshLoad)
-                {
-                    var meshLoad = (Alpaca4d.Loads.MeshLoad)item;
-                    // Assign the load to all the elements if the user does not specify the elements.
-                    if (meshLoad.Element == null)
-                    {
-                        foreach (var mesh in this.Shells)
-                        {
-                            meshLoad = new Alpaca4d.Loads.MeshLoad(mesh, meshLoad.GlobalForce, meshLoad.TimeSeries);
-                            myLoads.Add(meshLoad);
-                        }
-                    }
-                    else
-                        myLoads.Add(meshLoad);
-                }
-                else if (item.Type == Alpaca4d.Loads.LoadType.Mass)
-                    this.Mass.Add((Loads.MassLoad)item);
-                else if (item.Type == Alpaca4d.Loads.LoadType.UniformExcitation)
-                    continue;
-                else
-                    throw new Exception("Type of Load not found");
-            }
+            //item.Type == Alpaca4d.Loads.LoadType.Mass)
+            //        this.Mass.Add((Loads.MassLoad)item);
 
 
             foreach (var item in this.Mass)
@@ -915,45 +934,38 @@ namespace Alpaca4d
                 this.Tcl.Add(item.WriteTcl());
             }
 
-            foreach (var item in myLoads)
-            {
-                if (item.Type == Alpaca4d.Loads.LoadType.PointLoad || item.Type == Alpaca4d.Loads.LoadType.DistributedLoad || item.Type == Alpaca4d.Loads.LoadType.MeshLoad)
-                {
-                    item.SetTag(this);
-                }
-            }
-
+            this.addLoadPattern(this.LoadPatterns);
 
             // Group by TimeSeries
-            var totalLoads = myLoads.Concat(this.GravityPointLoad);
+            //var totalLoads = myLoads.Concat(this.GravityPointLoad);
 
-            var timeSeriesGroup = totalLoads.GroupBy(s => s.TimeSeries);
+            //var timeSeriesGroup = totalLoads.GroupBy(s => s.TimeSeries);
 
-            foreach(var group in timeSeriesGroup)
-            {
-                var timeSeries = group.Key;
-                if (timeSeries == null) { continue; }
-                timeSeries.Id = index;
-                var loadPattern = new Alpaca4d.Loads.LoadPattern(Alpaca4d.Loads.PatternType.Plain, timeSeries, group.ToList());
-                this.Tcl.Add(loadPattern.WriteTcl());
-            }
+            //foreach(var group in timeSeriesGroup)
+            //{
+            //    var timeSeries = group.Key;
+            //    if (timeSeries == null) { continue; }
+            //    timeSeries.Id = index;
+            //    var loadPattern = new Alpaca4d.Loads.LoadPattern(Alpaca4d.Loads.PatternType.Plain, timeSeries, group.ToList());
+            //    this.Tcl.Add(loadPattern.WriteTcl());
+            //}
 
 
             #region UNIFORM EXCITATION
-            var uniformExcitationLoads = this.Loads.OfType<Alpaca4d.Loads.UniformExcitation>().ToList();
+            //var uniformExcitationLoads = this.Loads.OfType<Alpaca4d.Loads.UniformExcitation>().ToList();
 
-            if (uniformExcitationLoads.Count > 1)
-            {
-                throw new Exception("Only one UniformExcitation is allowed!");
-            }
-            else if (uniformExcitationLoads.Count == 1)
-            {
-                var uniformExcitation = uniformExcitationLoads.FirstOrDefault();
-                uniformExcitation.TimeSeries.Id = index;
+            //if (uniformExcitationLoads.Count > 1)
+            //{
+            //    throw new Exception("Only one UniformExcitation is allowed!");
+            //}
+            //else if (uniformExcitationLoads.Count == 1)
+            //{
+            //    var uniformExcitation = uniformExcitationLoads.FirstOrDefault();
+            //    uniformExcitation.TimeSeries.Id = index;
 
-                this.Tcl.Add(uniformExcitation.TimeSeries.WriteTcl());
-                this.Tcl.Add(uniformExcitation.WriteTcl());
-            }
+            //    this.Tcl.Add(uniformExcitation.TimeSeries.WriteTcl());
+            //    this.Tcl.Add(uniformExcitation.WriteTcl());
+            //}
             #endregion
 
 

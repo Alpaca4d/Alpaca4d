@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 using Rhino.Geometry;
 using Alpaca4d.Generic;
+using Alpaca4d.Core.Utils;
 
 namespace Alpaca4d.Section
 {
     public partial class ISection : ISerialize, IUniaxialSection
     {
-        public int? Id { get; set; }
+        public int? Id { get; set; } = IdGenerator.GenerateId();
         public IUniaxialMaterial Material { get; set; }
         public string SectionName { get; set; }
         public double TopWidth { get; set; }

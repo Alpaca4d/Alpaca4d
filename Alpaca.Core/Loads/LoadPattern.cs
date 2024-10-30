@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Alpaca4d.Generic;
 using Alpaca4d.Core.Utils;
 using System.Runtime.CompilerServices;
+using Grasshopper.Kernel.Geometry.Delaunay;
 
 namespace Alpaca4d.Loads
 {
@@ -47,10 +48,28 @@ namespace Alpaca4d.Loads
                 tcl += $"pattern {PatternType} {Id} {TimeSeries.Id} {{\n";
                 foreach (var load in Load)
                 {
+                    if(load.GetType() == typeof(UniformExcitation))
+                        throw new Exception("UniformExcitation is not allowed in Plain Pattern");
                     tcl += load.WriteTcl();
                 }
+                tcl += "}\n";
             }
-            tcl += "}\n";
+
+            // pattern UniformExcitation $patternTag $dir -accel $tsTag <-vel0 $vel0> <-fact $cFactor>
+            if (PatternType == PatternType.UniformExcitation)
+            {
+                var loads = this.Load.OfType<UniformExcitation>().ToList();
+                if (loads.Count > 1)
+                {
+                    throw new Exception("Only one UniformExcitation is allowed!");
+                }
+                else if (loads.Count == 1)
+                {
+                    var load = loads[0];
+                    tcl += $"pattern {PatternType} {Id} {(int)load.Dof} -accel {TimeSeries.Id} -vel0 {load.Velocity} -fact {load.Factor}";
+                }
+            }
+
 
             return tcl;
         }
@@ -60,6 +79,6 @@ namespace Alpaca4d.Loads
     {
         Plain,
         UniformExcitation,
-        MultipleSupport
+        //MultipleSupport
     }
 }
