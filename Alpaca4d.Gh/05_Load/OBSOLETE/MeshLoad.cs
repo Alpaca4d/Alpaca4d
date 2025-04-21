@@ -8,9 +8,10 @@ using Alpaca4d.TimeSeries;
 
 namespace Alpaca4d.Gh
 {
-    public class MeshLoad : GH_Component
+    [Obsolete]
+    public class MeshLoad_obsolete : GH_Component
     {
-        public MeshLoad()
+        public MeshLoad_obsolete()
           : base("Mesh Load (Alpaca4d)", "MeshLoad",
             "Construct a MeshLoad",
             "Alpaca4d", "05_Load")
@@ -24,9 +25,11 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("ShellElement", "ShellElement", "By Default, the load will be applied to all the shell elements.", GH_ParamAccess.item);
+            pManager.AddGenericParameter("MeshElement", "MeshElement", "By Default, the load will be applied to all the beam elements.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddVectorParameter("Force", "Force", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("TimeSeries", "TimeSeries", "", GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -50,8 +53,11 @@ namespace Alpaca4d.Gh
             var force = Vector3d.Zero;
             DA.GetData(1, ref force);
 
+            Alpaca4d.Generic.ITimeSeries timeSeries = Alpaca4d.TimeSeries.Constant.Default();
+            DA.GetData(2, ref timeSeries);
+
             bool local = false;
-            var meshLoad = new Alpaca4d.Loads.MeshLoad(element, force, null, local);
+            var meshLoad = new Alpaca4d.Loads.MeshLoad(element, force, timeSeries, local);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, meshLoad);
@@ -64,7 +70,7 @@ namespace Alpaca4d.Gh
         /// each of which can be combined with the GH_Exposure.obscure flag, which 
         /// ensures the component will only be visible on panel dropdowns.
         /// </summary>
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.
@@ -79,6 +85,6 @@ namespace Alpaca4d.Gh
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("{C8514DEA-1B1B-45A6-ABC1-8004C1EFC617}");
+        public override Guid ComponentGuid => new Guid("{788550C4-8AF8-48EF-8A88-6F9787C35BB1}");
     }
 }

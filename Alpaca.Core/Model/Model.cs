@@ -749,22 +749,17 @@ namespace Alpaca4d
             foreach (var loadPattern in loadPatterns)
             {
                 var myLoads = new List<ILoad>();
-                foreach (var load in loadPattern.Load)
-                {
-                    if (load.Type == Alpaca4d.Loads.LoadType.PointLoad || load.Type == Alpaca4d.Loads.LoadType.DistributedLoad || load.Type == Alpaca4d.Loads.LoadType.MeshLoad)
-                    {
-                        load.SetTag(this);
-                    }
-                }
 
                 foreach(var item in loadPattern.Load)
                 {
                     if (item.Type == Alpaca4d.Loads.LoadType.PointLoad)
                     {
+                        item.SetTag(this);
                         myLoads.Add((Loads.PointLoad)item);
                     }
                     else if (item.Type == Alpaca4d.Loads.LoadType.DistributedLoad)
                     {
+                        item.SetTag(this);
                         var lineLoad = (Alpaca4d.Loads.LineLoad)item;
                         // Assign the load to all the elements if the user does not specify the elements.
                         if (lineLoad.Element == null)
@@ -780,6 +775,7 @@ namespace Alpaca4d
                     }
                     else if (item.Type == Alpaca4d.Loads.LoadType.MeshLoad)
                     {
+                        item.SetTag(this);
                         var meshLoad = (Alpaca4d.Loads.MeshLoad)item;
                         // Assign the load to all the elements if the user does not specify the elements.
                         if (meshLoad.Element == null)
@@ -796,12 +792,17 @@ namespace Alpaca4d
                     else if (item.Type == Alpaca4d.Loads.LoadType.Gravity)
                     {
                         var gravityLoad = this.CreateGravityLoad((Alpaca4d.Loads.Gravity)item);
-                        myLoads.Concat(gravityLoad);
+                        // set tags on gravity loads
+                        foreach (var load in gravityLoad)
+                        {
+                            load.SetTag(this);
+                        }
+
+                        myLoads.AddRange(gravityLoad);
                     }
                     else if(item.Type == Alpaca4d.Loads.LoadType.UniformExcitation)
                     {
                         myLoads.Add((Loads.UniformExcitation)item);
-
                     }
                 }
                 

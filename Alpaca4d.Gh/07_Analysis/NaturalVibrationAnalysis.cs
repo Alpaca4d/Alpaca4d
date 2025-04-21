@@ -10,11 +10,16 @@ using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Alpaca4d;
 using Alpaca4d.Generic;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using System.Reflection;
 
 namespace Alpaca4d.Gh
 {
     public class NaturalVibrationAnalysis : GH_Component
     {
+        private int counter = 0;
+        private DateTime? firstTimeRun = DateTime.Now;
+        private DateTime? lastTimeRun = null;
         public NaturalVibrationAnalysis()
           : base("Natural Vibration Analysis (Alpaca4d)", "NV",
             "",
@@ -65,9 +70,21 @@ namespace Alpaca4d.Gh
             DA.GetData(2, ref solver);
 
 
-            if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+            // Update last run time to the current DateTime
+            lastTimeRun = DateTime.Now;
+
+            if (counter == 0 || lastTimeRun - firstTimeRun > TimeSpan.FromMinutes(5))
             {
-                new Alpaca4d.Gh.Forms.Advertise();
+                // license routine
+                if (!Alpaca4d.License.License.IsValid)
+                {
+                    if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+                    {
+                        Alpaca4d.Gh.Forms.Advertise.Default();
+                    }
+                }
+                firstTimeRun = DateTime.Now;
+                counter++;
             }
 
 

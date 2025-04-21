@@ -27,8 +27,6 @@ namespace Alpaca4d.Gh
             pManager.AddGenericParameter("BeamElement", "BeamElement", "By Default, the load will be applied to all the beam elements.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddVectorParameter("Force", "Force", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("TimeSeries", "TimeSeries", "", GH_ParamAccess.item);
-            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -52,11 +50,8 @@ namespace Alpaca4d.Gh
             var force = Vector3d.Zero;
             DA.GetData(1, ref force);
 
-            Alpaca4d.Generic.ITimeSeries timeSeries = Alpaca4d.TimeSeries.Constant.Default();
-            DA.GetData(2, ref timeSeries);
-
             bool local = false;
-            var linearLoad = new Alpaca4d.Loads.LineLoad(element, force, timeSeries, local);
+            var linearLoad = new Alpaca4d.Loads.LineLoad(element, force, null, local);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, linearLoad);
@@ -84,6 +79,6 @@ namespace Alpaca4d.Gh
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("{C575E59A-2A81-4DDE-8DDA-5FC8BD7FBE36}");
+        public override Guid ComponentGuid => new Guid("{8593AC69-D975-4566-97FC-27D7D4A4D415}");
     }
 }

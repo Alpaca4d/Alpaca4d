@@ -63,7 +63,7 @@ namespace Alpaca4d.Result
             }
             else
             {
-                var dataset = h5File.Dataset($"MODEL_STAGE[1]/RESULTS/ON_NODES/MODES_OF_VIBRATION(R)/DATA/STEP_0/MODE_{step}");
+                var dataset = h5File.Dataset($"MODEL_STAGE[1]/RESULTS/ON_NODES/{_resultType}/DATA/STEP_0/MODE_{step}");
                 var dimX = (long)dataset.Space.Dimensions[0];
                 var dimY = (long)dataset.Space.Dimensions[1];
 

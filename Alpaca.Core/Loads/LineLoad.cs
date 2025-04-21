@@ -31,6 +31,7 @@ namespace Alpaca4d.Loads
         {
 
         }
+
         public LineLoad(Alpaca4d.Generic.IBeam element, Vector3d force, ITimeSeries timeSeries, bool local = false)
         {
             this.Element = element;

@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Alpaca4d.Gh
 {
-    public class UniformExcitation : GH_Component
+    public class UniformExcitationPattern : GH_Component
     {
-        public UniformExcitation()
+        public UniformExcitationPattern()
           : base("Uniform Excitation (Alpaca4d)", "Uniform Excitation",
             "Construct a Uniform Excitation Load",
             "Alpaca4d", "05_Load")

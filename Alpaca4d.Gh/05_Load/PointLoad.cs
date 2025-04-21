@@ -29,8 +29,6 @@ namespace Alpaca4d.Gh
             pManager.AddVectorParameter("Force", "Force", "", GH_ParamAccess.item);
             pManager.AddVectorParameter("Moment", "Moment", "", GH_ParamAccess.item, Vector3d.Zero);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("TimeSeries", "TimeSeries", "", GH_ParamAccess.item);
-            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -52,15 +50,12 @@ namespace Alpaca4d.Gh
             var force = Vector3d.Zero;
             var moment = Vector3d.Zero;
 
-            Alpaca4d.Generic.ITimeSeries timeSeries = Alpaca4d.TimeSeries.Constant.Default();
-
             if (!DA.GetData(0, ref pos)) return;
             if (!DA.GetData(1, ref force)) return;
 
             DA.GetData(2, ref moment);
-            DA.GetData(3, ref timeSeries);
 
-            var load = new Alpaca4d.Loads.PointLoad(pos, force, moment, timeSeries);
+            var load = new Alpaca4d.Loads.PointLoad(pos, force, moment, null);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, load);
@@ -88,6 +83,6 @@ namespace Alpaca4d.Gh
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("FB6E96E9-675A-4859-8EED-9F7935738090");
+        public override Guid ComponentGuid => new Guid("{069017B3-4A2F-40FE-87BA-126100908BC8}");
     }
 }
