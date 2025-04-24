@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddPointParameter("Point", "Point", "", GH_ParamAccess.item);
-            pManager.AddVectorParameter("TransMass", "TransMass", "", GH_ParamAccess.item); ;
+            pManager.AddVectorParameter("TransMass", "TransMass", $"[{Units.Mass}]", GH_ParamAccess.item); ;
             pManager.AddVectorParameter("RotationalMass", "RotationalMass", "", GH_ParamAccess.item, Vector3d.Zero);
             pManager[pManager.ParamCount - 1].Optional = true;
         }

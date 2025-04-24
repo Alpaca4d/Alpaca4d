@@ -23,17 +23,17 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("SectionName", "SecName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Height", "Height", "", GH_ParamAccess.item, 0.3);
+            pManager.AddNumberParameter("Height", "Height", $"[{Units.Length}]", GH_ParamAccess.item, 0.3);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("TopFlangeWidth", "TopFlangeWidth", "", GH_ParamAccess.item, 0.15);
+            pManager.AddNumberParameter("TopFlangeWidth", "TopFlangeWidth", $"[{Units.Length}]", GH_ParamAccess.item, 0.15);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("TopFlangeThickness", "TopFlangeThickness", "", GH_ParamAccess.item, 0.02);
+            pManager.AddNumberParameter("TopFlangeThickness", "TopFlangeThickness", $"[{Units.Length}]", GH_ParamAccess.item, 0.02);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("BottomFlangeWidth", "BottomFlangeWidth", "", GH_ParamAccess.item, 0.20);
+            pManager.AddNumberParameter("BottomFlangeWidth", "BottomFlangeWidth", $"[{Units.Length}]", GH_ParamAccess.item, 0.20);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("BottomFlangeThickness", "BottomFlangeThickness", "", GH_ParamAccess.item, 0.02);
+            pManager.AddNumberParameter("BottomFlangeThickness", "BottomFlangeThickness", $"[{Units.Length}]", GH_ParamAccess.item, 0.02);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Web", "Web", "", GH_ParamAccess.item, 0.02);
+            pManager.AddNumberParameter("Web", "Web", $"[{Units.Length}]", GH_ParamAccess.item, 0.02);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;

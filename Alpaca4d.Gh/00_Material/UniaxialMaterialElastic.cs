@@ -1,4 +1,5 @@
-﻿using Grasshopper;
+﻿using Alpaca4d;
+using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -16,6 +17,9 @@ namespace Alpaca4d.Gh
             this.Message = $"{this.NickName} \n{this.Category}";
         }
 
+        public override IEnumerable<string> Keywords => new string[] { "ume" };
+
+
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>
@@ -23,16 +27,16 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("E", "E", "Young Modulus", GH_ParamAccess.item);
+            pManager.AddNumberParameter("E", "E", $"Young Modulus {Units.Force}/{Units.Length}²", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Eneg", "Eneg", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Eneg", "Eneg", $"{Units.Force}/{Units.Length}²", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
             pManager.AddNumberParameter("Eta", "Eta", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("G", "G", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("G", "G", $"{Units.Force}/{Units.Length}²", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
             pManager.AddNumberParameter("v", "v", "", GH_ParamAccess.item);

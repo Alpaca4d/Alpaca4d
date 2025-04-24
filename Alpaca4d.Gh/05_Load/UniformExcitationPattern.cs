@@ -36,7 +36,7 @@ namespace Alpaca4d.Gh
             "yy : corresponds to rotation about the global Y axis\n" +
             "zz : corresponds to rotation about the global Z axis\n", GH_ParamAccess.item);
             pManager.AddGenericParameter("TimeSeries", "TimeSeries", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Velocity", "Velocity", "The initial velocity", GH_ParamAccess.item, 0);
+            pManager.AddNumberParameter("Velocity", "Velocity", $"The initial velocity [{Units.Length}/s]", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Factor", "Factor", "Constant factor", GH_ParamAccess.item, 1);
             pManager[pManager.ParamCount - 1].Optional = true;

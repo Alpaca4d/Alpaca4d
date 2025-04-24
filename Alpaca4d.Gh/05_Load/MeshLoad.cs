@@ -26,7 +26,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddGenericParameter("ShellElement", "ShellElement", "By Default, the load will be applied to all the shell elements.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddVectorParameter("Force", "Force", "", GH_ParamAccess.item);
+            pManager.AddVectorParameter("Force", "Force", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
         }
 
         /// <summary>

@@ -26,9 +26,9 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("SectionName", "SecName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Diameter", "Diameter", "", GH_ParamAccess.item, 0.15);
+            pManager.AddNumberParameter("Diameter", "Diameter", $"[{Units.Length}]", GH_ParamAccess.item, 0.15);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Thickness", "Thickness", "", GH_ParamAccess.item, 0.01);
+            pManager.AddNumberParameter("Thickness", "Thickness", $"[{Units.Length}]", GH_ParamAccess.item, 0.01);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;

@@ -8,7 +8,7 @@
     <ProjectGuid>{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Alpaca4d.Core</RootNamespace>
+    <RootNamespace>Alpaca4d</RootNamespace>
     <AssemblyName>Alpaca4d.Core</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -172,6 +172,7 @@
     <Compile Include="Utils\EnumHelper.cs" />
     <Compile Include="Utils\Export.cs" />
     <Compile Include="Utils\IdGenerator.cs" />
+    <Compile Include="Utils\Units.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Recorder\Recorder.cs" />
     <Compile Include="Generic\IStructure.cs" />

@@ -22,6 +22,8 @@ namespace Alpaca4d.Gh
             this.Message = $"{this.Name}";
         }
 
+        public override IEnumerable<string> Keywords => new string[] { "nd" };
+
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>

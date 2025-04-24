@@ -26,8 +26,8 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddPointParameter("Point", "Point", "Point to Restraint", GH_ParamAccess.item);
-            pManager.AddVectorParameter("Force", "Force", "", GH_ParamAccess.item);
-            pManager.AddVectorParameter("Moment", "Moment", "", GH_ParamAccess.item, Vector3d.Zero);
+            pManager.AddVectorParameter("Force", "Force", $"[{Units.Force}]", GH_ParamAccess.item);
+            pManager.AddVectorParameter("Moment", "Moment", $"[{Units.Force}{Units.Length}]", GH_ParamAccess.item, Vector3d.Zero);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
