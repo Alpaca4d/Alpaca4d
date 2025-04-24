@@ -37,11 +37,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
   </ItemGroup>
   
   <ItemGroup>
@@ -65,6 +60,8 @@
     <None Remove="Resources\Assemble Model %28Alpaca4d%29.png" />
     <None Remove="Resources\Beam Forces %28Alpaca4d%29.png" />
     <None Remove="Resources\BeamForcesDiagram %28Alpaca4d%29.png" />
+    <None Remove="Resources\Benchmark %28Alpaca4d%29.png" />
+    <None Remove="Resources\benchmark.png" />
     <None Remove="Resources\Bending Prestress %28Alpaca4d%29.png" />
     <None Remove="Resources\brick Disp %28Alpaca4d%29.png" />
     <None Remove="Resources\Brick Stresses %28Alpaca4d%29.png" />
@@ -77,6 +74,8 @@
     <None Remove="Resources\concreate02.png" />
     <None Remove="Resources\Constant Time Series %28Alpaca4d%29.png" />
     <None Remove="Resources\Counter %28Alpaca4d%29.png" />
+    <None Remove="Resources\Custom code %28Alpaca4d%29.png" />
+    <None Remove="Resources\Deconstruct %28Alpaca4d%29.png" />
     <None Remove="Resources\defModel.png" />
     <None Remove="Resources\Deformed Model %28Alpaca4d%29.png" />
     <None Remove="Resources\Deserialize %28Alpaca4d%29.png" />
@@ -98,6 +97,7 @@
     <None Remove="Resources\Fiber Aggregated%28Alpaca4d%29.png" />
     <None Remove="Resources\Fiber Point %28Alpaca4d%29.png" />
     <None Remove="Resources\Fiber section %28Alpaca4d%29.png" />
+    <None Remove="Resources\Fiber Stress Strain %28Alpaca4d%29.png" />
     <None Remove="Resources\Force Beam Column %28Alpaca4d%29.png" />
     <None Remove="Resources\Force Beam Column Attributes %28Alpaca4d%29.png" />
     <None Remove="Resources\formatengineers.png" />
@@ -112,6 +112,7 @@
     <None Remove="Resources\Line load.png" />
     <None Remove="Resources\Linear Time Series %28Alpaca4d%29.png" />
     <None Remove="Resources\Load Control Integrator %28Alpaca4d%29.png" />
+    <None Remove="Resources\Load pattern %28Alpaca4d%29.png" />
     <None Remove="Resources\Logo.png" />
     <None Remove="Resources\Mass Point %28Alpaca4d%29.png" />
     <None Remove="Resources\Mesh Loft %28Alpaca4d%29.png" />
@@ -126,6 +127,10 @@
     <None Remove="Resources\Moment Curvature Model %28Alpaca4d%29.png" />
     <None Remove="Resources\Newmark Integrator %28Alpaca4d%29.png" />
     <None Remove="Resources\Nodal Displacements %28Alpaca4d%29.png" />
+    <None Remove="Resources\Non Linear Icons\3D Domain %28Alpaca4d%29.png" />
+    <None Remove="Resources\Non Linear Icons\Domain M1 M2 %28Alpaca4d%29.png" />
+    <None Remove="Resources\Non Linear Icons\M-N Model %28Alpaca4d%29.png" />
+    <None Remove="Resources\Non Linear Icons\uniaxial Elastic Material Concreate02 %28Alpaca4d%29.png" />
     <None Remove="Resources\Patch %28Alpaca4d%29.png" />
     <None Remove="Resources\Path Time Series %28Alpaca4d%29.png" />
     <None Remove="Resources\Patreon Supporter %28Alpaca4d%29.png" />
@@ -179,6 +184,8 @@
     <EmbeddedResource Include="Resources\BeamForcesDiagram (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Benchmark (Alpaca4d).png" />
+    <EmbeddedResource Include="Resources\benchmark.png" />
     <EmbeddedResource Include="Resources\Bending Prestress (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -215,6 +222,8 @@
     <EmbeddedResource Include="Resources\Counter (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Custom code (Alpaca4d).png" />
+    <EmbeddedResource Include="Resources\Deconstruct (Alpaca4d).png" />
     <EmbeddedResource Include="Resources\defModel.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -278,16 +287,19 @@
     <EmbeddedResource Include="Resources\Fiber section (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Fiber Stress Strain (Alpaca4d).png" />
     <EmbeddedResource Include="Resources\Force Beam Column (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Force Beam Column Attributes (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Load pattern (Alpaca4d).png" />
+    <EmbeddedResource Include="Resources\Non Linear Icons\3D Domain (Alpaca4d).png" />
+    <EmbeddedResource Include="Resources\Non Linear Icons\Domain M1 M2 (Alpaca4d).png" />
+    <EmbeddedResource Include="Resources\Non Linear Icons\M-N Model (Alpaca4d).png" />
+    <EmbeddedResource Include="Resources\Non Linear Icons\uniaxial Elastic Material Concreate02 (Alpaca4d).png" />
     <EmbeddedResource Include="Resources\Sponsors\become a sponsor.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Sponsors\formatengineers.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Four Node Tetrahedron (Alpaca4d).png">
@@ -498,10 +510,6 @@
     </None>
     <None Update="OpenSees-Solvers\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Update="UserObject\Beam Forces View %28Alpaca4d%29.ghuser">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
