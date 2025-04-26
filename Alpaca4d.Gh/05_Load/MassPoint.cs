@@ -53,6 +53,7 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(1, ref transMass)) return;
             DA.GetData(2, ref rotationMass);
 
+            transMass = transMass * 9.81/1000;
             var load = new Alpaca4d.Loads.MassLoad(pos, transMass, rotationMass);
 
             // Finally assign the spiral to the output parameter.

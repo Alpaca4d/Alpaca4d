@@ -27,22 +27,22 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("E", "E", $"Young Modulus {Units.Force}/{Units.Length}²", GH_ParamAccess.item);
+            pManager.AddNumberParameter("E", "E", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Eneg", "Eneg", $"{Units.Force}/{Units.Length}²", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Eneg", "Eneg", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
             pManager.AddNumberParameter("Eta", "Eta", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("G", "G", $"{Units.Force}/{Units.Length}²", GH_ParamAccess.item);
+            pManager.AddNumberParameter("G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
             pManager.AddNumberParameter("v", "v", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Rho", "Rho", "Unit Mass - Density [MASS/VOLUME]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
         }
@@ -79,7 +79,7 @@ namespace Alpaca4d.Gh
             DA.GetData(5, ref v);
             DA.GetData(6, ref rho);
 
-
+            rho = rho * 9.81 / 1000;
             var material = new Alpaca4d.Material.UniaxialMaterialElastic(matName, e, eNeg, eta, g, v, rho);
 
 

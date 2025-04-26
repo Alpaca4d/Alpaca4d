@@ -23,17 +23,17 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Ex", "Ex", "Young Modulus", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Ex", "Ex", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Ey", "Ey", "Young Modulus", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Ey", "Ey", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Ez", "Ez", "Young Modulus", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Ez", "Ez", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Gxy", "Gxy", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Gxy", "Gxy", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Gyz", "Gyz", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Gyz", "Gyz", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Gzx", "Gzx", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Gzx", "Gzx", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("vxy", "vxy", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -41,7 +41,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("vzx", "vzx", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Rho", "Rho", "Unit Mass - Density [MASS/VOLUME]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -84,7 +84,7 @@ namespace Alpaca4d.Gh
 
             DA.GetData(10, ref rho);
 
-
+            rho = rho * 9.81 / 1000;
             var material = new Alpaca4d.Material.ElasticOrthotropicMaterial(matName, ex, ey, ez, gxy, gyz, gzx, vxy, vyz, vzx, rho);
 
 
