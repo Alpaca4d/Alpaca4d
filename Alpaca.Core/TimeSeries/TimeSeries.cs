@@ -101,12 +101,12 @@ namespace Alpaca4d.TimeSeries
             double t = 0.0;
             var graph = new List<double>();
 
-            var phi = this.Shift - this.Period / Math.PI * 2.0;
+            var phi = this.Shift;
             while(t < TEnd * 1.5)
             {
                 if(t < TEnd && t > TStart)
                 {
-                    value = this.CFactor * Math.Sin(2.0 * Math.PI * (t - this.TStart) / this.Period) + phi;
+                    value = this.CFactor * Math.Sin( ( (2.0 * Math.PI * (t - this.TStart)) / (this.Period) ) + phi) ;
                 }
                 else
                 {
