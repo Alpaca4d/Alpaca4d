@@ -74,7 +74,7 @@ namespace Alpaca4d.Element
         {
             string geomTransf = this.GeomTransf.WriteTcl();
             string integration = this.BeamIntegration.WriteTcl();
-            string beam = $"element forceBeamColumn {Id} {INode} {JNode} {GeomTransf.Id} {integration} -mass {MassDens}\n";
+            string beam = $"element forceBeamColumn {Id} {INode} {JNode} {GeomTransf.Id} {integration} -mass {MassDens/1000}\n";
             return geomTransf + beam;
         }
     }

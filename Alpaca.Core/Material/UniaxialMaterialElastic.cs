@@ -25,12 +25,12 @@ namespace Alpaca4d.Material
         {
             get
             {
-                double e = 2.1e11;
-                double eNeg = 2.1e11;
+                double e = 210000000;
+                double eNeg = 210000000;
                 double eta = 0.00;
-                double g = 8.076e10;
+                double g = 80760000;
                 double v = 0.3;
-                double rho = 78500;
+                double rho = 78.50;
                 return new UniaxialMaterialElastic(null, e, eNeg, eta, g, v, rho);
             }
         }

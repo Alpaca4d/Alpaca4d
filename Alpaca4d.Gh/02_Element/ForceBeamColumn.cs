@@ -32,7 +32,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddCurveParameter("Line", "Line", "", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Line", "Line", $"[{Units.Length}]", GH_ParamAccess.item);
             pManager.AddGenericParameter("Section", "Section", "", GH_ParamAccess.item);
             pManager.AddGenericParameter("GeometricTransformation", "GeomTransf", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;

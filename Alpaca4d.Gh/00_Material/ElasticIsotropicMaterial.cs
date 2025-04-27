@@ -23,13 +23,13 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("E", "E", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("E", "E", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 210000000);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 80760000);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("v", "v", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("v", "v", "", GH_ParamAccess.item, 0.3);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item, 7850);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -49,10 +49,10 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             string matName = null;
-            double e = 2.1e11;
-            double g = 8.076e10;
+            double e = 210000000;
+            double g = 80760000;
             double v = 0.3;
-            double rho = 78500;
+            double rho = 7850;
 
 
             DA.GetData(0, ref matName);
@@ -64,7 +64,7 @@ namespace Alpaca4d.Gh
             DA.GetData(4, ref rho);
 
 
-            rho = rho * 9.81 / 1000;
+            //rho = rho * 9.81 / 1000;
             var material = new Alpaca4d.Material.ElasticIsotropicMaterial(matName, e, g, v, rho);
 
 

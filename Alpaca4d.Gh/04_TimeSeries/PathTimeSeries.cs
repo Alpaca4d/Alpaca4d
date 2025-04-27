@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
         /// double tStart, double tEnd, double period, double shift = 0.0, double cFactor = 1.0
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Times", "Times", "", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Times", "Times", "[s]", GH_ParamAccess.list);
             pManager.AddNumberParameter("Values", "Values", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("LoadFactor", "LoadFactor", "", GH_ParamAccess.item, 1.0);
             pManager[pManager.ParamCount - 1].Optional = true;

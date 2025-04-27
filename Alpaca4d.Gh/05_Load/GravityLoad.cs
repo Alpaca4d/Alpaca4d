@@ -24,7 +24,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("GFactor", "GFactor", "", GH_ParamAccess.item, 9.81);
+            pManager.AddNumberParameter("Factor", "Factor", "", GH_ParamAccess.item, 1.0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -49,10 +49,10 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var gFactor = 9.81;
-            DA.GetData(0, ref gFactor);
+            var factor = 1;
+            DA.GetData(0, ref factor);
 
-            var load = new Alpaca4d.Loads.Gravity(gFactor ,null);
+            var load = new Alpaca4d.Loads.Gravity(factor ,null);
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, load);
         }

@@ -23,7 +23,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Point", "Point", "Point to Restraint", GH_ParamAccess.item);
+            pManager.AddPointParameter("Point", "Point", $"Point to Restraint [{Units.Length}]", GH_ParamAccess.item);
             pManager.AddBooleanParameter("Tx", "Tx", "Translation along X", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddBooleanParameter("Ty", "Ty", "Translation along Y", GH_ParamAccess.item, true);

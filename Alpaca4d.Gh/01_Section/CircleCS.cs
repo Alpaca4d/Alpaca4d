@@ -55,7 +55,6 @@ namespace Alpaca4d.Gh
             double d = 0.15;
             double t = 0.01;
             IUniaxialMaterial material = Alpaca4d.Material.UniaxialMaterialElastic.Steel;
-            ;
 
 
             DA.GetData(0, ref secName);
