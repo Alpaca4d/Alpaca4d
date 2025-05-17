@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
         public DeconstructFiberPoint_OBSOLETE()
           : base("Deconstruct Fiber Point(Alpaca4d)", "Deconstruct Fiber Point",
             "Deconstruct a FiberPoint",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = "Deconstruct Fiber Point\n(Alpaca4d)";

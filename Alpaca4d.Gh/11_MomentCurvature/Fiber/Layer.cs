@@ -15,7 +15,7 @@ namespace Alpaca4d.Gh
         public LayerFiber()
           : base("Layer Fiber (Alpaca4d)", "Layer Fiber",
             "Construct a LayerFiber",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";

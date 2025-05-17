@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
         public FiberStressStrain()
           : base("Fiber Stress Strain (Alpaca4d)", "FBS",
             "Read the stress strain in a fiber",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = $"Fiber Stress Strain\nAlpaca4d";

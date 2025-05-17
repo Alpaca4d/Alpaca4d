@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
         public Steel01()
           : base("Steel01 (Alpaca4d)", "Steel01",
             "Construct a Steel01",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             this.Message = $"{this.Name}";
         }

@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
         public ReinforcingSteel()
           : base("ReinforcingSteel (Alpaca4d)", "ReinforcingSteel",
             "Construct an ReinforcingSteel",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             this.Message = $"{this.Name}";
         }

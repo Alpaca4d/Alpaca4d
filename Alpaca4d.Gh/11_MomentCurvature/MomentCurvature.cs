@@ -9,7 +9,7 @@ namespace Alpaca4d.Gh
         public MomentCurvature()
           : base("MomentCurvature (Alpaca4d)", "MC",
             "",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = $"MomentCurvature\n(Alpaca4d)";

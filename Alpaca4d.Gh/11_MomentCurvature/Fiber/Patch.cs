@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
         public Patch()
           : base("Patch (Alpaca4d)", "Patch",
             "Construct a Patch",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";

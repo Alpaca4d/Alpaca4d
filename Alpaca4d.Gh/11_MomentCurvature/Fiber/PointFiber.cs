@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
         public PointFiber()
           : base("Fiber Point(Alpaca4d)", "Fiber Point",
             "Construct a FiberPoint",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";

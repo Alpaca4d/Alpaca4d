@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
         public Concrete01()
           : base("Concrete01 (Alpaca4d)", "Concrete",
             "Construct a concrete material with Zero Tensile Strength (Conrete01)",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             this.Message = $"{this.Name}";
         }

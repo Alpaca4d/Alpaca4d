@@ -22,7 +22,7 @@ namespace Alpaca4d.Gh
         public FiberSection()
           : base("Fiber Section (Alpaca4d)", "FiberSection",
             "Construct a FiberSection",
-            "Alpaca4d", "MomentCurvature")
+            "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
             this.Message = $"{this.Name}";
