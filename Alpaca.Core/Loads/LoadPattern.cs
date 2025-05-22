@@ -27,6 +27,11 @@ namespace Alpaca4d.Loads
         public PatternType PatternType;
         public double Factor;
 
+        // for UniformExcitation
+        public Direction Dof { get; set; } = Direction.X;
+        public LoadType Type { get; set; } = LoadType.UniformExcitation;
+        public double Velocity { get; set; } = 0.0;
+
         public LoadPattern()
         {
         }
@@ -39,6 +44,18 @@ namespace Alpaca4d.Loads
             this.Factor = factor;
         }
 
+        public static LoadPattern CreateUniformExcitation(Direction direction, ITimeSeries timeSeries, double velocity = 0.0, double factor = 1.0)
+        {
+            var load = new LoadPattern();
+            load.PatternType = PatternType.UniformExcitation;
+            load.Dof = direction;
+            load.Velocity = velocity;
+            load.Factor = factor;
+            load.TimeSeries = timeSeries;
+
+            return load;
+        }
+
         public string WriteTcl()
         {
             string tcl = "";
@@ -48,8 +65,6 @@ namespace Alpaca4d.Loads
                 tcl += $"pattern {PatternType} {Id} {TimeSeries.Id} {{\n";
                 foreach (var load in Load)
                 {
-                    if(load.GetType() == typeof(UniformExcitation))
-                        throw new Exception("UniformExcitation is not allowed in Plain Pattern");
                     tcl += load.WriteTcl();
                 }
                 tcl += "}\n";
@@ -58,7 +73,7 @@ namespace Alpaca4d.Loads
             // pattern UniformExcitation $patternTag $dir -accel $tsTag <-vel0 $vel0> <-fact $cFactor>
             if (PatternType == PatternType.UniformExcitation)
             {
-                var loads = this.Load.OfType<UniformExcitation>().ToList();
+                var loads = this.Load.Where(x => x.Type == LoadType.UniformExcitation).ToList();
                 if (loads.Count > 1)
                 {
                     throw new Exception("Only one UniformExcitation is allowed!");
@@ -66,7 +81,7 @@ namespace Alpaca4d.Loads
                 else if (loads.Count == 1)
                 {
                     var load = loads[0];
-                    tcl += $"pattern {PatternType} {Id} {(int)load.Dof} -accel {TimeSeries.Id} -vel0 {load.Velocity} -fact {load.Factor}";
+                    tcl += $"pattern {PatternType} {Id} {(int)Dof} -accel {TimeSeries.Id} -vel0 {Velocity} -fact {Factor}";
                 }
             }
 
@@ -80,5 +95,15 @@ namespace Alpaca4d.Loads
         Plain,
         UniformExcitation,
         //MultipleSupport
+    }
+
+    public enum Direction
+    {
+        X = 1,
+        Y = 2,
+        Z = 3,
+        XX = 4,
+        YY = 5,
+        ZZ = 6
     }
 }

@@ -748,66 +748,68 @@ namespace Alpaca4d
         {
             foreach (var loadPattern in loadPatterns)
             {
-                var myLoads = new List<ILoad>();
-
-                foreach(var item in loadPattern.Load)
+                if(loadPattern.Type == LoadType.UniformExcitation)
+                    this.Tcl.Add(loadPattern.WriteTcl());
+                else
                 {
-                    if (item.Type == Alpaca4d.Loads.LoadType.PointLoad)
-                    {
-                        item.SetTag(this);
-                        myLoads.Add((Loads.PointLoad)item);
-                    }
-                    else if (item.Type == Alpaca4d.Loads.LoadType.DistributedLoad)
-                    {
-                        item.SetTag(this);
-                        var lineLoad = (Alpaca4d.Loads.LineLoad)item;
-                        // Assign the load to all the elements if the user does not specify the elements.
-                        if (lineLoad.Element == null)
-                        {
-                            foreach (var beam in this.Beams)
-                            {
-                                lineLoad = new Alpaca4d.Loads.LineLoad(beam, lineLoad.GlobalForce, lineLoad.TimeSeries);
-                                myLoads.Add(lineLoad);
-                            }
-                        }
-                        else
-                            myLoads.Add(lineLoad);
-                    }
-                    else if (item.Type == Alpaca4d.Loads.LoadType.MeshLoad)
-                    {
-                        item.SetTag(this);
-                        var meshLoad = (Alpaca4d.Loads.MeshLoad)item;
-                        // Assign the load to all the elements if the user does not specify the elements.
-                        if (meshLoad.Element == null)
-                        {
-                            foreach (var mesh in this.Shells)
-                            {
-                                meshLoad = new Alpaca4d.Loads.MeshLoad(mesh, meshLoad.GlobalForce, meshLoad.TimeSeries);
-                                myLoads.Add(meshLoad);
-                            }
-                        }
-                        else
-                            myLoads.Add(meshLoad);
-                    }
-                    else if (item.Type == Alpaca4d.Loads.LoadType.Gravity)
-                    {
-                        var gravityLoad = this.CreateGravityLoad((Alpaca4d.Loads.Gravity)item);
-                        // set tags on gravity loads
-                        foreach (var load in gravityLoad)
-                        {
-                            load.SetTag(this);
-                        }
+                    var myLoads = new List<ILoad>();
 
-                        myLoads.AddRange(gravityLoad);
-                    }
-                    else if(item.Type == Alpaca4d.Loads.LoadType.UniformExcitation)
+                    foreach (var item in loadPattern.Load)
                     {
-                        myLoads.Add((Loads.UniformExcitation)item);
+                        if (item.Type == Alpaca4d.Loads.LoadType.PointLoad)
+                        {
+                            item.SetTag(this);
+                            myLoads.Add((Loads.PointLoad)item);
+                        }
+                        else if (item.Type == Alpaca4d.Loads.LoadType.DistributedLoad)
+                        {
+                            item.SetTag(this);
+                            var lineLoad = (Alpaca4d.Loads.LineLoad)item;
+                            // Assign the load to all the elements if the user does not specify the elements.
+                            if (lineLoad.Element == null)
+                            {
+                                foreach (var beam in this.Beams)
+                                {
+                                    lineLoad = new Alpaca4d.Loads.LineLoad(beam, lineLoad.GlobalForce, lineLoad.TimeSeries);
+                                    myLoads.Add(lineLoad);
+                                }
+                            }
+                            else
+                                myLoads.Add(lineLoad);
+                        }
+                        else if (item.Type == Alpaca4d.Loads.LoadType.MeshLoad)
+                        {
+                            item.SetTag(this);
+                            var meshLoad = (Alpaca4d.Loads.MeshLoad)item;
+                            // Assign the load to all the elements if the user does not specify the elements.
+                            if (meshLoad.Element == null)
+                            {
+                                foreach (var mesh in this.Shells)
+                                {
+                                    meshLoad = new Alpaca4d.Loads.MeshLoad(mesh, meshLoad.GlobalForce, meshLoad.TimeSeries);
+                                    myLoads.Add(meshLoad);
+                                }
+                            }
+                            else
+                                myLoads.Add(meshLoad);
+                        }
+                        else if (item.Type == Alpaca4d.Loads.LoadType.Gravity)
+                        {
+                            var gravityLoad = this.CreateGravityLoad((Alpaca4d.Loads.Gravity)item);
+                            // set tags on gravity loads
+                            foreach (var load in gravityLoad)
+                            {
+                                load.SetTag(this);
+                            }
+
+                            myLoads.AddRange(gravityLoad);
+                        }
                     }
+
+                    var newLoadPattern = new LoadPattern(loadPattern.PatternType, loadPattern.TimeSeries, myLoads, loadPattern.Factor);
+                    this.Tcl.Add(newLoadPattern.WriteTcl());
                 }
-                
-                var newLoadPattern = new LoadPattern(loadPattern.PatternType, loadPattern.TimeSeries, myLoads, loadPattern.Factor);
-                this.Tcl.Add(newLoadPattern.WriteTcl());
+
             }
         }
 

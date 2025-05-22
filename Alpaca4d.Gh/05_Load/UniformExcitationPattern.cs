@@ -71,7 +71,7 @@ namespace Alpaca4d.Gh
 
             var direction = (Alpaca4d.Loads.Direction)Enum.Parse(typeof(Alpaca4d.Loads.Direction), _direction, true);
 
-            var load = new Alpaca4d.Loads.UniformExcitation(direction, timeSeries, velocity, factor);
+            var load = Alpaca4d.Loads.LoadPattern.CreateUniformExcitation(direction, timeSeries, velocity, factor);
 
             DA.SetData(0, load);
         }
