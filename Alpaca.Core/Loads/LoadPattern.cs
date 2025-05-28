@@ -29,7 +29,6 @@ namespace Alpaca4d.Loads
 
         // for UniformExcitation
         public Direction Dof { get; set; } = Direction.X;
-        public LoadType Type { get; set; } = LoadType.UniformExcitation;
         public double Velocity { get; set; } = 0.0;
 
         public LoadPattern()
@@ -73,16 +72,7 @@ namespace Alpaca4d.Loads
             // pattern UniformExcitation $patternTag $dir -accel $tsTag <-vel0 $vel0> <-fact $cFactor>
             if (PatternType == PatternType.UniformExcitation)
             {
-                var loads = this.Load.Where(x => x.Type == LoadType.UniformExcitation).ToList();
-                if (loads.Count > 1)
-                {
-                    throw new Exception("Only one UniformExcitation is allowed!");
-                }
-                else if (loads.Count == 1)
-                {
-                    var load = loads[0];
-                    tcl += $"pattern {PatternType} {Id} {(int)Dof} -accel {TimeSeries.Id} -vel0 {Velocity} -fact {Factor}";
-                }
+                tcl += $"pattern {PatternType} {Id} {(int)Dof} -accel {TimeSeries.Id} -vel0 {Velocity} -fact {Factor}";
             }
 
 

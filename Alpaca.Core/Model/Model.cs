@@ -748,7 +748,7 @@ namespace Alpaca4d
         {
             foreach (var loadPattern in loadPatterns)
             {
-                if(loadPattern.Type == LoadType.UniformExcitation)
+                if(loadPattern.PatternType == PatternType.UniformExcitation)
                     this.Tcl.Add(loadPattern.WriteTcl());
                 else
                 {
