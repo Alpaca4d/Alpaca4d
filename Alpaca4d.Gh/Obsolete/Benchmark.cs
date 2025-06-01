@@ -4,8 +4,9 @@ using System.Diagnostics;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace Alpaca4d
+namespace Alpaca4d.Gh
 {
+    [Obsolete]
     public class Benchmark : GH_Component
     {
         /// <summary>
@@ -43,7 +44,7 @@ namespace Alpaca4d
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Benchmark__Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{ea517ec2-0ee8-401b-aba6-e1c0ef34adcc}");
     }

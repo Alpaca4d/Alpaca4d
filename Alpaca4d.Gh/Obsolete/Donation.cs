@@ -7,13 +7,14 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using System.Diagnostics;
 
-namespace Alpaca4d
+namespace Alpaca4d.Gh
 {
-    public class Patreon : GH_Component
+    [Obsolete]
+    public class Paypal : GH_Component
     {
-        public Patreon()
-          : base("Sponsor (Alpaca4d)", "Sponsor",
-            "Sponsor",
+        public Paypal()
+          : base("Donation (Alpaca4d)", "Donation",
+            "Donation",
             "Alpaca4d", " Info")
         {
             // Draw a Description Underneath the component
@@ -22,7 +23,7 @@ namespace Alpaca4d
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddBooleanParameter("Sponsor?", "Sponsor?", "", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Donate?", "Donate?", "", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -32,12 +33,12 @@ namespace Alpaca4d
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            bool sponsor = false;
-            DA.GetData(0, ref sponsor);
+            bool donate = false;
+            DA.GetData(0, ref donate);
 
-            string url = "https://www.patreon.com/Alpaca4d";
+            string url = "https://www.paypal.com/paypalme/marpelle";
 
-            if (sponsor)
+            if (donate)
             {
                 {
                     try
@@ -54,10 +55,10 @@ namespace Alpaca4d
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
-        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Patreon_Supporter__Alpaca4d_;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Donate_Alpaca4d_;
 
-        public override Guid ComponentGuid => new Guid("{4B01AE72-F80C-4451-9747-EAE1C338B453}");
+        public override Guid ComponentGuid => new Guid("{B249A4F6-27F1-4DA2-B03C-E490384ED350}");
     }
 }
