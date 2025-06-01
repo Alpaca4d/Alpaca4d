@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Alpaca4d.Menu;
 
 namespace Alpaca4d.Gh
 {
@@ -32,6 +33,8 @@ namespace Alpaca4d.Gh
     {
         public override Grasshopper.Kernel.GH_LoadingInstruction PriorityLoad()
         {
+            Instances.CanvasCreated += MenuLoad.OnStartup;
+
             Grasshopper.Instances.ComponentServer.AddCategoryIcon("Alpaca4d", Alpaca4d.Gh.Properties.Resources.Logo);
             Grasshopper.Instances.ComponentServer.AddCategorySymbolName("Alpaca4d", 'A');
             return Grasshopper.Kernel.GH_LoadingInstruction.Proceed;
