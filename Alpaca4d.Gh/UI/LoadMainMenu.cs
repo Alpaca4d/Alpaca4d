@@ -58,7 +58,6 @@ namespace Alpaca4d.Menu
             menuItem.DropDown.Items.Add("Login", null, OpenForm);
 
             menuItem.DropDown.Items.Add(new ToolStripSeparator());
-            //----------------------
 
             // Add Documentation
             menuItem.DropDown.Items.Add("Documentation", null, 
@@ -67,9 +66,9 @@ namespace Alpaca4d.Menu
             // Add Templates
             // add a sub menu for a toolstripmenu item
             ToolStripMenuItem subMenu = new ToolStripMenuItem("Examples");
-            subMenu.DropDown.Items.Add("Construct Model", null, (sender, e) => OpenTemplate(sender, e));
-            subMenu.DropDown.Items.Add("Analysis", null, (sender, e) => OpenTemplate(sender, e));
-            subMenu.DropDown.Items.Add("Results", null, (sender, e) => OpenTemplate(sender, e));
+            subMenu.DropDown.Items.Add("Construct Model", null, (sender, e) => OpenGhFile(sender, e));
+            subMenu.DropDown.Items.Add("Analysis", null, (sender, e) => OpenGhFile(sender, e));
+            subMenu.DropDown.Items.Add("Results", null, (sender, e) => OpenGhFile(sender, e));
 
             menuItem.DropDown.Items.Add(subMenu);
 
@@ -77,6 +76,9 @@ namespace Alpaca4d.Menu
             //----------------------
 
             // Add Help
+            menuItem.DropDown.Items.Add("License", null,
+                (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/references/license"));
+
             menuItem.DropDown.Items.Add("Help", null,
                 (sender, e) => OpenBrowser(sender, e, "https://github.com/Alpaca4d/Alpaca4d/issues/new"));
         }
@@ -94,12 +96,13 @@ namespace Alpaca4d.Menu
         }
 
         // create an event handler that opens up a Grasshopper template document 
-        private static void OpenTemplate(object sender, EventArgs e)
+        private static void OpenGhFile(object sender, EventArgs e, string fileName = null)
         {
             string assemblyPath = Assembly.GetExecutingAssembly().Location;
             string folderAssembly = System.IO.Path.GetDirectoryName(assemblyPath);
+            
 
-            string templateFile = System.IO.Path.Combine(folderAssembly, "SimplexFoundationTemplate.gh");
+            string templateFile = System.IO.Path.Combine(folderAssembly, "Assets", fileName);
 
             PasteGrasshopperFile(templateFile);
         }
