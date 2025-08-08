@@ -7,7 +7,6 @@ packages/
 
 # Local files
 .vs/
-.vscode/
 *.csproj.user
 *.mpco
 .mpco
