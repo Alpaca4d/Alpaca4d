@@ -13,7 +13,7 @@ namespace Alpaca4d.License
     {
         public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
-        public static string licenseLocation = System.IO.Path.Combine(GhAlpacaFolder, @"data.bin");
+        public static string licenseLocation = System.IO.Path.Combine(GhAlpacaFolder, "data.bin");
         public static bool IsValid
         {
             get

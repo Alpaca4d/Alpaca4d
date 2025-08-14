@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 using Alpaca4d.License;
 
@@ -13,12 +14,27 @@ namespace CreateLicense
         static void Main()
         {
             var jsonFilePath = "data.json";
-            var binaryFilePath = @"../../data.bin";
+            
+            // Get the project root directory (Alpaca4d.Utils folder)
+            var currentDir = Directory.GetCurrentDirectory();
+            var projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", ".."));
+            var binaryFilePath = Path.Combine(projectRoot, "data.bin");
 
-            var binary = License.SerializeJsonToBinary(jsonFilePath);
-            License.SerializeBinaryToFile(binaryFilePath, binary);
-            Console.WriteLine("data.bin created");
-            Console.ReadKey();
+            Console.WriteLine($"Current directory: {currentDir}");
+            Console.WriteLine($"Project root: {projectRoot}");
+            Console.WriteLine($"Binary file path: {binaryFilePath}");
+
+            try
+            {
+                var binary = License.SerializeJsonToBinary(jsonFilePath);
+                License.SerializeBinaryToFile(binaryFilePath, binary);
+                Console.WriteLine("data.bin created successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating data.bin: {ex.Message}");
+                Environment.Exit(1);
+            }
         }
     }
 }

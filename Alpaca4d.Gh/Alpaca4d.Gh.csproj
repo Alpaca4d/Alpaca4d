@@ -66,6 +66,7 @@
        ========================================== -->
   <ItemGroup>
     <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj" />
+    <ProjectReference Include="..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" />
   </ItemGroup>
 
   <!-- ==========================================
@@ -447,6 +448,32 @@
   <!-- ==========================================
        BUILD TARGETS
        ========================================== -->
+  
+  <!-- Run Alpaca4d.Utils to generate data.bin before building -->
+  <Target Name="GenerateDataBin" BeforeTargets="Build">
+    <!-- Build Alpaca4d.Utils first -->
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" 
+             Targets="Build" 
+             Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    
+    <!-- Run the executable to generate data.bin - Cross-platform compatible -->
+    <PropertyGroup>
+      <UtilsExePath>$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\bin\$(Configuration)\CreateLicense.exe</UtilsExePath>
+      <UtilsWorkingDir>$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\bin\$(Configuration)</UtilsWorkingDir>
+    </PropertyGroup>
+    
+    <!-- On Windows, run directly; on macOS/Linux, use mono -->
+    <Exec Command="CreateLicense.exe" 
+          WorkingDirectory="$(UtilsWorkingDir)" 
+          ContinueOnError="false"
+          Condition="'$(OS)' == 'Windows_NT'" />
+    
+    <Exec Command="mono CreateLicense.exe" 
+          WorkingDirectory="$(UtilsWorkingDir)" 
+          ContinueOnError="false"
+          Condition="'$(OS)' != 'Windows_NT'" />
+  </Target>
+  
   <Target Name="CopyToGrasshopperLibraries" AfterTargets="Build">
     <MakeDir Directories="$(GrasshopperLibrariesPath)/Alpaca4d/" />
     <ItemGroup>

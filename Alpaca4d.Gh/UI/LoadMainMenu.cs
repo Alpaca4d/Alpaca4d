@@ -75,6 +75,9 @@ namespace Alpaca4d.Menu
             menuItem.DropDown.Items.Add(new ToolStripSeparator());
             //----------------------
 
+            // Add License Management
+            menuItem.DropDown.Items.Add("License Management", null, ShowLicenseManagement);
+
             // Add Help
             menuItem.DropDown.Items.Add("License", null,
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/references/license"));
@@ -129,6 +132,19 @@ namespace Alpaca4d.Menu
             else
             {
                 MessageBox.Show("Failed to extract the Grasshopper document from the archive.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // create an event handler for showing the license management form
+        private static void ShowLicenseManagement(object sender, EventArgs e)
+        {
+            try
+            {
+                Alpaca4d.UI.LicenseManagementForm.ShowForm();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening license management: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
