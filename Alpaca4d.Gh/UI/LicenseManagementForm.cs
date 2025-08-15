@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Eto.Forms;
@@ -14,6 +15,7 @@ namespace Alpaca4d.UI
         private Label statusLabel;
         private Button addLicenseButton;
         private Button removeLicenseButton;
+        private Button buyLicenseButton;
         
         private string licenseFilePath;
         private List<User> currentLicenses;
@@ -30,10 +32,11 @@ namespace Alpaca4d.UI
             Title = "Alpaca4d - License Management";
             Maximizable = false;
             Minimizable = true;
-            Resizable = false;
+            Resizable = true;
             Topmost = true;
             Padding = new Padding(20);
             BackgroundColor = Eto.Drawing.Colors.White;
+            Size = new Size(500, 400);
 
             // Center the form on screen
             var centerScreen = Screen.DisplayBounds.Center;
@@ -68,8 +71,10 @@ namespace Alpaca4d.UI
             // Header section
             layout.Rows.Add(CreateHeaderSection());
 
-            // License list section
-            layout.Rows.Add(CreateLicenseListSection());
+            // License list section - make it expandable horizontally only
+            var listRow = new TableRow();
+            listRow.Cells.Add(CreateLicenseListSection());
+            layout.Rows.Add(listRow);
 
             // Status section
             layout.Rows.Add(CreateStatusSection());
@@ -114,27 +119,32 @@ namespace Alpaca4d.UI
 
         private Control CreateLicenseListSection()
         {
-            var listLayout = new StackLayout
+            var listLayout = new TableLayout
             {
-                Orientation = Orientation.Vertical,
-                Spacing = 10
+                Spacing = new Size(10, 10)
             };
 
             // List label
+            var labelRow = new TableRow();
             var listLabel = new Label
             {
                 Text = "Current Licenses:",
                 Font = SystemFonts.Bold(12)
             };
-            listLayout.Items.Add(listLabel);
+            labelRow.Cells.Add(listLabel);
+            listLayout.Rows.Add(labelRow);
 
-            // License list box
+            // License list box - make it expandable horizontally only
+            var listRow = new TableRow();
             licenseListBox = new ListBox
             {
                 Size = new Size(400, 150)
             };
             licenseListBox.SelectedIndexChanged += OnLicenseSelectionChanged;
-            listLayout.Items.Add(licenseListBox);
+            var listCell = new TableCell(licenseListBox);
+            listCell.ScaleWidth = true;
+            listRow.Cells.Add(listCell);
+            listLayout.Rows.Add(listRow);
 
             return listLayout;
         }
@@ -175,10 +185,11 @@ namespace Alpaca4d.UI
                 Spacing = new Size(10, 10)
             };
 
-            // Single row with Add and Remove buttons
+            // Single row with Add, Remove, and Buy License buttons
             var row1 = new TableRow();
             row1.Cells.Add(CreateAddLicenseButton());
             row1.Cells.Add(CreateRemoveLicenseButton());
+            row1.Cells.Add(CreateBuyLicenseButton());
             buttonLayout.Rows.Add(row1);
 
             return buttonLayout;
@@ -188,9 +199,10 @@ namespace Alpaca4d.UI
         {
             addLicenseButton = new Button
             {
-                Text = "➕ Add License",
-                Size = new Size(140, 35),
-                BackgroundColor = Eto.Drawing.Colors.LightGreen
+                Text = "Add License",
+                Size = new Size(120, 35),
+                BackgroundColor = Eto.Drawing.Colors.LightGreen,
+                TextColor = Eto.Drawing.Colors.Black
             };
             
             addLicenseButton.Click += OnAddLicenseClicked;
@@ -201,14 +213,29 @@ namespace Alpaca4d.UI
         {
             removeLicenseButton = new Button
             {
-                Text = "➖ Remove License",
-                Size = new Size(140, 35),
-                BackgroundColor = Eto.Drawing.Colors.LightCoral
+                Text = "Remove License",
+                Size = new Size(120, 35),
+                BackgroundColor = Eto.Drawing.Colors.LightCoral,
+                TextColor = Eto.Drawing.Colors.Black
             };
             
             removeLicenseButton.Click += OnRemoveLicenseClicked;
             removeLicenseButton.Enabled = false;
             return removeLicenseButton;
+        }
+
+        private Button CreateBuyLicenseButton()
+        {
+            buyLicenseButton = new Button
+            {
+                Text = "Buy License",
+                Size = new Size(120, 35),
+                BackgroundColor = Eto.Drawing.Colors.LightBlue,
+                TextColor = Eto.Drawing.Colors.Black
+            };
+            
+            buyLicenseButton.Click += OnBuyLicenseClicked;
+            return buyLicenseButton;
         }
 
         private void LoadLicenses()
@@ -318,6 +345,26 @@ namespace Alpaca4d.UI
             catch (Exception ex)
             {
                 UpdateStatus($"Error removing license: {ex.Message}", Eto.Drawing.Colors.Red);
+            }
+        }
+
+        private void OnBuyLicenseClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                // Open the license purchase URL in the default browser
+                string licenseUrl = "https://www.food4rhino.com/en/app/alpaca4d-openseesgh";
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = licenseUrl,
+                    UseShellExecute = true
+                });
+                
+                UpdateStatus("Opening license purchase page...", Eto.Drawing.Colors.DarkBlue);
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus($"Error opening license purchase page: {ex.Message}", Eto.Drawing.Colors.Red);
             }
         }
 
