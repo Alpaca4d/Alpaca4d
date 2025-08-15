@@ -10,11 +10,15 @@ namespace Alpaca4d.UI
 {
     internal static class Palette
     {
-        public static Color DarkBlue => Color.FromArgb(0, 73, 130);
-        public static Color Blue => Color.FromArgb(29, 89, 152);
-        public static Color Orange1 => Color.FromArgb(242, 180, 0);
-        public static Color Orange2 => Color.FromArgb(242, 65, 0);
         public static Color DarkTech => Color.FromArgb(42, 45, 49);
         public static Color LightGrey => Color.FromArgb(244, 244, 244);
+
+        // Alpaca4d Brand Colors (from logo)
+        public static Color AlpacaRed => Color.FromArgb(254, 0, 0);        // Red from head/torso
+        public static Color AlpacaOrange => Color.FromArgb(235, 108, 63);     // Orange from head/neck
+        public static Color AlpacaPurple => Color.FromArgb(158, 53, 218);    // Purple from mid-body
+        public static Color AlpacaLightGreen => Color.FromArgb(175, 201, 48); // Light green from hindquarters
+        public static Color AlpacaLightBlue => Color.FromArgb(66, 136, 247);  // Light blue from hindquarters
+        public static Color AlpacaDarkBlue => Color.FromArgb(1, 30, 254);     // Dark blue from tail
     }
 }

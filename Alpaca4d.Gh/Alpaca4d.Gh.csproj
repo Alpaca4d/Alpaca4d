@@ -450,7 +450,7 @@
        ========================================== -->
   
   <!-- Run Alpaca4d.Utils to generate data.bin before building -->
-  <Target Name="GenerateDataBin" BeforeTargets="Build">
+  <Target Name="GenerateDataBin" BeforeTargets="PrepareForBuild">
     <!-- Build Alpaca4d.Utils first -->
     <MSBuild Projects="$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" 
              Targets="Build" 

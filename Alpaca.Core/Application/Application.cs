@@ -11,9 +11,6 @@ namespace Alpaca4d
 {
     public partial class Application
     {
-        public static readonly List<string> Intro = new List<string>(){""};
-
-
         public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
         public static string licenseLocation = System.IO.Path.Combine(GhAlpacaFolder, @"data.bin");
