@@ -138,7 +138,8 @@ namespace Alpaca4d.UI
             var listRow = new TableRow();
             licenseListBox = new ListBox
             {
-                Size = new Size(400, 150)
+                Size = new Size(400, 150),
+                BackgroundColor = Eto.Drawing.Colors.LightGrey,
             };
             licenseListBox.SelectedIndexChanged += OnLicenseSelectionChanged;
             var listCell = new TableCell(licenseListBox);
@@ -187,9 +188,20 @@ namespace Alpaca4d.UI
 
             // Single row with Add, Remove, and Buy License buttons
             var row1 = new TableRow();
-            row1.Cells.Add(CreateAddLicenseButton());
-            row1.Cells.Add(CreateRemoveLicenseButton());
-            row1.Cells.Add(CreateBuyLicenseButton());
+            
+            // Create buttons and add them to cells with proper scaling
+            var addButtonCell = new TableCell(CreateAddLicenseButton());
+            addButtonCell.ScaleWidth = true;
+            row1.Cells.Add(addButtonCell);
+            
+            var removeButtonCell = new TableCell(CreateRemoveLicenseButton());
+            removeButtonCell.ScaleWidth = true;
+            row1.Cells.Add(removeButtonCell);
+            
+            var buyButtonCell = new TableCell(CreateBuyLicenseButton());
+            buyButtonCell.ScaleWidth = true;
+            row1.Cells.Add(buyButtonCell);
+            
             buttonLayout.Rows.Add(row1);
 
             return buttonLayout;
@@ -200,9 +212,9 @@ namespace Alpaca4d.UI
             addLicenseButton = new Button
             {
                 Text = "Add License",
-                Size = new Size(120, 35),
                 BackgroundColor = Eto.Drawing.Colors.LightGreen,
-                TextColor = Eto.Drawing.Colors.Black
+                TextColor = Eto.Drawing.Colors.Black,
+                MinimumSize = new Size(100, 35)
             };
             
             addLicenseButton.Click += OnAddLicenseClicked;
@@ -214,9 +226,9 @@ namespace Alpaca4d.UI
             removeLicenseButton = new Button
             {
                 Text = "Remove License",
-                Size = new Size(120, 35),
                 BackgroundColor = Eto.Drawing.Colors.LightCoral,
-                TextColor = Eto.Drawing.Colors.Black
+                TextColor = Eto.Drawing.Colors.Black,
+                MinimumSize = new Size(100, 35)
             };
             
             removeLicenseButton.Click += OnRemoveLicenseClicked;
@@ -229,9 +241,9 @@ namespace Alpaca4d.UI
             buyLicenseButton = new Button
             {
                 Text = "Buy License",
-                Size = new Size(120, 35),
-                BackgroundColor = Eto.Drawing.Colors.LightBlue,
-                TextColor = Eto.Drawing.Colors.Black
+                BackgroundColor = Eto.Drawing.Color.FromArgb(Palette.AlpacaDarkBlue.R, Palette.AlpacaDarkBlue.G, Palette.AlpacaDarkBlue.B),
+                TextColor = Eto.Drawing.Colors.Black,
+                MinimumSize = new Size(100, 35)
             };
             
             buyLicenseButton.Click += OnBuyLicenseClicked;
@@ -327,6 +339,7 @@ namespace Alpaca4d.UI
             try
             {
                 var result = MessageBox.Show(
+                    this, // Set the owner to this form
                     "Are you sure you want to remove the selected license?",
                     "Confirm License Removal",
                     MessageBoxType.Question);
