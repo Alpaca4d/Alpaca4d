@@ -33,7 +33,7 @@ namespace Alpaca4d.Gh
         protected override void BeforeSolveInstance()
         {
             List<string> resultTypes = new List<string> { "Constant", "Linear" };
-            ValueListUtils.updateValueLists(this, 0, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 0, resultTypes, null);
         }
 
         /// <summary>

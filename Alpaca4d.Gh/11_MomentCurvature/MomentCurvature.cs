@@ -148,7 +148,7 @@ namespace Alpaca4d.Gh
         protected override void BeforeSolveInstance()
         {
             List<string> directions = new List<string> { "y", "z" };
-            ValueListUtils.updateValueLists(this, 2, directions, null);
+            ValueListUtils.UpdateValueLists(this, 2, directions, null);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.tertiary;

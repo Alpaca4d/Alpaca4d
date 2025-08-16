@@ -149,19 +149,19 @@ namespace Alpaca4d.Gh
             List<string> resultTypes;
             
             resultTypes = Enum.GetNames(typeof(Constraint.ConstraintType)).ToList();
-            ValueListUtils.updateValueLists(this, 1, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 1, resultTypes, null);
 
             resultTypes = Enum.GetNames(typeof(Alpaca4d.Numberer.NumbererType)).ToList();
-            ValueListUtils.updateValueLists(this, 2, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 2, resultTypes, null);
 
             resultTypes = Enum.GetNames(typeof(Alpaca4d.SystemEquation.SystemType)).ToList();
-            ValueListUtils.updateValueLists(this, 3, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 3, resultTypes, null);
 
             resultTypes = Enum.GetNames(typeof(Alpaca4d.Algorithm.AlgorithmType)).ToList();
-            ValueListUtils.updateValueLists(this, 5, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 5, resultTypes, null);
 
             resultTypes = Enum.GetNames(typeof(Alpaca4d.Analysis.AnalysisType)).ToList();
-            ValueListUtils.updateValueLists(this, 7, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 7, resultTypes, null);
 
         }
 

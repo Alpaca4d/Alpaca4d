@@ -95,7 +95,7 @@ namespace Alpaca4d.Gh
             List<string> patternType;
 
             patternType = Enum.GetNames(typeof(Alpaca4d.Loads.PatternType)).ToList();
-            ValueListUtils.updateValueLists(this, 0, patternType, null);
+            ValueListUtils.UpdateValueLists(this, 0, patternType, null);
         }
 
     }

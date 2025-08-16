@@ -4,104 +4,157 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
-
-// The following code has been taken from an open-source library
 
 namespace Alpaca4d.Gh
 {
-	public static partial class ValueListUtils
-	{
-		private sealed class BracketC
-		{
-			public BracketC()
-			{
-			}
+    /// <summary>
+    /// Utility class for updating ValueList components in Grasshopper
+    /// </summary>
+    public static class ValueListUtils
+    {
+        /// <summary>
+        /// Updates ValueList components connected to a specific input parameter
+        /// </summary>
+        /// <param name="component">The Grasshopper component</param>
+        /// <param name="inputIndex">Index of the input parameter</param>
+        /// <param name="names">List of names to populate the ValueList with</param>
+        /// <param name="values">Optional list of values corresponding to the names</param>
+        /// <param name="listMode">Mode for the ValueList (dropdown, list, etc.)</param>
+        public static void UpdateValueLists(
+            GH_Component component, 
+            int inputIndex, 
+            List<string> names, 
+            List<int> values = null, 
+            GH_ValueListMode listMode = GH_ValueListMode.DropDown)
+        {
+            // Early return if no names provided
+            if (names == null || names.Count == 0)
+            {
+                return;
+            }
 
-			public static readonly ValueListUtils.BracketC _nine = new ValueListUtils.BracketC();
+            // Get the input parameter
+            var inputParam = component.Params.Input[inputIndex];
+            if (inputParam == null)
+            {
+                return;
+            }
 
-			public static Func<GH_ValueListItem, string> _nine__0_0 = null;
+            // Iterate through all sources connected to this input
+            foreach (var source in inputParam.Sources)
+            {
+                // Check if the source is a ValueList
+                if (source is GH_ValueList valueList)
+                {
+                    UpdateSingleValueList(valueList, names, values, listMode);
+                }
+            }
+        }
 
-			public static Func<GH_ValueListItem, string> _nine__0_1 = null;
+        /// <summary>
+        /// Updates a single ValueList component with new items
+        /// </summary>
+        /// <param name="valueList">The ValueList to update</param>
+        /// <param name="names">List of names to populate the ValueList with</param>
+        /// <param name="values">Optional list of values corresponding to the names</param>
+        /// <param name="listMode">Mode for the ValueList</param>
+        private static void UpdateSingleValueList(
+            GH_ValueList valueList, 
+            List<string> names, 
+            List<int> values, 
+            GH_ValueListMode listMode)
+        {
+            // Get current item names for comparison
+            var currentItemNames = valueList.ListItems.Select(item => item.Name).ToList();
+            
+            // Check if the lists are already the same
+            if (names.SequenceEqual(currentItemNames))
+            {
+                return; // No update needed
+            }
 
-			internal string b__0_0(GH_ValueListItem x)
-			{
-				return x.Name;
-			}
+            // Store currently selected items to restore them later
+            var selectedItemNames = valueList.SelectedItems.Select(item => item.Name).ToList();
 
-			internal string b__0_1(GH_ValueListItem x)
-			{
-				return x.Name;
-			}
-		}
+            // Clear existing items
+            valueList.ListItems.Clear();
 
+            // Add new items
+            if (values == null || values.Count != names.Count)
+            {
+                // Use names as both display name and value
+                foreach (var name in names)
+                {
+                    var item = new GH_ValueListItem(name, $"\"{name}\"");
+                    valueList.ListItems.Add(item);
+                }
+            }
+            else
+            {
+                // Use provided values
+                for (int i = 0; i < names.Count; i++)
+                {
+                    var item = new GH_ValueListItem(names[i], values[i].ToString());
+                    valueList.ListItems.Add(item);
+                }
+            }
 
-		public static void updateValueLists(GH_Component component, int input_ind, List<string> names, List<int> values = null, GH_ValueListMode list_mode = GH_ValueListMode.DropDown)
-		{
-			if (names.Count == 0)
-			{
-				return;
-			}
-			using (IEnumerator<IGH_Param> enumerator = component.Params.Input[input_ind].Sources.GetEnumerator())
-			{
-				while (enumerator.MoveNext())
-				{
-					GH_ValueList gH_ValueList = enumerator.Current as GH_ValueList;
-					if (gH_ValueList != null)
-					{
-						IEnumerable<GH_ValueListItem> arg_62_0 = gH_ValueList.ListItems;
-						Func<GH_ValueListItem, string> arg_62_1;
+            // Restore previously selected items if they still exist
+            foreach (var selectedName in selectedItemNames)
+            {
+                int index = names.IndexOf(selectedName);
+                if (index != -1)
+                {
+                    valueList.ToggleItem(index);
+                }
+            }
 
-						if ((arg_62_1 = ValueListUtils.BracketC._nine__0_0) == null)
-						{
-							arg_62_1 = new Func<GH_ValueListItem, string>(new BracketC().b__0_0);
-						}
-						if (!names.SequenceEqual(arg_62_0.Select(arg_62_1)))
-						{
-							IEnumerable<GH_ValueListItem> arg_96_0 = gH_ValueList.SelectedItems;
-							Func<GH_ValueListItem, string> arg_96_1;
-							if ((arg_96_1 = ValueListUtils.BracketC._nine__0_1) == null)
-							{
-								arg_96_1 = new Func<GH_ValueListItem, string>(new BracketC().b__0_1);
-							}
-							IEnumerable<string> enumerable = arg_96_0.Select(arg_96_1);
-							gH_ValueList.ListItems.Clear();
-							int num = 0;
-							if (values == null || values.Count != names.Count)
-							{
-								using (List<string>.Enumerator enumerator2 = names.GetEnumerator())
-								{
-									while (enumerator2.MoveNext())
-									{
-										string current = enumerator2.Current;
-										gH_ValueList.ListItems.Add(new GH_ValueListItem(current, String.Format("\"{0}\"", current) ));
-									}
-									goto IL_158;
-								}
-							}
-							goto IL_106;
-						IL_158:
-							foreach (string current2 in enumerable)
-							{
-								int num2 = names.IndexOf(current2);
-								if (num2 != -1)
-								{
-									gH_ValueList.ToggleItem(num2);
-								}
-							}
-							gH_ValueList.ListMode = list_mode;
-							gH_ValueList.ExpireSolution(true);
-							continue;
-						IL_106:
-							foreach (string current3 in names)
-							{
-								gH_ValueList.ListItems.Add(new GH_ValueListItem(current3, values[num++].ToString()));
-							}
-							goto IL_158;
-						}
-					}
-				}
-			}
-		}
-	}
+            // Update the list mode and expire the solution
+            valueList.ListMode = listMode;
+            valueList.ExpireSolution(true);
+        }
+
+        /// <summary>
+        /// Updates a ValueList with enum values
+        /// </summary>
+        /// <typeparam name="T">The enum type</typeparam>
+        /// <param name="component">The Grasshopper component</param>
+        /// <param name="inputIndex">Index of the input parameter</param>
+        /// <param name="listMode">Mode for the ValueList</param>
+        public static void UpdateValueListWithEnum<T>(
+            GH_Component component, 
+            int inputIndex, 
+            GH_ValueListMode listMode = GH_ValueListMode.DropDown) where T : Enum
+        {
+            var enumNames = Enum.GetNames(typeof(T)).ToList();
+            var enumValues = Enum.GetValues(typeof(T)).Cast<int>().ToList();
+            
+            UpdateValueLists(component, inputIndex, enumNames, enumValues, listMode);
+        }
+
+        /// <summary>
+        /// Gets all ValueList components connected to a specific input
+        /// </summary>
+        /// <param name="component">The Grasshopper component</param>
+        /// <param name="inputIndex">Index of the input parameter</param>
+        /// <returns>List of connected ValueList components</returns>
+        public static List<GH_ValueList> GetConnectedValueLists(GH_Component component, int inputIndex)
+        {
+            var valueLists = new List<GH_ValueList>();
+            
+            if (inputIndex >= 0 && inputIndex < component.Params.Input.Count)
+            {
+                var inputParam = component.Params.Input[inputIndex];
+                foreach (var source in inputParam.Sources)
+                {
+                    if (source is GH_ValueList valueList)
+                    {
+                        valueLists.Add(valueList);
+                    }
+                }
+            }
+            
+            return valueLists;
+        }
+    }
 }

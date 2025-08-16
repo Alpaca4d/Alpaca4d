@@ -108,7 +108,7 @@ namespace Alpaca4d.UIWidgets
                     SwitchUnit(evaluationUnit);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

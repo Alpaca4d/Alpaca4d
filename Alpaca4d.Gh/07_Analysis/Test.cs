@@ -88,7 +88,7 @@ namespace Alpaca4d.Gh
             List<string> resultTypes;
 
             resultTypes = Enum.GetNames(typeof(Alpaca4d.Test.TestType)).ToList();
-            ValueListUtils.updateValueLists(this, 0, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 0, resultTypes, null);
 
         }
 

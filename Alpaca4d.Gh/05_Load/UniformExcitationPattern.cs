@@ -105,7 +105,7 @@ namespace Alpaca4d.Gh
             List<string> directions;
 
             directions = Enum.GetNames(typeof(Loads.Direction)).ToList();
-            ValueListUtils.updateValueLists(this, 0, directions, null);
+            ValueListUtils.UpdateValueLists(this, 0, directions, null);
         }
 
     }
