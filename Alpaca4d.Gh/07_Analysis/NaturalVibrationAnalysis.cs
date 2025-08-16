@@ -70,21 +70,11 @@ namespace Alpaca4d.Gh
             DA.GetData(2, ref solver);
 
 
-            // Update last run time to the current DateTime
-            lastTimeRun = DateTime.Now;
-
-            if (counter == 0 || lastTimeRun - firstTimeRun > TimeSpan.FromMinutes(5))
+            // Validate license
+            if (!ValidateLicense(model))
             {
-                // license routine
-                if (!Alpaca4d.License.License.IsValid)
-                {
-                    if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
-                    {
-                        Alpaca4d.Gh.Forms.Advertise.Default();
-                    }
-                }
-                firstTimeRun = DateTime.Now;
-                counter++;
+                // add a warning on component saying that the message will be shown every 5 minutes
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "License validation failed. The license management form will be shown every 5 minutes.");
             }
 
 
@@ -162,7 +152,7 @@ namespace Alpaca4d.Gh
                 resultTypes.Add(result);
             }
 
-            ValueListUtils.updateValueLists(this, 2, resultTypes, null);
+            ValueListUtils.UpdateValueLists(this, 2, resultTypes, null);
 
         }
 

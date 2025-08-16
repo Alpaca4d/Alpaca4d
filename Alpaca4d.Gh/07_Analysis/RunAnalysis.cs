@@ -124,7 +124,8 @@ namespace Alpaca4d.Gh
             // Validate license
             if (!ValidateLicense(model))
             {
-                return; // Exit if license validation failed
+                // add a warning on component saying that the message will be shown every 5 minutes
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "License validation failed. The license management form will be shown every 5 minutes.");
             }
 
 
