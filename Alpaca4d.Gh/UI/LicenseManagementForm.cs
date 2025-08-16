@@ -232,7 +232,6 @@ namespace Alpaca4d.UI
             };
             
             removeLicenseButton.Click += OnRemoveLicenseClicked;
-            removeLicenseButton.Enabled = false;
             return removeLicenseButton;
         }
 
@@ -286,8 +285,8 @@ namespace Alpaca4d.UI
 
         private void OnLicenseSelectionChanged(object sender, EventArgs e)
         {
-            bool hasSelection = licenseListBox.SelectedIndex >= 0;
-            removeLicenseButton.Enabled = hasSelection;
+            // Remove button is always enabled now, no need to disable it
+            // The validation will happen when the button is clicked
         }
 
         private void OnAddLicenseClicked(object sender, EventArgs e)
@@ -334,7 +333,15 @@ namespace Alpaca4d.UI
 
         private void OnRemoveLicenseClicked(object sender, EventArgs e)
         {
-            if (licenseListBox.SelectedIndex < 0) return;
+            if (licenseListBox.SelectedIndex < 0)
+            {
+                MessageBox.Show(
+                    this,
+                    "Please select a license from the list to remove.",
+                    "No License Selected",
+                    MessageBoxType.Information);
+                return;
+            }
 
             try
             {
