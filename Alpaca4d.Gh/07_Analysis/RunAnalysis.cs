@@ -46,6 +46,40 @@ namespace Alpaca4d.Gh
             ExpireSolution(true);
         }
 
+        /// <summary>
+        /// Validates license and shows license management form if needed
+        /// </summary>
+        /// <param name="model">The Alpaca model to check element count against</param>
+        /// <param name="forceCheck">If true, bypasses the time-based check</param>
+        /// <returns>True if license is valid or form was shown, false otherwise</returns>
+        private bool ValidateLicense(Model model, bool forceCheck = false)
+        {
+            // Update last run time to the current DateTime
+            lastTimeRun = DateTime.Now;
+
+            // Check if we should validate (first run or every 5 minutes)
+            if (forceCheck || counter == 0 || lastTimeRun - firstTimeRun > TimeSpan.FromMinutes(5))
+            {
+                // License validation routine
+                if (!Alpaca4d.License.License.IsValid)
+                {
+                    if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
+                    {
+                        Alpaca4d.UI.LicenseManagementForm.ShowForm();
+                        return false; // Return false to indicate license issue
+                    }
+                }
+                
+                if (!forceCheck)
+                {
+                    firstTimeRun = DateTime.Now;
+                    counter++;
+                }
+            }
+            
+            return true; // License is valid
+        }
+
 
         /// <summary>
         /// Registers all the input parameters for this component.
@@ -87,21 +121,10 @@ namespace Alpaca4d.Gh
             }
 
 
-            // Update last run time to the current DateTime
-            lastTimeRun = DateTime.Now;
-
-            if (counter == 0 || lastTimeRun - firstTimeRun > TimeSpan.FromMinutes(5))
+            // Validate license
+            if (!ValidateLicense(model))
             {
-                // license routine
-                if (!Alpaca4d.License.License.IsValid)
-                {
-                    if (model.Elements.Count > Alpaca4d.Gh.Forms.Advertise.NumberOfElements)
-                    {
-                        Alpaca4d.Gh.Forms.Advertise.Default();
-                    }
-                }
-                firstTimeRun = DateTime.Now;
-                counter++;
+                return; // Exit if license validation failed
             }
 
 
