@@ -14,6 +14,11 @@ namespace Alpaca4d.License
         public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
         public static string licenseLocation = System.IO.Path.Combine(GhAlpacaFolder, "data.bin");
+        
+        // Static variables for license validation timing
+        private static int validationCounter = 0;
+        private static DateTime? validationFirstTimeRun = DateTime.Now;
+        private static DateTime? validationLastTimeRun = null;
         public static bool IsValid
         {
             get
@@ -88,6 +93,45 @@ namespace Alpaca4d.License
 
             return users;
         }
+
+        /// <summary>
+        /// Validates license and shows license management form if needed
+        /// </summary>
+        /// <param name="model">The Alpaca model to check element count against</param>
+        /// <param name="forceCheck">If true, bypasses the time-based check</param>
+        /// <param name="showFormCallback">Callback to show the license management form</param>
+        /// <param name="maxElements">Maximum number of elements allowed</param>
+        /// <returns>True if license is valid or form was shown, false otherwise</returns>
+        public static bool ValidateLicense(Alpaca4d.Model model, bool forceCheck = false, Action showFormCallback = null, int maxElements = 100)
+        {
+            // Update last run time to the current DateTime
+            validationLastTimeRun = DateTime.Now;
+
+            // Check if we should validate (first run or every 5 minutes)
+            if (forceCheck || validationCounter == 0 || validationLastTimeRun - validationFirstTimeRun > TimeSpan.FromMinutes(5))
+            {
+                // License validation routine
+                if (!IsValid)
+                {
+                    // Get element count directly from the Model
+                    int elementCount = model.Elements.Count;
+
+                    if (elementCount > maxElements)
+                    {
+                        showFormCallback?.Invoke();
+                        return false; // Return false to indicate license issue
+                    }
+                }
+                
+                if (!forceCheck)
+                {
+                    validationFirstTimeRun = DateTime.Now;
+                    validationCounter++;
+                }
+            }
+            
+            return true; // License is valid
+        }
     }
 
     public class User
@@ -96,6 +140,4 @@ namespace Alpaca4d.License
         public string mac_address { get; set; }
         public System.DateTime expiring_date { get; set; }
     }
-
 }
-
