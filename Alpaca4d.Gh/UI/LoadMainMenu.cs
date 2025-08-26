@@ -76,14 +76,19 @@ namespace Alpaca4d.Menu
             //----------------------
 
             // Add License Management
-            menuItem.DropDown.Items.Add("License Management", null, ShowLicenseManagement);
-
-            // Add Help
-            menuItem.DropDown.Items.Add("License", null,
+            ToolStripMenuItem subMenuLicense = new ToolStripMenuItem("License");
+            subMenuLicense.DropDown.Items.Add("Activate License", null, ShowLicenseManagement);
+            subMenuLicense.DropDown.Items.Add("License Terms", null,
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/references/license"));
 
-            menuItem.DropDown.Items.Add("Help", null,
+            menuItem.DropDown.Items.Add(subMenuLicense);
+
+            // Add Help
+            ToolStripMenuItem subMenuHelp = new ToolStripMenuItem("Help");
+            subMenuHelp.DropDown.Items.Add("Help", null,
                 (sender, e) => OpenBrowser(sender, e, "https://github.com/Alpaca4d/Alpaca4d/issues/new"));
+                
+            menuItem.DropDown.Items.Add(subMenu);
         }
 
         // create an event handler that opens up a sub-window
