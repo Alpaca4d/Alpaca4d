@@ -54,11 +54,6 @@ namespace Alpaca4d.Menu
 
         private static void PopulateSub(ToolStripMenuItem menuItem)
         {
-            // Add Login
-            menuItem.DropDown.Items.Add("Login", null, OpenForm);
-
-            menuItem.DropDown.Items.Add(new ToolStripSeparator());
-
             // Add Documentation
             menuItem.DropDown.Items.Add("Documentation", null, 
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs"));

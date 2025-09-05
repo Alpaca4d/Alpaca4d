@@ -49,7 +49,7 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var factor = 1;
+            double factor = 1;
             DA.GetData(0, ref factor);
 
             var load = new Alpaca4d.Loads.Gravity(factor ,null);

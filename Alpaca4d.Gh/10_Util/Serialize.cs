@@ -28,7 +28,7 @@ namespace Alpaca4d.Gh
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "Model to be serialized.", GH_ParamAccess.item);
             pManager.AddTextParameter("FilePath", "FilePath", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Save", "Save", "", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Save", "Save", "", GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -50,12 +50,11 @@ namespace Alpaca4d.Gh
             Model model = null;
             DA.GetData(0, ref model);
 
-            bool save = false;
-            DA.GetData(2, ref save);
-
-
             string filePath = null;
             DA.GetData(1, ref filePath);
+
+            bool save = false;
+            DA.GetData(2, ref save);
 
             var tclText = model.Tcl;
 
