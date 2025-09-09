@@ -23,13 +23,7 @@ namespace Alpaca4d.Gh
 
         private PropertyInfo[] propertiesArr;
 
-        private DeconstructAnythingAttributes ThisAttribute
-        {
-            get
-            {
-                return this.m_attributes as DeconstructAnythingAttributes;
-            }
-        }
+        
 
         protected override Bitmap Icon => Properties.Resources.Deconstruct__Alpaca4d_;
 
@@ -48,49 +42,11 @@ namespace Alpaca4d.Gh
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        public override void CreateAttributes()
-        {
-            this.m_attributes = new DeconstructAnythingAttributes(this)
-            {
-                ButtonResponder = new DeconstructAnythingAttributes.ResponderEvent(this.MatchResponder),
-                ButtonText = "Deconstruct",
-                //TextLine = new LongShortString
-                //{
-                //    Long = "NULL",
-                //    Short = "NULL"
-                //},
-                TextFont = new Font(GH_FontServer.ScriptSmall, FontStyle.Bold)
-            };
-        }
+        
 
-        protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
-        {
-            base.AppendAdditionalComponentMenuItems(menu);
-            GH_DocumentObject.Menu_AppendItem(menu, "Match object Fields", new EventHandler(this.MatchResponder));
-        }
+        
 
-        private void MatchResponder(object o, EventArgs e)
-        {
-            bool flag = this.fieldsArr == null || this.propertiesArr == null;
-            if (!flag)
-            {
-                bool flag2 = base.Params.Output.Count == this.fieldsArr.Length + this.propertiesArr.Length + 1;
-                if (!flag2)
-                {
-                    while (base.Params.Output.Count < this.fieldsArr.Length + this.propertiesArr.Length + 1)
-                    {
-                        base.Params.RegisterOutputParam(new Param_GenericObject());
-                    }
-                    while (base.Params.Output.Count > this.fieldsArr.Length + this.propertiesArr.Length + 1)
-                    {
-                        base.Params.UnregisterOutputParameter(base.Params.Output[base.Params.Output.Count - 1]);
-                    }
-                    base.Params.OnParametersChanged();
-                    this.VariableParameterMaintenance();
-                    this.ExpireSolution(true);
-                }
-            }
-        }
+        
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
@@ -140,89 +96,117 @@ namespace Alpaca4d.Gh
                 }
                 this.fieldsArr = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField);
                 this.propertiesArr = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
-                int num = Math.Max(this.fieldsArr.Length + this.propertiesArr.Length, base.Params.Output.Count - 1);
+                // Auto-match outputs to fields + properties without requiring button click
+                int desiredOutputCount = this.fieldsArr.Length + this.propertiesArr.Length + 1;
+                if (base.Params.Output.Count != desiredOutputCount)
+                {
+                    GH_Document doc = this.OnPingDocument();
+                    if (doc != null)
+                    {
+                        doc.ScheduleSolution(5, (d) =>
+                        {
+                            while (this.Params.Output.Count < desiredOutputCount)
+                            {
+                                this.Params.RegisterOutputParam(new Param_GenericObject());
+                            }
+                            while (this.Params.Output.Count > desiredOutputCount)
+                            {
+                                this.Params.UnregisterOutputParameter(this.Params.Output[this.Params.Output.Count - 1]);
+                            }
+                            this.Params.OnParametersChanged();
+                            this.VariableParameterMaintenance();
+                            this.ExpireSolution(false);
+                        });
+                    }
+                    return;
+                }
+                int availableSlots = Math.Max(0, base.Params.Output.Count - 1);
+                int num = Math.Min(this.fieldsArr.Length + this.propertiesArr.Length, availableSlots);
                 for (int i = 0; i < num; i++)
                 {
-                    bool flag5 = i >= this.fieldsArr.Length + this.propertiesArr.Length;
-                    if (flag5)
+                    bool flag6 = i < this.fieldsArr.Length;
+                    if (flag6)
                     {
-                        base.Params.Output[i + 1].NickName = "--";
+                        try
+                        {
+                            bool flag7 = base.Params.Output[i + 1].NickName != this.fieldsArr[i].Name;
+                            if (flag7)
+                            {
+                                base.Params.Output[i + 1].NickName = this.fieldsArr[i].Name;
+                            }
+                            DA.SetData(i + 1, this.fieldsArr[i].GetValue(obj));
+                        }
+                        catch
+                        {
+                            this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Some fields were failed to explode, check answer carefully");
+                        }
                     }
                     else
                     {
-                        bool flag6 = i < this.fieldsArr.Length;
-                        if (flag6)
+                        try
                         {
-                            try
+                            bool flag8 = base.Params.Output[i + 1].NickName != this.propertiesArr[i - this.fieldsArr.Length].Name;
+                            if (flag8)
                             {
-                                bool flag7 = base.Params.Output[i + 1].NickName != this.fieldsArr[i].Name;
-                                if (flag7)
-                                {
-                                    base.Params.Output[i + 1].NickName = this.fieldsArr[i].Name;
-                                }
-                                DA.SetData(i + 1, this.fieldsArr[i].GetValue(obj));
+                                base.Params.Output[i + 1].NickName = this.propertiesArr[i - this.fieldsArr.Length].Name;
                             }
-                            catch
+                            bool flag9 = this.propertiesArr[i - this.fieldsArr.Length].Name == "Item" && (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)));
+                            if (flag9)
                             {
-                                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Some fields were failed to explode, check answer carefully");
+                                IEnumerable enumerable = (IEnumerable)obj;
+                                DA.SetDataList(i + 1, enumerable);
                             }
-                        }
-                        else
-                        {
-                            try
+                            else
                             {
-                                bool flag8 = base.Params.Output[i + 1].NickName != this.propertiesArr[i - this.fieldsArr.Length].Name;
-                                if (flag8)
+                                bool flag10 = type.Name.Contains("[]") && i == 3;
+                                if (flag10)
                                 {
-                                    base.Params.Output[i + 1].NickName = this.propertiesArr[i - this.fieldsArr.Length].Name;
-                                }
-                                bool flag9 = this.propertiesArr[i - this.fieldsArr.Length].Name == "Item" && (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)));
-                                if (flag9)
-                                {
-                                    IEnumerable enumerable = (IEnumerable)obj;
-                                    DA.SetDataList(i + 1, enumerable);
+                                    DA.SetDataList(i + 1, (IEnumerable)obj);
                                 }
                                 else
                                 {
-                                    bool flag10 = type.Name.Contains("[]") && i == 3;
-                                    if (flag10)
+                                    PropertyInfo propertyInfo = this.propertiesArr[i - this.fieldsArr.Length];
+                                    bool flag11 = propertyInfo.GetIndexParameters().Length == 0;
+                                    if (flag11)
                                     {
-                                        DA.SetDataList(i + 1, (IEnumerable)obj);
+                                        DA.SetData(i + 1, propertyInfo.GetValue(obj));
                                     }
                                     else
                                     {
-                                        PropertyInfo propertyInfo = this.propertiesArr[i - this.fieldsArr.Length];
-                                        bool flag11 = propertyInfo.GetIndexParameters().Length == 0;
-                                        if (flag11)
+                                        bool flag12 = obj is IEnumerable;
+                                        if (flag12)
                                         {
-                                            DA.SetData(i + 1, propertyInfo.GetValue(obj));
+                                            DA.SetDataList(i + 1, (IEnumerable)obj);
                                         }
                                         else
                                         {
-                                            bool flag12 = obj is IEnumerable;
-                                            if (flag12)
-                                            {
-                                                DA.SetDataList(i + 1, (IEnumerable)obj);
-                                            }
-                                            else
-                                            {
-                                                DA.SetData(i + 1, obj);
-                                            }
+                                            DA.SetData(i + 1, obj);
                                         }
                                     }
                                 }
                             }
-                            catch
-                            {
-                                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Some fields were failed to explode, check answer carefully");
-                            }
+                        }
+                        catch
+                        {
+                            this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Some fields were failed to explode, check answer carefully");
                         }
                     }
                 }
+                // Clear any extra output slots beyond current fields+properties
+                for (int j = num; j < availableSlots; j++)
+                {
+                    if ((j + 1) < base.Params.Output.Count)
+                    {
+                        base.Params.Output[j + 1].NickName = "--";
+                        DA.SetData(j + 1, null);
+                    }
+                }
 
-                DA.SetData(0, type);
-
-                base.Params.Output[0].NickName = "Object Class";
+                if (base.Params.Output.Count > 0)
+                {
+                    DA.SetData(0, type);
+                    base.Params.Output[0].NickName = "Object Class";
+                }
             }
         }
 
@@ -248,25 +232,26 @@ namespace Alpaca4d.Gh
 
         public void VariableParameterMaintenance()
         {
-            bool flag = this.fieldsArr != null && this.propertiesArr != null;
-            if (flag)
+            bool hasMembers = this.fieldsArr != null && this.propertiesArr != null;
+            if (!hasMembers) return;
+            if (base.Params.Output.Count <= 1) return;
+
+            int availableSlots = base.Params.Output.Count - 1;
+            int num = Math.Min(this.fieldsArr.Length + this.propertiesArr.Length, availableSlots);
+            for (int i = 0; i < num; i++)
             {
-                bool flag2 = base.Params.Output.Count > 0;
-                if (flag2)
+                if (i < this.fieldsArr.Length)
                 {
-                    for (int i = 0; i < this.fieldsArr.Length + this.propertiesArr.Length; i++)
-                    {
-                        bool flag3 = i < this.fieldsArr.Length;
-                        if (flag3)
-                        {
-                            base.Params.Output[i].NickName = this.fieldsArr[i].Name;
-                        }
-                        else
-                        {
-                            base.Params.Output[i].NickName = this.propertiesArr[i - this.fieldsArr.Length].Name;
-                        }
-                    }
+                    base.Params.Output[i + 1].NickName = this.fieldsArr[i].Name;
                 }
+                else
+                {
+                    base.Params.Output[i + 1].NickName = this.propertiesArr[i - this.fieldsArr.Length].Name;
+                }
+            }
+            for (int j = num; j < availableSlots; j++)
+            {
+                base.Params.Output[j + 1].NickName = "--";
             }
         }
 
@@ -282,116 +267,7 @@ namespace Alpaca4d.Gh
 
 
 
-    internal class DeconstructAnythingAttributes : GH_ComponentAttributes
-    {
-        public delegate void ResponderEvent(object o, EventArgs e);
-
-        private readonly GH_Component attributeOwner;
-
-        private Rectangle textRectangle;
-
-        private Rectangle buttonRectangle;
-
-        public string ButtonText
-        {
-            get;
-            set;
-        }
-
-        public LongShortString TextLine
-        {
-            get;
-            set;
-        }
-
-        public Font TextFont
-        {
-            get;
-            set;
-        }
-
-        public ResponderEvent ButtonResponder
-        {
-            get;
-            set;
-        }
-
-        public DeconstructAnythingAttributes(GH_Component owner) : base(owner)
-        {
-            this.attributeOwner = owner;
-            //this.TextLine = new LongShortString
-            //{
-            //    Long = "",
-            //    Short = ""
-            //};
-            this.TextFont = GH_FontServer.Standard;
-            this.ButtonText = "Deconstruct";
-        }
-
-        protected override void Layout()
-        {
-            base.Layout();
-            Rectangle r = GH_Convert.ToRectangle(this.Bounds);
-            r.Height += 16;
-            this.Bounds = r;
-            this.buttonRectangle = r;
-            this.buttonRectangle.Y = this.buttonRectangle.Bottom - 20;
-            this.buttonRectangle.Height = 20;
-            this.buttonRectangle.Inflate(-2, -2);
-            this.textRectangle = r;
-            this.textRectangle.Y = this.buttonRectangle.Bottom - 36;
-            this.textRectangle.Height = 16;
-        }
-
-        protected override void Render(GH_Canvas canvas, Graphics graphics, GH_CanvasChannel channel)
-        {
-            base.Render(canvas, graphics, channel);
-            bool flag = channel == GH_CanvasChannel.Objects;
-            if (flag)
-            {
-                GH_Capsule gH_Capsule = GH_Capsule.CreateTextCapsule(this.buttonRectangle, this.buttonRectangle, GH_Palette.Grey, this.ButtonText);
-                gH_Capsule.Render(graphics, this.Selected, this.attributeOwner.Locked, false);
-                gH_Capsule.Dispose();
-                StringFormat format = new StringFormat
-                {
-                    Alignment = StringAlignment.Center,
-                    LineAlignment = StringAlignment.Center,
-                    Trimming = StringTrimming.EllipsisCharacter
-                };
-                //bool flag2 = (float)GH_FontServer.StringWidth(this.TextLine.Long, this.TextFont) < this.Bounds.Width;
-                //if (flag2)
-                //{
-                //    graphics.DrawString(this.TextLine.Long, this.TextFont, Brushes.Black, this.textRectangle, format);
-                //}
-                //else
-                //{
-                //    graphics.DrawString(this.TextLine.Short, this.TextFont, Brushes.Black, this.textRectangle, format);
-                //}
-            }
-        }
-
-        public override GH_ObjectResponse RespondToMouseUp(GH_Canvas sender, GH_CanvasMouseEvent e)
-        {
-            bool flag = e.Button == MouseButtons.Left;
-            GH_ObjectResponse result;
-            if (flag)
-            {
-                bool flag2 = this.buttonRectangle.Contains(new System.Drawing.Point((int)e.CanvasLocation.X, (int)e.CanvasLocation.Y));
-                if (flag2)
-                {
-                    bool flag3 = this.ButtonResponder != null;
-                    if (flag3)
-                    {
-                        this.ButtonResponder(sender, e);
-                        result = GH_ObjectResponse.Handled;
-                        return result;
-                    }
-                }
-            }
-            result = base.RespondToMouseDown(sender, e);
-            return result;
-        }
-    }
+    // Removed custom button attributes: using default component attributes
 
 
 
