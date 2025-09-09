@@ -12,7 +12,6 @@ using Grasshopper.GUI.Canvas;
 using Grasshopper.Kernel.Attributes;
 
 
-
 namespace Alpaca4d.Gh
 {
     public class DeconstructAnything : GH_Component, IGH_VariableParameterComponent
@@ -23,7 +22,8 @@ namespace Alpaca4d.Gh
 
         private PropertyInfo[] propertiesArr;
 
-        
+        // Prevent stacking multiple scheduled parameter resizes
+        private bool isParameterResizeScheduled;
 
         protected override Bitmap Icon => Properties.Resources.Deconstruct__Alpaca4d_;
 
@@ -42,12 +42,6 @@ namespace Alpaca4d.Gh
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        
-
-        
-
-        
-
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("object", "object", "Object to explode", 0);
@@ -55,8 +49,7 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Object Class", "T", "Object Class", 0);
-            this.VariableParameterMaintenance();
+            // Start with no outputs; they will be added dynamically when input is provided
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -97,26 +90,43 @@ namespace Alpaca4d.Gh
                 this.fieldsArr = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField);
                 this.propertiesArr = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
                 // Auto-match outputs to fields + properties without requiring button click
-                int desiredOutputCount = this.fieldsArr.Length + this.propertiesArr.Length + 1;
+                int desiredOutputCount = this.fieldsArr.Length + this.propertiesArr.Length + 1; // +1 for class output
                 if (base.Params.Output.Count != desiredOutputCount)
                 {
-                    GH_Document doc = this.OnPingDocument();
-                    if (doc != null)
+                    if (!this.isParameterResizeScheduled)
                     {
-                        doc.ScheduleSolution(5, (d) =>
+                        GH_Document doc = this.OnPingDocument();
+                        if (doc != null)
                         {
-                            while (this.Params.Output.Count < desiredOutputCount)
+                            this.isParameterResizeScheduled = true;
+                            int targetCount = desiredOutputCount;
+                            doc.ScheduleSolution(1, (d) =>
                             {
-                                this.Params.RegisterOutputParam(new Param_GenericObject());
-                            }
-                            while (this.Params.Output.Count > desiredOutputCount)
-                            {
-                                this.Params.UnregisterOutputParameter(this.Params.Output[this.Params.Output.Count - 1]);
-                            }
-                            this.Params.OnParametersChanged();
-                            this.VariableParameterMaintenance();
-                            this.ExpireSolution(false);
-                        });
+                                try
+                                {
+                                    // Ensure the class output exists at index 0 first
+                                    if (this.Params.Output.Count == 0)
+                                    {
+                                        this.Params.RegisterOutputParam(new Param_GenericObject { NickName = "Object Class" });
+                                    }
+                                    while (this.Params.Output.Count < targetCount)
+                                    {
+                                        this.Params.RegisterOutputParam(new Param_GenericObject());
+                                    }
+                                    while (this.Params.Output.Count > targetCount)
+                                    {
+                                        this.Params.UnregisterOutputParameter(this.Params.Output[this.Params.Output.Count - 1]);
+                                    }
+                                    this.Params.OnParametersChanged();
+                                    this.VariableParameterMaintenance();
+                                    this.ExpireSolution(false);
+                                }
+                                finally
+                                {
+                                    this.isParameterResizeScheduled = false;
+                                }
+                            });
+                        }
                     }
                     return;
                 }
@@ -134,7 +144,16 @@ namespace Alpaca4d.Gh
                             {
                                 base.Params.Output[i + 1].NickName = this.fieldsArr[i].Name;
                             }
-                            DA.SetData(i + 1, this.fieldsArr[i].GetValue(obj));
+                            object fieldValue = this.fieldsArr[i].GetValue(obj);
+                            bool isEnumerableField = fieldValue is IEnumerable && !(fieldValue is string);
+                            if (isEnumerableField)
+                            {
+                                DA.SetDataList(i + 1, (IEnumerable)fieldValue);
+                            }
+                            else
+                            {
+                                DA.SetData(i + 1, fieldValue);
+                            }
                         }
                         catch
                         {
@@ -158,30 +177,31 @@ namespace Alpaca4d.Gh
                             }
                             else
                             {
-                                bool flag10 = type.Name.Contains("[]") && i == 3;
-                                if (flag10)
+                                PropertyInfo propertyInfo = this.propertiesArr[i - this.fieldsArr.Length];
+                                bool flag11 = propertyInfo.GetIndexParameters().Length == 0;
+                                if (flag11)
                                 {
-                                    DA.SetDataList(i + 1, (IEnumerable)obj);
-                                }
-                                else
-                                {
-                                    PropertyInfo propertyInfo = this.propertiesArr[i - this.fieldsArr.Length];
-                                    bool flag11 = propertyInfo.GetIndexParameters().Length == 0;
-                                    if (flag11)
+                                    object propertyValue = propertyInfo.GetValue(obj);
+                                    bool isEnumerableProp = propertyValue is IEnumerable && !(propertyValue is string);
+                                    if (isEnumerableProp)
                                     {
-                                        DA.SetData(i + 1, propertyInfo.GetValue(obj));
+                                        DA.SetDataList(i + 1, (IEnumerable)propertyValue);
                                     }
                                     else
                                     {
-                                        bool flag12 = obj is IEnumerable;
-                                        if (flag12)
-                                        {
-                                            DA.SetDataList(i + 1, (IEnumerable)obj);
-                                        }
-                                        else
-                                        {
-                                            DA.SetData(i + 1, obj);
-                                        }
+                                        DA.SetData(i + 1, propertyValue);
+                                    }
+                                }
+                                else
+                                {
+                                    bool flag12 = obj is IEnumerable;
+                                    if (flag12)
+                                    {
+                                        DA.SetDataList(i + 1, (IEnumerable)obj);
+                                    }
+                                    else
+                                    {
+                                        DA.SetData(i + 1, obj);
                                     }
                                 }
                             }
@@ -264,13 +284,6 @@ namespace Alpaca4d.Gh
         }
     }
 
-
-
-
-    // Removed custom button attributes: using default component attributes
-
-
-
     internal class LongShortString
     {
         public string Long
@@ -285,8 +298,4 @@ namespace Alpaca4d.Gh
             set;
         }
     }
-
-
-
-
 }
