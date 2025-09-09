@@ -3,8 +3,10 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Alpaca4d.Generic;
+using Grasshopper.Kernel.Types;
 
 namespace Alpaca4d.Gh
 {
@@ -26,7 +28,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddGenericParameter("Elements", "Elements", "", GH_ParamAccess.list);
             pManager.AddGenericParameter("Supports", "Supports", "", GH_ParamAccess.list);
-            pManager.AddGenericParameter("LoadPatterns", "LoadPatterns", "", GH_ParamAccess.list);
+            pManager.AddGenericParameter("LoadPatterns", "LoadPatterns", "Load patterns and/or mass loads (mixed allowed)", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Constraints", "Constraints", "", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -56,18 +58,45 @@ namespace Alpaca4d.Gh
             var support = new List<Alpaca4d.Element.Support>();
             var loadPattern = new List<Alpaca4d.Loads.LoadPattern>();
             var constraint = new List<Alpaca4d.Generic.IConstraint>();
+            var massLoad = new List<Alpaca4d.Loads.MassLoad>();
             var recorder = new List<Alpaca4d.Generic.IRecorder>();
             double tolerance = 0.01;
 
-
             if (!DA.GetDataList(0, element)) return;
             if (!DA.GetDataList(1, support)) return;
-            DA.GetDataList(2, loadPattern);
+
+            // Accept both LoadPattern and MassLoad in input 2
+            var rawLoads = new List<object>();
+            DA.GetDataList(2, rawLoads);
+            foreach (var raw in rawLoads)
+            {
+                object val = raw;
+                if (val is GH_ObjectWrapper wrapper)
+                {
+                    val = wrapper.Value;
+                }
+                if (val is Alpaca4d.Loads.LoadPattern lp)
+                {
+                    loadPattern.Add(lp);
+                }
+                else if (val is Alpaca4d.Loads.MassLoad ml)
+                {
+                    massLoad.Add(ml);
+                }
+                else if (val != null)
+                {
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Unsupported item at LoadPatterns input: {val.GetType().Name}");
+                    return;
+                }
+            }
             DA.GetDataList(3, constraint);
             DA.GetDataList(4, recorder);
             DA.GetData(5, ref tolerance);
 
+
             var model = new Model(element, support, loadPattern, constraint, recorder);
+            model.Mass = massLoad;
+
             model.Tollerance = tolerance;
             model.Assemble();
             
