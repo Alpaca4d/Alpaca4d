@@ -11,6 +11,7 @@
     <TargetExt>.gha</TargetExt>
     <BaseOutputPath></BaseOutputPath>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <!-- ==========================================
@@ -42,6 +43,23 @@
     <StartProgram>/Applications/Rhino 7.app/Contents/MacOS/Rhinoceros</StartProgram>
     <StartArguments></StartArguments>
     <StartAction>Program</StartAction>
+  </PropertyGroup>
+
+  <!-- ==========================================
+       VISUAL STUDIO LAUNCH PROFILES
+       ========================================== -->
+  <!-- Rhino 8 Launch Profile -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <StartProgram>C:\Program Files\Rhino 8\System\Rhino.exe</StartProgram>
+    <StartAction>Program</StartAction>
+    <StartArguments></StartArguments>
+  </PropertyGroup>
+
+  <!-- Alternative: Rhino 7 Launch Profile (can be selected manually) -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugRhino7|AnyCPU'">
+    <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
+    <StartAction>Program</StartAction>
+    <StartArguments></StartArguments>
   </PropertyGroup>
 
   <!-- ==========================================
@@ -407,15 +425,16 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Alpaca4d.Utils\data.bin" Link="data.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
   <!-- ==========================================
        CONTENT FILES
        ========================================== -->
   <ItemGroup>
-    <None Include="..\Alpaca4d.Utils\data.bin">
-      <Link>data.bin</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -452,9 +471,7 @@
   <!-- Run Alpaca4d.Utils to generate data.bin before building -->
   <Target Name="GenerateDataBin" BeforeTargets="PrepareForBuild">
     <!-- Build Alpaca4d.Utils first -->
-    <MSBuild Projects="$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" 
-             Targets="Build" 
-             Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
     
     <!-- Run the executable to generate data.bin - Cross-platform compatible -->
     <PropertyGroup>
@@ -463,15 +480,9 @@
     </PropertyGroup>
     
     <!-- On Windows, run directly; on macOS/Linux, use mono -->
-    <Exec Command="CreateLicense.exe" 
-          WorkingDirectory="$(UtilsWorkingDir)" 
-          ContinueOnError="false"
-          Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="CreateLicense.exe" WorkingDirectory="$(UtilsWorkingDir)" ContinueOnError="false" Condition="'$(OS)' == 'Windows_NT'" />
     
-    <Exec Command="mono CreateLicense.exe" 
-          WorkingDirectory="$(UtilsWorkingDir)" 
-          ContinueOnError="false"
-          Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="mono CreateLicense.exe" WorkingDirectory="$(UtilsWorkingDir)" ContinueOnError="false" Condition="'$(OS)' != 'Windows_NT'" />
   </Target>
   
   <Target Name="CopyToGrasshopperLibraries" AfterTargets="Build">

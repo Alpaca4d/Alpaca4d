@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Rhino 7 (.NET Framework)",
+      "type": "clr",
+      "request": "launch",
+      "program": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Launch Rhino 8 (.NET Framework)",
+      "type": "clr",
+      "request": "launch",
+      "program": "C:\\Program Files\\Rhino 8\\System\\Rhino.exe",
+      "args": ["/netfx"],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Launch Rhino 7 (.NET Core)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "C:\\Program Files\\Rhino 7\\System\\Rhino.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Launch Rhino 8 (.NET Core)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "C:\\Program Files\\Rhino 8\\System\\Rhino.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

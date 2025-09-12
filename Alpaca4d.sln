@@ -10,8 +10,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.Gh", "Alpaca4d.Gh\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca4d.Core", "Alpaca.Core\Alpaca4d.Core.csproj", "{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpaca4d.Test", "Alpaca4d.Test\Alpaca4d.Test.csproj", "{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpaca4d.Utils", "Alpaca4d.Utils\Alpaca4d.Utils.csproj", "{2650D2A7-5DBC-432A-B182-223DBCCA3639}"
 EndProject
 Global
@@ -28,10 +26,6 @@ Global
 		{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5BADCFA-479E-4E9C-8F17-1F4D77B4DEE2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04E429C5-A9C6-48FE-B1E1-68BAB4AAF9D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2650D2A7-5DBC-432A-B182-223DBCCA3639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2650D2A7-5DBC-432A-B182-223DBCCA3639}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2650D2A7-5DBC-432A-B182-223DBCCA3639}.Release|Any CPU.ActiveCfg = Release|Any CPU
