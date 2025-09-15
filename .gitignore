@@ -21,4 +21,5 @@ Alpaca4d.Test/bin/
 Alpaca4d.Utils/bin/
 Alpaca4d.Utils/bin/
 
-YAK/
+# Ignore only subfolders inside YAK (keep root files like manifest.yml, scripts, icon.png)
+YAK/*/

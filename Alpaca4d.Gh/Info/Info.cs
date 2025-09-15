@@ -17,7 +17,6 @@ namespace Alpaca4d.Gh
         public override Guid Id => new Guid("52A09029-AC68-4356-803D-724D05588549");
         public override string AuthorName => "Marco Pellegrino";
         public override string AuthorContact => "pellegrino.marco@icloud.com";
-
         public override string AssemblyVersion
         {
             get

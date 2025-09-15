@@ -46,23 +46,6 @@
   </PropertyGroup>
 
   <!-- ==========================================
-       VISUAL STUDIO LAUNCH PROFILES
-       ========================================== -->
-  <!-- Rhino 8 Launch Profile -->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <StartProgram>C:\Program Files\Rhino 8\System\Rhino.exe</StartProgram>
-    <StartAction>Program</StartAction>
-    <StartArguments></StartArguments>
-  </PropertyGroup>
-
-  <!-- Alternative: Rhino 7 Launch Profile (can be selected manually) -->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugRhino7|AnyCPU'">
-    <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
-    <StartAction>Program</StartAction>
-    <StartArguments></StartArguments>
-  </PropertyGroup>
-
-  <!-- ==========================================
        GRASSHOPPER LIBRARIES PATH
        ========================================== -->
   <PropertyGroup>
