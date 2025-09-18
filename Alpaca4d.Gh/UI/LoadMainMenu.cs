@@ -55,17 +55,11 @@ namespace Alpaca4d.Menu
         private static void PopulateSub(ToolStripMenuItem menuItem)
         {
             // Add Documentation
-            menuItem.DropDown.Items.Add("Documentation", null, 
+            menuItem.DropDown.Items.Add("Documentation", Alpaca4d.Gh.Properties.Resources.External_link_Alpaca4d_, 
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs"));
 
-            // Add Templates
-            // add a sub menu for a toolstripmenu item
-            ToolStripMenuItem subMenu = new ToolStripMenuItem("Examples");
-            subMenu.DropDown.Items.Add("Construct Model", null, (sender, e) => OpenGhFile(sender, e));
-            subMenu.DropDown.Items.Add("Analysis", null, (sender, e) => OpenGhFile(sender, e));
-            subMenu.DropDown.Items.Add("Results", null, (sender, e) => OpenGhFile(sender, e));
-
-            menuItem.DropDown.Items.Add(subMenu);
+            menuItem.DropDown.Items.Add("Examples", Alpaca4d.Gh.Properties.Resources.External_link_Alpaca4d_, 
+                (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/examples"));
 
             menuItem.DropDown.Items.Add(new ToolStripSeparator());
             //----------------------
@@ -83,7 +77,7 @@ namespace Alpaca4d.Menu
             subMenuHelp.DropDown.Items.Add("Help", null,
                 (sender, e) => OpenBrowser(sender, e, "https://github.com/Alpaca4d/Alpaca4d/issues/new"));
                 
-            menuItem.DropDown.Items.Add(subMenu);
+            menuItem.DropDown.Items.Add(subMenuHelp);
         }
 
         // create an event handler that opens up a sub-window
