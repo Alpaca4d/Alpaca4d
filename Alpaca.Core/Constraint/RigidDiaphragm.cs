@@ -12,7 +12,6 @@ namespace Alpaca4d.Constraints
 {
     public partial class RigidDiaphragm : EntityBase, IConstraint, IStructure, ISerialize
     {
-
         public int MasterNodeId { get; set; }
         public Rhino.Geometry.Point3d? MasterNode { get; set; } = new Point3d();
         public List<int> SlaveNodeId { get; set; }

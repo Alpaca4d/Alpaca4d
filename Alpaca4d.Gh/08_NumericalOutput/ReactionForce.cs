@@ -40,8 +40,8 @@ namespace Alpaca4d.Gh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.Register_GenericParam("SupportPosition", "SupportPosition", "");
-            pManager.Register_VectorParam("ReactionForce", "ReactionForce", "");
-            pManager.Register_VectorParam("ReactionMoment", "ReactionMoment", "");
+            pManager.Register_VectorParam("ReactionForce", "ReactionForce",$"[{Units.Force}]");
+            pManager.Register_VectorParam("ReactionMoment", "ReactionMoment", $"[{Units.Force}{Units.Length}]");
         }
 
         /// <summary>

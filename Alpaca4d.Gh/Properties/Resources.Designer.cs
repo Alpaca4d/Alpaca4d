@@ -453,6 +453,16 @@ namespace Alpaca4d.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap External_Link__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("External Link (Alpaca4d)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Fiber_Aggregated_Alpaca4d_ {
             get {
                 object obj = ResourceManager.GetObject("Fiber Aggregated(Alpaca4d)", resourceCulture);

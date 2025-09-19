@@ -39,12 +39,12 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("N", "N", "");
-            pManager.Register_GenericParam("Vy", "Vy", "");
-            pManager.Register_GenericParam("Vz", "Vz", "");
-            pManager.Register_GenericParam("Mx", "Mx", "");
-            pManager.Register_GenericParam("My", "My", "");
-            pManager.Register_GenericParam("Mz", "Mz", "");
+            pManager.Register_GenericParam("N", "N", $"[{Units.Force}]");
+            pManager.Register_GenericParam("Vy", "Vy", $"[{Units.Force}]");
+            pManager.Register_GenericParam("Vz", "Vz", $"[{Units.Force}]");
+            pManager.Register_GenericParam("Mx", "Mx", $"[{Units.Force}{Units.Length}]");
+            pManager.Register_GenericParam("My", "My", $"[{Units.Force}{Units.Length}]");
+            pManager.Register_GenericParam("Mz", "Mz", $"[{Units.Force}{Units.Length}]");
         }
 
         /// <summary>

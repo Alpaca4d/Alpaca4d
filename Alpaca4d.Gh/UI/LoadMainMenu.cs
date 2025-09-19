@@ -55,10 +55,10 @@ namespace Alpaca4d.Menu
         private static void PopulateSub(ToolStripMenuItem menuItem)
         {
             // Add Documentation
-            menuItem.DropDown.Items.Add("Documentation", Alpaca4d.Gh.Properties.Resources.External_link_Alpaca4d_, 
+            menuItem.DropDown.Items.Add("Documentation", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_, 
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs"));
 
-            menuItem.DropDown.Items.Add("Examples", Alpaca4d.Gh.Properties.Resources.External_link_Alpaca4d_, 
+            menuItem.DropDown.Items.Add("Examples", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_, 
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/examples"));
 
             menuItem.DropDown.Items.Add(new ToolStripSeparator());
@@ -73,11 +73,7 @@ namespace Alpaca4d.Menu
             menuItem.DropDown.Items.Add(subMenuLicense);
 
             // Add Help
-            ToolStripMenuItem subMenuHelp = new ToolStripMenuItem("Help");
-            subMenuHelp.DropDown.Items.Add("Help", null,
-                (sender, e) => OpenBrowser(sender, e, "https://github.com/Alpaca4d/Alpaca4d/issues/new"));
-                
-            menuItem.DropDown.Items.Add(subMenuHelp);
+            menuItem.DropDown.Items.Add("Help", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_,(sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/examples"));
         }
 
         // create an event handler that opens up a sub-window

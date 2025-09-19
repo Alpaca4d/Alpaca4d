@@ -41,11 +41,11 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_VectorParam("Displacement", "Displacement", "");
-            pManager.Register_VectorParam("Rotation", "Rotation", "");
+            pManager.Register_VectorParam("Displacement", "Displacement", $"[{Units.Length}]");
+            pManager.Register_VectorParam("Rotation", "Rotation", $"[{Units.Angle}]");
             pManager.Register_GenericParam("--------", "--------", "");
-            pManager.Register_VectorParam("Velocity", "Velocity", "");
-            pManager.Register_VectorParam("Acceleration", "Acceleration", "");
+            pManager.Register_VectorParam("Velocity", "Velocity", $"[{Units.Length}/{Units.Time}]");
+            pManager.Register_VectorParam("Acceleration", "Acceleration", $"[{Units.Length}/{Units.Time}²]");
         }
 
         /// <summary>

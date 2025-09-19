@@ -1,18 +1,18 @@
-﻿using Grasshopper;
-using Grasshopper.Kernel;
-using Rhino.Geometry;
-using Rhino;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-
-using System.Windows.Forms;
-using Microsoft.CSharp.RuntimeBinder;
-using Alpaca4d;
+﻿using Alpaca4d;
 using Alpaca4d.Generic;
 using Alpaca4d.License;
 using Eto.Forms;
+using GH_IO.Serialization;
+using Grasshopper;
+using Grasshopper.Kernel;
+using Microsoft.CSharp.RuntimeBinder;
+using Rhino;
+using Rhino.Geometry;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Alpaca4d.Gh
 {
@@ -33,6 +33,24 @@ namespace Alpaca4d.Gh
         }
 
         public bool _settings { get; set; }
+
+        public override bool Write(GH_IWriter writer)
+        {
+            // Save the version when this component was created
+            writer.SetBoolean("settings", _settings);
+            return base.Write(writer);
+        }
+
+        public override bool Read(GH_IReader reader)
+        {
+            // Read the version when this component was created
+            try
+            {
+                _settings = reader.GetBoolean("settings");
+            }
+            catch (NullReferenceException) { } // In case the info component was created before the VersionWhenFirstCreated was implemented.
+            return base.Read(reader);
+        }
 
         protected override void AppendAdditionalComponentMenuItems(System.Windows.Forms.ToolStripDropDown menu)
         {
