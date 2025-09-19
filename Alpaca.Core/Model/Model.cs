@@ -923,13 +923,6 @@ namespace Alpaca4d
                 this.Tcl.Add(item.WriteTcl());
             }
 
-            /////////
-            /// Loads
-            /////////
-
-            //item.Type == Alpaca4d.Loads.LoadType.Mass)
-            //        this.Mass.Add((Loads.MassLoad)item);
-
 
             foreach (var item in this.Mass)
             {
@@ -938,40 +931,6 @@ namespace Alpaca4d
             }
 
             this.addLoadPattern(this.LoadPatterns);
-
-            // Group by TimeSeries
-            //var totalLoads = myLoads.Concat(this.GravityPointLoad);
-
-            //var timeSeriesGroup = totalLoads.GroupBy(s => s.TimeSeries);
-
-            //foreach(var group in timeSeriesGroup)
-            //{
-            //    var timeSeries = group.Key;
-            //    if (timeSeries == null) { continue; }
-            //    timeSeries.Id = index;
-            //    var loadPattern = new Alpaca4d.Loads.LoadPattern(Alpaca4d.Loads.PatternType.Plain, timeSeries, group.ToList());
-            //    this.Tcl.Add(loadPattern.WriteTcl());
-            //}
-
-
-            #region UNIFORM EXCITATION
-            //var uniformExcitationLoads = this.Loads.OfType<Alpaca4d.Loads.UniformExcitation>().ToList();
-
-            //if (uniformExcitationLoads.Count > 1)
-            //{
-            //    throw new Exception("Only one UniformExcitation is allowed!");
-            //}
-            //else if (uniformExcitationLoads.Count == 1)
-            //{
-            //    var uniformExcitation = uniformExcitationLoads.FirstOrDefault();
-            //    uniformExcitation.TimeSeries.Id = index;
-
-            //    this.Tcl.Add(uniformExcitation.TimeSeries.WriteTcl());
-            //    this.Tcl.Add(uniformExcitation.WriteTcl());
-            //}
-            #endregion
-
-
         }
     }
 }
