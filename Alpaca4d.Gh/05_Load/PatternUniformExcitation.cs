@@ -1,0 +1,80 @@
+using Alpaca4d.UIWidgets;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Alpaca4d.Loads;
+using Alpaca4d.Generic;
+using Alpaca4d;
+
+namespace Alpaca4d.Gh
+{
+    internal class PatternUniformExcitation : SubComponent
+    {
+        public override string name() => "UniformExcitation";
+        public override string display_name() => "UniformExcitation";
+
+        public override void registerEvaluationUnits(EvaluationUnitManager mngr)
+        {
+            EvaluationUnit evaluationUnit = new EvaluationUnit(name(), display_name(), "Uniform Excitation Pattern");
+            evaluationUnit.Icon = Alpaca4d.Gh.Properties.Resources.Uniform_excitation;
+            mngr.RegisterUnit(evaluationUnit);
+
+            evaluationUnit.RegisterInputParam(new Param_String(), "Dof", "Dof", "Degree of freedom direction the ground motion acts\n" + 
+                "x : corresponds to translation along the global X axis\n" +
+                "y : corresponds to translation along the global Y axis\n" +
+                "z : corresponds to translation along the global Z axis\n" +
+                "xx : corresponds to rotation about the global X axis\n" +
+                "yy : corresponds to rotation about the global Y axis\n" +
+                "zz : corresponds to rotation about the global Z axis", GH_ParamAccess.item, new GH_String("X"));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;
+
+            evaluationUnit.RegisterInputParam(new Param_GenericObject(), "TimeSeries", "TimeSeries", "Time series for the excitation", GH_ParamAccess.item, new GH_ObjectWrapper(null));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "Velocity", "Velocity", $"The initial velocity [{Units.Length}/s]", GH_ParamAccess.item, new GH_Number(0));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "Factor", "Factor", "Constant factor", GH_ParamAccess.item, new GH_Number(1));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+        }
+
+        public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
+        {
+            msg = "";
+            level = GH_RuntimeMessageLevel.Warning;
+
+            string _direction = "X";
+            if (!DA.GetData(0, ref _direction))
+            {
+                msg = "Direction is required";
+                level = GH_RuntimeMessageLevel.Error;
+                return;
+            }
+
+            Alpaca4d.Generic.ITimeSeries timeSeries = null;
+            if (!DA.GetData(1, ref timeSeries))
+            {
+                msg = "TimeSeries is required";
+                level = GH_RuntimeMessageLevel.Error;
+                return;
+            }
+
+            double velocity = 0;
+            DA.GetData(2, ref velocity);
+
+            double factor = 1;
+            DA.GetData(3, ref factor);
+
+            var direction = (Alpaca4d.Loads.Direction)Enum.Parse(typeof(Alpaca4d.Loads.Direction), _direction, true);
+
+            var load = Alpaca4d.Loads.LoadPattern.CreateUniformExcitation(direction, timeSeries, velocity, factor);
+
+            DA.SetData(0, load);
+        }
+    }
+}

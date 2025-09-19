@@ -1,4 +1,4 @@
-﻿using Grasshopper;
+using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -7,16 +7,15 @@ using System.Collections.Generic;
 using Alpaca4d.TimeSeries;
 using Alpaca4d.Loads;
 using System.Linq;
-using Alpaca4d.Generic;
-using Alpaca4d.Core.Utils;
 
 namespace Alpaca4d.Gh
 {
-    public class PlainPattern : GH_Component
+    [Obsolete]
+    public class UniformExcitationPattern : GH_Component
     {
-        public PlainPattern()
-          : base("Load Pattern (Alpaca4d)", "Load Pattern",
-            "Construct a Load Pattern",
+        public UniformExcitationPattern()
+          : base("Uniform Excitation (Alpaca4d)", "Uniform Excitation",
+            "Construct a Uniform Excitation Load",
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
@@ -30,9 +29,16 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddTextParameter("Dof", "Dof", "Degree of freedom direction the ground motion acts\n" + 
+            "x : corresponds to translation along the global X axis\n" +
+            "y : corresponds to translation along the global Y axis\n" +
+            "z : corresponds to translation along the global Z axis\n" +
+            "xx : corresponds to rotation about the global X axis\n" +
+            "yy : corresponds to rotation about the global Y axis\n" +
+            "zz : corresponds to rotation about the global Z axis\n", GH_ParamAccess.item);
             pManager.AddGenericParameter("TimeSeries", "TimeSeries", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Velocity", "Velocity", $"The initial velocity [{Units.Length}/s]", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Loads", "Loads", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("Factor", "Factor", "Constant factor", GH_ParamAccess.item, 1);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
@@ -42,7 +48,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("LoadPattern", "", "");
+            pManager.Register_GenericParam("UniformExcitation", "UniformExcitation", "");
         }
 
         /// <summary>
@@ -52,16 +58,21 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Alpaca4d.Generic.ITimeSeries timeSeries = TimeSeries.Constant.Default();
-            DA.GetData(0, ref timeSeries);
+            string _direction = "X";
+            if (!DA.GetData(0, ref _direction)) return;
 
-            List<ILoad> loads = new List<ILoad>();
-            DA.GetDataList(1, loads);
+            Alpaca4d.Generic.ITimeSeries timeSeries = null;
+            if (!DA.GetData(1, ref timeSeries)) return;
+
+            double velocity = 0;
+            DA.GetData(2, ref velocity);
 
             double factor = 1;
-            DA.GetData(2, ref factor);
+            DA.GetData(3, ref factor);
 
-            var load = new Alpaca4d.Loads.LoadPattern(PatternType.Plain, timeSeries, loads, factor);
+            var direction = (Alpaca4d.Loads.Direction)Enum.Parse(typeof(Alpaca4d.Loads.Direction), _direction, true);
+
+            var load = Alpaca4d.Loads.LoadPattern.CreateUniformExcitation(direction, timeSeries, velocity, factor);
 
             DA.SetData(0, load);
         }
@@ -73,7 +84,7 @@ namespace Alpaca4d.Gh
         /// each of which can be combined with the GH_Exposure.obscure flag, which 
         /// ensures the component will only be visible on panel dropdowns.
         /// </summary>
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.
@@ -81,21 +92,21 @@ namespace Alpaca4d.Gh
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Load_pattern__Alpaca4d_;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Uniform_excitation;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("{E0A01D43-26F4-4506-B2F5-A9A33A0DDF59}");
+        public override Guid ComponentGuid => new Guid("{2064D9F5-EFCB-4D35-8389-3BEC2F87E413}");
 
         protected override void BeforeSolveInstance()
         {
-            List<string> patternType;
+            List<string> directions;
 
-            patternType = Enum.GetNames(typeof(Alpaca4d.Loads.PatternType)).ToList();
-            ValueListUtils.UpdateValueLists(this, 0, patternType, null);
+            directions = Enum.GetNames(typeof(Loads.Direction)).ToList();
+            ValueListUtils.UpdateValueLists(this, 0, directions, null);
         }
 
     }
