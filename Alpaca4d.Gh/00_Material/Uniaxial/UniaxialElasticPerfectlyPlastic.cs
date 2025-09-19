@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Alpaca4d.Gh
 {
-    internal class UniaxialElastic : SubComponent
+    internal class UniaxialElasticPerfectlyPlastic : SubComponent
     {
-        public override string name() => "UniaxialElastic";
-        public override string display_name() => "UniaxialElastic";
+        public override string name() => "ElasticPerfectlyPlastic";
+        public override string display_name() => "ElasticPerfectlyPlastic";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)
         {
@@ -25,19 +25,18 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_String(), "Material Name", "MatName", "", GH_ParamAccess.item, new GH_String(""));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "E", "E", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, new GH_Number(210000000));
+            // E, epsyP, epsyN=epsyP, eps0=0.0
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "E", "E", $"Young Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "Eneg", "Eneg", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, new GH_Number(210000000));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "epsyP", "epsyP", $"", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "Eta", "Eta", "", GH_ParamAccess.item, new GH_Number(0.0));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "epsyN", "epsyN", "", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, new GH_Number(90760000));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
-
-            evaluationUnit.RegisterInputParam(new Param_Number(), "v", "v", "", GH_ParamAccess.item, new GH_Number(0.3));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "eps0", "eps0", $"", GH_ParamAccess.item, new GH_Number(0));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_Number(), "Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item, new GH_Number(7850));
@@ -51,23 +50,14 @@ namespace Alpaca4d.Gh
 
             string matName = null;
             double e = 210000000;
-            double eNeg = 210000000;
-            double eta = 0.00;
-            double g = 90760000;
-            double v = 0.3;
-            double rho = 7850;
+
 
 
             DA.GetData(0, ref matName);
             DA.GetData(1, ref e);
-            DA.GetData(2, ref eNeg);
-            DA.GetData(3, ref eta);
-            DA.GetData(4, ref g);
-            DA.GetData(5, ref v);
-            DA.GetData(6, ref rho);
 
             //rho = rho * 9.81 / 1000;
-            var material = new Alpaca4d.Material.UniaxialMaterialElastic(matName, e, eNeg, eta, g, v, rho);
+            object material = null;
 
             DA.SetData(0, material);
         }

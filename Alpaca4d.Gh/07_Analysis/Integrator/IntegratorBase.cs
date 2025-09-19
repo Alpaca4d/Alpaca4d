@@ -1,10 +1,9 @@
-﻿using Alpaca4d.UIWidgets;
+using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Special;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
-using Alpaca4d.UIWidgets;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,22 +15,22 @@ using Alpaca4d.Gh;
 
 namespace Alpaca4d.Gh
 {
-    public class Uniaxial : GH_SwitcherComponent
+    public class IntegratorBase : GH_SwitcherComponent
     {
         private List<SubComponent> _subcomponents = new List<SubComponent>();
-        public override string UnitMenuName => "Uniaxial";
-        protected override string DefaultEvaluationUnit => _subcomponents[0].name();
-        public override Guid ComponentGuid => new Guid("{4F1E13F9-0B35-4F8F-A324-883CEA2F8777}");
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override string UnitMenuName => "Integrator";
+        protected override string DefaultEvaluationUnit => _subcomponents.Count > 0 ? _subcomponents[0].name() : "LoadControl";
+        public override Guid ComponentGuid => new Guid("{A5F2B8C3-D1E4-4F5A-B6C7-8D9E0F1A2B3C}");
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         protected override Bitmap Icon => null;
 
-        public Uniaxial()
-            : base("Uniaxial", "Uniaxial",
-              "",
-              "Alpaca4d", "00_Material")
+        public IntegratorBase()
+            : base("Integrator", "Integrator",
+              "Integrator Base Component",
+              "Alpaca4d", "07_Analysis")
         {
-            ((GH_Component)this).Hidden = true;
+            ((GH_Component)this).Hidden = false;
             this.Message = this.Category;
         }
 
@@ -41,13 +40,14 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.RegisterParam(new Param_GenericObject(), "Material", "Material", "Material");
+            pManager.RegisterParam(new Param_GenericObject(), "Integrator", "Integrator", "Integrator");
         }
 
         protected override void RegisterEvaluationUnits(EvaluationUnitManager mngr)
         {
-            _subcomponents.Add(new UniaxialElastic());
-            _subcomponents.Add(new UniaxialElasticPerfectlyPlastic());
+            _subcomponents.Add(new IntegratorLoadControl());
+            _subcomponents.Add(new IntegratorNewmark());
+            _subcomponents.Add(new IntegratorCentralDifference());
 
             foreach (SubComponent item in _subcomponents)
             {
@@ -100,7 +100,7 @@ namespace Alpaca4d.Gh
                     SwitchUnit(evaluationUnit);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

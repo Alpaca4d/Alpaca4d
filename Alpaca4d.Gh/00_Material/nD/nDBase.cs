@@ -22,7 +22,7 @@ namespace SimplexGh
         public override string UnitMenuName => "nD";
         protected override string DefaultEvaluationUnit => _subcomponents[0].name();
         public override Guid ComponentGuid => new Guid("{B40E1124-E203-4E1A-8962-2A6FB8D751A5}");
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
         protected override Bitmap Icon => null;
 
@@ -46,7 +46,8 @@ namespace SimplexGh
 
         protected override void RegisterEvaluationUnits(EvaluationUnitManager mngr)
         {
-            _subcomponents.Add();
+            _subcomponents.Add(new nDElasticIsotropic());
+            _subcomponents.Add(new nDElasticOrthotropic());
 
             foreach (SubComponent item in _subcomponents)
             {

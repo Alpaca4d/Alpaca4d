@@ -5,8 +5,10 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+
 namespace Alpaca4d.Gh
 {
+    [Obsolete]
     public class UniaxialMaterialElastic : GH_Component
     {
         public UniaxialMaterialElastic()
@@ -36,7 +38,7 @@ namespace Alpaca4d.Gh
             pManager.AddNumberParameter("Eta", "Eta", "", GH_ParamAccess.item, 0.0);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 80760000);
+            pManager.AddNumberParameter("G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 90760000);
             pManager[pManager.ParamCount - 1].Optional = true;
 
             pManager.AddNumberParameter("v", "v", "", GH_ParamAccess.item, 0.3);
@@ -66,7 +68,7 @@ namespace Alpaca4d.Gh
             double e = 210000000;
             double eNeg = 210000000;
             double eta = 0.00;
-            double g = 80760000;
+            double g = 90760000;
             double v = 0.3;
             double rho = 7850;
 
@@ -94,7 +96,7 @@ namespace Alpaca4d.Gh
         /// each of which can be combined with the GH_Exposure.obscure flag, which 
         /// ensures the component will only be visible on panel dropdowns.
         /// </summary>
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.

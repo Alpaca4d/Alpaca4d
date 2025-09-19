@@ -4,8 +4,11 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+
+
 namespace Alpaca4d.Gh
 {
+    [Obsolete]
     public class ElasticOrthotropicMaterial : GH_Component
     {
         public ElasticOrthotropicMaterial()
@@ -33,7 +36,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Gyz", "Gyz", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 90760000);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Gzx", "Gzx", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 80760000);
+            pManager.AddNumberParameter("Gzx", "Gzx", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, 90760000);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("vxy", "vxy", "", GH_ParamAccess.item, 0.3);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -94,7 +97,7 @@ namespace Alpaca4d.Gh
 
 
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Elastic_Orthotropic_Material__Alpaca4d_;

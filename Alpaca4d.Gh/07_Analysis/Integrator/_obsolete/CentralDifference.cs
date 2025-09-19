@@ -1,4 +1,4 @@
-﻿using Grasshopper;
+using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using Alpaca4d;
 using Alpaca4d.Generic;
 
+
 namespace Alpaca4d.Gh
 {
+    [Obsolete]
     public class CentralDifference : GH_Component
     {
         public CentralDifference()
@@ -29,7 +31,7 @@ namespace Alpaca4d.Gh
             pManager.Register_GenericParam("Integrator", "Integrator", "");
         }
 
-      
+
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             var integrator = Alpaca4d.Integrator.CentralDifference();
@@ -39,7 +41,7 @@ namespace Alpaca4d.Gh
 
 
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Central_Difference__Alpaca4d_;

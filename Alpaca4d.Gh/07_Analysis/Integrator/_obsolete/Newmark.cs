@@ -1,4 +1,4 @@
-﻿using Grasshopper;
+using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -9,6 +9,7 @@ using Alpaca4d.Generic;
 
 namespace Alpaca4d.Gh
 {
+    [Obsolete]
     public class Newmark : GH_Component
     {
         public Newmark()
@@ -58,9 +59,9 @@ namespace Alpaca4d.Gh
 
 
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.hidden;
 
-        
+
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Newmark_Integrator__Alpaca4d_;
 
 
