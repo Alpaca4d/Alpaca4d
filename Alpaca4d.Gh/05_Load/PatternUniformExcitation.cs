@@ -33,7 +33,7 @@ namespace Alpaca4d.Gh
                 "zz : corresponds to rotation about the global Z axis", GH_ParamAccess.item, new GH_String("X"));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;
 
-            evaluationUnit.RegisterInputParam(new Param_GenericObject(), "TimeSeries", "TimeSeries", "Time series for the excitation", GH_ParamAccess.item, new GH_ObjectWrapper(null));
+            evaluationUnit.RegisterInputParam(new Param_GenericObject(), "TimeSeries", "TimeSeries", "Time series for the excitation", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;
 
             evaluationUnit.RegisterInputParam(new Param_Number(), "Velocity", "Velocity", $"The initial velocity [{Units.Length}/s]", GH_ParamAccess.item, new GH_Number(0));
@@ -49,20 +49,10 @@ namespace Alpaca4d.Gh
             level = GH_RuntimeMessageLevel.Warning;
 
             string _direction = "X";
-            if (!DA.GetData(0, ref _direction))
-            {
-                msg = "Direction is required";
-                level = GH_RuntimeMessageLevel.Error;
-                return;
-            }
+            DA.GetData(0, ref _direction);
 
             Alpaca4d.Generic.ITimeSeries timeSeries = null;
-            if (!DA.GetData(1, ref timeSeries))
-            {
-                msg = "TimeSeries is required";
-                level = GH_RuntimeMessageLevel.Error;
-                return;
-            }
+            DA.GetData(1, ref timeSeries);
 
             double velocity = 0;
             DA.GetData(2, ref velocity);

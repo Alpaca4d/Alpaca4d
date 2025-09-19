@@ -26,7 +26,7 @@ namespace Alpaca4d.Gh
         protected override Bitmap Icon => null;
 
         public PatternBase()
-            : base("Pattern", "Pattern",
+            : base("Load Pattern (Alpaca4d)", "Pattern",
               "Pattern Base Component",
               "Alpaca4d", "05_Load")
         {

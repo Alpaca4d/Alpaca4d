@@ -1,119 +1,225 @@
-﻿using Grasshopper;
+using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Special;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-
-using Grasshopper.Kernel.Special;
+using System.Drawing;
 using System.Linq;
-using Alpaca4d;
-using Alpaca4d.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Alpaca4d.Gh;
 
 namespace Alpaca4d.Gh
 {
-    public class Test : GH_Component
+    public class TestBase : GH_SwitcherComponent
     {
-        public Test()
-          : base("Test (Alpaca4d)", "Test",
-            "",
-            "Alpaca4d", "07_Analysis")
+        private List<SubComponent> _subcomponents = new List<SubComponent>();
+        public override string UnitMenuName => "Test";
+        protected override string DefaultEvaluationUnit => _subcomponents.Count > 0 ? _subcomponents[0].name() : "EnergyIncr";
+        public override Guid ComponentGuid => new Guid("{F8A3B2C1-D4E5-4F6A-B7C8-9D0E1F2A3B4C}");
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
+
+        protected override Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Analysis_settings__Alpaca4d_;
+
+        public TestBase()
+            : base("Test (Alpaca4d)", "Test",
+              "Test Base Component",
+              "Alpaca4d", "07_Analysis")
         {
-            // Draw a Description Underneath the component
-            this.Message = $"Test (Alpaca4d)";
+            ((GH_Component)this).Hidden = false;
+            this.Message = this.Category;
         }
 
-
-        protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
+        protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("TestType", "TestType", "Connect a 'ValueList'\nNormUnbalance, NormDispIncr, EnergyIncr, RelativeNormUnbalance, RelativeNormDispIncr, RelativeTotalNormDispIncr, RelativeEnergyIncr, FixedNumIter", GH_ParamAccess.item, "EnergyIncr");
-            pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Tollerance", "Tollerance", "", GH_ParamAccess.item, 1e-8);
-            pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Iteration", "Iteration", "", GH_ParamAccess.item, 10);
-            pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Flag", "Flag", "0 - Nothing\n1 - EachTime\n2 - Successful\n4 - EachStep\n5 - ErrorMessage", GH_ParamAccess.item, 0);
-            pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Norm", "Norm", "0 - MaxNorm, 1 - OneNorm, 2 - TwoNorm", GH_ParamAccess.item, 2);
-            pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("MaxIncr", "MaxIncr", "", GH_ParamAccess.item);
-            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
-        /// <summary>
-        /// Registers all the output parameters for this component.
-        /// </summary>
-        protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
+        protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Test", "Test", "");
+            pManager.RegisterParam(new Param_GenericObject(), "Test", "Test", "Test");
         }
 
-        /// <summary>
-        /// This is the method that actually does the work.
-        /// </summary>
-        /// <param name="DA">The DA object can be used to retrieve data from input parameters and 
-        /// to store data in output parameters.</param>
-        protected override void SolveInstance(IGH_DataAccess DA)
+        protected override void RegisterEvaluationUnits(EvaluationUnitManager mngr)
         {
-            ///
-            var type = "EnergyIncr";
-            DA.GetData(0, ref type);
+            _subcomponents.Add(new TestEnergyIncr());
+            _subcomponents.Add(new TestNormUnbalance());
+            _subcomponents.Add(new TestNormDispIncr());
+            _subcomponents.Add(new TestRelativeNormUnbalance());
+            _subcomponents.Add(new TestRelativeNormDispIncr());
+            _subcomponents.Add(new TestRelativeTotalNormDispIncr());
+            _subcomponents.Add(new TestRelativeEnergyIncr());
+            _subcomponents.Add(new TestFixedNumIter());
 
-            var testType = (Alpaca4d.Test.TestType) Enum.Parse(typeof(Alpaca4d.Test.TestType), type, true);
+            foreach (SubComponent item in _subcomponents)
+            {
+                item.registerEvaluationUnits(mngr);
+            }
+        }
+
+        protected override void OnComponentLoaded()
+        {
+            base.OnComponentLoaded();
+            foreach (SubComponent item in _subcomponents)
+            {
+                item.OnComponentLoaded();
+            }
+        }
+
+        protected override void SolveInstance(IGH_DataAccess DA, EvaluationUnit unit)
+        {
+            if (unit == null)
+            {
+                return;
+            }
+            foreach (SubComponent item in _subcomponents)
+            {
+                if (unit.Name.Equals(item.name()))
+                {
+                    item.SolveInstance(DA, out var msg, out var level);
+                    if (msg != "")
+                    {
+                        ((GH_ActiveObject)this).AddRuntimeMessage(level, msg);
+                    }
+                    return;
+                }
+            }
+            throw new Exception("Invalid sub-component");
+        }
+        
+        public override void AppendAdditionalMenuItems(ToolStripDropDown menu)
+        {
+            base.AppendAdditionalMenuItems(menu);
+        }
+        
+        private void Menu_ActivateUnit(object sender, EventArgs e)
+        {
+            try
+            {
+                EvaluationUnit evaluationUnit = (EvaluationUnit)((ToolStripMenuItem)sender).Tag;
+                if (evaluationUnit != null)
+                {
+                    SwitchUnit(evaluationUnit);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+    }
+
+    // Base class for all test subcomponents to share common parameter registration
+    internal abstract class TestSubComponentBase : SubComponent
+    {
+        protected abstract Alpaca4d.Test.TestType TestType { get; }
+
+        public override void registerEvaluationUnits(EvaluationUnitManager mngr)
+        {
+            EvaluationUnit evaluationUnit = new EvaluationUnit(name(), display_name(), $"{TestType} Test");
+            evaluationUnit.Icon = Alpaca4d.Gh.Properties.Resources.Analysis_settings__Alpaca4d_;
+            mngr.RegisterUnit(evaluationUnit);
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "Tolerance", "Tol", "Convergence tolerance", GH_ParamAccess.item, new GH_Number(1e-8));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Iteration", "Iter", "Maximum number of iterations", GH_ParamAccess.item, new GH_Integer(10));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Flag", "Flag", "0 - Nothing\n1 - EachTime\n2 - Successful\n4 - EachStep\n5 - ErrorMessage", GH_ParamAccess.item, new GH_Integer(0));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Norm", "Norm", "0 - MaxNorm\n1 - OneNorm\n2 - TwoNorm", GH_ParamAccess.item, new GH_Integer(2));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "MaxIncr", "MaxIncr", "Maximum number of increments", GH_ParamAccess.item, new GH_Integer(2));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+        }
+
+        public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
+        {
+            msg = "";
+            level = GH_RuntimeMessageLevel.Warning;
 
             double tol = 1e-8;
-            DA.GetData(1, ref tol);
+            DA.GetData(0, ref tol);
 
             int iter = 10;
-            DA.GetData(2, ref iter);
+            DA.GetData(1, ref iter);
 
             int flag = 0;
-            DA.GetData(3, ref flag);
+            DA.GetData(2, ref flag);
             var flagEnum = (Alpaca4d.Test.FlagType)flag;
 
             int norm = 2;
-            DA.GetData(4, ref norm);
+            DA.GetData(3, ref norm);
             var normEnum = (Alpaca4d.Test.NormType)norm;
 
             int maxIncr = 2;
-            DA.GetData(5, ref maxIncr);
+            DA.GetData(4, ref maxIncr);
 
-            var test = new Alpaca4d.Test(testType, tol, iter, flagEnum, normEnum, maxIncr);
+            var test = new Alpaca4d.Test(TestType, tol, iter, flagEnum, normEnum, maxIncr);
 
-            // Finally assign the spiral to the output parameter.
             DA.SetData(0, test);
         }
+    }
 
-        protected override void BeforeSolveInstance()
-        {
-            List<string> resultTypes;
+    internal class TestEnergyIncr : TestSubComponentBase
+    {
+        public override string name() => "EnergyIncr";
+        public override string display_name() => "EnergyIncr";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.EnergyIncr;
+    }
 
-            resultTypes = Enum.GetNames(typeof(Alpaca4d.Test.TestType)).ToList();
-            ValueListUtils.UpdateValueLists(this, 0, resultTypes, null);
+    internal class TestNormUnbalance : TestSubComponentBase
+    {
+        public override string name() => "NormUnbalance";
+        public override string display_name() => "NormUnbalance";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.NormUnbalance;
+    }
 
-        }
+    internal class TestNormDispIncr : TestSubComponentBase
+    {
+        public override string name() => "NormDispIncr";
+        public override string display_name() => "NormDispIncr";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.NormDispIncr;
+    }
 
+    internal class TestRelativeNormUnbalance : TestSubComponentBase
+    {
+        public override string name() => "RelativeNormUnbalance";
+        public override string display_name() => "RelativeNormUnbalance";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.RelativeNormUnbalance;
+    }
 
-        /// <summary>
-        /// The Exposure property controls where in the panel a component icon 
-        /// will appear. There are seven possible locations (primary to septenary), 
-        /// each of which can be combined with the GH_Exposure.obscure flag, which 
-        /// ensures the component will only be visible on panel dropdowns.
-        /// </summary>
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+    internal class TestRelativeNormDispIncr : TestSubComponentBase
+    {
+        public override string name() => "RelativeNormDispIncr";
+        public override string display_name() => "RelativeNormDispIncr";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.RelativeNormDispIncr;
+    }
 
-        /// <summary>
-        /// Provides an Icon for every component that will be visible in the User Interface.
-        /// Icons need to be 24x24 pixels.
-        /// You can add image files to your project resources and access them like this:
-        /// return Resources.IconForThisComponent;
-        /// </summary>
-        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Analysis_settings__Alpaca4d_;
+    internal class TestRelativeTotalNormDispIncr : TestSubComponentBase
+    {
+        public override string name() => "RelativeTotalNormDispIncr";
+        public override string display_name() => "RelativeTotalNormDispIncr";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.RelativeTotalNormDispIncr;
+    }
 
-        /// <summary>
-        /// Each component must have a unique Guid to identify it. 
-        /// It is vital this Guid doesn't change otherwise old ghx files 
-        /// that use the old ID will partially fail during loading.
-        /// </summary>
-        public override Guid ComponentGuid => new Guid("{4D7EAFC1-A0FF-473D-BB04-03DA99F6B41C}");
+    internal class TestRelativeEnergyIncr : TestSubComponentBase
+    {
+        public override string name() => "RelativeEnergyIncr";
+        public override string display_name() => "RelativeEnergyIncr";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.RelativeEnergyIncr;
+    }
+
+    internal class TestFixedNumIter : TestSubComponentBase
+    {
+        public override string name() => "FixedNumIter";
+        public override string display_name() => "FixedNumIter";
+        protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.FixedNumIter;
     }
 }
