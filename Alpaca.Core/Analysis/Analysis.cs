@@ -124,6 +124,7 @@ namespace Alpaca4d
     {
         public TestType Type { get; set; }
         public double Tol { get; set; }
+        public double? TolR { get; set; }
         public int Iter { get; set; }
         public NormType Norm { get; set; } = NormType.TwoNorm;
         public FlagType Flag { get; set; } = FlagType.Nothing;
@@ -134,11 +135,13 @@ namespace Alpaca4d
             NormUnbalance,
             NormDispIncr,
             EnergyIncr,
+            NormDispAndUnbalance,
+            NormDispOrUnbalance,
             RelativeNormUnbalance,
             RelativeNormDispIncr,
             RelativeTotalNormDispIncr,
             RelativeEnergyIncr,
-            FixedNumIter
+            FixedNumIter,
         }
         public enum NormType
         {
@@ -190,9 +193,38 @@ namespace Alpaca4d
             test.MaxIncr = maxIncr;
             return test;
         }
+        public static Test NormDispAndUnbalance(double tolIncr = 1e-8, double tolR = 1e-8, int iter = 10, FlagType flag = FlagType.Nothing, NormType norm = NormType.TwoNorm, int? maxIncr = null)
+        {
+            var test = new Test();
+            test.Type = TestType.NormDispAndUnbalance;
+            test.Tol = tolIncr;
+            test.TolR = tolR;
+            test.Iter = iter;
+            test.Flag = flag;
+            test.Norm = norm;
+            test.MaxIncr = maxIncr;
+            return test;
+        }
+        public static Test NormDispOrUnbalance(double tolIncr = 1e-8, double tolR = 1e-8, int iter = 10, FlagType flag = FlagType.Nothing, NormType norm = NormType.TwoNorm, int? maxIncr = null)
+        {
+            var test = new Test();
+            test.Type = TestType.NormDispOrUnbalance;
+            test.Tol = tolIncr;
+            test.TolR = tolR;
+            test.Iter = iter;
+            test.Flag = flag;
+            test.Norm = norm;
+            test.MaxIncr = maxIncr;
+            return test;
+        }
+
+
         public string WriteTcl()
         {
-            return $"test {Type} {Tol} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
+            if (this.Type == TestType.NormDispAndUnbalance || this.Type == TestType.NormDispOrUnbalance)
+                return $"test {Type} {Tol} {TolR} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
+            else
+                return $"test {Type} {Tol} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
         }
 
     }

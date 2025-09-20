@@ -48,6 +48,8 @@ namespace Alpaca4d.Gh
             _subcomponents.Add(new TestEnergyIncr());
             _subcomponents.Add(new TestNormUnbalance());
             _subcomponents.Add(new TestNormDispIncr());
+            _subcomponents.Add(new TestNormDispAndUnbalance());
+            _subcomponents.Add(new TestNormDispOrUnbalance());
             _subcomponents.Add(new TestRelativeNormUnbalance());
             _subcomponents.Add(new TestRelativeNormDispIncr());
             _subcomponents.Add(new TestRelativeTotalNormDispIncr());
@@ -186,6 +188,128 @@ namespace Alpaca4d.Gh
         public override string name() => "NormDispIncr";
         public override string display_name() => "NormDispIncr";
         protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.NormDispIncr;
+    }
+
+    internal class TestNormDispAndUnbalance : SubComponent
+    {
+        public override string name() => "NormDispAndUnbalance";
+        public override string display_name() => "NormDispAndUnbalance";
+
+        public override void registerEvaluationUnits(EvaluationUnitManager mngr)
+        {
+            EvaluationUnit evaluationUnit = new EvaluationUnit(name(), display_name(), "NormDispAndUnbalance Test");
+            evaluationUnit.Icon = Alpaca4d.Gh.Properties.Resources.Analysis_settings__Alpaca4d_;
+            mngr.RegisterUnit(evaluationUnit);
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "TolIncr", "TolIncr", "Tolerance on displacement increment", GH_ParamAccess.item, new GH_Number(1e-8));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "TolR", "TolR", "Tolerance on residual force", GH_ParamAccess.item, new GH_Number(1e-8));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Iteration", "Iter", "Maximum number of iterations", GH_ParamAccess.item, new GH_Integer(10));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Flag", "Flag", "0 - Nothing\n1 - EachTime\n2 - Successful\n4 - EachStep\n5 - ErrorMessage", GH_ParamAccess.item, new GH_Integer(0));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Norm", "Norm", "0 - MaxNorm\n1 - OneNorm\n2 - TwoNorm", GH_ParamAccess.item, new GH_Integer(2));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "MaxIncr", "MaxIncr", "Maximum number of increments", GH_ParamAccess.item, new GH_Integer(2));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+        }
+
+        public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
+        {
+            msg = "";
+            level = GH_RuntimeMessageLevel.Warning;
+
+            double tolIncr = 1e-8;
+            DA.GetData(0, ref tolIncr);
+
+            double tolR = 1e-8;
+            DA.GetData(1, ref tolR);
+
+            int iter = 10;
+            DA.GetData(2, ref iter);
+
+            int flag = 0;
+            DA.GetData(3, ref flag);
+            var flagEnum = (Alpaca4d.Test.FlagType)flag;
+
+            int norm = 2;
+            DA.GetData(4, ref norm);
+            var normEnum = (Alpaca4d.Test.NormType)norm;
+
+            int maxIncr = 2;
+            DA.GetData(5, ref maxIncr);
+
+            var test = Alpaca4d.Test.NormDispAndUnbalance(tolIncr, tolR, iter, flagEnum, normEnum, maxIncr);
+
+            DA.SetData(0, test);
+        }
+    }
+
+    internal class TestNormDispOrUnbalance : SubComponent
+    {
+        public override string name() => "NormDispOrUnbalance";
+        public override string display_name() => "NormDispOrUnbalance";
+
+        public override void registerEvaluationUnits(EvaluationUnitManager mngr)
+        {
+            EvaluationUnit evaluationUnit = new EvaluationUnit(name(), display_name(), "NormDispOrUnbalance Test");
+            evaluationUnit.Icon = Alpaca4d.Gh.Properties.Resources.Analysis_settings__Alpaca4d_;
+            mngr.RegisterUnit(evaluationUnit);
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "TolIncr", "TolIncr", "Tolerance on displacement increment", GH_ParamAccess.item, new GH_Number(1e-8));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Number(), "TolR", "TolR", "Tolerance on residual force", GH_ParamAccess.item, new GH_Number(1e-8));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Iteration", "Iter", "Maximum number of iterations", GH_ParamAccess.item, new GH_Integer(10));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Flag", "Flag", "0 - Nothing\n1 - EachTime\n2 - Successful\n4 - EachStep\n5 - ErrorMessage", GH_ParamAccess.item, new GH_Integer(0));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "Norm", "Norm", "0 - MaxNorm\n1 - OneNorm\n2 - TwoNorm", GH_ParamAccess.item, new GH_Integer(2));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "MaxIncr", "MaxIncr", "Maximum number of increments", GH_ParamAccess.item, new GH_Integer(2));
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+        }
+
+        public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
+        {
+            msg = "";
+            level = GH_RuntimeMessageLevel.Warning;
+
+            double tolIncr = 1e-8;
+            DA.GetData(0, ref tolIncr);
+
+            double tolR = 1e-8;
+            DA.GetData(1, ref tolR);
+
+            int iter = 10;
+            DA.GetData(2, ref iter);
+
+            int flag = 0;
+            DA.GetData(3, ref flag);
+            var flagEnum = (Alpaca4d.Test.FlagType)flag;
+
+            int norm = 2;
+            DA.GetData(4, ref norm);
+            var normEnum = (Alpaca4d.Test.NormType)norm;
+
+            int maxIncr = 2;
+            DA.GetData(5, ref maxIncr);
+
+            var test = Alpaca4d.Test.NormDispOrUnbalance(tolIncr, tolR, iter, flagEnum, normEnum, maxIncr);
+
+            DA.SetData(0, test);
+        }
     }
 
     internal class TestRelativeNormUnbalance : TestSubComponentBase

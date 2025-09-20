@@ -37,7 +37,7 @@ namespace Alpaca4d.Gh
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Vibration Modes", "Vibration Modes", "", GH_ParamAccess.item, 1);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddTextParameter("Solver", "Solver", "Connect a 'ValueList'\n-genBandArpack \n-symmBandLapack \n-fullGenLapack", GH_ParamAccess.item, "-fullGenLapack");
+            pManager.AddTextParameter("Solver", "Solver", "Connect a 'ValueList'\n-genBandArpack \n-symmBandLapack \n-fullGenLapack", GH_ParamAccess.item, "-genBandArpack");
             pManager[pManager.ParamCount-1].Optional = true;
         }
 
