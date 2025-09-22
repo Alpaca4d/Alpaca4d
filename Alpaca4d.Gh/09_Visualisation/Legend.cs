@@ -41,7 +41,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddColourParameter("Colors", "C", "Legend colors (gradient steps)", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Position", "Pos", "0: Left, 1: Right, 2: Bottom Center", GH_ParamAccess.item, 2);
+            pManager.AddIntegerParameter("Position", "Pos", "0: Left, 1: Right, 2: Bottom Center", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Scale", "Scale", "Size scale factor", GH_ParamAccess.item, 1.5);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -171,9 +171,10 @@ namespace Alpaca4d.Gh
             else // Horizontal gradient (bottom center)
             {
                 int textHeightSmallPx = (int)Math.Round(textHeight / 1.4);
+                double startX = anchorX - 0.5 * _colors.Count * rectX;
                 for (int i = 0; i < _colors.Count; i++)
                 {
-                    int rx = (int)Math.Round(anchorX + i * rectX);
+                    int rx = (int)Math.Round(startX + i * rectX);
                     int ry = (int)Math.Round(anchorY);
                     int rw = (int)Math.Round(rectX);
                     int rh = (int)Math.Round(rectY);
@@ -182,18 +183,35 @@ namespace Alpaca4d.Gh
 
                     double value = _diff * (double)i / _range + _min;
                     string valueText = value.ToString("0.0", CultureInfo.InvariantCulture);
-                    var pt = new Point2d(anchorX - 1.0 / 1.6 * textHeight + i * rectX, anchorY + 3.0 / 1.2 * textHeight);
+                    var pt = new Point2d(startX - 1.0 / 1.6 * textHeight + i * rectX, anchorY + 3.0 / 1.2 * textHeight);
                     args.Display.Draw2dText(valueText, _black, pt, false, textHeightSmallPx, _fontFace);
                 }
 
                 // Max label at the end
                 {
                     int i = _colors.Count;
-                    var pt = new Point2d(anchorX - 1.0 / 1.2 * textHeight + i * rectX, anchorY + 3.0 / 1.2 * textHeight);
+                    var pt = new Point2d(startX - 1.0 / 1.2 * textHeight + i * rectX, anchorY + 3.0 / 1.2 * textHeight);
                     string maxText = _max.ToString("0.0", CultureInfo.InvariantCulture);
                     args.Display.Draw2dText(maxText, _black, pt, false, textHeightSmallPx, _fontFace);
                 }
             }
+        }
+
+        public override BoundingBox ClippingBox
+        {
+            get
+            {
+                return new BoundingBox(
+                    new Point3d(-1e9, -1e9, -1e9),
+                    new Point3d( 1e9,  1e9,  1e9)
+                );
+            }
+        }
+
+        protected override void BeforeSolveInstance()
+        {
+            List<string> resultTypes = new List<string> { "Left", "Right", "Bottom" };
+            ValueListUtils.UpdateValueLists(this, 3, resultTypes, null);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
