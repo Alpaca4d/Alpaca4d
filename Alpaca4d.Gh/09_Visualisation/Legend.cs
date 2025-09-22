@@ -13,6 +13,8 @@ namespace Alpaca4d.Gh
     {
         private List<Color> _colors = new List<Color>();
         private List<double> _data = new List<double>();
+        private readonly LegendConduit _conduit;
+        private bool _preview = true;
 
         // UI options / state
         private double _scale = 1.5;        // scale factor
@@ -26,11 +28,13 @@ namespace Alpaca4d.Gh
         private int _range = 0;             // colors.Count + 1
 
         public Legend()
-          : base("Legend (Alpaca4d)", "Legend",
+          : base("Legend\n(Alpaca4d)", "Legend",
             "Draw a fixed on-screen legend with colors and labels",
             "Alpaca4d", "09_Visualisation")
         {
             this.Message = $"{this.Name}";
+            _conduit = new LegendConduit();
+            _conduit.SetShouldDrawProvider(() => !this.Hidden && !this.Locked);
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
@@ -39,7 +43,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Data", "Data", "Numeric data to derive min/max labels", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddColourParameter("Colors", "C", "Legend colors (gradient steps)", GH_ParamAccess.list);
+            pManager.AddColourParameter("Colors", "Colors", "Legend colors (gradient steps)", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddIntegerParameter("Position", "Pos", "0: Left, 1: Right, 2: Bottom Center", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -96,105 +100,34 @@ namespace Alpaca4d.Gh
 
             _diff = _max - _min;
             _range = _colors.Count;
+
+            // Update conduit state and request a redraw
+            _conduit?.Update(
+                _title,
+                _colors,
+                _min,
+                _max,
+                _pos,
+                _scale,
+                _fontFace,
+                _black,
+                !this.Hidden && !this.Locked
+            );
+            Rhino.RhinoDoc.ActiveDoc?.Views?.Redraw();
         }
 
-        public override void DrawViewportWires(IGH_PreviewArgs args)
+        // DrawViewportWires is intentionally omitted; legend rendering is handled by a DisplayConduit in DrawForeground.
+
+        public override void AddedToDocument(GH_Document document)
         {
-            base.DrawViewportWires(args);
-            if (this.Hidden || this.Locked) return;
-            if (_colors.Count == 0) return;
+            base.AddedToDocument(document);
+            _conduit.Enabled = true;
+        }
 
-            // Determine viewport size
-            int left, right, bottom, top, near, far;
-            args.Viewport.GetScreenPort(out left, out right, out bottom, out top, out near, out far);
-            int width = right - left;
-            int height = bottom - top;
-
-            // Anchor position
-            double anchorX;
-            double anchorY = height * 0.075;
-            if (_pos == 0)
-            {
-                anchorX = width * 0.025;
-            }
-            else if (_pos == 1)
-            {
-                anchorX = width * (1.0 - 0.125);
-            }
-            else // _pos == 2
-            {
-                anchorX = width * 0.5;
-                anchorY = height * (1.0 - 0.125);
-            }
-
-            // Sizes
-            double rectX = 20.0 * _scale;
-            double rectY = 20.0 * _scale;
-            double textHeight = rectY * 0.6;
-            double titleHeight = rectY * 0.9;
-
-            // Title
-            int titleHeightPx = (int)Math.Round(titleHeight);
-            if (!string.IsNullOrWhiteSpace(_title))
-            {
-                var titlePt = new Point2d(anchorX, anchorY - 3.0 / 1.6 * textHeight);
-                args.Display.Draw2dText(_title, _black, titlePt, false, titleHeightPx, _fontFace);
-            }
-
-            // Vertical gradient (left/right)
-            if (_pos == 0 || _pos == 1)
-            {
-                int textHeightPx = (int)Math.Round(textHeight);
-                for (int i = 0; i < _colors.Count; i++)
-                {
-                    int rx = (int)Math.Round(anchorX);
-                    int ry = (int)Math.Round(anchorY + i * rectY);
-                    int rw = (int)Math.Round(rectX);
-                    int rh = (int)Math.Round(rectY);
-                    var rec2d = new Rectangle(rx, ry, rw, rh);
-                    args.Display.Draw2dRectangle(rec2d, _black, 3, _colors[i]);
-
-                    double value = _diff * (double)i / _range + _min;
-                    string valueText = value.ToString("0.0", CultureInfo.InvariantCulture);
-                    var pt = new Point2d(anchorX + 1.5 * rectX, anchorY - 1.0 / (1.6 * 2.0) * textHeight + i * rectY);
-                    args.Display.Draw2dText(valueText, _black, pt, false, textHeightPx, _fontFace);
-                }
-
-                // Max label at the end
-                {
-                    int i = _colors.Count;
-                    var pt = new Point2d(anchorX + 1.5 * rectX, anchorY - 1.0 / (1.6 * 2.0) * textHeight + i * rectY);
-                    string maxText = _max.ToString("0.0", CultureInfo.InvariantCulture);
-                    args.Display.Draw2dText(maxText, _black, pt, false, textHeightPx, _fontFace);
-                }
-            }
-            else // Horizontal gradient (bottom center)
-            {
-                int textHeightSmallPx = (int)Math.Round(textHeight / 1.4);
-                double startX = anchorX - 0.5 * _colors.Count * rectX;
-                for (int i = 0; i < _colors.Count; i++)
-                {
-                    int rx = (int)Math.Round(startX + i * rectX);
-                    int ry = (int)Math.Round(anchorY);
-                    int rw = (int)Math.Round(rectX);
-                    int rh = (int)Math.Round(rectY);
-                    var rec2d = new Rectangle(rx, ry, rw, rh);
-                    args.Display.Draw2dRectangle(rec2d, _black, 3, _colors[i]);
-
-                    double value = _diff * (double)i / _range + _min;
-                    string valueText = value.ToString("0.0", CultureInfo.InvariantCulture);
-                    var pt = new Point2d(startX - 1.0 / 1.6 * textHeight + i * rectX, anchorY + 3.0 / 1.2 * textHeight);
-                    args.Display.Draw2dText(valueText, _black, pt, false, textHeightSmallPx, _fontFace);
-                }
-
-                // Max label at the end
-                {
-                    int i = _colors.Count;
-                    var pt = new Point2d(startX - 1.0 / 1.2 * textHeight + i * rectX, anchorY + 3.0 / 1.2 * textHeight);
-                    string maxText = _max.ToString("0.0", CultureInfo.InvariantCulture);
-                    args.Display.Draw2dText(maxText, _black, pt, false, textHeightSmallPx, _fontFace);
-                }
-            }
+        public override void RemovedFromDocument(GH_Document document)
+        {
+            _conduit.Enabled = false;
+            base.RemovedFromDocument(document);
         }
 
         public override BoundingBox ClippingBox
@@ -211,14 +144,160 @@ namespace Alpaca4d.Gh
         protected override void BeforeSolveInstance()
         {
             List<string> resultTypes = new List<string> { "Left", "Right", "Bottom" };
-            ValueListUtils.UpdateValueLists(this, 3, resultTypes, null);
+            List<int> values = new List<int> { 0, 1, 2 };
+            ValueListUtils.UpdateValueLists(this, 3, resultTypes, values);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
         public override bool IsPreviewCapable => true;
         protected override Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Legend__Alpaca4d_;
         public override Guid ComponentGuid => new Guid("{A6B3B5C9-DB8D-4B6A-9E7E-63C6D2E2F9F5}");
+
+        private class LegendConduit : DisplayConduit
+        {
+            private string _title = string.Empty;
+            private List<Color> _colors = new List<Color>();
+            private double _min = -1.0;
+            private double _max = 1.0;
+            private int _pos = 2;
+            private double _scale = 1.5;
+            private string _fontFace = "Arial";
+            private Color _stroke = Color.Black;
+            private bool _shouldDraw = false;
+            private Func<bool> _shouldDrawProvider;
+
+            public void SetShouldDrawProvider(Func<bool> provider)
+            {
+                _shouldDrawProvider = provider;
+            }
+
+            public void Update(string title, List<Color> colors, double min, double max, int pos, double scale, string fontFace, Color stroke, bool shouldDraw)
+            {
+                _title = title ?? string.Empty;
+                _colors = colors != null ? new List<Color>(colors) : new List<Color>();
+                _min = min;
+                _max = max;
+                _pos = pos;
+                _scale = scale > 0 ? scale : 1.5;
+                _fontFace = string.IsNullOrWhiteSpace(fontFace) ? "Arial" : fontFace;
+                _stroke = stroke;
+                _shouldDraw = shouldDraw;
+            }
+
+            protected override void DrawForeground(DrawEventArgs e)
+            {
+                bool allow = _shouldDrawProvider != null ? _shouldDrawProvider() : _shouldDraw;
+                if (!allow) return;
+                if (_colors == null || _colors.Count == 0) return;
+
+                int left, right, bottom, top, near, far;
+                e.Viewport.GetScreenPort(out left, out right, out bottom, out top, out near, out far);
+                int width = right - left;
+                int height = bottom - top;
+
+                double anchorX;
+                double anchorY = height * 0.075;
+                if (_pos == 0)
+                {
+                    anchorX = width * 0.025;
+                }
+                else if (_pos == 1)
+                {
+                    anchorX = width * (1.0 - 0.075);
+                }
+                else
+                {
+                    anchorX = width * 0.5;
+                    anchorY = height * (1.0 - 0.075);
+                }
+
+                double baseUnit = 20.0 * _scale;
+                double rectX = (_pos == 2) ? baseUnit * 3.0 : baseUnit;
+                double rectY = (_pos == 2) ? baseUnit : baseUnit * 3.0;
+                double textHeight = (baseUnit * 2.0) * 0.6;
+                double titleHeight = (baseUnit * 2.0) * 0.9;
+
+                // Small positional nudges per request
+                if (_pos == 1)
+                {
+                    anchorX += rectX * 0.5; // move legend slightly right
+                }
+                else if (_pos == 2)
+                {
+                    anchorY += rectY * 0.5; // move legend slightly down
+                }
+
+
+                double diff = _max - _min;
+                int range = _colors.Count;
+
+                if (_pos == 0 || _pos == 1)
+                {
+                    int titleHeightPx = (int)Math.Round(titleHeight);
+                    if (!string.IsNullOrWhiteSpace(_title))
+                    {
+                        var titlePt = new Point2d(anchorX, anchorY - 3.0 / 1.6 * textHeight);
+                        e.Display.Draw2dText(_title, _stroke, titlePt, false, titleHeightPx, _fontFace);
+                    }
+
+
+                    int textHeightPx = (int)Math.Round(textHeight);
+                    for (int i = 0; i < _colors.Count; i++)
+                    {
+                        int rx = (int)Math.Round(anchorX);
+                        int ry = (int)Math.Round(anchorY + i * rectY);
+                        int rw = (int)Math.Round(rectX);
+                        int rh = (int)Math.Round(rectY);
+                        var rec2d = new Rectangle(rx, ry, rw, rh);
+                        e.Display.Draw2dRectangle(rec2d, _stroke, 2, _colors[i]);
+
+                        double value = diff * (double)i / range + _min;
+                        string valueText = value.ToString("0.00", CultureInfo.InvariantCulture);
+                        var pt = new Point2d(anchorX + 1.5 * rectX, anchorY - 1.0 / (1.6 * 2.0) * textHeight + i * rectY);
+                        e.Display.Draw2dText(valueText, _stroke, pt, false, textHeightPx, _fontFace);
+                    }
+
+                    {
+                        int i = _colors.Count;
+                        var pt = new Point2d(anchorX + 1.5 * rectX, anchorY - 1.0 / (1.6 * 2.0) * textHeight + i * rectY);
+                        string maxText = _max.ToString("0.00", CultureInfo.InvariantCulture);
+                        e.Display.Draw2dText(maxText, _stroke, pt, false, textHeightPx, _fontFace);
+                    }
+                }
+                else
+                {
+                    int titleHeightPx = (int)Math.Round(titleHeight);
+                    if (!string.IsNullOrWhiteSpace(_title))
+                    {
+                        var titlePt = new Point2d(anchorX, anchorY + 2.0 / 1.6 * textHeight);
+                        e.Display.Draw2dText(_title, _stroke, titlePt, false, titleHeightPx, _fontFace);
+                    }
+
+                    int textHeightPx = (int)Math.Round(textHeight);
+                    double startX = anchorX - 0.5 * _colors.Count * rectX;
+                    for (int i = 0; i < _colors.Count; i++)
+                    {
+                        int rx = (int)Math.Round(startX + i * rectX);
+                        int ry = (int)Math.Round(anchorY);
+                        int rw = (int)Math.Round(rectX);
+                        int rh = (int)Math.Round(rectY);
+                        var rec2d = new Rectangle(rx, ry, rw, rh);
+                        e.Display.Draw2dRectangle(rec2d, _stroke, 2, _colors[i]);
+
+                        double value = diff * (double)i / range + _min;
+                        string valueText = value.ToString("0.00", CultureInfo.InvariantCulture);
+                        var pt = new Point2d(startX - 1.0 / 1.6 * textHeight + i * rectX, anchorY - 1.5 * textHeight);
+                        e.Display.Draw2dText(valueText, _stroke, pt, false, textHeightPx, _fontFace);
+                    }
+
+                    {
+                        int i = _colors.Count;
+                        var pt = new Point2d(startX - 1.0 / 1.2 * textHeight + i * rectX, anchorY - 1.5 * textHeight);
+                        string maxText = _max.ToString("0.00", CultureInfo.InvariantCulture);
+                        e.Display.Draw2dText(maxText, _stroke, pt, false, textHeightPx, _fontFace);
+                    }
+                }
+            }
+        }
     }
 }
-
-
