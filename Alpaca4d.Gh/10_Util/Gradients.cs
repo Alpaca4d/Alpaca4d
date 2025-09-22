@@ -26,7 +26,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("GradientIndex", "Index", "gradIndex: An index refering to one of the following possible gradients: \n0 - Turbo\n1 - Viridis\n2 - Plasma\n3 - Inferno\n4 - Magma\n5 - Cool\n6 - Hot\n7 - Coolwarm\n8 - Spectral\n9 - Seismic\n10 - Batlow\n11 - Tokyo\n12 - Buda\n13 - Imola\n14 - Vik\n15 - Roma\n16 - Bam\n17 - Berlin", GH_ParamAccess.item, 2);
+            pManager.AddIntegerParameter("GradientIndex", "Index", "gradIndex: An index refering to one of the following possible gradients: \n0 - Turbo\n1 - Viridis\n2 - Plasma\n3 - Inferno\n4 - Magma\n5 - Cool\n6 - Hot\n7 - Coolwarm\n8 - Spectral\n9 - Seismic\n10 - Batlow\n11 - Tokyo\n12 - Buda\n13 - Imola\n14 - Vik\n15 - Roma\n16 - Bam\n17 - Berlin", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -45,7 +45,7 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int index = 1;
+            int index = 0;
 
             DA.GetData(0, ref index);
 

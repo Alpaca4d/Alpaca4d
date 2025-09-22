@@ -75,7 +75,7 @@ namespace Alpaca4d
         //    }
         //}
 
-        public static List<Color> Gradient(int index)
+        public static List<Color> Gradient(int index, int step = 10)
         {
             Dictionary<int, int[]> gradientDictionary = new Dictionary<int, int[]>
             {
@@ -106,6 +106,11 @@ namespace Alpaca4d
                 {
                     colors.Add(Color.FromArgb(gradient[i], gradient[i+1], gradient[i+2]));
                 }
+
+                colors = Enumerable.Range(0, step)      // 10 elements
+                    .Select(i => colors[i * 10])         // Pick index 0, 10, 20, ...
+                    .ToList();
+
                 return colors;
             }
             else

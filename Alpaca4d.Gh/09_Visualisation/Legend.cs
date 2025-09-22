@@ -70,16 +70,7 @@ namespace Alpaca4d.Gh
 
             if (_colors.Count == 0)
             {
-                _colors = new List<Color>
-                {
-                    Color.FromArgb(255,  51,  51),
-                    Color.FromArgb(255, 170,  51),
-                    Color.FromArgb(255, 255,  51),
-                    Color.FromArgb(170, 255, 125),
-                    Color.FromArgb( 51, 255, 231),
-                    Color.FromArgb( 51, 170, 255),
-                    Color.FromArgb( 51,  51, 255)
-                };
+                _colors = Alpaca4d.Colors.Gradient(0);
             }
 
             if (_data != null && _data.Count > 0)
@@ -190,109 +181,126 @@ namespace Alpaca4d.Gh
                 if (!allow) return;
                 if (_colors == null || _colors.Count == 0) return;
 
+                // Viewport dimensions
                 int left, right, bottom, top, near, far;
                 e.Viewport.GetScreenPort(out left, out right, out bottom, out top, out near, out far);
                 int width = right - left;
                 int height = bottom - top;
 
+                // Common constants and derived values
+                const double topBottomMarginFactor = 0.075;   // 7.5% from top/bottom
+                const double leftMarginFactor = 0.025;         // 2.5% from left
+                const double rightMarginFactor = 0.075;        // 7.5% from right
+                const int strokeThickness = 2;
+
+                double baseUnit = 15.0 * _scale;
+                double rectWidth = (_pos == 2) ? baseUnit * 3.5 : baseUnit;
+                double rectHeight = (_pos == 2) ? baseUnit : baseUnit * 3.5;
+                double textHeight = (baseUnit * 2.0) * 0.6;
+                double titleHeight = (baseUnit * 2.0) * 0.9;
+
+                int rectWidthPx = (int)Math.Round(rectWidth);
+                int rectHeightPx = (int)Math.Round(rectHeight);
+                int textHeightPx = (int)Math.Round(textHeight);
+                int titleHeightPx = (int)Math.Round(titleHeight);
+
+                // Label offsets (group repeated magic numbers)
+                double titleYOffsetVertical = -(3.0 / 1.6) * textHeight;
+                double labelYOffsetVertical = -(1.0 / (1.6 * 2.0)) * textHeight; // used for all vertical labels including max
+                double titleYOffsetHorizontal = (2.5 / 1.6) * textHeight;
+                double labelYOffsetHorizontal = -1.5 * textHeight;               // used for all horizontal labels
+                double labelXOffsetHorizontal = -(1.0 / 1.6) * textHeight;       // value labels
+                double labelXOffsetHorizontalMax = -(1.0 / 1.2) * textHeight;    // max label only
+
+                // Anchor position based on desired legend position
                 double anchorX;
-                double anchorY = height * 0.075;
+                double anchorY = height * topBottomMarginFactor;
                 if (_pos == 0)
                 {
-                    anchorX = width * 0.025;
+                    anchorX = width * leftMarginFactor;
                 }
                 else if (_pos == 1)
                 {
-                    anchorX = width * (1.0 - 0.075);
+                    anchorX = width * (1.0 - rightMarginFactor);
                 }
                 else
                 {
                     anchorX = width * 0.5;
-                    anchorY = height * (1.0 - 0.075);
+                    anchorY = height * (1.0 - topBottomMarginFactor);
                 }
-
-                double baseUnit = 20.0 * _scale;
-                double rectX = (_pos == 2) ? baseUnit * 3.0 : baseUnit;
-                double rectY = (_pos == 2) ? baseUnit : baseUnit * 3.0;
-                double textHeight = (baseUnit * 2.0) * 0.6;
-                double titleHeight = (baseUnit * 2.0) * 0.9;
 
                 // Small positional nudges per request
                 if (_pos == 1)
                 {
-                    anchorX += rectX * 0.5; // move legend slightly right
+                    anchorX += rectWidth * 0.5; // move legend slightly right
                 }
                 else if (_pos == 2)
                 {
-                    anchorY += rectY * 0.5; // move legend slightly down
+                    anchorY += rectHeight * 0.5; // move legend slightly down
                 }
 
-
+                // Data range
+                int colorCount = _colors.Count;
                 double diff = _max - _min;
-                int range = _colors.Count;
+                int range = colorCount;
 
                 if (_pos == 0 || _pos == 1)
                 {
-                    int titleHeightPx = (int)Math.Round(titleHeight);
+                    // Vertical layouts (left/right)
                     if (!string.IsNullOrWhiteSpace(_title))
                     {
-                        var titlePt = new Point2d(anchorX, anchorY - 3.0 / 1.6 * textHeight);
+                        var titlePt = new Point2d(anchorX, anchorY + titleYOffsetVertical);
                         e.Display.Draw2dText(_title, _stroke, titlePt, false, titleHeightPx, _fontFace);
                     }
 
-
-                    int textHeightPx = (int)Math.Round(textHeight);
-                    for (int i = 0; i < _colors.Count; i++)
+                    for (int i = 0; i < colorCount; i++)
                     {
                         int rx = (int)Math.Round(anchorX);
-                        int ry = (int)Math.Round(anchorY + i * rectY);
-                        int rw = (int)Math.Round(rectX);
-                        int rh = (int)Math.Round(rectY);
-                        var rec2d = new Rectangle(rx, ry, rw, rh);
-                        e.Display.Draw2dRectangle(rec2d, _stroke, 2, _colors[i]);
+                        int ry = (int)Math.Round(anchorY + i * rectHeight);
+                        var rec2d = new Rectangle(rx, ry, rectWidthPx, rectHeightPx);
+                        e.Display.Draw2dRectangle(rec2d, _stroke, strokeThickness, _colors[i]);
 
                         double value = diff * (double)i / range + _min;
                         string valueText = value.ToString("0.00", CultureInfo.InvariantCulture);
-                        var pt = new Point2d(anchorX + 1.5 * rectX, anchorY - 1.0 / (1.6 * 2.0) * textHeight + i * rectY);
+                        var pt = new Point2d(anchorX + 1.5 * rectWidth, anchorY + labelYOffsetVertical + i * rectHeight);
                         e.Display.Draw2dText(valueText, _stroke, pt, false, textHeightPx, _fontFace);
                     }
 
+                    // Max value label
                     {
-                        int i = _colors.Count;
-                        var pt = new Point2d(anchorX + 1.5 * rectX, anchorY - 1.0 / (1.6 * 2.0) * textHeight + i * rectY);
+                        int i = colorCount;
+                        var pt = new Point2d(anchorX + 1.5 * rectWidth, anchorY + labelYOffsetVertical + i * rectHeight);
                         string maxText = _max.ToString("0.00", CultureInfo.InvariantCulture);
                         e.Display.Draw2dText(maxText, _stroke, pt, false, textHeightPx, _fontFace);
                     }
                 }
                 else
                 {
-                    int titleHeightPx = (int)Math.Round(titleHeight);
+                    // Horizontal layout (bottom center)
                     if (!string.IsNullOrWhiteSpace(_title))
                     {
-                        var titlePt = new Point2d(anchorX, anchorY + 2.0 / 1.6 * textHeight);
+                        var titlePt = new Point2d(anchorX, anchorY + titleYOffsetHorizontal);
                         e.Display.Draw2dText(_title, _stroke, titlePt, false, titleHeightPx, _fontFace);
                     }
 
-                    int textHeightPx = (int)Math.Round(textHeight);
-                    double startX = anchorX - 0.5 * _colors.Count * rectX;
-                    for (int i = 0; i < _colors.Count; i++)
+                    double startX = anchorX - 0.5 * colorCount * rectWidth;
+                    for (int i = 0; i < colorCount; i++)
                     {
-                        int rx = (int)Math.Round(startX + i * rectX);
+                        int rx = (int)Math.Round(startX + i * rectWidth);
                         int ry = (int)Math.Round(anchorY);
-                        int rw = (int)Math.Round(rectX);
-                        int rh = (int)Math.Round(rectY);
-                        var rec2d = new Rectangle(rx, ry, rw, rh);
-                        e.Display.Draw2dRectangle(rec2d, _stroke, 2, _colors[i]);
+                        var rec2d = new Rectangle(rx, ry, rectWidthPx, rectHeightPx);
+                        e.Display.Draw2dRectangle(rec2d, _stroke, strokeThickness, _colors[i]);
 
                         double value = diff * (double)i / range + _min;
                         string valueText = value.ToString("0.00", CultureInfo.InvariantCulture);
-                        var pt = new Point2d(startX - 1.0 / 1.6 * textHeight + i * rectX, anchorY - 1.5 * textHeight);
+                        var pt = new Point2d(startX + labelXOffsetHorizontal + i * rectWidth, anchorY + labelYOffsetHorizontal);
                         e.Display.Draw2dText(valueText, _stroke, pt, false, textHeightPx, _fontFace);
                     }
 
+                    // Max value label
                     {
-                        int i = _colors.Count;
-                        var pt = new Point2d(startX - 1.0 / 1.2 * textHeight + i * rectX, anchorY - 1.5 * textHeight);
+                        int i = colorCount;
+                        var pt = new Point2d(startX + labelXOffsetHorizontalMax + i * rectWidth, anchorY + labelYOffsetHorizontal);
                         string maxText = _max.ToString("0.00", CultureInfo.InvariantCulture);
                         e.Display.Draw2dText(maxText, _stroke, pt, false, textHeightPx, _fontFace);
                     }
