@@ -73,7 +73,7 @@ namespace Alpaca4d.Menu
             menuItem.DropDown.Items.Add(subMenuLicense);
 
             // Add Help
-            menuItem.DropDown.Items.Add("Help", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_,(sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/examples"));
+            menuItem.DropDown.Items.Add("Help", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_,(sender, e) => OpenBrowser(sender, e, "https://github.com/Alpaca4d/Alpaca4d/issues/new"));
         }
 
         // create an event handler that opens up a sub-window

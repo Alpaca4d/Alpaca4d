@@ -27,7 +27,7 @@ namespace Alpaca4d.Gh
         protected override Bitmap Icon => null;
 
         public Uniaxial()
-            : base("Uniaxial", "Uniaxial",
+            : base(" Uniaxial", " Uniaxial",
               "",
               "Alpaca4d", "00_Material")
         {

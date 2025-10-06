@@ -1,11 +1,11 @@
-﻿using Grasshopper;
+﻿using Alpaca4d.TimeSeries;
+using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
-using Alpaca4d.TimeSeries;
 
 namespace Alpaca4d.Gh
 {
@@ -137,19 +137,27 @@ namespace Alpaca4d.Gh
             // Draw Point Fibers
             if(_loads == true)
             {
-                foreach(var pointLoad in _model.PointLoad)
+                var loadPatterns = _model.LoadPatterns.SelectMany(x => x.Load);
+
+                var pointLoads = loadPatterns.OfType<Alpaca4d.Loads.PointLoad>();
+                var meshLoads = loadPatterns.OfType<Alpaca4d.Loads.MeshLoad>();
+                var lineLoads = loadPatterns.OfType<Alpaca4d.Loads.LineLoad>();
+
+
+                foreach (var pointLoad in pointLoads)
                 {
                     var point = pointLoad.Pos;
                     var magnitude = pointLoad.Force * _loadsScale;
                     VisualisePointLoad(args, point, magnitude);
                 }
 
-                foreach (var pointLoad in _model.GravityPointLoad)
-                {
-                    var point = pointLoad.Pos;
-                    var magnitude = pointLoad.Force * _loadsScale;
-                    VisualisePointLoad(args, point, magnitude);
-                }
+                //foreach (var pointLoad in _model.GravityPointLoad)
+                //{
+                //    var point = pointLoad.Pos;
+                //    var magnitude = pointLoad.Force * _loadsScale;
+                //    VisualisePointLoad(args, point, magnitude);
+                //}
+
                 // visualise MeshLoad
                 foreach(var meshLoad in _model.MeshLoad)
                 {

@@ -111,7 +111,7 @@ namespace Alpaca4d
                 {
                     mass += pointMass.TransMass.Z;
                 }
-                return mass * 1000 / 9.81;
+                return mass;
             }
         }
 

@@ -52,7 +52,6 @@ namespace Alpaca4d.Gh
             double e = 210000000;
 
 
-
             DA.GetData(0, ref matName);
             DA.GetData(1, ref e);
 

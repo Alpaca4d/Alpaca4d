@@ -28,7 +28,7 @@ namespace Alpaca4d.Gh
         private int _range = 0;             // colors.Count + 1
 
         public Legend()
-          : base("Legend\n(Alpaca4d)", "Legend",
+          : base("Legend (Alpaca4d)", "Legend",
             "Draw a fixed on-screen legend with colors and labels",
             "Alpaca4d", "09_Visualisation")
         {
