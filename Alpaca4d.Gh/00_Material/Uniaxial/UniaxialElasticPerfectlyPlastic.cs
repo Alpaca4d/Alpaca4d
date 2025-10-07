@@ -45,20 +45,25 @@ namespace Alpaca4d.Gh
 
         public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
         {
-            msg = "";
+            msg = "UniaxialElasticPerfectlyPlastic not YET implemented";
             level = GH_RuntimeMessageLevel.Warning;
 
             string matName = null;
             double e = 210000000;
+            double epsyP = double.NaN;
+            double epsyN = double.NaN;
+            double eps0 = 0.0;
+            double rho = 7850.0;
 
 
             DA.GetData(0, ref matName);
             DA.GetData(1, ref e);
+            DA.GetData(2, ref epsyP);
+            DA.GetData(3, ref epsyN);
+            DA.GetData(4, ref eps0);
+            DA.GetData(5, ref rho);
 
-            //rho = rho * 9.81 / 1000;
-            object material = null;
-
-            DA.SetData(0, material);
+            return;
         }
 
     }

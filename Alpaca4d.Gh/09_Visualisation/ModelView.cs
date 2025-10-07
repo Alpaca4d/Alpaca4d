@@ -118,6 +118,9 @@ namespace Alpaca4d.Gh
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, _model);
             DA.SetDataList(1, _model.Tcl);
+
+            // Ensure viewport updates even if only preview content changed
+            Rhino.RhinoDoc.ActiveDoc?.Views?.Redraw();
         }
 
 
@@ -302,6 +305,19 @@ namespace Alpaca4d.Gh
 
             //args.Display.Draw2dText("Y", System.Drawing.Color.Black, center + yPos, true, 36);
             //args.Display.Draw2dText("Z", System.Drawing.Color.Black, center + zPos, true, 36);
+        }
+
+        public override bool IsPreviewCapable => true;
+
+        public override BoundingBox ClippingBox
+        {
+            get
+            {
+                return new BoundingBox(
+                    new Point3d(-1e9, -1e9, -1e9),
+                    new Point3d( 1e9,  1e9,  1e9)
+                );
+            }
         }
 
         private void VisualisePointLoad(IGH_PreviewArgs args, Point3d position, Vector3d magnitude)
