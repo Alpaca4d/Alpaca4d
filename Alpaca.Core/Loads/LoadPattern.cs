@@ -39,6 +39,7 @@ namespace Alpaca4d.Loads
         {
             this.PatternType = patternType;
             this.TimeSeries = timeSeries;
+            this.TimeSeries.Id = (int)Id;
             this.Load = load;
             this.Factor = factor;
         }
@@ -51,6 +52,8 @@ namespace Alpaca4d.Loads
             load.Velocity = velocity;
             load.Factor = factor;
             load.TimeSeries = timeSeries;
+            load.TimeSeries.Id = (int)load.Id;
+
 
             return load;
         }
@@ -61,7 +64,7 @@ namespace Alpaca4d.Loads
             tcl += this.TimeSeries.WriteTcl();
             if (PatternType == PatternType.Plain)
             {
-                tcl += $"pattern {PatternType} {Id} {TimeSeries.Id} {{\n";
+                tcl += $"pattern {PatternType} {Id} {TimeSeries.Id} -fact {Factor} {{\n";
                 foreach (var load in Load)
                 {
                     tcl += load.WriteTcl();
