@@ -24,6 +24,8 @@ namespace Alpaca4d.Element
 
         public Tetrahedron(Mesh mesh, IMultiDimensionMaterial material)
         {
+            if (mesh.Vertices.Count != 4)
+                throw new Exception("Mesh vertices must be 4!");
             this.Mesh = mesh;
             this.Material = material;
         }

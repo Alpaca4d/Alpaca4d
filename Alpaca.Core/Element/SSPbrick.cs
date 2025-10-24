@@ -9,7 +9,7 @@ using Rhino.Geometry;
 
 namespace Alpaca4d.Element
 {
-    public partial class SSPbrick : EntityBase, ISerialize, IBrick, IStructure
+    public partial class SSPbrick : ISerialize, IBrick, IStructure
     {
         public int? Id { get; set; }
         public Mesh Mesh { get; set; }
@@ -23,6 +23,8 @@ namespace Alpaca4d.Element
 
         public SSPbrick(Mesh mesh, IMultiDimensionMaterial material)
         {
+            if (mesh.Vertices.Count != 8)
+                throw new Exception("Mesh vertices must be 8!");
             this.Mesh = mesh;
             this.Material = material;
         }
@@ -52,7 +54,7 @@ namespace Alpaca4d.Element
             this.IndexNodes = closestIndexes;
         }
 
-        public override string WriteTcl()
+        public string WriteTcl()
         {
             string tcl = $"element SSPbrick {this.Id} {this.IndexNodes[0]} {this.IndexNodes[1]} {this.IndexNodes[2]} {this.IndexNodes[3]} {this.IndexNodes[4]} {this.IndexNodes[5]} {this.IndexNodes[6]} {this.IndexNodes[7]} {this.Material.Id} {this.BodyForce} {this.BodyForce} {this.BodyForce}\n";
             return tcl;
