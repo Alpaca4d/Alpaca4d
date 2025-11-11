@@ -39,14 +39,14 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Fx", "Fx", "");
-            pManager.Register_GenericParam("Fy", "Fy", "");
-            pManager.Register_GenericParam("Fxy", "Fxy", "");
-            pManager.Register_GenericParam("Mx", "Mx", "");
-            pManager.Register_GenericParam("My", "My", "");
-            pManager.Register_GenericParam("Mxy", "Mxy", "");
-            pManager.Register_GenericParam("Vxz", "Vxz", "");
-            pManager.Register_GenericParam("Vyz", "Vyz", "");
+            pManager.Register_GenericParam("pxx", "pxx", $"[{Units.Force}/{Units.Length}]");
+            pManager.Register_GenericParam("pyy", "pyy", $"[{Units.Force}/{Units.Length}]");
+            pManager.Register_GenericParam("pxy", "pxy", $"[{Units.Force}/{Units.Length}]");
+            pManager.Register_GenericParam("mxx", "mxx", $"[{Units.Force}{Units.Length}/{Units.Length}]");
+            pManager.Register_GenericParam("myy", "myy", $"[{Units.Force}{Units.Length}/{Units.Length}]");
+            pManager.Register_GenericParam("mxy", "mxy", $"[{Units.Force}{Units.Length}/{Units.Length}]");
+            pManager.Register_GenericParam("vxz", "vxz", $"[{Units.Force}/{Units.Length}]");
+            pManager.Register_GenericParam("vyz", "vyz", $"[{Units.Force}/{Units.Length}]");
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
 
-        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.meshForces;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.shellStress;
 
         public override Guid ComponentGuid => new Guid("{8A27E0D6-4D39-417E-A9E9-202AB291CE01}");
     }

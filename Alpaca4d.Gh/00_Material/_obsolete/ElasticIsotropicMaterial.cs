@@ -52,7 +52,7 @@ namespace Alpaca4d.Gh
         {
             string matName = null;
             double e = 210000000;
-            double g = 90760000;
+            double g = 80760000;
             double v = 0.3;
             double rho = 7850;
 

@@ -52,7 +52,7 @@ namespace Alpaca4d.Gh
             string secName = "";
             double thickness = 0.15;
 
-            IMultiDimensionMaterial material = new Alpaca4d.Material.ElasticIsotropicMaterial(null, 210000000, 90760000, 0.3, 78.50);
+            IMultiDimensionMaterial material = new Alpaca4d.Material.ElasticIsotropicMaterial(null, 210000000, 90760000, 0.3, 7850);
 
 
             DA.GetData(0, ref secName);

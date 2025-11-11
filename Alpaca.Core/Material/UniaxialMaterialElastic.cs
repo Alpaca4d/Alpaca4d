@@ -30,7 +30,7 @@ namespace Alpaca4d.Material
                 double eta = 0.00;
                 double g = 90760000;
                 double v = 0.3;
-                double rho = 78.50;
+                double rho = 7850;
                 return new UniaxialMaterialElastic(null, e, eNeg, eta, g, v, rho);
             }
         }
