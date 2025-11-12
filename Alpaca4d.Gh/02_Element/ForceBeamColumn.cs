@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using Alpaca4d.Generic;
 using Alpaca4d;
+using static Alpaca4d.Gh.ComponentMessage;
 
 namespace Alpaca4d.Gh
 {
@@ -24,7 +25,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "02_Element")
         {
             // Draw a Description Underneath the component
-            this.Message = $"{this.NickName} \n{this.Category}";
+			this.Message = MyMessage(this);
         }
 
         /// <summary>

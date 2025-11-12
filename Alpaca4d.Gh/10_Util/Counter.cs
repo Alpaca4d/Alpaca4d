@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
             "Timer-based counter",
             "Alpaca4d", "10_Utility")
         {
-            this.Message = this.Name;
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

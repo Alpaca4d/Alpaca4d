@@ -32,7 +32,7 @@ namespace SimplexGh
               "Alpaca4d", "00_Material")
         {
             ((GH_Component)this).Hidden = true;
-            this.Message = this.Category;
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)

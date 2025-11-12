@@ -15,7 +15,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "10_Utility")
         {
             // Draw a Description Underneath the component
-            this.Message = "Mesh Loft (Alpaca4d)";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <inheritdoc />

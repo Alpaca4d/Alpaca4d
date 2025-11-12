@@ -18,7 +18,7 @@
 //            "Alpaca4d", "08_NumericalOutput")
 //        {
 //            // Draw a Description Underneath the component
-//            this.Message = "Shell Stresses\n(Alpaca4d)";
+//            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
 //        }
 
 //        /// <summary>

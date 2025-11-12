@@ -16,7 +16,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", " Info")
         {
             // Draw a Description Underneath the component
-            this.Message = $"{this.NickName}\n{"Alpaca4d"}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

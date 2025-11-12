@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using Alpaca4d.TimeSeries;
+using static Alpaca4d.Gh.ComponentMessage;
 
 namespace Alpaca4d.Gh
 {
@@ -16,7 +17,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
-            this.Message = $"Linear Load (Alpaca4d)";
+            this.Message = MyMessage(this);
         }
 
         /// <summary>

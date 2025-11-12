@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
             "Construct an ReinforcingSteel",
             "Alpaca4d", "MomentCurvature_βeta")
         {
-            this.Message = $"{this.Name}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

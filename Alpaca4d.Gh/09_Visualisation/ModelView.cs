@@ -32,7 +32,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "09_Visualisation")
         {
             // Draw a Description Underneath the component
-            this.Message = $"{this.Name}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

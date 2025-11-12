@@ -17,7 +17,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "02_Element")
         {
             // Draw a Description Underneath the component
-            this.Message = $"SSP Brick (Alpaca4d)";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "01_Section")
         {
             // Draw a Description Underneath the component
-            this.Message = $"Plate Fiber Section\n(Alpaca4d";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

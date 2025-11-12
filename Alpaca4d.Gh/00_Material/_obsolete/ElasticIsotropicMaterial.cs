@@ -15,7 +15,7 @@ namespace Alpaca4d.Gh
             "Construct an ElasticIsotropicMaterial",
             "Alpaca4d", "00_Material")
         {
-            this.Message = "ElasticIsotropicMaterial\n(Alpaca4d)";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

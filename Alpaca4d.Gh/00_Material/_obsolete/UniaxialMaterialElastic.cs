@@ -16,7 +16,7 @@ namespace Alpaca4d.Gh
             "Construct an UniaxialMaterialElastic",
             "Alpaca4d", "00_Material")
         {
-            this.Message = $"{this.NickName} \n{this.Category}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         public override IEnumerable<string> Keywords => new string[] { "ume" };

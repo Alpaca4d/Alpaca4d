@@ -8,6 +8,7 @@ using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using static Alpaca4d.Gh.ComponentMessage;
 
 namespace Alpaca4d.Gh
 {
@@ -71,8 +72,10 @@ namespace Alpaca4d.Gh
 			: base("Material Preset (Elastic)", "MatPresetE",
 			  "Select a material type and grade to create an Elastic Isotropic Material",
 			  "Alpaca4d", "00_Material")
-		{
-		}
+        {
+            // Draw a Description Underneath the component
+            this.Message = MyMessage(this);
+        }
 
 		protected override void RegisterInputParams(GH_InputParamManager pManager)
 		{

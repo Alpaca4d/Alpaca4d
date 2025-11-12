@@ -37,7 +37,7 @@ namespace Alpaca4d.Gh
 
         public DeconstructAnything() : base("Deconstruct (Alpaca4d)", "Deconstruct", "Deconstruct any object", "Alpaca4d", "10_Utility")
         {
-            this.Message = $"{this.NickName} \n{this.Category}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;

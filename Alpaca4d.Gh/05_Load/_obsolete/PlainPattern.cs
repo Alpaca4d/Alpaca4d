@@ -21,7 +21,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
-            this.Message = $"{this.NickName} \n{this.Category}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// pattern UniformExcitation $patternTag $dir -accel $tsTag <-vel0 $vel0> <-fact $cFactor>

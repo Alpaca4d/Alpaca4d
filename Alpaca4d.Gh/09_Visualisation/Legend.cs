@@ -32,7 +32,7 @@ namespace Alpaca4d.Gh
             "Draw a fixed on-screen legend with colors and labels",
             "Alpaca4d", "09_Visualisation")
         {
-            this.Message = $"{this.Name}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
             _conduit = new LegendConduit();
             _conduit.SetShouldDrawProvider(() => !this.Hidden && !this.Locked);
         }

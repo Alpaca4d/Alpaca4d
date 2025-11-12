@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
             "Construct a concrete material with Zero Tensile Strength (Conrete01)",
             "Alpaca4d", "MomentCurvature_βeta")
         {
-            this.Message = $"{this.Name}";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

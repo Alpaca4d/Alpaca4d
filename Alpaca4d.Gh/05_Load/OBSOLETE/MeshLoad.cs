@@ -17,7 +17,7 @@ namespace Alpaca4d.Gh
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
-            this.Message = $"Mesh Load (Alpaca4d)";
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         /// <summary>

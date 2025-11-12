@@ -31,7 +31,7 @@ namespace Alpaca4d.Gh
               "Alpaca4d", "07_Analysis")
         {
             ((GH_Component)this).Hidden = false;
-            this.Message = this.Category;
+            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
