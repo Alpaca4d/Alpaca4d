@@ -1,0 +1,9 @@
+{ 
+    "C25_30":              {"fc_k":25,"fcu_k":30,"epsilon_co":0.002,"epsilon_cu":0.0035,"rho_k":2500,"rho_mean":2500,"E_mean":30000, "E0_05":25000,"G_mean":15000,"material_type": "Concrete"},
+    "C28_35":              {"fc_k":28,"fcu_k":35,"epsilon_co":0.002,"epsilon_cu":0.0035,"rho_k":2500,"rho_mean":2500,"E_mean":32000, "E0_05":28000,"G_mean":16000,"material_type": "Concrete"},
+    "C30_37":              {"fc_k":30,"fcu_k":37,"epsilon_co":0.002,"epsilon_cu":0.0035,"rho_k":2500,"rho_mean":2500,"E_mean":30000, "E0_05":28000,"G_mean":16000,"material_type": "Concrete"},
+    "C32_40":              {"fc_k":32,"fcu_k":40,"epsilon_co":0.002,"epsilon_cu":0.0035,"rho_k":2500,"rho_mean":2500,"E_mean":32000, "E0_05":28000,"G_mean":16000,"material_type": "Concrete"},
+    "C35_45":              {"fc_k":35,"fcu_k":45,"epsilon_co":0.002,"epsilon_cu":0.0035,"rho_k":2500,"rho_mean":2500,"E_mean":35000, "E0_05":28000,"G_mean":16000,"material_type": "Concrete"},
+    "C40_50":              {"fc_k":40,"fcu_k":50,"epsilon_co":0.002,"epsilon_cu":0.0035,"rho_k":2500,"rho_mean":2500,"E_mean":40000, "E0_05":28000,"G_mean":16000,"material_type": "Concrete"}
+}
+

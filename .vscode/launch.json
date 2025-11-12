@@ -42,6 +42,17 @@
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "stopAtEntry": false
-    }
+    },
+    // launch a .NET Core application for macos
+    {
+      "name": "Launch Rhino 8 (.NET Core) - macOS",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "/Applications/Rhino 8.app/Contents/MacOS/Rhinoceros",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
   ]
 }

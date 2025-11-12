@@ -188,7 +188,10 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="Resources\Material\steel_material.json" />
+    <EmbeddedResource Include="Resources\Material\steel_properties.json" />
+    <EmbeddedResource Include="Resources\Material\concrete_properties.json" />
+    <EmbeddedResource Include="Resources\Material\timber_properties.json" />
+    <EmbeddedResource Include="Resources\Material\plastic_properties.json" />
     <EmbeddedResource Include="Resources\Section\steel_section.json" />
   </ItemGroup>
   <ItemGroup />

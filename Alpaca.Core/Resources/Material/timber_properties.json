@@ -8,3 +8,4 @@
     "C22":              {"fm_k":22.0,"fv_k":3.80,"fc_0_k":20.0,"fc_90_k":2.4,"ft_0_k":13.0,"ft_90_k":0.40,"rho_k":340,"rho_mean":410,"E_mean":10000,"E0_05":6700,"G_mean":630,"type":"Solid_Timber","material_type": "Timber"},
     "C24":              {"fm_k":24.0,"fv_k":4.00,"fc_0_k":21.0,"fc_90_k":2.5,"ft_0_k":14.5,"ft_90_k":0.40,"rho_k":350,"rho_mean":410,"E_mean":10500,"E0_05":7400,"G_mean":690,"type":"Solid_Timber","material_type": "Timber"}
 }
+

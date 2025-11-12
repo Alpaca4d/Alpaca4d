@@ -1,0 +1,15 @@
+{
+    "PVC":    {"rho":1380, "E": 3000000, "G": 1500000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "HDPE":   {"rho":950, "E": 1000000, "G": 500000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PE":     {"rho":1100, "E": 3000000, "G": 1500000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PP":     {"rho":900, "E": 2000000, "G": 1000000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PS":     {"rho":1050, "E": 2500000, "G": 1250000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PET":    {"rho":1400, "E": 2800000, "G": 1400000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PC":     {"rho":1200, "E": 2400000, "G": 1200000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PLA":    {"rho":1250, "E": 2500000, "G": 1250000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PVA":    {"rho":1000, "E": 2000000, "G": 1000000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PTFE":   {"rho":2200, "E": 3000000, "G": 1500000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PEEK":   {"rho":1300, "E": 3500000, "G": 1750000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"},
+    "PVDF":   {"rho":1300, "E": 3500000, "G": 1750000,"epsilon_yield":0.015 ,"epsilon_max_Stress": 0.11, "strainAtRupture": 0.17, "material_type": "Plastic"}
+}
+
