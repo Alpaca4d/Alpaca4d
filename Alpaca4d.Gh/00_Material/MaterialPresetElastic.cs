@@ -14,6 +14,7 @@ namespace Alpaca4d.Gh
 {
 	public class MaterialPresetElastic : GH_ExtendableComponent
 	{
+		private MenuDropDown modelDrop;
 		private MenuDropDown typeDrop;
 		private MenuDropDown gradeDrop;
 
@@ -69,8 +70,8 @@ namespace Alpaca4d.Gh
 		protected override Bitmap Icon => null;
 
 		public MaterialPresetElastic()
-			: base("Material Preset (Elastic)", "MatPresetE",
-			  "Select a material type and grade to create an Elastic Isotropic Material",
+			: base("Material Library (Elastic)", "Library",
+			  "Select a material type and grade to create an Elastic Material",
 			  "Alpaca4d", "00_Material")
         {
             // Draw a Description Underneath the component
@@ -83,32 +84,39 @@ namespace Alpaca4d.Gh
 
 		protected override void RegisterOutputParams(GH_OutputParamManager pManager)
 		{
-			pManager.RegisterParam(new Param_GenericObject(), "Material", "Material", "Elastic Isotropic Material");
+			pManager.RegisterParam(new Param_GenericObject(), "Material", "Material", "Material");
 		}
 
 		protected override void Setup(GH_ExtendableComponentAttributes attr)
 		{
-			var menu = new GH_ExtendableMenu(0, "menu_material");
-			menu.Name = "Material Preset";
-			menu.Header = "Select type and grade";
+			var menu = new GH_ExtendableMenu(0, "Library");
+			menu.Name = "Library";
+			menu.Header = "Select model, type and grade";
 
-			var panel = new MenuPanel(0, "panel_material");
-			panel.Header = "Preset";
+			var panel = new MenuPanel(0, "Library");
+			panel.Header = "Library";
 
-			typeDrop = new MenuDropDown(0, "dd_type", "material_type");
+			typeDrop = new MenuDropDown(0, "Type", "Type");
 			typeDrop.VisibleItemCount = 6;
 			typeDrop.ValueChanged += OnTypeChanged;
 
-			gradeDrop = new MenuDropDown(1, "dd_grade", "material_grade");
+			gradeDrop = new MenuDropDown(1, "Grade", "Grade");
 			gradeDrop.VisibleItemCount = 8;
 			gradeDrop.ValueChanged += OnGradeChanged;
+			
+			modelDrop = new MenuDropDown(2, "Model", "Model");
+			modelDrop.VisibleItemCount = 2;
+			modelDrop.ValueChanged += OnModelChanged;
 
 			panel.AddControl(typeDrop);
 			panel.AddControl(gradeDrop);
+			panel.AddControl(modelDrop);
 			menu.AddControl(panel);
 			menu.Expand();
 			attr.AddMenu(menu);
+			attr.MinWidth = 160f;
 
+			InitializeModelOptions();
 			InitializeTypeOptions();
 			InitializeGradeOptions();
 		}
@@ -116,8 +124,14 @@ namespace Alpaca4d.Gh
 		protected override void OnComponentLoaded()
 		{
 			base.OnComponentLoaded();
+			InitializeModelOptions();
 			InitializeTypeOptions();
 			InitializeGradeOptions();
+		}
+
+		private void OnModelChanged(object sender, EventArgs e)
+		{
+			this.ExpireSolution(true);
 		}
 
 		private void OnTypeChanged(object sender, EventArgs e)
@@ -129,6 +143,15 @@ namespace Alpaca4d.Gh
 		private void OnGradeChanged(object sender, EventArgs e)
 		{
 			this.ExpireSolution(true);
+		}
+
+		private void InitializeModelOptions()
+		{
+			if (modelDrop == null) return;
+			modelDrop.Clear();
+			// Keep default as nD to preserve previous behavior
+			modelDrop.AddItem("Uniaxial", "Uniaxial");
+			modelDrop.AddItem("nD", "nD");
 		}
 
 		private void InitializeTypeOptions()
@@ -202,14 +225,25 @@ namespace Alpaca4d.Gh
 		{
 			string selType = typeDrop != null ? GetSelected(typeDrop, "Steel") : "Steel";
 			string selGrade = gradeDrop != null ? GetSelected(gradeDrop, "S235") : "S235";
+			string selModel = modelDrop != null ? GetSelected(modelDrop, "nD") : "nD";
 
 			// Compute properties in kN/m^2, unit system consistent with existing components (Force=kN, Length=m)
 			double E, nu, rho;
 			GetElasticParameters(selType, selGrade, out E, out nu, out rho);
 			double G = E / (2.0 * (1.0 + nu));
 
-			var material = new Alpaca4d.Material.ElasticIsotropicMaterial(selGrade, E, G, nu, rho);
-			DA.SetData(0, material);
+			if (string.Equals(selModel, "Uniaxial", StringComparison.OrdinalIgnoreCase))
+			{
+				double eNeg = E;
+				double eta = 0.0;
+				var material = new Alpaca4d.Material.UniaxialMaterialElastic(selGrade, E, eNeg, eta, G, nu, rho);
+				DA.SetData(0, material);
+			}
+			else
+			{
+				var material = new Alpaca4d.Material.ElasticIsotropicMaterial(selGrade, E, G, nu, rho);
+				DA.SetData(0, material);
+			}
 		}
 
 		private void GetElasticParameters(string type, string grade, out double E, out double nu, out double rho)

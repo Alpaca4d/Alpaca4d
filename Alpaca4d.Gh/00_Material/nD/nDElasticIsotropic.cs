@@ -31,7 +31,7 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Number(), "G", "G", $"Shear Modulus [{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, new GH_Number(80760000));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "Nu", "Nu", "Poisson's Ratio", GH_ParamAccess.item, new GH_Number(0.3));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "ν", "ν", "Poisson's Ratio", GH_ParamAccess.item, new GH_Number(0.3));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_Number(), "Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item, new GH_Number(7850));

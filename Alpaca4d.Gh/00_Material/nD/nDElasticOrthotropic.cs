@@ -46,10 +46,10 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Number(), "NuXy", "NuXy", "Poisson's Ratio XY", GH_ParamAccess.item, new GH_Number(0.3));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "NuYz", "NuYz", "Poisson's Ratio YZ", GH_ParamAccess.item, new GH_Number(0.3));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "νYz", "νYz", "Poisson's Ratio YZ", GH_ParamAccess.item, new GH_Number(0.3));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "NuZx", "NuZx", "Poisson's Ratio ZX", GH_ParamAccess.item, new GH_Number(0.3));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "νZx", "νZx", "Poisson's Ratio ZX", GH_ParamAccess.item, new GH_Number(0.3));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_Number(), "Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item, new GH_Number(7850));
