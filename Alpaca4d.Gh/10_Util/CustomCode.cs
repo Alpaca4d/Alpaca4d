@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
     public class CustomCode : GH_Component
     {
         public CustomCode()
-          : base("Custom code (Alpaca4d)", "CC",
+          : base("Custom code (Alpaca4d)", "Custom Code",
             "Add a custom OpenSees code",
             "Alpaca4d", "10_Utility")
         {

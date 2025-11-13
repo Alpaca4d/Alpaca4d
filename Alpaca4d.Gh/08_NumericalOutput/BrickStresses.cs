@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
     public class BrickStress : GH_Component
     {
         public BrickStress()
-          : base("Brick Stresses (Alpaca4d)", "BS",
+          : base("Brick Stresses (Alpaca4d)", "Brick Stresses",
             "Read the Brick Stresses",
             "Alpaca4d", "08_NumericalOutput")
         {

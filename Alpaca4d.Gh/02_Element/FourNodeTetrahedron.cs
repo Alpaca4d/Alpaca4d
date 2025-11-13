@@ -19,7 +19,7 @@ namespace Alpaca4d.Gh
         /// new tabs/panels will automatically be created.
         /// </summary>
         public FourNodeTetrahedron()
-          : base("FourNodeTetrahedron (Alpaca4d)", "FNT",
+          : base("FourNodeTetrahedron (Alpaca4d)", "Four Node Tetrahedron",
             "Construct a FourNodeTetrahedron element",
             "Alpaca4d", "02_Element")
         {

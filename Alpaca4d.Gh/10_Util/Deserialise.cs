@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
 	public class Deserialize : GH_Component
 	{
 		public Deserialize()
-		  : base("Deserialise (Alpaca4d)", "DSLRZ",
+		  : base("Deserialise (Alpaca4d)", "Deserialize",
 			"Geometry representation of an OpenSeesFile. Not all the elements have been implemented!",
 			"Alpaca4d", "10_Utility")
 		{

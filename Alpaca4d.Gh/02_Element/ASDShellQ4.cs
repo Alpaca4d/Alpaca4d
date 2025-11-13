@@ -77,17 +77,15 @@ namespace Alpaca4d.Gh
                 meshes.Add(_mesh);
             }
 
-            foreach(var mesh in meshes)
+			var elements = new List<Alpaca4d.Generic.IShell>();
+			foreach (var mesh in meshes)
             {
-                var elements = new List<Alpaca4d.Generic.IShell>();
-
-                if(mesh.Vertices.Count == 4)
+				if (mesh.Vertices.Count == 4)
                 {
                     var element = new Alpaca4d.Element.ASDShellQ4(mesh, section);
                     element.Color = color;
 
                     elements.Add(element);
-                    DA.SetDataList(0, elements);
                 }
                 else if (mesh.Vertices.Count == 3)
                 {
@@ -95,9 +93,9 @@ namespace Alpaca4d.Gh
                     element.Color = color;
 
                     elements.Add(element);
-                    DA.SetDataList(0, elements);
                 }
             }
+			DA.SetDataList(0, elements);
         }
 
 

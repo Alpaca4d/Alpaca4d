@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class MassPointLoad : GH_Component
     {
         public MassPointLoad()
-          : base("Mass Point (Alpaca4d)", "MP",
+          : base("Mass Point (Alpaca4d)", "Mass Point",
             "Construct a PointLoad",
             "Alpaca4d", "05_Load")
         {

@@ -10,7 +10,7 @@ namespace Alpaca4d.Gh
     public class MeshLoft : GH_Component
     {
         public MeshLoft()
-          : base("MeshLoft (Alpaca4d)", "ML",
+          : base("MeshLoft (Alpaca4d)", "Mesh Loft",
             "Mesh Loft",
             "Alpaca4d", "10_Utility")
         {

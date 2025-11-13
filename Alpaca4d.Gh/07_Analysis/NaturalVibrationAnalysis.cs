@@ -21,7 +21,7 @@ namespace Alpaca4d.Gh
         private DateTime? firstTimeRun = DateTime.Now;
         private DateTime? lastTimeRun = null;
         public NaturalVibrationAnalysis()
-          : base("Natural Vibration Analysis (Alpaca4d)", "NV",
+          : base("Natural Vibration Analysis (Alpaca4d)", "Natural Vibration",
             "",
             "Alpaca4d", "07_Analysis")
         {

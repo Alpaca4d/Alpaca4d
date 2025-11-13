@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class ReadTimeSeries : GH_Component
     {
         public ReadTimeSeries()
-          : base("Read Time Series (Alpaca4d)", "RTS",
+          : base("Read Time Series (Alpaca4d)", "Read Time Series",
             "Read a Path Time Series",
             "Alpaca4d", "04_Time Series")
         {

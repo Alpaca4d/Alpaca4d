@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
 {
     internal class nDElasticIsotropic : SubComponent
     {
-        public override string name() => "ElasticIsotropic";
+        public override string name() => "ElasticIsotropic (Alpaca4d)";
         public override string display_name() => "ElasticIsotropic";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)

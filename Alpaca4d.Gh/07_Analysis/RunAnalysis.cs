@@ -23,7 +23,7 @@ namespace Alpaca4d.Gh
         private DateTime? lastTimeRun = null;
 
         public RunAnalysis()
-          : base(" Run Analysis (Alpaca4d)", "RA",
+          : base(" Run Analysis (Alpaca4d)", "Run Analysis",
             "",
             "Alpaca4d", "07_Analysis")
         {

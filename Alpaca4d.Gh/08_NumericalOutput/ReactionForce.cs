@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     public class ReactionForce : GH_Component
     {
         public ReactionForce()
-          : base("Reaction Forces (Alpaca4d)", "RF",
+          : base("Reaction Forces (Alpaca4d)", "Reaction Forces",
             "Read Reaction Forces",
             "Alpaca4d", "08_NumericalOutput")
         {

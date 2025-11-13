@@ -15,7 +15,7 @@ namespace Alpaca4d.Gh
 {
     internal class PatternUniformExcitation : SubComponent
     {
-        public override string name() => "UniformExcitation";
+        public override string name() => "UniformExcitation (Alpaca4d)";
         public override string display_name() => "UniformExcitation";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)
@@ -25,6 +25,7 @@ namespace Alpaca4d.Gh
             mngr.RegisterUnit(evaluationUnit);
 
             evaluationUnit.RegisterInputParam(new Param_String(), "Dof", "Dof", "Degree of freedom direction the ground motion acts\n" + 
+                "Connect a 'ValueList' component to get the list of directions\n" +
                 "x : corresponds to translation along the global X axis\n" +
                 "y : corresponds to translation along the global Y axis\n" +
                 "z : corresponds to translation along the global Z axis\n" +
@@ -32,6 +33,7 @@ namespace Alpaca4d.Gh
                 "yy : corresponds to rotation about the global Y axis\n" +
                 "zz : corresponds to rotation about the global Z axis", GH_ParamAccess.item, new GH_String("X"));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].EnumInput = Enum.GetNames(typeof(Alpaca4d.Loads.Direction)).ToList();;
 
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "TimeSeries", "TimeSeries", "Time series for the excitation", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;

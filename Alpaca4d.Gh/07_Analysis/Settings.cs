@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     public class AnalysisSettings : GH_Component
     {
         public AnalysisSettings()
-          : base("Analysis Settings (Alpaca4d)", "AnalysisSettings",
+          : base("Analysis Settings (Alpaca4d)", "Analysis Settings",
             "",
             "Alpaca4d", "07_Analysis")
         {
@@ -29,19 +29,19 @@ namespace Alpaca4d.Gh
         {
             pManager.AddGenericParameter("Damping", "Damping", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Constraint", "Constraint", "Connect a 'ValueList'\nPlain, Transformation", GH_ParamAccess.item);
+            pManager.AddTextParameter("Constraint", "Constraint", "Connect a 'ValueList'\nPlain, Transformation", GH_ParamAccess.item, "Transformation");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Numberer", "Numberer", "Connect a 'ValueList'\nRCM, AMD, Plain", GH_ParamAccess.item);
+            pManager.AddTextParameter("Numberer", "Numberer", "Connect a 'ValueList'\nRCM, AMD, Plain", GH_ParamAccess.item, "RCM");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("System", "System", "Connect a 'ValueList'\nBandGen, BandSPD, ProfileSPD, SuperLU, UmfPack, FullGeneral, SparseSYM", GH_ParamAccess.item);
+            pManager.AddTextParameter("System", "System", "Connect a 'ValueList'\nBandGen, BandSPD, ProfileSPD, SuperLU, UmfPack, FullGeneral, SparseSYM", GH_ParamAccess.item, "BandGen");
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Test", "Test", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Algorithm", "Algorithm", "Connect a 'ValueList'\nLinear, Newton, NewtonLineSearch, ModifiedNewton, KrylovNewton, SecantNewton, BFGS, Broyden", GH_ParamAccess.item);
+            pManager.AddTextParameter("Algorithm", "Algorithm", "Connect a 'ValueList'\nLinear, Newton, NewtonLineSearch, ModifiedNewton, KrylovNewton, SecantNewton, BFGS, Broyden", GH_ParamAccess.item, "ModifiedNewton");
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Integrator", "Integrator", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("AnalysisType", "AnalysisType", "Connect a 'ValueList'\nStatic, Transient", GH_ParamAccess.item);
+            pManager.AddTextParameter("AnalysisType", "AnalysisType", "Connect a 'ValueList'\nStatic, Transient", GH_ParamAccess.item, "Static");
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("AnalysisSteps", "AnalysisSteps", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;

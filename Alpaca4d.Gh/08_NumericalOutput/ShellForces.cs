@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     public class ShellForces : GH_Component
     {
         public ShellForces()
-          : base("Shell Forces (Alpaca4d)", "SF",
+          : base("Shell Forces (Alpaca4d)", "Shell Forces",
             "Read the Shell Forces",
             "Alpaca4d", "08_NumericalOutput")
         {

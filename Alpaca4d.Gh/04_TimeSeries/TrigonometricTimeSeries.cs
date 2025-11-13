@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class TrigonometricTimeSeries : GH_Component
     {
         public TrigonometricTimeSeries()
-          : base("Trigonometric Time Series (Alpaca4d)", "TTS",
+          : base("Trigonometric Time Series (Alpaca4d)", "Trigonometric Time Series",
             "Construct a Trigonometric Time Series",
             "Alpaca4d", "04_Time Series")
         {

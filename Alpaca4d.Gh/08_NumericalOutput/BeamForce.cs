@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     public class BeamForce : GH_Component
     {
         public BeamForce()
-          : base("Beam Forces (Alpaca4d)", "BF",
+          : base("Beam Forces (Alpaca4d)", "Beam Forces",
             "Read the Beam Forces",
             "Alpaca4d", "08_NumericalOutput")
         {

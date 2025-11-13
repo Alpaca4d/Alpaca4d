@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
 {
     internal class UniaxialElasticPerfectlyPlastic : SubComponent
     {
-        public override string name() => "ElasticPerfectlyPlastic";
+        public override string name() => "ElasticPerfectlyPlastic (Alpaca4d)";
         public override string display_name() => "ElasticPerfectlyPlastic";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)

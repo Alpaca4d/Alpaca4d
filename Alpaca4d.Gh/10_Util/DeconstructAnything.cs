@@ -283,19 +283,4 @@ namespace Alpaca4d.Gh
         {
         }
     }
-
-    internal class LongShortString
-    {
-        public string Long
-        {
-            get;
-            set;
-        }
-
-        public string Short
-        {
-            get;
-            set;
-        }
-    }
 }

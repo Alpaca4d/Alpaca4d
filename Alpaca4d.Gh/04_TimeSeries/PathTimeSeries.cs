@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class PathTimeSeries : GH_Component
     {
         public PathTimeSeries()
-          : base("Path Time Series (Alpaca4d)", "PTS",
+          : base("Path Time Series (Alpaca4d)", "Path Time Series",
             "Construct a Path Time Series",
             "Alpaca4d", "04_Time Series")
         {

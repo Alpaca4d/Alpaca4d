@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     public class NodalDisplacement : GH_Component
     {
         public NodalDisplacement()
-          : base("Nodal Displacements (Alpaca4d)", "ND",
+          : base("Nodal Displacements (Alpaca4d)", "Nodal Displacements",
             "Read Nodal Displacements",
             "Alpaca4d", "08_NumericalOutput")
         {

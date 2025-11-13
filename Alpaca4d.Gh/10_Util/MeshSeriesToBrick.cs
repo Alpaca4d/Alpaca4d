@@ -10,7 +10,7 @@ namespace Alpaca4d.Gh
     public class MeshSeriesToBrick : GH_Component
     {
         public MeshSeriesToBrick()
-          : base("MeshSeriesToBrick (Alpaca4d)", "MSTB",
+          : base("MeshSeriesToBrick (Alpaca4d)", "Mesh Series to Brick",
             "MeshSeriesToBrick",
             "Alpaca4d", "10_Utility")
         {

@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
     public class Serialize : GH_Component
     {
         public Serialize()
-          : base("Serialize (Alpaca4d)", "SLRZ",
+          : base("Serialize (Alpaca4d)", "Serialize",
             "Serialize a model and write the content to a file",
             "Alpaca4d", "10_Utility")
         {

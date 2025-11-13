@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
     public class AnalysisStep : GH_Component
     {
         public AnalysisStep()
-          : base("Analysis Step (Alpaca4d)", "AnalysisStep",
+          : base("Analysis Step (Alpaca4d)", "Analysis Step",
             "",
             "Alpaca4d", "07_Analysis")
         {

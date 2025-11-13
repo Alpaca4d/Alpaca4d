@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     public class ModalAnalysisReport : GH_Component
     {
         public ModalAnalysisReport()
-          : base("Modal Analysis Report (Alpaca4d)", "MAR",
+          : base("Modal Analysis Report (Alpaca4d)", "Modal Analysis Report",
             "Read the Modal Analysis Report",
             "Alpaca4d", "08_NumericalOutput")
         {

@@ -15,7 +15,7 @@ namespace Alpaca4d.Gh
 {
     internal class PatternPlain : SubComponent
     {
-        public override string name() => "PlainPattern";
+        public override string name() => "PlainPattern (Alpaca4d)";
         public override string display_name() => "PlainPattern";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)
@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
             mngr.RegisterUnit(evaluationUnit);
 
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "TimeSeries", "TimeSeries", "Time series for the load pattern", GH_ParamAccess.item, new GH_ObjectWrapper(TimeSeries.Constant.Default()));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;
 
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "Loads", "Loads", "List of loads to apply", GH_ParamAccess.list, new GH_ObjectWrapper(null));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = false;

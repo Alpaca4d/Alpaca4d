@@ -18,7 +18,7 @@ namespace Alpaca4d.Gh
     public class PatternBase : GH_SwitcherComponent
     {
         private List<SubComponent> _subcomponents = new List<SubComponent>();
-        public override string UnitMenuName => "Pattern";
+        public override string UnitMenuName => "Load Pattern";
         protected override string DefaultEvaluationUnit => _subcomponents.Count > 0 ? _subcomponents[0].name() : "PlainPattern";
         public override Guid ComponentGuid => new Guid("{C4E8F9A2-B5D3-4E6F-A7B8-9C0D1E2F3A4B}");
         public override GH_Exposure Exposure => GH_Exposure.secondary;
@@ -26,7 +26,7 @@ namespace Alpaca4d.Gh
         protected override Bitmap Icon => null;
 
         public PatternBase()
-            : base("Load Pattern (Alpaca4d)", "Pattern",
+            : base("Load Pattern (Alpaca4d)", "Load Pattern",
               "Pattern Base Component",
               "Alpaca4d", "05_Load")
         {

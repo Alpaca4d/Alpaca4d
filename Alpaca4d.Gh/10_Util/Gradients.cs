@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
     public class Gradients : GH_Component
     {
         public Gradients()
-          : base("Colors (Alpaca4d)", "CLR",
+          : base("Colors (Alpaca4d)", "Colors",
             "Preset of gradient colors perfect for Data Visualisation",
             "Alpaca4d", "10_Utility")
         {

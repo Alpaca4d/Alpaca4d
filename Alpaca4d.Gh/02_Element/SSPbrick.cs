@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
     public class SSPbrick : GH_Component
     {
         public SSPbrick()
-          : base("SSP Brick (Alpaca4d)", "SSP",
+          : base("SSP Brick (Alpaca4d)", "SSP Brick",
             "Construct a SSP (Stabilized Single Point) Brick element",
             "Alpaca4d", "02_Element")
         {

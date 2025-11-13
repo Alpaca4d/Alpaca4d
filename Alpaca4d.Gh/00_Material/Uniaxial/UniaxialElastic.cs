@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
 {
     internal class UniaxialElastic : SubComponent
     {
-        public override string name() => "UniaxialElastic";
+        public override string name() => "UniaxialElastic (Alpaca4d)";
         public override string display_name() => "UniaxialElastic";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)
@@ -37,7 +37,7 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Number(), "G", "G", $"[{Units.Force}/{Units.Length}²]", GH_ParamAccess.item, new GH_Number(90760000));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "v", "v", "", GH_ParamAccess.item, new GH_Number(0.3));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "ν", "ν", "", GH_ParamAccess.item, new GH_Number(0.3));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_Number(), "Rho", "Rho", $"Density [{Units.Mass}/{Units.Length}³]", GH_ParamAccess.item, new GH_Number(7850));
