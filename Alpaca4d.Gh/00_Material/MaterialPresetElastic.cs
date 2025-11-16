@@ -134,12 +134,12 @@ namespace Alpaca4d.Gh
 
 		protected override void RegisterInputParams(GH_InputParamManager pManager)
 		{
-			pManager.AddParameter("DatabasePath", "DBPath", "Optional custom material database JSON (steel_properties schema).", GH_ParamAccess.item);
+			pManager.AddGenericParameter("DatabasePath", "DBPath", "Optional custom material database JSON (steel_properties schema).", GH_ParamAccess.item);
 		}
 
 		protected override void RegisterOutputParams(GH_OutputParamManager pManager)
 		{
-			pManager.RegisterParam(new Param_GenericObject(), "Material", "Material", "Material");
+			pManager.Register_GenericParam("Material", "Material", "Material");
 		}
 
 		protected override void Setup(GH_ExtendableComponentAttributes attr)
