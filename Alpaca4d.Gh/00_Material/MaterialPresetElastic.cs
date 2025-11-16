@@ -67,7 +67,7 @@ namespace Alpaca4d.Gh
 
 		public override Guid ComponentGuid => new Guid("{F50A7B47-2E73-4B57-BF7A-DB6D7EAC91D6}");
 		public override GH_Exposure Exposure => GH_Exposure.secondary;
-		protected override Bitmap Icon => null;
+		protected override Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Material_Library__Alpaca4d_;
 
 		public MaterialPresetElastic()
 			: base("Material Library (Elastic)", "Library",

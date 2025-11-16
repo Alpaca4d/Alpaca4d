@@ -601,6 +601,16 @@ namespace Alpaca4d.Gh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Material_Library__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("Material_Library__Alpaca4d_", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copyright @ 1999,2000 The Regents of the University of California. All Rights Reserved.
         ///
         ///The Regents grants permission, without fee and without a written license agreement, for (a) use, reproduction, modification, and distribution of this software and its documentation by educational, research, and non-profit entities for noncommercial purposes only; and (b) use, reproduction and modification of this software by other entities for internal purposes only. The above copyright notice, this paragraph and the  [rest of string was truncated]&quot;;.
