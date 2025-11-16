@@ -7,6 +7,7 @@ using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.Reflection;
 using static Alpaca4d.Gh.ComponentMessage;
 
@@ -19,12 +20,65 @@ namespace Alpaca4d.Gh
 		private MenuDropDown gradeDrop;
 
 		private Dictionary<string, List<string>> typeToGrades = new Dictionary<string, List<string>>();
+		private JObject customDb;
+		private string lastCustomDbPath;
+		private DateTime lastCustomDbWriteTimeUtc;
 
 		private static readonly object jsonLock = new object();
 		private static JObject steelDb;
 		private static JObject concreteDb;
 		private static JObject timberDb;
 		private static JObject plasticDb;
+
+		private bool TryLoadCustomDb(string path)
+		{
+			// Returns true only when the effective DB source changed (loaded, reloaded, or cleared)
+			if (string.IsNullOrWhiteSpace(path))
+			{
+				if (customDb != null)
+				{
+					customDb = null;
+					lastCustomDbPath = null;
+					lastCustomDbWriteTimeUtc = DateTime.MinValue;
+					return true;
+				}
+				return false;
+			}
+			try
+			{
+				if (!File.Exists(path))
+				{
+					AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Custom material database not found: {path}");
+					if (customDb != null)
+					{
+						customDb = null;
+						lastCustomDbPath = null;
+						lastCustomDbWriteTimeUtc = DateTime.MinValue;
+						return true;
+					}
+					return false;
+				}
+				var fi = new FileInfo(path);
+				if (string.Equals(path, lastCustomDbPath, StringComparison.OrdinalIgnoreCase) &&
+					fi.LastWriteTimeUtc == lastCustomDbWriteTimeUtc)
+				{
+					// No change
+					return false;
+				}
+				var json = File.ReadAllText(path);
+				var parsed = JObject.Parse(json);
+				// Accept and record
+				customDb = parsed;
+				lastCustomDbPath = path;
+				lastCustomDbWriteTimeUtc = fi.LastWriteTimeUtc;
+				return true;
+			}
+			catch (Exception ex)
+			{
+				AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Failed to load custom material DB: {ex.Message}");
+				return false;
+			}
+		}
 
 		private static JObject LoadJsonResourceOnce(ref JObject cache, string resourceName)
 		{
@@ -80,6 +134,7 @@ namespace Alpaca4d.Gh
 
 		protected override void RegisterInputParams(GH_InputParamManager pManager)
 		{
+			pManager.AddParameter("DatabasePath", "DBPath", "Optional custom material database JSON (steel_properties schema).", GH_ParamAccess.item);
 		}
 
 		protected override void RegisterOutputParams(GH_OutputParamManager pManager)
@@ -162,7 +217,7 @@ namespace Alpaca4d.Gh
 			// Repopulate type dropdown
 			if (typeDrop == null) return;
 			typeDrop.Clear();
-			var types = typeToGrades.Keys.OrderBy(k => k).ToList();
+			var types = typeToGrades.Keys.ToList();
 			for (int i = 0; i < types.Count; i++)
 			{
 				var t = types[i];
@@ -180,8 +235,8 @@ namespace Alpaca4d.Gh
 				// Discover material_type from first entry and collect all names (keys)
 				var first = db.Properties().Select(p => p.Value as JObject).FirstOrDefault(v => v != null);
 				if (first == null) return;
-				var matType = first["material_type"]?.Value<string>() ?? "Unknown";
-				var names = db.Properties().Select(p => p.Name).OrderBy(n => n).ToList();
+				var matType = "custom";
+				var names = db.Properties().Select(p => p.Name).ToList();
 				if (names.Count == 0) return;
 				if (!result.ContainsKey(matType)) result[matType] = new List<string>();
 				foreach (var n in names)
@@ -195,6 +250,8 @@ namespace Alpaca4d.Gh
 			try { addFromDb(LoadJsonResourceOnce(ref concreteDb, "Alpaca4d.Resources.Material.concrete_properties.json")); } catch { }
 			try { addFromDb(LoadJsonResourceOnce(ref timberDb, "Alpaca4d.Resources.Material.timber_properties.json")); } catch { }
 			try { addFromDb(LoadJsonResourceOnce(ref plasticDb, "Alpaca4d.Resources.Material.plastic_properties.json")); } catch { }
+			// Add from custom DB if provided
+			try { addFromDb(customDb); } catch { }
 
 			return result;
 		}
@@ -221,8 +278,46 @@ namespace Alpaca4d.Gh
 			return dd.Items[idx].name ?? dd.Items[idx].content ?? defaultName;
 		}
 
+		private static string GetMaterialTypeFromDb(JObject db)
+		{
+			if (db == null) return null;
+			var first = db.Properties().Select(p => p.Value as JObject).FirstOrDefault(v => v != null);
+			return first?["material_type"]?.Value<string>();
+		}
+
+		private void GetParametersFromDb(JObject db, string grade, out double E, out double nu, out double rho)
+		{
+			SetDefaultElastic(out E, out nu, out rho);
+			if (db == null) return;
+			var entry = db?[grade] as JObject;
+			if (entry == null) return;
+
+			var eMpa = TryGetDouble(entry, "E");
+			var gMpa = TryGetDouble(entry, "G");
+			var rhoVal = TryGetDouble(entry, "rho");
+
+			if (!double.IsNaN(eMpa)) E = MPaTokN_m2(eMpa);
+			if (!double.IsNaN(rhoVal)) rho = rhoVal;
+			var nuComputed = ComputeNuFromEG(MPaTokN_m2(eMpa), MPaTokN_m2(gMpa));
+			if (!double.IsNaN(nuComputed)) nu = nuComputed;
+		}
+
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{
+			// 1) Try to load/refresh custom DB if provided
+			string customPath = null;
+			if (Params.Input.Count > 0)
+			{
+				try { DA.GetData(0, ref customPath); } catch { customPath = null; }
+			}
+			var dbChanged = TryLoadCustomDb(customPath);
+			if (dbChanged)
+			{
+				// Rebuild types/grades when DB source changes
+				InitializeTypeOptions();
+				InitializeGradeOptions();
+			}
+
 			string selType = typeDrop != null ? GetSelected(typeDrop, "Steel") : "Steel";
 			string selGrade = gradeDrop != null ? GetSelected(gradeDrop, "S235") : "S235";
 			string selModel = modelDrop != null ? GetSelected(modelDrop, "nD") : "nD";
@@ -249,6 +344,13 @@ namespace Alpaca4d.Gh
 		private void GetElasticParameters(string type, string grade, out double E, out double nu, out double rho)
 		{
 			SetDefaultElastic(out E, out nu, out rho);
+			// If custom DB is present and matches the selected material type, prefer it
+			var customType = GetMaterialTypeFromDb(customDb);
+			if (!string.IsNullOrEmpty(customType) && string.Equals(type, customType, StringComparison.OrdinalIgnoreCase))
+			{
+				GetParametersFromDb(customDb, grade, out E, out nu, out rho);
+				return;
+			}
 			switch (type)
 			{
 				case "Steel":

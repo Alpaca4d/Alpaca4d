@@ -489,7 +489,10 @@
     <Copy SourceFiles="@(OpenSeesFiles)" DestinationFolder="$(GrasshopperLibrariesPath)/Alpaca4d/OpenSees-Solvers\%(RecursiveDir)" />
     
     <!-- Copy data.bin file -->
-    <Copy SourceFiles="$(OutDir)data.bin" DestinationFolder="$(GrasshopperLibrariesPath)/Alpaca4d/" />
+    <ItemGroup>
+      <DataBin Include="$(OutDir)data.bin" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DataBin)" DestinationFolder="$(GrasshopperLibrariesPath)/Alpaca4d/" SkipUnchangedFiles="true" />
     
     <!-- Copy custom_properties.json file -->
     <ItemGroup>
