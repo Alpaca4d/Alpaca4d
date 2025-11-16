@@ -18,10 +18,6 @@ namespace Alpaca4d.Gh
 {
     public class RunAnalysis : GH_Component
     {
-        private int counter = 0;
-        private DateTime? firstTimeRun = DateTime.Now;
-        private DateTime? lastTimeRun = null;
-
         public RunAnalysis()
           : base(" Run Analysis (Alpaca4d)", "Run Analysis",
             "",

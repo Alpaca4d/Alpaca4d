@@ -17,9 +17,6 @@ namespace Alpaca4d.Gh
 {
     public class NaturalVibrationAnalysis : GH_Component
     {
-        private int counter = 0;
-        private DateTime? firstTimeRun = DateTime.Now;
-        private DateTime? lastTimeRun = null;
         public NaturalVibrationAnalysis()
           : base("Natural Vibration Analysis (Alpaca4d)", "Natural Vibration",
             "",

@@ -4,7 +4,6 @@ using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Special;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
-using Alpaca4d.UIWidgets;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -102,7 +101,7 @@ namespace SimplexGh
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception(ex.Message);
             }
         }
     }

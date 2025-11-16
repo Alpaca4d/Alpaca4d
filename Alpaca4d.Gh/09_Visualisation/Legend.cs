@@ -14,7 +14,6 @@ namespace Alpaca4d.Gh
         private List<Color> _colors = new List<Color>();
         private List<double> _data = new List<double>();
         private readonly LegendConduit _conduit;
-        private bool _preview = true;
 
         // UI options / state
         private double _scale = 1.5;        // scale factor
