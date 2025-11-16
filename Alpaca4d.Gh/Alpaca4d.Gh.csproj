@@ -413,6 +413,10 @@
     <None Include="..\Alpaca4d.Utils\data.bin" Link="data.bin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\Alpaca.Core\Resources\Material\custom_properties.json">
+      <Link>custom_properties.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!-- ==========================================
@@ -486,6 +490,12 @@
     
     <!-- Copy data.bin file -->
     <Copy SourceFiles="$(OutDir)data.bin" DestinationFolder="$(GrasshopperLibrariesPath)/Alpaca4d/" />
+    
+    <!-- Copy custom_properties.json file -->
+    <ItemGroup>
+      <CustomDb Include="$(OutDir)custom_properties.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CustomDb)" DestinationFolder="$(GrasshopperLibrariesPath)/Alpaca4d/" SkipUnchangedFiles="true" />
     
     <!-- Copy UserObject folder -->
     <ItemGroup>
