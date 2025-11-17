@@ -135,6 +135,7 @@ namespace Alpaca4d.Gh
 		protected override void RegisterInputParams(GH_InputParamManager pManager)
 		{
 			pManager.AddGenericParameter("DatabasePath", "DBPath", "Optional custom material database JSON (steel_properties schema).", GH_ParamAccess.item);
+			pManager[pManager.ParamCount - 1].Optional = true;
 		}
 
 		protected override void RegisterOutputParams(GH_OutputParamManager pManager)
@@ -235,7 +236,7 @@ namespace Alpaca4d.Gh
 				// Discover material_type from first entry and collect all names (keys)
 				var first = db.Properties().Select(p => p.Value as JObject).FirstOrDefault(v => v != null);
 				if (first == null) return;
-				var matType = "custom";
+				var matType = first["material_type"]?.Value<string>() ?? "Custom";
 				var names = db.Properties().Select(p => p.Name).ToList();
 				if (names.Count == 0) return;
 				if (!result.ContainsKey(matType)) result[matType] = new List<string>();
