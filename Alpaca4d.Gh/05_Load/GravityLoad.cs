@@ -1,4 +1,4 @@
-﻿using Grasshopper;
+using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -12,7 +12,7 @@ namespace Alpaca4d.Gh
     {
         public GravityLoad()
           : base("Gravity Load (Alpaca4d)", "Gravity Load",
-            "Construct a Gravity Load",
+            "Construct a Gravity Load. For beams, the algorithm generates equivalent concentrated nodal loads at the element ends; discretize beams for a better gravity-load representation.",
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
