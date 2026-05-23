@@ -696,7 +696,7 @@ namespace Alpaca4d
                 {
                     var beam = (IBeam)item;
                     var length = beam.Curve.GetLength();
-                    var massDens = beam.Section.Area * beam.Section.Material.Rho;
+                    var massDens = beam.Section.Area * beam.Section.Material.Rho * 9.81 / 1000.0;
                     mass += (massDens * length);
                     if (gravityLoad != null)
                     {
@@ -717,7 +717,7 @@ namespace Alpaca4d
                     var shell = (IShell)item;
 
                     double meshArea = Rhino.Geometry.AreaMassProperties.Compute(shell.Mesh).Area;
-                    var areaDensity = shell.Section.Thickness * (double)shell.Section.Material.Rho;
+                    var areaDensity = shell.Section.Thickness * (double)shell.Section.Material.Rho * 9.81 / 1000.0;
                     mass += areaDensity * meshArea;
                     if (gravityLoad != null)
                     {
@@ -751,7 +751,7 @@ namespace Alpaca4d
                 {
                     var brick = (IBrick)item;
                     var meshVolume = Rhino.Geometry.VolumeMassProperties.Compute(brick.Mesh).Volume;
-                    var density = (double)brick.Material.Rho;
+                    var density = (double)brick.Material.Rho * 9.81 / 1000.0;
                     mass += density * meshVolume;
                     if (gravityLoad != null)
                     {
