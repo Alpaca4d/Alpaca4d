@@ -467,7 +467,7 @@
     <!-- Run the executable to generate data.bin - Cross-platform compatible -->
     <PropertyGroup>
       <UtilsExePath>$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\bin\$(Configuration)\CreateLicense.exe</UtilsExePath>
-      <UtilsWorkingDir>$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\bin\$(Configuration)</UtilsWorkingDir>
+      <UtilsWorkingDir>$(MSBuildProjectDirectory)\..\Alpaca4d.Utils\bin\$(Configuration)\net48</UtilsWorkingDir>
     </PropertyGroup>
     
     <!-- On Windows, run directly; on macOS/Linux, use mono -->
