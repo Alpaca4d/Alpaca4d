@@ -12,5 +12,6 @@ namespace Alpaca4d.BeamIntegration
         Legendre,
         Radau,
         NewtonCotes,
+        HingeRadau,
     }
 }

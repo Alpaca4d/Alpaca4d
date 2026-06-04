@@ -118,66 +118,84 @@ namespace Alpaca4d.Result
         /// <exception cref="Exception"></exception>
         public static (List<List<double>> n, List<List<double>> mz, List<List<double>> vy, List<List<double>> my, List<List<double>> vz, List<List<double>> t) ForceBeamColumn(Model alpacaModel, int step, string resultType = null)
         {
-            resultType = "74-ForceBeamColumn3d[1000:1:0]";
-            var nNested = new List<List<double>>();
+            // OpenSees writes ForceBeamColumn results under different keys depending on
+            // the integration scheme used:
+            //   [1000:1:0]  ->  NewtonCotes  (ForceBeamColumn)
+            //   [1000:2:0]  ->  HingeRadau   (BeamWithHinges)
+            // A model may contain both types, whose rows are interleaved by element ID.
+            // We therefore build a map  elementId -> row-data  from every present group
+            // and look up each beam by its assigned Id.
+            const string BASE = "/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force";
+            string[] knownKeys = {
+                "74-ForceBeamColumn3d[1000:1:0]",
+                "74-ForceBeamColumn3d[1000:2:0]"
+            };
+            const int SECTIONFORCES = 6;
+
+            var nNested  = new List<List<double>>();
             var mzNested = new List<List<double>>();
             var vyNested = new List<List<double>>();
             var myNested = new List<List<double>>();
             var vzNested = new List<List<double>>();
-            var tNested = new List<List<double>>();
-
+            var tNested  = new List<List<double>>();
 
             string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
 
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
-            double[,] values;
 
-            var dataset = h5File.Dataset($"/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force/{resultType}/DATA/STEP_{step}");
-            var dimX = (long)dataset.Space.Dimensions[0];
-            var dimY = (long)dataset.Space.Dimensions[1];
+            // Map: element ID -> row data (all columns for that element)
+            var rowById = new Dictionary<int, double[]>();
 
-            values = dataset.Read<double>().ToArray2D(dimX, dimY);
+            foreach (var key in knownKeys)
+            {
+                try
+                {
+                    var idDataset   = h5File.Dataset($"{BASE}/{key}/ID");
+                    var dataDataset = h5File.Dataset($"{BASE}/{key}/DATA/STEP_{step}");
+
+                    long rows = (long)dataDataset.Space.Dimensions[0];
+                    long cols = (long)dataDataset.Space.Dimensions[1];
+                    long idRows = (long)idDataset.Space.Dimensions[0];
+
+                    double[,] data = dataDataset.Read<double>().ToArray2D(rows, cols);
+                    int[,]    ids  = idDataset.Read<int>().ToArray2D(idRows, 1L);
+
+                    for (int r = 0; r < rows; r++)
+                    {
+                        int elemId = ids[r, 0];
+                        var rowData = new double[cols];
+                        for (int c = 0; c < cols; c++)
+                            rowData[c] = data[r, c];
+                        rowById[elemId] = rowData;
+                    }
+                }
+                catch { /* group not present in this file – skip */ }
+            }
 
             try
             {
-                for (int i = 0; i < alpacaModel.Beams.Count; i++)
+                foreach (var beam in alpacaModel.Beams)
                 {
-                    var n = new List<double>();
+                    var n  = new List<double>();
                     var mz = new List<double>();
                     var vy = new List<double>();
                     var my = new List<double>();
                     var vz = new List<double>();
-                    var t = new List<double>();
+                    var t  = new List<double>();
 
-                    int SECTIONFORCES = 6;
-                    int integrationPoint = alpacaModel.Beams[i].BeamIntegration.IntegrationPoint;
-                    for (int j = 0; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
+                    if (rowById.TryGetValue(beam.Id.Value, out double[] row))
                     {
-                        n.Add((double)values.GetValue(i, j));
-                    }
-
-                    for (int j = 1; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        mz.Add((double)values.GetValue(i, j));
-                    }
-
-                    for (int j = 2; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        vy.Add((double)values.GetValue(i, j));
-                    }
-
-                    for (int j = 3; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        my.Add((double)values.GetValue(i, j));
-                    }
-
-                    for (int j = 4; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        vz.Add((double)values.GetValue(i, j));
-                    }
-                    for (int j = 5; j < SECTIONFORCES * alpacaModel.Beams[i].BeamIntegration.IntegrationPoint; j += 6)
-                    {
-                        t.Add((double)values.GetValue(i, j));
+                        // Derive the number of integration points from the column count
+                        int numIP = row.Length / SECTIONFORCES;
+                        for (int j = 0; j < SECTIONFORCES * numIP; j += SECTIONFORCES)
+                        {
+                            n.Add(row[j + 0]);
+                            mz.Add(row[j + 1]);
+                            vy.Add(row[j + 2]);
+                            my.Add(row[j + 3]);
+                            vz.Add(row[j + 4]);
+                            t.Add(row[j + 5]);
+                        }
                     }
 
                     nNested.Add(n);
