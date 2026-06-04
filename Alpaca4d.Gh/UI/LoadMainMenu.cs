@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Windows.Forms;
 
+using Alpaca4d;
 using Alpaca4d.UI;
 using Grasshopper.GUI;
 using Grasshopper.GUI.Canvas;
@@ -60,6 +61,15 @@ namespace Alpaca4d.Menu
 
             menuItem.DropDown.Items.Add("Examples", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_, 
                 (sender, e) => OpenBrowser(sender, e, "https://alpaca4d.gitbook.io/docs/examples"));
+
+            menuItem.DropDown.Items.Add(new ToolStripSeparator());
+            //----------------------
+
+            // Add Settings
+            ToolStripMenuItem subMenuSettings = new ToolStripMenuItem("Settings");
+            subMenuSettings.DropDown.Items.Add("Set OpenSees Executable...", null, SetOpenSeesPath);
+            subMenuSettings.DropDown.Items.Add("Clear OpenSees Path", null, ClearOpenSeesPath);
+            menuItem.DropDown.Items.Add(subMenuSettings);
 
             menuItem.DropDown.Items.Add(new ToolStripSeparator());
             //----------------------
@@ -136,6 +146,30 @@ namespace Alpaca4d.Menu
             {
                 MessageBox.Show($"Error opening license management: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private static void SetOpenSeesPath(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.Title = "Select OpenSees Executable";
+                dialog.Filter = "Executable files (*)|*";
+                dialog.CheckFileExists = true;
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    AlpacaSettings.OpenSeesPath = dialog.FileName;
+                    MessageBox.Show($"OpenSees path set to:\n{dialog.FileName}", "Alpaca4d Settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private static void ClearOpenSeesPath(object sender, EventArgs e)
+        {
+            AlpacaSettings.OpenSeesPath = string.Empty;
+            MessageBox.Show("OpenSees path has been cleared.", "Alpaca4d Settings",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

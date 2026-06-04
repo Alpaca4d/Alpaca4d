@@ -84,7 +84,16 @@ namespace Alpaca4d.Gh
 
             model.FileName = System.IO.Path.GetFullPath("MomentCurvature.tcl");
             model.Serialise();
-            (string output, string error) = model.RunOpenSees();
+            string output, error;
+            try
+            {
+                (output, error) = model.RunOpenSees();
+            }
+            catch (Exception ex)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                return;
+            }
 
             var forceFilePath = System.IO.Path.GetFullPath(Alpaca4d.Template.MomentCurvature.ForceFilePath);
             var forceData = System.IO.File.ReadAllLines(forceFilePath);

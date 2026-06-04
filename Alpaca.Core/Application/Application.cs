@@ -15,39 +15,21 @@ namespace Alpaca4d
     {
         public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
-        public static string licenseLocation = System.IO.Path.Combine(GhAlpacaFolder, @"data.bin");
 
-        public static string OpenSeesFolder
+        public static string OpenSees
         {
             get
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    return System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers\win\bin");
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    return System.IO.Path.Combine(GhAlpacaFolder, @"OpenSees-Solvers/mac/bin");
-                }
-                else
-                {
-                    throw new Exception("Linux is not supported!");
-                }
-            }
-        }
+                string openSeesPath = AlpacaSettings.OpenSeesPath;
 
-        public static string OpenSees 
-        {
-            get
-            {
-                string openSeesPath = System.IO.Path.Combine(OpenSeesFolder, @"OpenSees");
-                
                 // Ensure execute permissions on Unix-like systems
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && File.Exists(openSeesPath))
+                if (!string.IsNullOrEmpty(openSeesPath) &&
+                    !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
+                    File.Exists(openSeesPath))
                 {
                     EnsureExecutePermissions(openSeesPath);
                 }
-                
+
                 return openSeesPath;
             }
         }
@@ -82,14 +64,5 @@ namespace Alpaca4d
                 // This prevents the application from crashing due to permission issues
             }
         }
-
-        public string CurrentDir { get; } = System.IO.Directory.GetCurrentDirectory();
-        public string FileName { get; set; }
-
-        public Application()
-        {
-
-        }
-
     }
 }

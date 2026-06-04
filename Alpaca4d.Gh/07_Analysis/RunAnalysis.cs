@@ -164,7 +164,16 @@ namespace Alpaca4d.Gh
 
 
             analysisModel.Serialise();
-            (var output, var error) = ((string, string))analysisModel.RunOpenSees();
+            string output, error;
+            try
+            {
+                (output, error) = ((string, string))analysisModel.RunOpenSees();
+            }
+            catch (Exception ex)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                return;
+            }
 
             String[] separator = { "Italy."};
             var log = error.Split(separator, StringSplitOptions.RemoveEmptyEntries);

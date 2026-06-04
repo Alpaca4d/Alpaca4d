@@ -112,7 +112,16 @@ namespace Alpaca4d.Gh
             analysisModel.Tcl.Add("record\nwipe");
 
             analysisModel.Serialise();
-            (var stdout, var stderr) = ((string, string))analysisModel.RunOpenSees();
+            string stdout, stderr;
+            try
+            {
+                (stdout, stderr) = ((string, string))analysisModel.RunOpenSees();
+            }
+            catch (Exception ex)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                return;
+            }
 
             // clean string
 

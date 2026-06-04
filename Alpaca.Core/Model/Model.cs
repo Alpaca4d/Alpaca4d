@@ -553,6 +553,15 @@ namespace Alpaca4d
         {
             string openSeesPath = Application.OpenSees;
 
+            if (string.IsNullOrWhiteSpace(openSeesPath))
+                throw new InvalidOperationException(
+                    "OpenSees executable path is not configured. " +
+                    "Use Alpaca4d \u2192 Settings \u2192 Set OpenSees Executable in the Grasshopper menu.");
+
+            if (!System.IO.File.Exists(openSeesPath))
+                throw new System.IO.FileNotFoundException(
+                    $"OpenSees executable not found at: \"{openSeesPath}\". " +
+                    "Update it via Alpaca4d \u2192 Settings in the Grasshopper menu.");
 
             Process process = new Process();
             // Configure the process using the StartInfo properties.

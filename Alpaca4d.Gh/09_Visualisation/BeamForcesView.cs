@@ -142,7 +142,7 @@ namespace Alpaca4d.Gh
                         var forces = forceData[i];
                         
                         // Create diagram mesh for this beam
-                        var diagramMesh = CreateBeamForceDiagram((Alpaca4d.Element.ForceBeamColumn)beam, forces, forceType, _scale);
+                        var diagramMesh = CreateBeamForceDiagram(beam, forces, forceType, _scale);
                         if (diagramMesh != null)
                         {
                             _forceDiagramMeshes.Add(diagramMesh);
@@ -206,7 +206,7 @@ namespace Alpaca4d.Gh
         /// <summary>
         /// Creates a force diagram mesh for a single beam
         /// </summary>
-        private Mesh CreateBeamForceDiagram(Alpaca4d.Element.ForceBeamColumn beam, List<double> forces, int forceType, double scale)
+        private Mesh CreateBeamForceDiagram(Alpaca4d.Generic.IBeam beam, List<double> forces, int forceType, double scale)
         {
             if (forces == null || forces.Count == 0) return null;
 
@@ -327,7 +327,7 @@ namespace Alpaca4d.Gh
         /// <summary>
         /// Gets the reference direction for plotting based on force type
         /// </summary>
-        private Vector3d GetReferenceDirection(Alpaca4d.Element.ForceBeamColumn beam, int forceType)
+        private Vector3d GetReferenceDirection(Alpaca4d.Generic.IBeam beam, int forceType)
         {
             var curve = beam.Curve;
             var localZ = beam.GeomTransf.LocalZ;
