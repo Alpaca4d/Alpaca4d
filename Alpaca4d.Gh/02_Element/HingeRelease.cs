@@ -52,7 +52,7 @@ namespace Alpaca4d.Gh
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Hinge_Release__Alpaca4d_;
 
         public override Guid ComponentGuid => new Guid("3F8A1C2D-5B4E-4F9A-8D7C-1E2F3A4B5C6D");
     }

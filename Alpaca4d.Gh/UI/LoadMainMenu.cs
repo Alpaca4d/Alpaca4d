@@ -67,6 +67,9 @@ namespace Alpaca4d.Menu
 
             // Add Settings
             ToolStripMenuItem subMenuSettings = new ToolStripMenuItem("Settings");
+            subMenuSettings.DropDown.Items.Add("Download OpenSees...", Alpaca4d.Gh.Properties.Resources.External_Link__Alpaca4d_,
+                (sender, e) => OpenBrowser(sender, e, "https://opensees.berkeley.edu/OpenSees/user/download.php"));
+            subMenuSettings.DropDown.Items.Add(new ToolStripSeparator());
             subMenuSettings.DropDown.Items.Add("Set OpenSees Executable...", null, SetOpenSeesPath);
             subMenuSettings.DropDown.Items.Add("Clear OpenSees Path", null, ClearOpenSeesPath);
             menuItem.DropDown.Items.Add(subMenuSettings);
