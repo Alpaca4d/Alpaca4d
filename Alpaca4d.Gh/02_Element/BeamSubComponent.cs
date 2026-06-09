@@ -8,10 +8,10 @@ using System.Drawing;
 
 namespace Alpaca4d.Gh
 {
-    internal class BeamSubComponent : SubComponent
+    internal class ForceBeamColumnSubComponent : SubComponent
     {
-        public override string name() => "Beam (Alpaca4d)";
-        public override string display_name() => "Beam";
+        public override string name() => "ForceBeamColumn (Alpaca4d)";
+        public override string display_name() => "ForceBeamColumn";
 
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)
         {

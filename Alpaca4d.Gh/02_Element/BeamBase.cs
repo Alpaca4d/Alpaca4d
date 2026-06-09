@@ -7,14 +7,14 @@ using System.Windows.Forms;
 
 namespace Alpaca4d.Gh
 {
-    public class BeamWithHinges : GH_SwitcherComponent
+    public class BeamBase : GH_SwitcherComponent
     {
         private readonly List<SubComponent> _subcomponents = new List<SubComponent>();
 
         public override string UnitMenuName => "Element Type";
         protected override string DefaultEvaluationUnit => "Beam (Alpaca4d)";
 
-        public BeamWithHinges()
+        public BeamBase()
           : base("Beam With Hinges (Alpaca4d)", "Beam With Hinges",
             "Construct a beam element. Switch between a standard ForceBeamColumn (Beam) " +
             "and a beam with plastic hinge zones (WithHinges).",
@@ -33,7 +33,7 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterEvaluationUnits(EvaluationUnitManager mngr)
         {
-            _subcomponents.Add(new BeamSubComponent());
+            _subcomponents.Add(new ForceBeamColumnSubComponent());
             _subcomponents.Add(new WithHingesSubComponent());
 
             foreach (var sub in _subcomponents)
