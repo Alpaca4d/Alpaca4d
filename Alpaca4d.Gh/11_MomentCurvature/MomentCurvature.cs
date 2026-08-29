@@ -85,13 +85,20 @@ namespace Alpaca4d.Gh
             model.FileName = System.IO.Path.GetFullPath("MomentCurvature.tcl");
             model.Serialise();
             string output, error;
+            int exitCode;
             try
             {
-                (output, error) = model.RunOpenSees();
+                (output, error, exitCode) = model.RunOpenSees();
             }
             catch (Exception ex)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                return;
+            }
+
+            if (exitCode != 0)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Moment-Curvature analysis failed: OpenSees exited with an error. See log for details.");
                 return;
             }
 

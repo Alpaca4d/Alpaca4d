@@ -403,7 +403,11 @@ namespace Alpaca4d
 
         public string WriteTcl()
         {
-            return $"analyze {NumIncr} {Dt} {DtMin} {DtMax} {Jd}";
+            // Capture the analyze() return code explicitly: OpenSees' "analyze" command
+            // always returns TCL_OK (no process/exit-code signal on non-convergence);
+            // failure is only reported via a negative return value from analyze() itself.
+            return $"set alpacaAnalyzeOk [analyze {NumIncr} {Dt} {DtMin} {DtMax} {Jd}]\n"
+                 + "puts \"ALPACA_ANALYZE_RESULT $alpacaAnalyzeOk\"\n";
         }
     }
 

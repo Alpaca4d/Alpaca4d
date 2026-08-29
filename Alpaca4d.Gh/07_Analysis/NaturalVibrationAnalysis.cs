@@ -113,13 +113,20 @@ namespace Alpaca4d.Gh
 
             analysisModel.Serialise();
             string stdout, stderr;
+            int exitCode;
             try
             {
-                (stdout, stderr) = ((string, string))analysisModel.RunOpenSees();
+                (stdout, stderr, exitCode) = analysisModel.RunOpenSees();
             }
             catch (Exception ex)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                return;
+            }
+
+            if (exitCode != 0)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Analysis Failed: OpenSees exited with an error. See log for details.");
                 return;
             }
 

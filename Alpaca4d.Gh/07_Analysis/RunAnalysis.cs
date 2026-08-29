@@ -165,9 +165,10 @@ namespace Alpaca4d.Gh
 
             analysisModel.Serialise();
             string output, error;
+            int exitCode;
             try
             {
-                (output, error) = ((string, string))analysisModel.RunOpenSees();
+                (output, error, exitCode) = analysisModel.RunOpenSees();
             }
             catch (Exception ex)
             {
@@ -175,29 +176,45 @@ namespace Alpaca4d.Gh
                 return;
             }
 
-            String[] separator = { "Italy."};
-            var log = error.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            if(log.Count() != 1)
+            const string AnalyzeResultTag = "ALPACA_ANALYZE_RESULT";
+            string log = string.IsNullOrEmpty(error) ? output : error + "\n" + output;
+
+            if (exitCode != 0)
             {
-                if (error.Contains("WARNING") && error.Contains("failed"))
+                // A non-zero exit code means the Tcl script itself errored out
+                // (e.g. bad command, undefined material) - see TclInterpreter::run.
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Analysis Failed: OpenSees exited with an error. See log for details.");
+                analysisModel = null;
+            }
+            else
+            {
+                // analyze() always returns TCL_OK to Tcl even on non-convergence; the
+                // actual result is a negative integer captured via the sentinel below.
+                int? analyzeResult = null;
+                var resultLine = output
+                    .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
+                    .LastOrDefault(l => l.Contains(AnalyzeResultTag));
+
+                if (resultLine != null)
                 {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Analysis Failed");
+                    var token = resultLine.Substring(resultLine.IndexOf(AnalyzeResultTag) + AnalyzeResultTag.Length).Trim();
+                    if (int.TryParse(token, out int parsed))
+                        analyzeResult = parsed;
+                }
+
+                if (analyzeResult.HasValue && analyzeResult.Value < 0)
+                {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Analysis Failed: OpenSees 'analyze' did not converge.");
                     analysisModel = null;
                 }
                 else if (error.Contains("WARNING"))
                 {
                     AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Warning! Double check the log!");
-                    analysisModel = null;
                 }
-                DA.SetData(0, log[1]);
-                DA.SetData(1, analysisModel);
-            }
-            else
-            {
-                DA.SetData(0, error);
-                DA.SetData(1, analysisModel);
             }
 
+            DA.SetData(0, log);
+            DA.SetData(1, analysisModel);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;

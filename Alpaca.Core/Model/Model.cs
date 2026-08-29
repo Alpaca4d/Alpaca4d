@@ -549,7 +549,7 @@ namespace Alpaca4d
             // in a tcl property
         }
 
-        public (string, string) RunOpenSees()
+        public (string output, string error, int exitCode) RunOpenSees()
         {
             string openSeesPath = Application.OpenSees;
 
@@ -563,6 +563,9 @@ namespace Alpaca4d
                     $"OpenSees executable not found at: \"{openSeesPath}\". " +
                     "Update it via Alpaca4d \u2192 Settings in the Grasshopper menu.");
 
+            var outputBuilder = new System.Text.StringBuilder();
+            var errorBuilder = new System.Text.StringBuilder();
+
             Process process = new Process();
             // Configure the process using the StartInfo properties.
             process.StartInfo.FileName = openSeesPath;
@@ -571,13 +574,29 @@ namespace Alpaca4d
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            process.Start();
 
-            string output = process.StandardOutput.ReadToEnd().Trim();
-            string error = process.StandardError.ReadToEnd().Trim();
+            // Read stdout/stderr via events (not Task/async) so we never block on a full
+            // pipe while the other stream is being written (deadlock risk with ReadToEnd
+            // on both streams sequentially). This stays fully synchronous, which is
+            // required for Grasshopper components.
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (e.Data != null)
+                    outputBuilder.AppendLine(e.Data);
+            };
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (e.Data != null)
+                    errorBuilder.AppendLine(e.Data);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             process.WaitForExit();
+
             this.IsAnalysed = true;
-            return (output, error);
+            return (outputBuilder.ToString().Trim(), errorBuilder.ToString().Trim(), process.ExitCode);
         }
 
         public void Serialise()
