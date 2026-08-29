@@ -39,7 +39,7 @@ namespace Alpaca4d
             this.Force = forces;
             this.Stress = stresses;
             this.SectionForce = sectionForces;
-            this.SectionFiberStress = SectionFiberStress;
+            this.SectionFiberStress = sectionFiberStresses;
         }
 
         public string WriteTcl()

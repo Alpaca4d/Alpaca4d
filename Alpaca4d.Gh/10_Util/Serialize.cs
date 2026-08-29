@@ -68,6 +68,7 @@ namespace Alpaca4d.Gh
                 }
                 filePath = OnPingDocument().FilePath;
                 filePath = System.IO.Path.ChangeExtension(filePath, "tcl");
+                System.IO.File.WriteAllLines(filePath, tclText);
             }
 			else if(filePath != null && save == true)
 			{

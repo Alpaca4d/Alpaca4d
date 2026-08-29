@@ -93,7 +93,7 @@ namespace Alpaca4d.Constraints
             var dofs = new List<int>();
 
             int i;
-            for(i = 0; i < 5; i++)
+            for(i = 0; i < this.Dof.Count; i++)
             {
                 if(this.Dof[i] == true)
                 {

@@ -41,7 +41,8 @@ namespace Alpaca4d.Template
             var element = $"element zeroLengthSection 1 1 2 {fiber.Id}\n";
 
 
-            var patternAxial = "pattern Plain 1 \"Constant\" {\n\t"
+            var timeSeriesAxial = "timeSeries Constant 1\n";
+            var patternAxial = "pattern Plain 1 1 {\n\t"
                         + $"load 2 {axialForce} 0 0 0 0 0}}\n";
 
             var integrator = "integrator LoadControl 0\n";
@@ -72,7 +73,8 @@ namespace Alpaca4d.Template
 
             var dir = (dof == "y") ? "1 0" : "0 1";
 
-            var patternMoment = "\npattern Plain 2 \"Linear\" {\n\t"
+            var timeSeriesMoment = "timeSeries Linear 2\n";
+            var patternMoment = "\npattern Plain 2 2 {\n\t"
             + $"load 2 0 0 0 0 {dir}}}\n";
 
             var dofInt = dof == "y" ? 5 : 6;
@@ -80,7 +82,7 @@ namespace Alpaca4d.Template
             var integratorDisp = $"integrator DisplacementControl 2 {dofInt} {maxPhi / numIncr}\n";
             var analyzeIncrement = $"analyze {numIncr}\n";
 
-            return clean + builder + node1 + node2 + fix1 + fix2 + material + fiberSection + element + patternAxial + integrator + system + test + number + constraints + algorithm + analysis + analyze + lc + recorder1 + recorder2 + recorder3 + patternMoment + integratorDisp + analyzeIncrement + clean;
+            return clean + builder + node1 + node2 + fix1 + fix2 + material + fiberSection + element + timeSeriesAxial + patternAxial + integrator + system + test + number + constraints + algorithm + analysis + analyze + lc + recorder1 + recorder2 + recorder3 + timeSeriesMoment + patternMoment + integratorDisp + analyzeIncrement + clean;
         }
 
         public static string Define(FiberSection fiber, double axialForce, double maxPhi, double alpha = 0.00, int numIncr = 1000)
@@ -110,7 +112,8 @@ namespace Alpaca4d.Template
 
 
 
-            var patternAxial = "pattern Plain 1 \"Constant\" {\n\t"
+            var timeSeriesAxial = "timeSeries Constant 1\n";
+            var patternAxial = "pattern Plain 1 1 {\n\t"
                         + $"load 2 {axialForce} 0 0 0 0 0}}\n";
 
             var integrator = "integrator LoadControl 0\n";
@@ -130,14 +133,15 @@ namespace Alpaca4d.Template
             var recorder3 = $"recorder Element -file {MomentCurvature.FiberStressFilePath} -ele 1 section fiber 0 stressStrain\n";
 
 
-            var patternMoment = "pattern Plain 2 \"Linear\" {\n\t"
+            var timeSeriesMoment = "timeSeries Linear 2\n";
+            var patternMoment = "pattern Plain 2 2 {\n\t"
             + $"load 2 0 0 0 0 {Math.Cos(alpha)} {Math.Sin(alpha)}}}\n";
 
 
             var integratorDisp = $"integrator DisplacementControl 2 5 {maxPhi / numIncr}\n";
             var analyzeIncrement = $"analyze {numIncr}\n";
 
-            return clean + builder + node1 + node2 + fix1 + fix2 + material + fiberSection + element + patternAxial + integrator + system + test + number + constraints + algorithm + analysis + analyze + lc + recorder1 + recorder2 + recorder3 + patternMoment + integratorDisp + analyzeIncrement + clean;
+            return clean + builder + node1 + node2 + fix1 + fix2 + material + fiberSection + element + timeSeriesAxial + patternAxial + integrator + system + test + number + constraints + algorithm + analysis + analyze + lc + recorder1 + recorder2 + recorder3 + timeSeriesMoment + patternMoment + integratorDisp + analyzeIncrement + clean;
         }
     }
 }
