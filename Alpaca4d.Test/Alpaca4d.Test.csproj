@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ==========================================
+       Alpaca4d component test-bench.
+       Solves Grasshopper components against a head-less Rhino, with no canvas open.
+       Windows only - see README.md.
+       ========================================== -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <RootNamespace>Alpaca4d.Testing</RootNamespace>
+    <AssemblyName>Alpaca4d.Test</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\.runsettings</RunSettingsFilePath>
+    <!-- Obsolete components are part of what needs testing, and the Rhino SDK packages
+         carry a known-vulnerability advisory we do not control. -->
+    <NoWarn>$(NoWarn);CS0612;CS0618;NU1902</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="Rhino.Testing" Version="8.0.28-beta" />
+    <!-- Compile-only: at run time Rhino.Testing binds these to the installed Rhino.
+         The version matches what Rhino.Inside requires - Rhino.Testing needs Rhino 8.
+         Alpaca4d itself still builds against the 7.18 SDK; Grasshopper 8 loads those
+         assemblies unchanged, exactly as it does for the installed plug-in. -->
+    <PackageReference Include="Grasshopper" Version="8.0.23304.9001" IncludeAssets="compile;build" />
+    <PackageReference Include="RhinoCommon" Version="8.0.23304.9001" IncludeAssets="compile;build" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj" />
+    <ProjectReference Include="..\Alpaca4d.Gh\Alpaca4d.Gh.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Rhino.Testing.Configs.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include=".runsettings" />
+    <None Include="Approved\ComponentApi.approved.txt" />
+    <None Include="README.md" />
+  </ItemGroup>
+
+  <!-- The Rhino SDK reference assemblies must not sit next to the test binary: the CLR
+       probes the application base first and would bind them instead of the ones inside
+       the installed Rhino that Rhino.Testing starts. -->
+  <Target Name="StripRhinoSdkFromOutput" AfterTargets="Build">
+    <ItemGroup>
+      <RhinoSdkLeftovers Include="$(OutDir)RhinoCommon.dll" />
+      <RhinoSdkLeftovers Include="$(OutDir)Grasshopper.dll" />
+      <RhinoSdkLeftovers Include="$(OutDir)GH_IO.dll" />
+    </ItemGroup>
+    <Delete Files="@(RhinoSdkLeftovers)" />
+  </Target>
+
+</Project>

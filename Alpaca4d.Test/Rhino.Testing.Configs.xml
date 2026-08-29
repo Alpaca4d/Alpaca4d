@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Where the head-less Rhino comes from. Edit RhinoSystemDirectory if Rhino is installed
+  somewhere else; Rhino.Testing needs Rhino 8 or newer.
+
+  LoadEto is on because Alpaca4d references Eto.Forms (the licence dialog and the
+  settings UI); nothing opens a window in a test run, but the assembly has to resolve.
+-->
+<Settings>
+  <RhinoSystemDirectory>C:\Program Files\Rhino 8\System</RhinoSystemDirectory>
+  <CreateRhinoDoc>true</CreateRhinoDoc>
+  <CreateRhinoView>false</CreateRhinoView>
+  <LoadEto>true</LoadEto>
+  <LoadRDK>false</LoadRDK>
+  <LoadLegacyIronPython>false</LoadLegacyIronPython>
+  <LoadGrasshopper>true</LoadGrasshopper>
+</Settings>

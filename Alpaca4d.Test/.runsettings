@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rhino.Inside only runs 64-bit; without this the test host may start as x86. -->
+<RunSettings>
+  <RunConfiguration>
+    <TargetPlatform>x64</TargetPlatform>
+    <TargetFrameworkVersion>net48</TargetFrameworkVersion>
+  </RunConfiguration>
+</RunSettings>
