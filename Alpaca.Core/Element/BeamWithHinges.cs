@@ -29,6 +29,36 @@ namespace Alpaca4d.Element
 
         private HingeRadauIntegration HingeIntegration => (HingeRadauIntegration)this.BeamIntegration;
 
+        /// <summary>Plastic hinge length used when the caller does not supply one, as a fraction of L.</summary>
+        public const double DefaultLpRatio = 0.05;
+
+        /// <summary>Lower bound on lp/L. Below this the 1e-6 hinge softening stops reading as a release.</summary>
+        public const double MinLpRatio = 0.02;
+
+        /// <summary>
+        /// Upper bound on lp/L. HingeRadau gives the two interior points a weight of
+        /// 0.5 - 2*(lpI+lpJ)/L (HingeRadauBeamIntegration::getSectionWeights), so lpI+lpJ
+        /// must stay below L/4; capping each end at 0.10*L keeps that weight at 0.30 or more.
+        /// </summary>
+        public const double MaxLpRatio = 0.10;
+
+        /// <summary>Node-to-node distance, which is the length L that OpenSees integrates over.</summary>
+        public static double ChordLength(Curve curve) => curve.PointAtStart.DistanceTo(curve.PointAtEnd);
+
+        /// <summary>
+        /// Turns a plastic hinge length into a value that is safe for HingeRadau: a non-positive
+        /// input falls back to <see cref="DefaultLpRatio"/>*L, anything else is clamped to
+        /// [<see cref="MinLpRatio"/>, <see cref="MaxLpRatio"/>]*L. Because the release is modelled by
+        /// scaling the hinge section stiffness by 1e-6, the released flexibility is proportional to
+        /// lp/L, so an absolute lp would behave differently in m and in mm.
+        /// </summary>
+        public static double ResolveLp(double lp, double length)
+        {
+            if (length <= 0.0) return lp;
+            if (lp <= 0.0) return DefaultLpRatio * length;
+            return Math.Min(Math.Max(lp, MinLpRatio * length), MaxLpRatio * length);
+        }
+
         public BeamWithHinges(
             Curve curve,
             IUniaxialSection section,
@@ -43,7 +73,11 @@ namespace Alpaca4d.Element
             var sectionI = CreateHingeSection(section, releaseI);
             var sectionJ = CreateHingeSection(section, releaseJ);
 
-            this.BeamIntegration = new HingeRadauIntegration(sectionI, lpI, sectionJ, lpJ, section);
+            double length = ChordLength(curve);
+            this.BeamIntegration = new HingeRadauIntegration(
+                sectionI, ResolveLp(lpI, length),
+                sectionJ, ResolveLp(lpJ, length),
+                section);
         }
 
         private static ElasticSection CreateHingeSection(IUniaxialSection baseSection, Release release)
@@ -98,7 +132,8 @@ namespace Alpaca4d.Element
             string sectionI    = this.HingeIntegration.SectionI.WriteTcl();
             string sectionJ    = this.HingeIntegration.SectionJ.WriteTcl();
             string integration = this.HingeIntegration.WriteTcl();
-            // HingeRadau is a compound integration spec and must be a single TCL token → wrap in { }
+            // The legacy inline form takes the spec as separate words: TclForceBeamColumnCommand
+            // reads argv[6] as the type and argv[7..11] as secTagI lpI secTagJ lpJ secTagE, so no braces.
             string beam = $"element forceBeamColumn {Id} {INode} {JNode} {GeomTransf.Id} {integration} -mass {MassDens / 1000}\n";
             return geomTransf + sectionI + sectionJ + beam;
         }

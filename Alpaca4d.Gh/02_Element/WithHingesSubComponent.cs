@@ -34,13 +34,13 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "ReleaseI", "ReleaseI", "Release condition at the I end.", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "LpI", "LpI", $"Plastic hinge length at I end [{Units.Length}].", GH_ParamAccess.item, new GH_Number(0.01));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "LpI", "LpI", $"Plastic hinge length at I end [{Units.Length}]. 0 or unset uses 0.05*L; other values are clamped to [0.02*L, 0.10*L].", GH_ParamAccess.item, new GH_Number(0.0));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "ReleaseJ", "ReleaseJ", "Release condition at the J end.", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "LpJ", "LpJ", $"Plastic hinge length at J end [{Units.Length}].", GH_ParamAccess.item, new GH_Number(0.01));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "LpJ", "LpJ", $"Plastic hinge length at J end [{Units.Length}]. 0 or unset uses 0.05*L; other values are clamped to [0.02*L, 0.10*L].", GH_ParamAccess.item, new GH_Number(0.0));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_Colour(), "Colour", "Colour", "", GH_ParamAccess.item, new GH_Colour(Color.FromArgb(255, 13, 13, 13)));
@@ -90,6 +90,8 @@ namespace Alpaca4d.Gh
             double lpJ = 0.0;
             DA.GetData(7, ref lpJ);
 
+            ValidateHingeLengths(line, lpI, lpJ, out msg, out level);
+
             Color color = Color.FromArgb(255, 13, 13, 13);
             DA.GetData(8, ref color);
 
@@ -97,6 +99,44 @@ namespace Alpaca4d.Gh
             element.Color = color;
 
             DA.SetData(0, element);
+        }
+
+        /// <summary>
+        /// Reports how the raw LpI/LpJ inputs will be treated by
+        /// <see cref="Alpaca4d.Element.BeamWithHinges.ResolveLp"/>. The L/4 check runs on the raw
+        /// values, before clamping, so the user still hears about a request that HingeRadau could
+        /// not have integrated: its interior weights are 0.5 - 2*(lpI+lpJ)/L.
+        /// </summary>
+        private static void ValidateHingeLengths(Curve line, double lpI, double lpJ, out string msg, out GH_RuntimeMessageLevel level)
+        {
+            msg = "";
+            level = GH_RuntimeMessageLevel.Remark;
+
+            double length = Alpaca4d.Element.BeamWithHinges.ChordLength(line);
+            if (length <= 0.0) return;
+
+            // A blank input is not a request for zero, it asks for the default share of L.
+            double requestedI = lpI > 0.0 ? lpI : Alpaca4d.Element.BeamWithHinges.DefaultLpRatio * length;
+            double requestedJ = lpJ > 0.0 ? lpJ : Alpaca4d.Element.BeamWithHinges.DefaultLpRatio * length;
+
+            if (requestedI + requestedJ >= 0.25 * length)
+            {
+                msg = $"LpI + LpJ ({requestedI + requestedJ:G4}) must stay below L/4 ({0.25 * length:G4}) or the HingeRadau "
+                    + $"interior weights 0.5-2*(LpI+LpJ)/L turn negative. Clamped to {Alpaca4d.Element.BeamWithHinges.MaxLpRatio:P0} of L.";
+                level = GH_RuntimeMessageLevel.Warning;
+                return;
+            }
+
+            var clamped = new System.Collections.Generic.List<string>();
+            if (lpI > 0.0 && Alpaca4d.Element.BeamWithHinges.ResolveLp(lpI, length) != lpI) clamped.Add("LpI");
+            if (lpJ > 0.0 && Alpaca4d.Element.BeamWithHinges.ResolveLp(lpJ, length) != lpJ) clamped.Add("LpJ");
+
+            if (clamped.Count > 0)
+            {
+                msg = $"{string.Join(" and ", clamped)} clamped to the "
+                    + $"[{Alpaca4d.Element.BeamWithHinges.MinLpRatio:P0}, {Alpaca4d.Element.BeamWithHinges.MaxLpRatio:P0}] "
+                    + $"range of the element length L = {length:G4} [{Units.Length}].";
+            }
         }
     }
 }
