@@ -53,7 +53,7 @@ namespace Alpaca4d.Testing.Tests
                 .Set("Section", section));
 
             var support = _run.Solve("Support", ComponentHarness.For<Alpaca4d.Gh.Support>()
-                .Set("Point", Root));
+                .Set("Position", Root));
 
             var load = _run.Solve("Load", ComponentHarness.For<Alpaca4d.Gh.PointLoad>()
                 .Set("Point", Tip)
@@ -314,7 +314,7 @@ namespace Alpaca4d.Testing.Tests
                 .Set("Section", section));
 
             var supports = EdgeAt(0).Select(p => _run.Solve("Support",
-                ComponentHarness.For<Alpaca4d.Gh.Support>().Set("Point", p))).ToArray();
+                ComponentHarness.For<Alpaca4d.Gh.Support>().Set("Position", p))).ToArray();
 
             var original = _run.Solve("Assemble", ComponentHarness.For<Alpaca4d.Gh.AssembleModel>()
                 .Set("Elements", elements.ToArray())

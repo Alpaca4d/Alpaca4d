@@ -52,7 +52,7 @@ namespace Alpaca4d.Testing.Tests
                 .Set("Section", section));
 
             var support = _run.Solve("Support", ComponentHarness.For<Alpaca4d.Gh.Support>()
-                .Set("Point", Root));
+                .Set("Position", Root));
 
             var load = _run.Solve("Load", ComponentHarness.For<Alpaca4d.Gh.PointLoad>()
                 .Set("Point", Tip)

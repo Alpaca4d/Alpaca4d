@@ -48,7 +48,7 @@ namespace Alpaca4d.Testing.Tests
                 .Set("Section", section));
 
             var supports = EdgeAt(0).Select(p => _run.Solve("Support",
-                ComponentHarness.For<Alpaca4d.Gh.Support>().Set("Point", p))).ToArray();
+                ComponentHarness.For<Alpaca4d.Gh.Support>().Set("Position", p))).ToArray();
 
             var loads = EdgeAt(Length).Select(p => _run.Solve("Load",
                 ComponentHarness.For<Alpaca4d.Gh.PointLoad>()

@@ -23,18 +23,21 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Point", "Point", $"Point to Restraint [{Units.Length}]", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("Tx", "Tx", "Translation along X", GH_ParamAccess.item, true);
+            pManager.AddPlaneParameter("Position", "Position",
+                $"Point or Plane to restrain [{Units.Length}]. A Point restrains the global axes. " +
+                "A Plane restrains its own axes instead, so the support can be skewed - " +
+                "an inclined roller, a support on a sloping face.", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Tx", "Tx", "Translation along the support plane's X axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Ty", "Ty", "Translation along Y", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Ty", "Ty", "Translation along the support plane's Y axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Tz", "Tz", "Translation along Z", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Tz", "Tz", "Translation along the support plane's Z axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Rx", "Rx", "Rotation along X", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Rx", "Rx", "Rotation about the support plane's X axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Ry", "Ry", "Rotation along Y", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Ry", "Ry", "Rotation about the support plane's Y axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Rz", "Rz", "Rotation along Z", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Rz", "Rz", "Rotation about the support plane's Z axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -54,7 +57,9 @@ namespace Alpaca4d.Gh
         [STAThread]
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Point3d pos = Point3d.Origin;
+            // A Point arriving on this input is cast to a world-aligned Plane at that
+            // point, which is the support every model had before planes were an option.
+            Plane position = Plane.WorldXY;
             bool tx = true;
             bool ty = true;
             bool tz = true;
@@ -62,7 +67,7 @@ namespace Alpaca4d.Gh
             bool ry = true;
             bool rz = true;
 
-            if (!DA.GetData(0, ref pos)) return;
+            if (!DA.GetData(0, ref position)) return;
             if (!DA.GetData(1, ref tx)) return;
             if (!DA.GetData(2, ref ty)) return;
             if (!DA.GetData(3, ref tz)) return;
@@ -70,7 +75,7 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(5, ref ry)) return;
             if (!DA.GetData(6, ref rz)) return;
 
-            var support = new Alpaca4d.Element.Support(pos, tx, ty, tz, rx, ry, rz);
+            var support = new Alpaca4d.Element.Support(position, tx, ty, tz, rx, ry, rz);
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, support);

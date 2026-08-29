@@ -40,8 +40,13 @@ namespace Alpaca4d.Gh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.Register_GenericParam("SupportPosition", "SupportPosition", "");
-            pManager.Register_VectorParam("ReactionForce", "ReactionForce",$"[{Units.Force}]");
-            pManager.Register_VectorParam("ReactionMoment", "ReactionMoment", $"[{Units.Force}{Units.Length}]");
+            pManager.Register_VectorParam("ReactionForce", "ReactionForce",
+                $"[{Units.Force}] in the support's own axes. For a support placed on a Point " +
+                "those are the global axes; for one placed on a Plane they are the plane's.");
+            pManager.Register_VectorParam("ReactionMoment", "ReactionMoment",
+                $"[{Units.Force}{Units.Length}] in the support's own axes.");
+            pManager.Register_PlaneParam("SupportPlane", "SupportPlane",
+                "The axes the reactions above are given in, one per support.");
         }
 
         /// <summary>
@@ -59,12 +64,33 @@ namespace Alpaca4d.Gh
             DA.GetData(1, ref history);
             DA.GetData(2, ref step);
 
-            var reactionForce = Result.Read.NodalOutput(alpacaModel, step, ResultType.REACTION_FORCE, alpacaModel.Supports.Select(x => x.Id).ToList());
-            var reactionMoment = Result.Read.NodalOutput(alpacaModel, step, ResultType.REACTION_MOMENT, alpacaModel.Supports.Select(x => x.Id).ToList());
+            // A skewed support carries its fix on a coincident auxiliary node, so that is
+            // where OpenSees puts the reaction; the support node itself reads zero. An
+            // axis-aligned support has no auxiliary node and is read where it always was.
+            var nodes = alpacaModel.Supports.Select(x => x.AuxiliaryNodeId ?? x.Id).ToList();
+
+            var globalForce = Result.Read.NodalOutput(alpacaModel, step, ResultType.REACTION_FORCE, nodes).ToList();
+            var globalMoment = Result.Read.NodalOutput(alpacaModel, step, ResultType.REACTION_MOMENT, nodes).ToList();
+
+            // Reactions come out of the recorder in global components whatever the
+            // support is turned to, which for a skewed one spreads a reaction that runs
+            // along a single local axis across all three global ones. Resolving them onto
+            // the support's own axes is what makes a released direction read as the zero
+            // it is.
+            var planes = alpacaModel.Supports.Select(x => x.Plane).ToList();
+            var localForce = globalForce.Select((vector, i) => InAxesOf(vector, planes[i])).ToList();
+            var localMoment = globalMoment.Select((vector, i) => InAxesOf(vector, planes[i])).ToList();
+
             // Finally assign the spiral to the output parameter.
             DA.SetDataList(0, alpacaModel.Supports.Select(x => x.Pos).ToList());
-            DA.SetDataList(1, reactionForce);
-            DA.SetDataList(2, reactionMoment);
+            DA.SetDataList(1, localForce);
+            DA.SetDataList(2, localMoment);
+            DA.SetDataList(3, planes);
+        }
+
+        private static Vector3d InAxesOf(Vector3d vector, Plane frame)
+        {
+            return new Vector3d(vector * frame.XAxis, vector * frame.YAxis, vector * frame.ZAxis);
         }
 
 

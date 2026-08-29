@@ -40,7 +40,7 @@ the full geometry kernel, real Grasshopper parameters and goo, real `SolveInstan
 * switcher components (`nD`, `Uniaxial`, `BeamBase`, …) including unit selection;
 * chaining components by handing one solve's output to the next input;
 * the Alpaca4d.Core objects that come out, including their `WriteTcl()` text;
-* **two whole workflows, solver included** — see below.
+* **four whole workflows, solver included** — see below.
 
 Still out of reach, because there is no canvas and no viewport: drawing
 (`DrawViewportWires/Meshes`, the 09_Visualisation components), Eto dialogs, component
@@ -61,18 +61,20 @@ Rhino.Inside requires.
 
 ## The workflow tests
 
-`CantileverWorkflowTests` and `ShellWorkflowTests` run the chains a user would build on
+The workflow fixtures run the chains a user would build on
 the canvas — material → section → element → supports + loads → load pattern → assemble →
 analysis settings → **run analysis** → nodal displacements — and start a real OpenSees
 process from the `OpenSees-Solvers` folder the build copies next to the test assembly.
 
-Both models are chosen so the answer is known in closed form rather than stored as a
-blob:
+Each model is chosen so the answer is known in closed form, or fixed by statics,
+rather than stored as a blob:
 
 | Fixture | Model | Check | Measured |
 | --- | --- | --- | --- |
 | `CantileverWorkflowTests` | 10 m beam, square 0.4 m section, 10 kN tip load | `δ = P L³ / (3 E I)` = 7.4405 mm | 7.4487 mm (+0.11%, shear) |
 | `ShellWorkflowTests` | 10 × 1 m strip, 0.3 m thick, 10 ASD shell quads, 10 kN tip load | `δ = P L³ / (3 E I)` = 7.0547 mm | 7.0408 mm (−0.2%, discretisation) |
+| `InclinedFixedSupportTests` | the same cantilever with its base turned 30° about Y, every restraint on | turning a fully fixed support cannot change anything: same `δ`, same `P` and `P L` | — |
+| `InclinedRollerTests` | cantilever held against a plane turned 30° at the tip, free to slide along it | the reaction is perpendicular to the sliding axis, and the released local component reads zero | — |
 
 Each assertion covers the components, the generated OpenSees input deck, the solver, the
 `.mpco` recorder file and the HDF5 read-back — in about a second.
@@ -85,7 +87,7 @@ stored numbers:
 | Reader | Checked against |
 | --- | --- |
 | `NodalDisplacement` | the closed-form deflection, in both workflows |
-| `ReactionForce` | equilibrium — the support returns `P` and `P L`; on the shell, the two corners sum to `P` |
+| `ReactionForce` | equilibrium — the support returns `P` and `P L`; on the shell, the two corners sum to `P`; on a skewed support, the reaction resolved onto the support plane |
 | `BeamForce` | `N = 0`, shear `= P`, peak moment `= P L`, zero at the free end |
 | `ShellForces` | the whole cantilever diagram: `myy` = 95 → 5 kNm/m across the ten elements, `vyz` = 10 kN/m, membrane zero |
 
@@ -101,7 +103,7 @@ natural-vibration workflow, which no fixture builds yet.
 `WorkflowRun` is the shared scaffolding: it owns a temporary working directory (hence
 `[NonParallelizable]`, since `RunAnalysis` changes the process working directory),
 records every step so a failure names the component that caused it, and prints the
-solver log next to it. To add a workflow, follow the shape of the two existing fixtures.
+solver log next to it. To add a workflow, follow the shape of the existing fixtures.
 
 ## Writing a component test
 

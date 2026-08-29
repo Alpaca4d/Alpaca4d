@@ -709,8 +709,161 @@ namespace Alpaca4d
                         throw new Exception($"Support node at location '{supportNode.Pos}' is not part of the model!");
                 }
 
+            }
+
+            this.CreateSupportSprings();
+
+            // A skewed support writes a node and a fix of its own, and both of those read
+            // the number of degrees of freedom from whichever model builder is current.
+            // The node block leaves that at 6 whenever the model has any beams or shells,
+            // so a support sitting on a 3 ndf brick node needs the builder moved back
+            // before it is written - and moved again for the next one.
+            var activeNdf = this.UniquePointsSixNDF.Count != 0 ? 6 : 3;
+            var deckNdf = activeNdf;
+
+            foreach (var supportNode in this.Supports)
+            {
+                if (supportNode.ndf != activeNdf)
+                {
+                    this.Tcl.Add(supportNode.ndf == 3 ? Model.Initialise3ndf() : Model.Initialise6ndf());
+                    activeNdf = supportNode.ndf;
+                }
+
                 this.Tcl.Add(supportNode.WriteTcl());
             }
+
+            // Everything after this - the elements above all - expects the builder the
+            // node block left behind.
+            if (activeNdf != deckNdf)
+                this.Tcl.Add(deckNdf == 3 ? Model.Initialise3ndf() : Model.Initialise6ndf());
+        }
+
+        /// <summary>
+        /// How much stiffer than the structure itself a support spring is made.
+        ///
+        /// The restrained direction then gives way by about one part in a million of what
+        /// the structure around it moves - orders below anything a user reads off a
+        /// result - while spending only six of the roughly sixteen decimal digits a
+        /// double carries, which leaves the solver about ten digits of conditioning to
+        /// work with. Scaling by the model rather than hard-coding a stiffness is what
+        /// keeps this unit-independent: a model in kN/m and the same model in N/mm come
+        /// out equally fixed.
+        /// </summary>
+        private const double PenaltyFactor = 1.0e6;
+
+        /// <summary>
+        /// Gives every skewed support the auxiliary node, the element tag and the penalty
+        /// materials its zeroLength needs.
+        ///
+        /// Auxiliary nodes are numbered above every real node and spring elements above
+        /// every real element, on purpose. Node results in the recorder file are read by
+        /// row, and the rows are ordered by node tag, so keeping the extra nodes last
+        /// leaves the row of every node the user actually drew exactly where it was.
+        /// </summary>
+        private void CreateSupportSprings()
+        {
+            var skewed = this.Supports.Where(support => support.NeedsSpring).ToList();
+
+            if (skewed.Count == 0)
+                return;
+
+            var stiffness = this.PenaltyStiffness();
+
+            var auxiliaryNodeTag = this.UniquePointsThreeNDF.Count + this.UniquePointsSixNDF.Count;
+            var springElementTag = this.Elements.Count;
+
+            foreach (var support in skewed)
+            {
+                support.AuxiliaryNodeId = ++auxiliaryNodeTag;
+                support.SpringElementId = ++springElementTag;
+                support.TranslationSpring = SupportSpring(stiffness.translation);
+                support.RotationSpring = SupportSpring(stiffness.rotation);
+            }
+        }
+
+        private static Alpaca4d.Material.UniaxialMaterialElastic SupportSpring(double stiffness)
+        {
+            return new Alpaca4d.Material.UniaxialMaterialElastic(
+                "Alpaca4d support spring", stiffness, stiffness, 0.0, 0.0, 0.0);
+        }
+
+        /// <summary>
+        /// The stiffness a support spring is given, translational and rotational, taken
+        /// as <see cref="PenaltyFactor"/> times the stiffest thing in the model. Each
+        /// element contributes the terms that actually appear on its stiffness diagonal -
+        /// EA/L and 12EI/L^3 for a beam, 4EI/L and GJ/L for its rotations, membrane Et
+        /// and plate Et^3/12 for a shell, E times a size for a brick - so the reference
+        /// tracks the model whatever it is made of.
+        /// </summary>
+        private (double translation, double rotation) PenaltyStiffness()
+        {
+            double translation = 0.0;
+            double rotation = 0.0;
+
+            foreach (var beam in this.Beams)
+            {
+                var length = beam.Curve.GetLength();
+                if (length <= 0.0)
+                    continue;
+
+                var section = beam.Section;
+                var e = section.Material.E;
+                var g = section.Material.G;
+                var inertia = Math.Max(section.Iyy, section.Izz);
+
+                translation = Math.Max(translation, e * section.Area / length);
+                translation = Math.Max(translation, 12.0 * e * inertia / (length * length * length));
+                rotation = Math.Max(rotation, 4.0 * e * inertia / length);
+                rotation = Math.Max(rotation, g * section.J / length);
+            }
+
+            foreach (var shell in this.Shells)
+            {
+                var e = YoungsModulusOf(shell.Section.Material);
+                var thickness = shell.Section.Thickness;
+
+                translation = Math.Max(translation, e * thickness);
+                rotation = Math.Max(rotation, e * thickness * thickness * thickness / 12.0);
+            }
+
+            foreach (var brick in this.Bricks)
+            {
+                var e = YoungsModulusOf(brick.Material);
+                var size = CharacteristicSize(brick.Mesh);
+
+                if (size > 0.0)
+                    translation = Math.Max(translation, e * size);
+            }
+
+            // Nothing to scale against - a model of nothing but supports. Anything
+            // positive will do; there is no structure for it to be stiff relative to.
+            if (translation <= 0.0)
+                translation = 1.0;
+            if (rotation <= 0.0)
+                rotation = translation;
+
+            return (PenaltyFactor * translation, PenaltyFactor * rotation);
+        }
+
+        private static double YoungsModulusOf(IMultiDimensionMaterial material)
+        {
+            if (material is Alpaca4d.Material.ElasticIsotropicMaterial isotropic)
+                return isotropic.E;
+
+            if (material is Alpaca4d.Material.ElasticOrthotropicMaterial orthotropic)
+                return Math.Max(orthotropic.Ex, Math.Max(orthotropic.Ey, orthotropic.Ez));
+
+            return 0.0;
+        }
+
+        private static double CharacteristicSize(Mesh mesh)
+        {
+            if (mesh == null)
+                return 0.0;
+
+            var diagonal = mesh.GetBoundingBox(true).Diagonal;
+
+            return (Math.Abs(diagonal.X) + Math.Abs(diagonal.Y) + Math.Abs(diagonal.Z)) / 3.0;
         }
 
         private List<PointLoad> CreateGravityLoad(Alpaca4d.Loads.Gravity gravityLoad = null)

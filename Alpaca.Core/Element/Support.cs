@@ -19,7 +19,110 @@ namespace Alpaca4d.Element
         public bool Rz { get; set; }
         public int? Id { get; set; }
         public int ndf { get; set; }
+
+        private Plane plane = Plane.WorldXY;
+
+        /// <summary>
+        /// The frame Tx/Ty/Tz and Rx/Ry/Rz are read in. Its axes - not the world axes -
+        /// are what each restraint refers to, so rotating the plane skews the support.
+        /// The origin is the support location, mirrored by <see cref="Pos"/>.
+        /// </summary>
+        public Plane Plane
+        {
+            get { return this.plane.IsValid ? this.plane : Plane.WorldXY; }
+            set { this.plane = value; }
+        }
+
+        /// <summary>
+        /// The coincident node that carries the <c>fix</c> of a skewed support, and with
+        /// it the reaction. Null while the support restrains global axes and needs no
+        /// spring. Assigned by <see cref="Model"/> during assembly.
+        /// </summary>
+        public int? AuxiliaryNodeId { get; set; }
+
+        /// <summary>Tag of the zeroLength element joining the support node to <see cref="AuxiliaryNodeId"/>.</summary>
+        public int? SpringElementId { get; set; }
+
+        /// <summary>Penalty material holding the restrained translations, set during assembly.</summary>
+        public Alpaca4d.Material.UniaxialMaterialElastic TranslationSpring { get; set; }
+
+        /// <summary>Penalty material holding the restrained rotations, set during assembly.</summary>
+        public Alpaca4d.Material.UniaxialMaterialElastic RotationSpring { get; set; }
+
+        /// <summary>
+        /// Two frames count as the same one when their axes agree to this much. Well
+        /// inside anything a user can dial in, and far outside the rounding a plane
+        /// picks up being passed around Grasshopper.
+        /// </summary>
+        private const double AxisTolerance = 1e-9;
+
+        /// <summary>
+        /// True when the support frame is the world frame, so every restraint lands on a
+        /// global degree of freedom and OpenSees' own <c>fix</c> can express it exactly.
+        /// </summary>
+        public bool IsAxisAligned
+        {
+            get
+            {
+                return this.Plane.XAxis.EpsilonEquals(Vector3d.XAxis, AxisTolerance)
+                    && this.Plane.YAxis.EpsilonEquals(Vector3d.YAxis, AxisTolerance)
+                    && this.Plane.ZAxis.EpsilonEquals(Vector3d.ZAxis, AxisTolerance);
+            }
+        }
+
+        /// <summary>
+        /// The restraints as zeroLength <c>-dir</c> indices: 1-3 translation along the
+        /// plane's own axes, 4-6 rotation about them. A 3 ndf node - anything meshed out
+        /// of bricks - carries no rotations, so Rx/Ry/Rz are dropped rather than written
+        /// as directions the node does not have.
+        /// </summary>
+        public List<int> RestrainedDirections
+        {
+            get
+            {
+                var directions = new List<int>();
+
+                if (this.Tx) directions.Add(1);
+                if (this.Ty) directions.Add(2);
+                if (this.Tz) directions.Add(3);
+
+                if (this.ndf == 3)
+                    return directions;
+
+                if (this.Rx) directions.Add(4);
+                if (this.Ry) directions.Add(5);
+                if (this.Rz) directions.Add(6);
+
+                return directions;
+            }
+        }
+
+        /// <summary>True when this support is written as a penalty spring rather than a <c>fix</c>.</summary>
+        public bool NeedsSpring
+        {
+            get { return !this.IsAxisAligned && this.RestrainedDirections.Count != 0; }
+        }
+
         public dynamic Geometry
+        {
+            get
+            {
+                var symbol = this.SymbolGeometry;
+
+                if (symbol is Mesh mesh && !this.IsAxisAligned)
+                {
+                    var oriented = mesh.DuplicateMesh();
+                    oriented.Transform(Transform.PlaneToPlane(
+                        Plane.WorldXY,
+                        new Plane(Point3d.Origin, this.Plane.XAxis, this.Plane.YAxis)));
+                    return oriented;
+                }
+
+                return symbol;
+            }
+        }
+
+        private dynamic SymbolGeometry
         {
             get
             {
@@ -68,8 +171,14 @@ namespace Alpaca4d.Element
             }
         }
         public Support(Point3d node, bool tx, bool ty, bool tz, bool rx, bool ry, bool rz)
+            : this(new Plane(node, Vector3d.XAxis, Vector3d.YAxis), tx, ty, tz, rx, ry, rz)
         {
-            this.Pos = node;
+        }
+
+        public Support(Plane frame, bool tx, bool ty, bool tz, bool rx, bool ry, bool rz)
+        {
+            this.Plane = frame;
+            this.Pos = frame.Origin;
             this.Tx = tx;
             this.Ty = ty;
             this.Tz = tz;
@@ -91,25 +200,70 @@ namespace Alpaca4d.Element
 
         public override string WriteTcl()
         {
-            string tclText;
+            // A support the model has not seen yet - the one a Grasshopper panel prints
+            // straight off the component - has no node to name. Show it the way it always
+            // has been shown rather than failing on a preview.
+            if (this.ndf == 0 && this.Id == null)
+                return this.WriteFixTcl(6);
 
-            if(this.ndf == 6)
-            {
-                tclText = $"fix {this.Id} {Convert.ToInt16(this.Tx)} {Convert.ToInt16(this.Ty)} {Convert.ToInt16(this.Tz)} {Convert.ToInt16(this.Rx)} {Convert.ToInt16(this.Ry)} {Convert.ToInt16(this.Rz)}\n";
-            }
-            else if(this.ndf == 3)
-            {
-                tclText = $"fix {this.Id} {Convert.ToInt16(this.Tx)} {Convert.ToInt16(this.Ty)} {Convert.ToInt16(this.Tz)}\n";
-            }
-            else if(this.ndf == 0 && this.Id == null)
-            {
-                tclText = $"fix {this.Id} {Convert.ToInt16(this.Tx)} {Convert.ToInt16(this.Ty)} {Convert.ToInt16(this.Tz)} {Convert.ToInt16(this.Rx)} {Convert.ToInt16(this.Ry)} {Convert.ToInt16(this.Rz)}\n";
-            }
-			else
-			{
+            if (this.ndf != 3 && this.ndf != 6)
                 throw new Exception($"The support at location {this.Pos.ToString()} is not part of the mdodel");
-            }
-            return tclText;
+
+            return this.NeedsSpring ? this.WriteSpringTcl() : this.WriteFixTcl(this.ndf);
+        }
+
+        /// <summary>
+        /// An axis-aligned support, written the way OpenSees means it: a single point
+        /// constraint on global degrees of freedom, exact and free of any penalty.
+        /// </summary>
+        private string WriteFixTcl(int dofCount)
+        {
+            var translations = $"{Convert.ToInt16(this.Tx)} {Convert.ToInt16(this.Ty)} {Convert.ToInt16(this.Tz)}";
+
+            if (dofCount == 3)
+                return $"fix {this.Id} {translations}\n";
+
+            return $"fix {this.Id} {translations} {Convert.ToInt16(this.Rx)} {Convert.ToInt16(this.Ry)} {Convert.ToInt16(this.Rz)}\n";
+        }
+
+        /// <summary>
+        /// A skewed support. OpenSees has no notion of a nodal coordinate system - `fix`
+        /// only ever speaks global degrees of freedom - so the restraint is carried by a
+        /// zeroLength element between the support node and a coincident node that is
+        /// fixed outright. `-orient` hands that element the support plane, and from then
+        /// on its `-dir` indices count along the plane's own axes: 1-3 translation, 4-6
+        /// rotation. Directions left out of `-dir` carry no stiffness at all, so a
+        /// release along a local axis is exact; only the restrained ones are a penalty.
+        ///
+        /// The reaction ends up on the auxiliary node, in global components, because that
+        /// is where the point constraint lives - see the reaction reader.
+        /// </summary>
+        private string WriteSpringTcl()
+        {
+            var directions = this.RestrainedDirections;
+            var materials = directions.Select(direction =>
+                direction <= 3 ? this.TranslationSpring.Id : this.RotationSpring.Id);
+
+            var x = this.Plane.XAxis;
+            var y = this.Plane.YAxis;
+
+            var tcl = new StringBuilder();
+
+            if (directions.Any(direction => direction <= 3))
+                tcl.Append(this.TranslationSpring.WriteTcl());
+            if (directions.Any(direction => direction > 3))
+                tcl.Append(this.RotationSpring.WriteTcl());
+
+            tcl.Append($"node {this.AuxiliaryNodeId} {this.Pos.X} {this.Pos.Y} {this.Pos.Z}\n");
+            tcl.Append(this.ndf == 3
+                ? $"fix {this.AuxiliaryNodeId} 1 1 1\n"
+                : $"fix {this.AuxiliaryNodeId} 1 1 1 1 1 1\n");
+            tcl.Append($"element zeroLength {this.SpringElementId} {this.AuxiliaryNodeId} {this.Id}" +
+                       $" -mat {string.Join(" ", materials)}" +
+                       $" -dir {string.Join(" ", directions)}" +
+                       $" -orient {x.X} {x.Y} {x.Z} {y.X} {y.Y} {y.Z}\n");
+
+            return tcl.ToString();
         }
         public void SetNodeTag(Model model)
         {
