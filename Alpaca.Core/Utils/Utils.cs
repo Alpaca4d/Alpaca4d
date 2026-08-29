@@ -456,12 +456,33 @@ namespace Alpaca4d
             }
             return solid;
         }
+        /// <summary>
+        /// Reads a number out of a Tcl token. A .tcl file is written with a dot for the decimal
+        /// separator whatever the machine's locale is, so it has to be read that way too.
+        /// </summary>
+        private static double ParseNumber(string token)
+        {
+            if (double.TryParse(token, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double value))
+                return value;
+
+            return double.Parse(token, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture);
+        }
+
+        private static int ParseTag(string token)
+        {
+            if (int.TryParse(token, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int tag))
+                return tag;
+
+            return (int)Math.Round(ParseNumber(token));
+        }
+
         public static Vector3d PlaceCoordinates(Point3d point, Plane localPlane)
         {
             localPlane.ClosestParameter(point, out double s, out double t);
             double w = localPlane.DistanceTo(point);
             return new Vector3d(-1.0 * w, t, s);
         }
+        [Obsolete("Use Alpaca4d.TclReader, which reads a .tcl file into a full Model rather than into loose geometry.")]
         public static (List<Point3d> points, List<Point3d> supports, List<Curve> beamCurves, List<Mesh> shellMeshes, List<Mesh> brickMeshes) TextToGeometry(string filepath)
         {
             var lines = System.IO.File.ReadAllLines(filepath);
@@ -470,15 +491,25 @@ namespace Alpaca4d
             return (points, supports, lineGeometry, meshShell, meshBrick);
         }
 
+        [Obsolete("Use Alpaca4d.TclReader, which reads a .tcl file into a full Model rather than into loose geometry.")]
         public static (List<Point3d> points, List<Point3d> supports, List<Curve> beamCurves, List<Mesh> shellMeshes, List<Mesh> brickMeshes) TextToGeometry(List<string> lines)
         {
             Model model = new Model();
 
-            var splittedLines = lines.Select(x => x.Split(new char[] { ' ', '\t', '\n' }, StringSplitOptions.RemoveEmptyEntries)).ToList();
+            // One entry of the incoming list can hold several commands: every WriteTcl() ends in "\n"
+            // and some emit more than one line, so the newlines separate commands and must not be
+            // treated as plain whitespace.
+            var splittedLines = lines
+                .Where(x => x != null)
+                .SelectMany(x => x.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
+                .Select(x => x.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
+                .Where(x => x.Length != 0 && !x[0].StartsWith("#"))
+                .ToList();
 
 
             var monoDimensionalObject = new List<string> { "truss", "corotTruss", "elasticBeamColumn", "ElasticTimoshenkoBeam", "dispBeamColumn", "forceBeamColumn", "twoNodeLink" };
-            var biDimensionalObject = new List<string> { "ShellMITC4", "ASDShellQ4", "ShellDKGQ", "ShellNLDKGQ" };
+            var biDimensionalObject = new List<string> { "ShellMITC4", "ASDShellQ4", "ShellDKGQ", "ShellNLDKGQ", "ShellDKGT", "ShellNLDKGT", "ASDShellT3" };
+            var quadShellObject = new List<string> { "ShellMITC4", "ASDShellQ4", "ShellDKGQ", "ShellNLDKGQ" };
             var triDimensionalObject = new List<string> { "SSPbrick", "stdBrick", "FourNodeTetrahedron" };
 
             var nodeDictionary = new Dictionary<int, Alpaca4d.Element.Node>();
@@ -490,127 +521,117 @@ namespace Alpaca4d
             foreach (var line in splittedLines)
             {
                 // create only Node, Material, Section and Geometric Transformation
-                if (Regex.IsMatch(line[0], "node"))
+                if (line[0] == "node")
                 {
-                    int index = int.Parse(line[1]);
-                    double x = double.Parse(line[2]);
-                    double y = double.Parse(line[3]);
-                    double z = double.Parse(line[4]);
+                    int index = ParseTag(line[1]);
+                    double x = ParseNumber(line[2]);
+                    double y = ParseNumber(line[3]);
+                    double z = ParseNumber(line[4]);
 
                     var node = new Alpaca4d.Element.Node(index, x, y, z);
-                    nodeDictionary.Add(index, node);
+                    nodeDictionary[index] = node;
                 }
             }
 
             foreach (var line in splittedLines)
             {
-                if (Regex.IsMatch(line[0], "fix"))
+                if (line[0] == "fix")
                 {
-                    var index = int.Parse(line[1]);
+                    var index = ParseTag(line[1]);
 
                     if (line.Length == 8)
                     {
-                        var x = Convert.ToBoolean(int.Parse(line[2]));
-                        var y = Convert.ToBoolean(int.Parse(line[3]));
-                        var z = Convert.ToBoolean(int.Parse(line[4]));
-                        var xx = Convert.ToBoolean(int.Parse(line[5]));
-                        var yy = Convert.ToBoolean(int.Parse(line[6]));
-                        var zz = Convert.ToBoolean(int.Parse(line[7]));
+                        var x = Convert.ToBoolean(ParseTag(line[2]));
+                        var y = Convert.ToBoolean(ParseTag(line[3]));
+                        var z = Convert.ToBoolean(ParseTag(line[4]));
+                        var xx = Convert.ToBoolean(ParseTag(line[5]));
+                        var yy = Convert.ToBoolean(ParseTag(line[6]));
+                        var zz = Convert.ToBoolean(ParseTag(line[7]));
                         var supportNode = nodeDictionary[index];
                         var support = new Alpaca4d.Element.Support(supportNode.Pos, x, y, z, xx, yy, zz);
                         support.ndf = 6;
 
-                        supportDictionary.Add(index, support);
+                        supportDictionary[index] = support;
                     }
                     else if (line.Length == 5)
                     {
-                        var x = Convert.ToBoolean(int.Parse(line[2]));
-                        var y = Convert.ToBoolean(int.Parse(line[3]));
-                        var z = Convert.ToBoolean(int.Parse(line[4]));
+                        var x = Convert.ToBoolean(ParseTag(line[2]));
+                        var y = Convert.ToBoolean(ParseTag(line[3]));
+                        var z = Convert.ToBoolean(ParseTag(line[4]));
                         var supportNode = nodeDictionary[index];
                         var support = new Alpaca4d.Element.Support(supportNode.Pos, x, y, z, false, false, false);
                         support.ndf = 3; // it is require because WriteTcl read the ndf to correctly serialise
 
-                        supportDictionary.Add(index, support);
+                        supportDictionary[index] = support;
                     }
                     else
                     {
                         throw new Exception("Support element is not ndf 3 or 6!");
                     }
                 }
-                else if (Regex.IsMatch(line[0], "element"))
+                else if (line[0] == "element")
                 {
                     if (monoDimensionalObject.Contains(line[1]))
                     {
-                        var index = int.Parse(line[2]);
-                        var startIndex = int.Parse(line[3]);
-                        var endIndex = int.Parse(line[4]);
+                        var index = ParseTag(line[2]);
+                        var startIndex = ParseTag(line[3]);
+                        var endIndex = ParseTag(line[4]);
 
                         var startNode = nodeDictionary[startIndex];
                         var endNode = nodeDictionary[endIndex];
                         var stickElement = new Rhino.Geometry.LineCurve(startNode.Pos, endNode.Pos);
-                        stickDictionary.Add(index, stickElement);
+                        stickDictionary[index] = stickElement;
                     }
                     if (biDimensionalObject.Contains(line[1]))
                     {
-                        if (line[1] == "ASDShellQ4" || line[1] == "ShellMITC4")
-                        {
-                            var index = int.Parse(line[2]);
-                            var nodeId_0 = int.Parse(line[3]);
-                            var nodeId_1 = int.Parse(line[4]);
-                            var nodeId_2 = int.Parse(line[5]);
-                            var nodeId_3 = int.Parse(line[6]);
-                            var nodeId = new List<int> { nodeId_0, nodeId_1, nodeId_2, nodeId_3 };
-                            var flatMesh = new Rhino.Geometry.Mesh();
-                            foreach (var id in nodeId)
-                                flatMesh.Vertices.Add(nodeDictionary[id].Pos);
+                        // The quad shells take four corner nodes, the DKGT/T3 family three.
+                        bool isQuad = quadShellObject.Contains(line[1]);
+                        var index = ParseTag(line[2]);
+                        var nodeId = new List<int>();
+                        for (int i = 0; i < (isQuad ? 4 : 3); i++)
+                            nodeId.Add(ParseTag(line[3 + i]));
+
+                        var flatMesh = new Rhino.Geometry.Mesh();
+                        foreach (var id in nodeId)
+                            flatMesh.Vertices.Add(nodeDictionary[id].Pos);
+
+                        if (isQuad)
                             flatMesh.Faces.AddFace(0, 1, 2, 3);
-                            shellGeometryDictionary.Add(index, flatMesh);
-                        }
-                        else if (line[1] == "ShellNLDKGQ" || line[1] == "ShellDKGQ")
-                        {
-                            var index = int.Parse(line[2]);
-                            var nodeId_0 = int.Parse(line[3]);
-                            var nodeId_1 = int.Parse(line[4]);
-                            var nodeId_2 = int.Parse(line[5]);
-                            var nodeId = new List<int> { nodeId_0, nodeId_1, nodeId_2 };
-                            var flatMesh = new Rhino.Geometry.Mesh();
-                            foreach (var id in nodeId)
-                                flatMesh.Vertices.Add(nodeDictionary[id].Pos);
+                        else
                             flatMesh.Faces.AddFace(0, 1, 2);
-                            shellGeometryDictionary.Add(index, flatMesh);
-                        }
+
+                        shellGeometryDictionary[index] = flatMesh;
                     }
                     if (triDimensionalObject.Contains(line[1]))
                     {
                         if (line[1] == "FourNodeTetrahedron")
                         {
-                            var index = int.Parse(line[2]);
-                            var nodeId_0 = int.Parse(line[3]);
-                            var nodeId_1 = int.Parse(line[4]);
-                            var nodeId_2 = int.Parse(line[5]);
-                            var nodeId_3 = int.Parse(line[6]);
+                            var index = ParseTag(line[2]);
+                            var nodeId_0 = ParseTag(line[3]);
+                            var nodeId_1 = ParseTag(line[4]);
+                            var nodeId_2 = ParseTag(line[5]);
+                            var nodeId_3 = ParseTag(line[6]);
                             var nodeId = new List<int> { nodeId_0, nodeId_1, nodeId_2, nodeId_3 };
                             var solidMesh = new Rhino.Geometry.Mesh();
                             foreach (var id in nodeId)
                                 solidMesh.Vertices.Add(nodeDictionary[id].Pos);
                             solidMesh.Faces.AddFace(0, 1, 2);
-                            solidMesh.Faces.AddFace(1, 3, 2);
+                            solidMesh.Faces.AddFace(0, 1, 3);
+                            solidMesh.Faces.AddFace(1, 2, 3);
                             solidMesh.Faces.AddFace(0, 2, 3);
-                            solidMesh.Faces.AddFace(0, 3, 2);
-                            brickGeometryDictionary.Add(index, solidMesh);
+                            brickGeometryDictionary[index] = solidMesh;
                         }
                         else if (line[1] == "SSPbrick" || line[1] == "stdBrick")
                         {
-                            var index = int.Parse(line[2]);
-                            var nodeId_0 = int.Parse(line[3]);
-                            var nodeId_1 = int.Parse(line[4]);
-                            var nodeId_2 = int.Parse(line[5]);
-                            var nodeId_3 = int.Parse(line[6]);
-                            var nodeId_4 = int.Parse(line[7]);
-                            var nodeId_5 = int.Parse(line[8]);
-                            var nodeId_6 = int.Parse(line[9]);
-                            var nodeId_7 = int.Parse(line[10]);
+                            var index = ParseTag(line[2]);
+                            var nodeId_0 = ParseTag(line[3]);
+                            var nodeId_1 = ParseTag(line[4]);
+                            var nodeId_2 = ParseTag(line[5]);
+                            var nodeId_3 = ParseTag(line[6]);
+                            var nodeId_4 = ParseTag(line[7]);
+                            var nodeId_5 = ParseTag(line[8]);
+                            var nodeId_6 = ParseTag(line[9]);
+                            var nodeId_7 = ParseTag(line[10]);
                             var nodeId = new List<int> { nodeId_0, nodeId_1, nodeId_2, nodeId_3, nodeId_4, nodeId_5, nodeId_6, nodeId_7 };
                             var solidMesh = new Rhino.Geometry.Mesh();
                             foreach (var id in nodeId)
@@ -621,7 +642,7 @@ namespace Alpaca4d
                             solidMesh.Faces.AddFace(4, 7, 3, 0);
                             solidMesh.Faces.AddFace(0, 1, 5, 4);
                             solidMesh.Faces.AddFace(2, 3, 7, 6);
-                            brickGeometryDictionary.Add(index, solidMesh);
+                            brickGeometryDictionary[index] = solidMesh;
                         }
                     }
                 }
