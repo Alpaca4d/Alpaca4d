@@ -11,7 +11,19 @@ dotnet test
 [Rhino.Testing](https://github.com/mcneel/Rhino.Testing), McNeel's NUnit host for
 Rhino.Inside, which needs **Rhino 8 or newer installed** on the machine. If Rhino lives
 somewhere other than `C:\Program Files\Rhino 8\System`, edit
-[Rhino.Testing.Configs.xml](Rhino.Testing.Configs.xml).
+[Rhino.Testing.Configs.xml](Rhino.Testing.Configs.xml) — the build reads that same file,
+so it is the only place the path is written down.
+
+The Rhino SDK is bound to the installed Rhino rather than to the NuGet packages, at
+compile time and again at run time, and never copied next to the test binary. Both
+halves matter and the reasons are in [Alpaca4d.Test.csproj](Alpaca4d.Test.csproj);
+the short version is that NUnit needs the SDK resolvable before any fixture runs, and
+Rhino needs it loaded from its own installation folder. It follows that the test
+assembly is tied to whatever Rhino is installed: after a Rhino update, rebuild.
+
+The first run takes a few minutes — starting Rhino and loading Grasshopper with every
+plug-in in the user's Libraries folder dominates. The assertions themselves take about a
+second, all told.
 
 > Rhino.Inside is not available for macOS — McNeel's position as of June 2026 is that
 > Rhino.Testing "hinges on Rhino.Inside working for macOS, which is not ready yet."
@@ -129,9 +141,9 @@ evaluation units. (That last part earns its keep already: `BeamBase` declares a 
 unit of `Beam (Alpaca4d)`, which no longer matches any registered unit — harmless, since
 the base class falls back to the first one, but now visible.)
 
-> The checked-in snapshot was generated against Grasshopper 7. If the first run on
-> Rhino 8 reports a difference, read it before re-approving — it should be empty, since
-> everything in the snapshot comes from Alpaca4d's own code rather than from Rhino.
+> The checked-in snapshot was generated against Grasshopper 7 and matches unchanged on
+> Grasshopper 8, as it should — everything in it comes from Alpaca4d's own code rather
+> than from Rhino.
 
 A component's GUID and its parameter order, access and optionality are load-bearing:
 change one and every Grasshopper file that already contains that component silently
@@ -145,8 +157,9 @@ which existing definitions are affected.
 ## Layout
 
 ```
-SetupFixture.cs               starts the head-less Rhino, loads the .gha
+SetupFixture.cs               starts the head-less Rhino, loads Grasshopper and the .gha
 Rhino.Testing.Configs.xml     which Rhino, and what to load with it
+Alpaca4d.Test.csproj          how the Rhino SDK is bound to that Rhino
 Harness/ComponentHarness.cs   Set(...) / Solve() / SolveResult
 Harness/WorkflowRun.cs        multi-component runs: working directory, steps, results
 Harness/ComponentApi.cs       the component-surface snapshot

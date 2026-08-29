@@ -14,7 +14,11 @@ namespace Alpaca4d.Testing.Tests
         public void Rhino_is_running_head_less()
         {
             TestContext.WriteLine("Rhino " + Rhino.RhinoApp.Version);
-            Assert.That(Rhino.RhinoDoc.ActiveDoc, Is.Not.Null, "Rhino.Testing should have created a document.");
+
+            // Not RhinoDoc.ActiveDoc: it is per-thread in a head-less Rhino and set
+            // only on the thread that started it, so it reads back null here.
+            Assert.That(SetupFixture.HeadlessDoc, Is.Not.Null, "Rhino.Testing should have created a document.");
+            Assert.That(SetupFixture.HeadlessDoc.IsHeadless, Is.True, "The document should be head-less.");
         }
 
         [Test]
@@ -23,6 +27,25 @@ namespace Alpaca4d.Testing.Tests
             var assembly = typeof(Grasshopper.Kernel.GH_Component).Assembly;
             TestContext.WriteLine("Grasshopper " + assembly.GetName().Version + " from " + assembly.Location);
             Assert.That(assembly.GetName().Name, Is.EqualTo("Grasshopper"));
+        }
+
+        /// <summary>
+        /// Twice is not the same as once. Grasshopper loads the deployed plug-in out of
+        /// its libraries folder during startup, and the test bench has a second copy of
+        /// the same file next to the test assembly; load both and every component GUID
+        /// is claimed twice, which Grasshopper reports as a Component ID conflict - a
+        /// modal dialog, in a process with nobody to click it.
+        /// </summary>
+        [Test]
+        public void The_plugin_is_loaded_exactly_once()
+        {
+            var loaded = SetupFixture.LoadedPlugins;
+
+            foreach (var location in loaded)
+                TestContext.WriteLine(location);
+
+            Assert.That(loaded, Has.Length.EqualTo(1),
+                        "Alpaca4d.Gh is loaded " + loaded.Length + " times: " + string.Join(" / ", loaded));
         }
 
         [Test]

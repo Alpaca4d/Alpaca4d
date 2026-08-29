@@ -1,4 +1,4 @@
-using Alpaca4d.UIWidgets;
+﻿using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using System;
 using System.Collections.Generic;
@@ -12,16 +12,31 @@ namespace Alpaca4d.Gh
         private readonly List<SubComponent> _subcomponents = new List<SubComponent>();
 
         public override string UnitMenuName => "Element Type";
-        protected override string DefaultEvaluationUnit => "Beam (Alpaca4d)";
+        protected override string DefaultEvaluationUnit => "ForceBeamColumn (Alpaca4d)";
 
         public BeamBase()
-          : base("Beam With Hinges (Alpaca4d)", "Beam With Hinges",
+          : base("ForceBeamColumn (Alpaca4d)", "ForceBeamColumn",
             "Construct a beam element. Switch between a standard ForceBeamColumn (Beam) " +
             "and a beam with plastic hinge zones (WithHinges).",
             "Alpaca4d", "02_Element")
         {
             ((GH_Component)this).Hidden = false;
-            this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
+            UpdateMessage();
+        }
+
+        /// <summary>
+        /// Keeps the message under the component in sync with the active sub-component.
+        /// </summary>
+        private void UpdateMessage()
+        {
+            string name = ActiveUnit?.DisplayName ?? this.NickName;
+            this.Message = $"{name}\n{this.Category}";
+        }
+
+        protected override void SwitchUnit(EvaluationUnit unit, bool recompute = true, bool recordEvent = true)
+        {
+            base.SwitchUnit(unit, recompute, recordEvent);
+            UpdateMessage();
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager) { }
