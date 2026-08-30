@@ -191,19 +191,20 @@ namespace Alpaca4d.Testing.Tests
 
             Assert.That(reactions.Errors, Is.Empty, reactions.Describe());
 
-            var position = reactions.GetList<Point3d>(0).Single();
+            // One output carries both halves: where the support is, and the axes its
+            // reaction is given in.
+            var support = reactions.GetList<Plane>(0).Single();
             var force = reactions.GetList<Vector3d>(1).Single();
             var moment = reactions.GetList<Vector3d>(2).Single();
-            var plane = reactions.GetList<Plane>(3).Single();
-            TestContext.WriteLine("reaction at " + position + ": F=" + force + " M=" + moment);
+            TestContext.WriteLine("reaction at " + support.Origin + ": F=" + force + " M=" + moment);
 
             Assert.Multiple(() =>
             {
-                Assert.That(position.DistanceTo(Root), Is.LessThan(1e-9),
+                Assert.That(support.Origin.DistanceTo(Root), Is.LessThan(1e-9),
                     "reported against the support, not the auxiliary node");
                 Assert.That(force.Length, Is.EqualTo(TipLoad).Within(0.1).Percent, "sum of vertical forces");
                 Assert.That(moment.Length, Is.EqualTo(TipLoad * Length).Within(0.1).Percent, "moment about the base");
-                Assert.That(plane.XAxis.IsParallelTo(SkewedSupport.Inclined(Root, Incline).XAxis), Is.EqualTo(1),
+                Assert.That(support.XAxis.IsParallelTo(SkewedSupport.Inclined(Root, Incline).XAxis), Is.EqualTo(1),
                     "the plane the components are given in");
             });
         }
@@ -375,12 +376,12 @@ namespace Alpaca4d.Testing.Tests
 
             Assert.That(reactions.Errors, Is.Empty, reactions.Describe());
 
-            var positions = reactions.GetList<Point3d>(0);
+            var supports = reactions.GetList<Plane>(0);
             var forces = reactions.GetList<Vector3d>(1);
             var moments = reactions.GetList<Vector3d>(2);
 
-            var atTip = Enumerable.Range(0, positions.Count)
-                                  .Single(i => positions[i].DistanceTo(Tip) < 1e-9);
+            var atTip = Enumerable.Range(0, supports.Count)
+                                  .Single(i => supports[i].Origin.DistanceTo(Tip) < 1e-9);
 
             var force = forces[atTip];
             var moment = moments[atTip];

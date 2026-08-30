@@ -148,14 +148,14 @@ namespace Alpaca4d.Testing.Tests
 
             Assert.That(reactions.Errors, Is.Empty, reactions.Describe());
 
-            var position = reactions.GetList<Point3d>(0).Single();
+            var support = reactions.GetList<Plane>(0).Single();
             var force = reactions.GetList<Vector3d>(1).Single();
             var moment = reactions.GetList<Vector3d>(2).Single();
-            TestContext.WriteLine("reaction at " + position + ": F=" + force + " M=" + moment);
+            TestContext.WriteLine("reaction at " + support.Origin + ": F=" + force + " M=" + moment);
 
             Assert.Multiple(() =>
             {
-                Assert.That(position.DistanceTo(Root), Is.LessThan(1e-9));
+                Assert.That(support.Origin.DistanceTo(Root), Is.LessThan(1e-9));
                 Assert.That(force.Length, Is.EqualTo(TipLoad).Within(0.1).Percent, "sum of vertical forces");
                 Assert.That(moment.Length, Is.EqualTo(TipLoad * Length).Within(0.1).Percent, "moment about the base");
             });

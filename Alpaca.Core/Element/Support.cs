@@ -25,11 +25,19 @@ namespace Alpaca4d.Element
         /// <summary>
         /// The frame Tx/Ty/Tz and Rx/Ry/Rz are read in. Its axes - not the world axes -
         /// are what each restraint refers to, so rotating the plane skews the support.
-        /// The origin is the support location, mirrored by <see cref="Pos"/>.
+        /// The origin is the support location, mirrored by <see cref="Pos"/>; the reaction
+        /// reader hands this back as the support's position and frame in one.
         /// </summary>
         public Plane Plane
         {
-            get { return this.plane.IsValid ? this.plane : Plane.WorldXY; }
+            get
+            {
+                // A support that was never given a plane still has to report where it is,
+                // so fall back to the world axes at the support rather than at the origin.
+                return this.plane.IsValid
+                    ? this.plane
+                    : new Plane(this.Pos, Vector3d.XAxis, Vector3d.YAxis);
+            }
             set { this.plane = value; }
         }
 

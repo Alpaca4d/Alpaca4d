@@ -39,14 +39,17 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("SupportPosition", "SupportPosition", "");
+            // One output rather than two: the support's plane already sits at the support,
+            // so its origin is the position and its axes are the frame the reactions below
+            // are given in.
+            pManager.Register_PlaneParam("SupportPosition", "SupportPosition",
+                "Where each support is, and the axes its reactions are given in. For a support " +
+                "placed on a Point those axes are the global ones; for one placed on a Plane " +
+                "they are the plane's.");
             pManager.Register_VectorParam("ReactionForce", "ReactionForce",
-                $"[{Units.Force}] in the support's own axes. For a support placed on a Point " +
-                "those are the global axes; for one placed on a Plane they are the plane's.");
+                $"[{Units.Force}] in the support's own axes.");
             pManager.Register_VectorParam("ReactionMoment", "ReactionMoment",
                 $"[{Units.Force}{Units.Length}] in the support's own axes.");
-            pManager.Register_PlaneParam("SupportPlane", "SupportPlane",
-                "The axes the reactions above are given in, one per support.");
         }
 
         /// <summary>
@@ -82,10 +85,9 @@ namespace Alpaca4d.Gh
             var localMoment = globalMoment.Select((vector, i) => InAxesOf(vector, planes[i])).ToList();
 
             // Finally assign the spiral to the output parameter.
-            DA.SetDataList(0, alpacaModel.Supports.Select(x => x.Pos).ToList());
+            DA.SetDataList(0, planes);
             DA.SetDataList(1, localForce);
             DA.SetDataList(2, localMoment);
-            DA.SetDataList(3, planes);
         }
 
         private static Vector3d InAxesOf(Vector3d vector, Plane frame)
