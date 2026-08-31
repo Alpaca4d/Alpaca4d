@@ -75,26 +75,64 @@ namespace Alpaca4d.Testing.Tests
         [Test]
         public void No_two_presets_share_a_symbol()
         {
-            var symbols = SupportPreset.All
-                .Select(preset => new { preset.Id, Mesh = SupportSymbol.For(preset.Id) })
+            // Compare the vertices themselves, not counts and bounding boxes. Sliding in X
+            // and Sliding in Y are the same rollers a quarter turn apart, so they agree on
+            // vertex count, face count and - both being framed by the same square plates -
+            // bounding box too. Only the positions tell them apart.
+            var signatures = SupportPreset.All
+                .Select(preset => new { preset.Id, Signature = Signature(SupportSymbol.For(preset.Id)) })
                 .ToList();
 
             Assert.Multiple(() =>
             {
-                foreach (var a in symbols)
+                foreach (var a in signatures)
                 {
-                    foreach (var b in symbols.Where(other => other.Id != a.Id))
-                    {
-                        var different =
-                            a.Mesh.Vertices.Count != b.Mesh.Vertices.Count ||
-                            a.Mesh.Faces.Count != b.Mesh.Faces.Count ||
-                            !a.Mesh.GetBoundingBox(true).Diagonal.EpsilonEquals(
-                                 b.Mesh.GetBoundingBox(true).Diagonal, 1e-9);
-
-                        Assert.That(different, Is.True, a.Id + " is drawn the same as " + b.Id);
-                    }
+                    foreach (var b in signatures.Where(other => other.Id != a.Id))
+                        Assert.That(a.Signature, Is.Not.EqualTo(b.Signature),
+                            a.Id + " is drawn the same as " + b.Id);
                 }
             });
+        }
+
+        /// <summary>Every vertex position, rounded and sorted, so order of assembly cannot matter.</summary>
+        private static string Signature(Mesh mesh)
+        {
+            return string.Join(";", mesh.Vertices
+                .Select(v => string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                    "{0:F4},{1:F4},{2:F4}", v.X, v.Y, v.Z))
+                .OrderBy(text => text, System.StringComparer.Ordinal));
+        }
+
+        /// <summary>
+        /// A roller's end caps are rings of quads, not fans of triangles converging on the
+        /// centre: at symbol scale a fan reads as a knot of noise. The plates and the
+        /// pyramid are quads and triangles by nature, so only the rollers are checked.
+        /// </summary>
+        [TestCase(SupportPreset.SlidingX)]
+        [TestCase(SupportPreset.SlidingY)]
+        [TestCase(SupportPreset.SlidingXY)]
+        public void A_roller_symbol_is_built_entirely_from_quads(string presetId)
+        {
+            var mesh = SupportSymbol.For(presetId);
+            var triangles = mesh.Faces.Count(face => face.IsTriangle);
+
+            TestContext.WriteLine(presetId + ": " + mesh.Faces.Count + " faces, " + triangles + " triangles");
+
+            Assert.That(triangles, Is.Zero, "a fan cap would show up here");
+        }
+
+        /// <summary>
+        /// CreateQuadSphere gives 6 * 4^level faces. Level 2 is 96, a quarter of the 384
+        /// that level 3 was drawing, which was far denser than the symbol needs.
+        /// </summary>
+        [Test]
+        public void The_pinned_ball_is_not_over_subdivided()
+        {
+            var faces = SupportSymbol.For(SupportPreset.Hinged).Faces.Count;
+            TestContext.WriteLine("hinged symbol: " + faces + " faces");
+
+            // The pyramid contributes 5; the rest is the ball.
+            Assert.That(faces - 5, Is.EqualTo(96), "6 * 4^2");
         }
 
         /// <summary>

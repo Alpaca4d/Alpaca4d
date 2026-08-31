@@ -31,6 +31,19 @@ namespace Alpaca4d.Element
         private const int Facets = 16;
 
         /// <summary>
+        /// How far a roller's rim is offset inwards to make its bore, as a fraction of the
+        /// radius. The hole is what lets each end cap be a ring of quads instead of a fan
+        /// of triangles - and a roller with a bore through it is what one looks like.
+        /// </summary>
+        private const double BoreRatio = 0.45;
+
+        /// <summary>
+        /// Subdivisions of the sphere. CreateQuadSphere gives 6 * 4^level faces, so each
+        /// step down is a quarter of the faces: level 2 is 96 where level 3 was 384.
+        /// </summary>
+        private const int SphereSubdivision = 2;
+
+        /// <summary>
         /// The symbol for a preset id, or null if the id is not one of the seven.
         /// Ids come from <see cref="SupportPreset"/>; this switch is the one place the two
         /// halves meet.
@@ -99,7 +112,7 @@ namespace Alpaca4d.Element
             const double height = 0.46;
 
             symbol.Append(Plate(Size, Size, 0.0));
-            symbol.Append(Rod(new Point3d(0, 0, -PlateThickness - height), Vector3d.ZAxis, roller, height));
+            symbol.Append(Roller(new Point3d(0, 0, -PlateThickness - height), Vector3d.ZAxis, roller, height));
             symbol.Append(Block(Size * 0.9, 0.05, height, -PlateThickness));
             symbol.Append(Block(0.05, Size * 0.9, height, -PlateThickness));
             symbol.Append(Plate(Size, Size, -PlateThickness - height));
@@ -148,7 +161,7 @@ namespace Alpaca4d.Element
             foreach (var offset in new[] { -spacing, spacing })
             {
                 var centre = new Point3d(travel.X * offset, travel.Y * offset, centreZ);
-                symbol.Append(Rod(centre - axis * (Size * 0.34), axis, radius, Size * 0.68));
+                symbol.Append(Roller(centre - axis * (Size * 0.34), axis, radius, Size * 0.68));
             }
 
             symbol.Append(Plate(Size, Size, centreZ - radius));
@@ -218,7 +231,57 @@ namespace Alpaca4d.Element
 
         private static Mesh Ball(double radius, double centreZ)
         {
-            return Mesh.CreateQuadSphere(new Sphere(new Point3d(0, 0, centreZ), radius), 3);
+            return Mesh.CreateQuadSphere(new Sphere(new Point3d(0, 0, centreZ), radius), SphereSubdivision);
+        }
+
+        /// <summary>
+        /// A roller: a cylinder with a bore through it, closed at each end by a flat ring.
+        ///
+        /// Built by hand rather than with Mesh.CreateFromCylinder, which closes its ends
+        /// with a fan of triangles meeting at the centre - a knot of long thin faces that
+        /// reads as noise at symbol scale. Offsetting the rim inwards leaves a hole, and
+        /// every face on the result is then a quad: the outer wall, the bore, and a ring
+        /// at each end.
+        /// </summary>
+        private static Mesh Roller(Point3d start, Vector3d axis, double radius, double length)
+        {
+            var frame = new Plane(start, axis);
+            var bore = radius * BoreRatio;
+
+            var span = axis;
+            span.Unitize();
+            span *= length;
+
+            var mesh = new Mesh();
+
+            // Four rings of vertices - outer and bore, at each end. Index i of every ring
+            // sits on the same spoke, which is what makes the faces below index arithmetic.
+            for (var i = 0; i < Facets; i++)
+            {
+                var angle = 2.0 * Math.PI * i / Facets;
+                var spoke = (frame.XAxis * Math.Cos(angle)) + (frame.YAxis * Math.Sin(angle));
+
+                var outer = start + (spoke * radius);
+                var inner = start + (spoke * bore);
+
+                mesh.Vertices.Add(outer);          // 4i + 0
+                mesh.Vertices.Add(outer + span);   // 4i + 1
+                mesh.Vertices.Add(inner);          // 4i + 2
+                mesh.Vertices.Add(inner + span);   // 4i + 3
+            }
+
+            for (var i = 0; i < Facets; i++)
+            {
+                var a = 4 * i;
+                var b = 4 * ((i + 1) % Facets);
+
+                mesh.Faces.AddFace(a + 0, b + 0, b + 1, a + 1);   // outer wall, facing out
+                mesh.Faces.AddFace(a + 3, b + 3, b + 2, a + 2);   // the bore, facing in
+                mesh.Faces.AddFace(a + 2, b + 2, b + 0, a + 0);   // ring at the near end
+                mesh.Faces.AddFace(a + 1, b + 1, b + 3, a + 3);   // ring at the far end
+            }
+
+            return mesh;
         }
 
         /// <summary>
