@@ -39,7 +39,27 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddBooleanParameter("Rz", "Rz", "Rotation about the support plane's Z axis", GH_ParamAccess.item, true);
             pManager[pManager.ParamCount - 1].Optional = true;
+
+            // Appended last on purpose: inserting a parameter renumbers the ones after it
+            // and every file already holding this component loses those wires.
+            pManager.AddIntegerParameter("Type", "Type",
+                "One of the predefined supports, which sets all six restraints at once and " +
+                "overrides Tx..Rz. Right-click the input to pick one by name. Leave it alone " +
+                "to set the six restraints yourself.", GH_ParamAccess.item, UseTheBooleans);
+            pManager[pManager.ParamCount - 1].Optional = true;
+
+            var type = pManager[pManager.ParamCount - 1] as Grasshopper.Kernel.Parameters.Param_Integer;
+            if (type != null)
+            {
+                type.AddNamedValue("Custom (use Tx..Rz)", UseTheBooleans);
+
+                for (var index = 0; index < Alpaca4d.Element.SupportPreset.All.Count; index++)
+                    type.AddNamedValue(Alpaca4d.Element.SupportPreset.All[index].Label, index);
+            }
         }
+
+        /// <summary>Type value meaning "no preset - read the six booleans instead".</summary>
+        private const int UseTheBooleans = -1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -67,6 +87,8 @@ namespace Alpaca4d.Gh
             bool ry = true;
             bool rz = true;
 
+            int type = UseTheBooleans;
+
             if (!DA.GetData(0, ref position)) return;
             if (!DA.GetData(1, ref tx)) return;
             if (!DA.GetData(2, ref ty)) return;
@@ -74,8 +96,29 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(4, ref rx)) return;
             if (!DA.GetData(5, ref ry)) return;
             if (!DA.GetData(6, ref rz)) return;
+            DA.GetData(7, ref type);
 
-            var support = new Alpaca4d.Element.Support(position, tx, ty, tz, rx, ry, rz);
+            Alpaca4d.Element.Support support;
+
+            if (type == UseTheBooleans)
+            {
+                support = new Alpaca4d.Element.Support(position, tx, ty, tz, rx, ry, rz);
+            }
+            else if (type >= 0 && type < Alpaca4d.Element.SupportPreset.All.Count)
+            {
+                var preset = Alpaca4d.Element.SupportPreset.All[type];
+                support = preset.On(position);
+
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark,
+                    preset.Describe() + Environment.NewLine + "Tx..Rz are ignored while a Type is set.");
+            }
+            else
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
+                    $"There is no support type {type}. Valid types are 0 to " +
+                    $"{Alpaca4d.Element.SupportPreset.All.Count - 1}, or {UseTheBooleans} to use Tx..Rz.");
+                return;
+            }
 
             // Finally assign the spiral to the output parameter.
             DA.SetData(0, support);

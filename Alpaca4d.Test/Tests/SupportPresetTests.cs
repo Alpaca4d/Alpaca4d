@@ -184,6 +184,59 @@ namespace Alpaca4d.Testing.Tests
             });
         }
 
+        /// <summary>
+        /// The Type input is the only practical way to reach most of the seven. Five of
+        /// them need Rx and Ry off and Rz on as well as the translations, so flipping the
+        /// one boolean a user would think to flip lands outside the set and draws the text
+        /// tag instead of a symbol.
+        /// </summary>
+        [TestCaseSource(nameof(Table))]
+        public void Picking_a_type_on_the_component_gives_that_preset_and_a_symbol(
+            int position, string id, bool tx, bool ty, bool tz, bool rx, bool ry, bool rz)
+        {
+            var result = ComponentHarness.For<Alpaca4d.Gh.Support>()
+                                         .Set("Position", new Point3d(1, 2, 3))
+                                         .Set("Type", position)
+                                         .Solve();
+
+            Assert.That(result.Errors, Is.Empty, result.Describe());
+
+            var support = result.Get<Alpaca4d.Element.Support>(0);
+            TestContext.WriteLine(support.Description);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(support.Preset, Is.Not.Null, "type " + position + " matched no preset");
+                Assert.That(support.Preset.Id, Is.EqualTo(id));
+                // Geometry is dynamic; asserting on it directly would need the C# runtime
+                // binder, which this project does not reference.
+                Assert.That((object)support.Geometry, Is.InstanceOf<Mesh>(),
+                    "a preset must draw a symbol, not fall through to the text tag");
+            });
+        }
+
+        /// <summary>Left alone, the component still reads the six booleans as it always did.</summary>
+        [Test]
+        public void Leaving_the_type_alone_reads_the_six_booleans()
+        {
+            var result = ComponentHarness.For<Alpaca4d.Gh.Support>()
+                                         .Set("Position", new Point3d(1, 2, 3))
+                                         .Set("Tx", false)
+                                         .Solve();
+
+            var support = result.Get<Alpaca4d.Element.Support>(0);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Errors, Is.Empty, result.Describe());
+                Assert.That(support.Tx, Is.False);
+                Assert.That(support.Ty, Is.True);
+                Assert.That(support.Rz, Is.True);
+                Assert.That(support.Preset, Is.Null,
+                    "one translation off with every rotation still held is not one of the seven");
+            });
+        }
+
         [Test]
         public void A_combination_outside_the_seven_matches_nothing()
         {
