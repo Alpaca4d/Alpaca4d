@@ -139,22 +139,24 @@ namespace Alpaca4d
         }
 
 
-        public static List<string> Fiber(Alpaca4d.Section.FiberSection FiberSection, string type = "stressStrain")
+        /// <summary>
+        /// Every fibre of a section, in one recorder.
+        ///
+        /// "section fiberData" writes five numbers per fibre per step - y, z, area,
+        /// stress, strain - in the order the fibres were added to the section, which is
+        /// the order <see cref="Alpaca4d.Section.FiberSection.WriteTcl(int?)"/> writes
+        /// them and therefore the order <see cref="Alpaca4d.Section.FiberSection.Fibers"/>
+        /// returns them.
+        ///
+        /// This used to be one "section fiber $y $z" recorder per fibre. Every recorder
+        /// holds its file open, and the C runtime OpenSees is built against will not have
+        /// more than 512 files open at once - so a section of 2052 fibres got 507 result
+        /// files and 1545 that were never created, with no error from the solver, which
+        /// exits 0 regardless. The missing ones came back as empty fibre results.
+        /// </summary>
+        public static string FiberData()
         {
-            var recorders = new List<string>();
-
-            int i = 0;
-            foreach (var fiber in FiberSection.Fibers)
-            {
-                var posY = Math.Round(fiber.Pos.X, 2);
-                var posZ = Math.Round(fiber.Pos.Y, 2);
-                var fileName = $"{MomentCurvature.FiberStressFilePath}_{fiber.Index}.out";
-                var recorder = $"recorder Element -file {fileName} -ele 1 section fiber {fiber.Pos.X} {fiber.Pos.Y} {type}";
-                recorders.Add(recorder);
-                i++;
-            }
-
-            return recorders;
+            return $"recorder Element -file {MomentCurvature.FiberDataFilePath} -ele 1 section fiberData\n";
         }
 
     }

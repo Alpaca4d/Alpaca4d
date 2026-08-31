@@ -628,24 +628,45 @@ namespace Alpaca4d.Result
         }
 
 
-        public static (List<double>, List<double>) FiberStress(string filePath)
+        /// <summary>
+        /// Every fibre's stress and strain history, from a "section fiberData" recorder
+        /// file. Each line is one analysis step and carries five numbers per fibre -
+        /// y, z, area, stress, strain - in the section's own fibre order.
+        /// </summary>
+        /// <param name="fiberCount">
+        /// How many fibres the section has. The file is read against this rather than
+        /// inferred from it, so a step written short - the solver killed mid-write - is
+        /// dropped instead of silently shifting every fibre after it.
+        /// </param>
+        public static List<(List<double> Stress, List<double> Strain)> FiberData(string filePath, int fiberCount)
         {
-            var stress = new List<double>();
-            var strain = new List<double>();
+            const int ValuesPerFiber = 5;
+            const int StressOffset = 3;
+            const int StrainOffset = 4;
 
-            var lines = System.IO.File.ReadAllLines(filePath);
+            var histories = new List<(List<double> Stress, List<double> Strain)>(fiberCount);
+            for (var i = 0; i < fiberCount; i++)
+                histories.Add((new List<double>(), new List<double>()));
 
-            foreach(var line in lines)
+            if (fiberCount <= 0 || !System.IO.File.Exists(filePath))
+                return histories;
+
+            foreach (var line in System.IO.File.ReadAllLines(filePath))
             {
-                var splittedLine = line.Split(new char[] { ' ' });
-                var stressValue = splittedLine[0];
-                var strainValue = splittedLine[1];
+                var values = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-                strain.Add(Double.Parse(strainValue));
-                stress.Add(Double.Parse(stressValue));
+                if (values.Length < fiberCount * ValuesPerFiber)
+                    continue;
+
+                for (var i = 0; i < fiberCount; i++)
+                {
+                    var at = i * ValuesPerFiber;
+                    histories[i].Stress.Add(TclNumber.Read(values[at + StressOffset]));
+                    histories[i].Strain.Add(TclNumber.Read(values[at + StrainOffset]));
+                }
             }
 
-            return (stress, strain);
+            return histories;
         }
 
     }

@@ -10,7 +10,7 @@ namespace Alpaca4d.Gh
     {
         public Steel01()
           : base("Steel01 (Alpaca4d)", "Steel01",
-            "Construct a Steel01",
+            "Construct a bilinear steel material with kinematic hardening (OpenSees Steel01).\nStresses in kN/m2, strains dimensionless.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
@@ -21,28 +21,35 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
+            var preset = Alpaca4d.Material.Steel01.S355;
+
+            pManager.AddTextParameter("Material Name", "MatName", "Material name.", GH_ParamAccess.item, preset.MatName);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("fy", "fy", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("fy", "fy", "Yield strength, in kN/m2.", GH_ParamAccess.item, preset.Fy);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("E0", "E0", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("E0", "E0", "Initial elastic modulus, in kN/m2.", GH_ParamAccess.item, preset.E0);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("b", "b", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("b", "b",
+                "Strain-hardening ratio, dimensionless: the post-yield tangent over E0.",
+                GH_ParamAccess.item, preset.b);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("a1", "a1", "", GH_ParamAccess.item);
+            // The four isotropic hardening parameters are one optional group, and OpenSees
+            // takes them together or not at all - so they are left empty rather than
+            // defaulted, and Steel01 rejects a half-filled set.
+            pManager.AddNumberParameter("a1", "a1", "Isotropic hardening in compression, dimensionless. Give a1-a4 together or leave all four empty.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("a2", "a2", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("a2", "a2", "Compression hardening limit, dimensionless. Give a1-a4 together or leave all four empty.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("a3", "a3", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("a3", "a3", "Isotropic hardening in tension, dimensionless. Give a1-a4 together or leave all four empty.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("a4", "a4", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("a4", "a4", "Tension hardening limit, dimensionless. Give a1-a4 together or leave all four empty.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -61,10 +68,14 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string matName = null;
-            double fy = 319.3;
-            double e0 = 210000;
-            double b = 0.1;
+            // The registered defaults above are what these are; the fallbacks here only
+            // matter if a wire is connected and carries nothing.
+            var preset = Alpaca4d.Material.Steel01.S355;
+
+            string matName = preset.MatName;
+            double fy = preset.Fy;
+            double e0 = preset.E0;
+            double b = preset.b;
             double? a1 = null;
             double? a2 = null;
             double? a3 = null;

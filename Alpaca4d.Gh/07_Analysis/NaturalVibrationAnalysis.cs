@@ -66,6 +66,20 @@ namespace Alpaca4d.Gh
             string solver = "";
             DA.GetData(2, ref solver);
 
+            // An analysed model is not a model any more: Run Analysis ends the script it
+            // hands on with "wipe", which clears the OpenSees domain. Appending the eigen
+            // block to that would call eigen on an empty domain - ArpackSolver fails with
+            // "N must be positive" and no eigenvalue is ever set. Modal analysis belongs
+            // on its own branch, straight off the assembled model.
+            if (model.IsAnalysed)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
+                    "This AlpacaModel has already been analysed. Connect the Natural Vibration Analysis " +
+                    "to the AlpacaModel output of the Assemble component, not to the output of Run Analysis: " +
+                    "Run Analysis clears the OpenSees domain when it finishes, so the eigen analysis would " +
+                    "find nothing to solve.");
+                return;
+            }
 
             // Validate license
             if (!Alpaca4d.License.License.ValidateLicense(model, false, () => Alpaca4d.UI.LicenseManagementForm.ShowForm(), Alpaca4d.Gh.Forms.Advertise.NumberOfElements))

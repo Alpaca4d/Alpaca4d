@@ -10,7 +10,7 @@ namespace Alpaca4d.Gh
     {
         public ReinforcingSteel()
           : base("ReinforcingSteel (Alpaca4d)", "ReinforcingSteel",
-            "Construct an ReinforcingSteel",
+            "Construct a reinforcing bar material (OpenSees ReinforcingSteel).\nStresses in kN/m2, strains dimensionless.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
@@ -21,28 +21,36 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Material Name", "MatName", "", GH_ParamAccess.item);
+            var preset = Alpaca4d.Material.ReinforcingSteel.B450C;
+
+            pManager.AddTextParameter("Material Name", "MatName", "Material name.", GH_ParamAccess.item, preset.MatName);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("fy", "fy", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("fy", "fy", "Yield strength, in kN/m2.", GH_ParamAccess.item, preset.Fy);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("fu", "fu", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("fu", "fu", "Ultimate strength, in kN/m2.", GH_ParamAccess.item, preset.Fu);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Es", "Es", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Es", "Es", "Initial elastic modulus, in kN/m2.", GH_ParamAccess.item, preset.Es);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("Esh", "Esh", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Esh", "Esh",
+                "Tangent modulus at the onset of strain hardening, in kN/m2. Greater than zero.",
+                GH_ParamAccess.item, preset.Esh);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("esh", "esh", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("esh", "esh",
+                "Strain at the onset of strain hardening, dimensionless. Past the yield strain fy/Es.",
+                GH_ParamAccess.item, preset.EpsilonSh);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("eult", "eult", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("eult", "eult", "Strain at fu, dimensionless.", GH_ParamAccess.item, preset.EpsilonUlt);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddBooleanParameter("MinMax", "MinMax", "", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("MinMax", "MinMax",
+                "Wrap the material so a bar fails once its strain passes eult in either direction.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
 
 
@@ -63,13 +71,17 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string matName = null;
-            double fy = 319.300;
-            double fu = 469.560;
-            double es = 200000;
-            double esh = 0.0;
-            double epsilonSh = 0.001957;
-            double epsilonUlt = 0.0675;
+            // The registered defaults above are what these are; the fallbacks here only
+            // matter if a wire is connected and carries nothing.
+            var preset = Alpaca4d.Material.ReinforcingSteel.B450C;
+
+            string matName = preset.MatName;
+            double fy = preset.Fy;
+            double fu = preset.Fu;
+            double es = preset.Es;
+            double esh = preset.Esh;
+            double epsilonSh = preset.EpsilonSh;
+            double epsilonUlt = preset.EpsilonUlt;
             bool minMax = false;
 
 

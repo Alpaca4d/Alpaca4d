@@ -14,7 +14,7 @@ namespace Alpaca4d.Gh
     {
         public LayerFiber()
           : base("Layer Fiber (Alpaca4d)", "Layer Fiber",
-            "Construct a LayerFiber",
+            "A row of equally spaced fibres along a curve - a layer of reinforcement.\nCurve in m, area in m2.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
@@ -22,10 +22,22 @@ namespace Alpaca4d.Gh
         }
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curve", "Curve", "", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("NumberOfFibers", "NumberOfFibers", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AreaFiber", "AreaFiber", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Curve", "Curve",
+                "The line the fibres are spread along, in m, in the section's local yz plane.",
+                GH_ParamAccess.item);
+
+            pManager.AddIntegerParameter("NumberOfFibers", "NumberOfFibers",
+                "How many fibres to space along the curve, ends included.",
+                GH_ParamAccess.item, 3);
+
+            pManager.AddNumberParameter("AreaFiber", "AreaFiber",
+                "Area of each fibre, in m2. Defaults to one 16 mm bar.",
+                GH_ParamAccess.item, 2.011e-4);
+
+            pManager.AddGenericParameter("Material", "Material",
+                "Material of the fibres. Defaults to B450C reinforcement.",
+                GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
@@ -35,13 +47,24 @@ namespace Alpaca4d.Gh
         {
             Rhino.Geometry.Curve curve = null;
             int numberFiber = 3;
-            double area = 0.0;
-            Alpaca4d.Generic.IMaterial material = null;
+            double area = 2.011e-4;
 
-            DA.GetData(0, ref curve);
+            // A layer is a row of bars, so that is what it falls back to.
+            Alpaca4d.Generic.IMaterial material = Alpaca4d.Material.ReinforcingSteel.B450C;
+
+            if (!DA.GetData(0, ref curve) || curve == null)
+                return;
+
             DA.GetData(1, ref numberFiber);
             DA.GetData(2, ref area);
             DA.GetData(3, ref material);
+
+            if (numberFiber < 2)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
+                    "A layer needs at least two fibres, not " + numberFiber + ".");
+                return;
+            }
 
             var fiber = new Alpaca4d.Section.Layer(curve, numberFiber, area, material);
             _fibers.Add(fiber);
@@ -52,29 +75,37 @@ namespace Alpaca4d.Gh
 
 
         private List<Alpaca4d.Section.Layer> _fibers = new List<Section.Layer>();
+        private readonly FiberPreview _preview = new FiberPreview();
 
         protected override void BeforeSolveInstance()
         {
             _fibers.Clear();
+            _preview.Clear();
         }
+
+        protected override void AfterSolveInstance()
+        {
+            _preview.AddLayers(_fibers);
+        }
+
+        /// <summary>
+        /// Without this the box comes from the output parameter, which holds a layer and
+        /// not geometry - so it is empty, Zoom Extents ignores the preview, and Rhino is
+        /// free to cull the drawing.
+        /// </summary>
+        public override BoundingBox ClippingBox
+        {
+            get { return _preview.Box; }
+        }
+
         public override void DrawViewportWires(IGH_PreviewArgs args)
         {
-            if (_fibers.Count == 0)
+            base.DrawViewportWires(args);
+
+            if (this.Hidden || this.Locked || _preview.IsEmpty)
                 return;
 
-            base.DrawViewportWires(args);
-            if (this.Hidden || this.Locked) return;
-
-            if(_fibers != null)
-            {
-                var points = _fibers.SelectMany(x => x.Fibers).Select(x => x.Pos);
-                foreach (var point in points)
-                {
-                    args.Display.DrawPoint(point, Rhino.Display.PointStyle.Pin, 3, System.Drawing.Color.Red);
-                }
-
-                args.Display.DrawDottedPolyline(points, System.Drawing.Color.Black, false);
-            }
+            _preview.Draw(args);
         }
         public override GH_Exposure Exposure => GH_Exposure.secondary;
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Layer__Alpaca4d_;

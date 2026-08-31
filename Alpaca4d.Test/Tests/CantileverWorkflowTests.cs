@@ -191,6 +191,27 @@ namespace Alpaca4d.Testing.Tests
             });
         }
 
+        /// <summary>
+        /// Modal analysis has to branch off the assembled model, not off RunAnalysis:
+        /// RunAnalysis ends its script with "wipe", so an eigen block appended after it
+        /// would solve an empty domain (ArpackSolver: "N must be positive"). The
+        /// component refuses the analysed model instead of letting the solver fail.
+        /// </summary>
+        [Test]
+        public void Natural_vibration_refuses_an_already_analysed_model()
+        {
+            var modal = ComponentHarness.For<Alpaca4d.Gh.NaturalVibrationAnalysis>()
+                                        .Set("AlpacaModel", _run.AnalysedModel)
+                                        .Solve();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(modal.Errors, Has.Count.EqualTo(1), modal.Describe());
+                Assert.That(modal.Errors[0], Does.Contain("already been analysed").And.Contain("Assemble"));
+                Assert.That(modal.All("Eigenvalues"), Is.Empty, "the solver must not have run");
+            });
+        }
+
         private static IReadOnlyList<double> Resultant(IReadOnlyList<double> first, IReadOnlyList<double> second)
         {
             return first.Zip(second, (a, b) => Math.Sqrt(a * a + b * b)).ToList();

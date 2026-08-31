@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
     {
         public PointFiber()
           : base("Fiber Point(Alpaca4d)", "Fiber Point",
-            "Construct a FiberPoint",
+            "One fibre of a fibre section - a point with an area and a material.\nCoordinates in m, area in m2. The point's X is the section's local y and its Y the local z.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
@@ -25,9 +25,16 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Point", "Point", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AreaFiber", "AreaFiber", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
+            pManager.AddPointParameter("Point", "Point", "Where the fibre sits, in m. X is the section's local y, Y its local z.", GH_ParamAccess.item);
+
+            pManager.AddNumberParameter("AreaFiber", "AreaFiber",
+                "Area of the fibre, in m2. Defaults to one 16 mm bar.",
+                GH_ParamAccess.item, 2.011e-4);
+
+            pManager.AddGenericParameter("Material", "Material",
+                "Material of the fibre. Defaults to B450C reinforcement.",
+                GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -46,10 +53,14 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             var pos = Point3d.Origin;
-            double area = 0.0;
-            Alpaca4d.Generic.IMaterial material = null; ;
+            double area = 2.011e-4;
 
-            DA.GetData(0, ref pos);
+            // A fibre point is nearly always a bar, so that is what it falls back to.
+            Alpaca4d.Generic.IMaterial material = Alpaca4d.Material.ReinforcingSteel.B450C;
+
+            if (!DA.GetData(0, ref pos))
+                return;
+
             DA.GetData(1, ref area);
             DA.GetData(2, ref material);
 
@@ -61,27 +72,37 @@ namespace Alpaca4d.Gh
         }
 
         private List<Alpaca4d.Section.PointFiber> _pointFiber = new List<Section.PointFiber>();
+        private readonly FiberPreview _preview = new FiberPreview();
+
         protected override void BeforeSolveInstance()
         {
             _pointFiber.Clear();
+            _preview.Clear();
+        }
+
+        protected override void AfterSolveInstance()
+        {
+            _preview.AddPointFibers(_pointFiber);
+        }
+
+        /// <summary>
+        /// Without this the box comes from the output parameter, which holds a fibre and
+        /// not geometry - so it is empty, Zoom Extents ignores the preview, and Rhino is
+        /// free to cull the drawing.
+        /// </summary>
+        public override BoundingBox ClippingBox
+        {
+            get { return _preview.Box; }
         }
 
         public override void DrawViewportWires(IGH_PreviewArgs args)
         {
-            if (_pointFiber.Count == 0)
+            base.DrawViewportWires(args);
+
+            if (this.Hidden || this.Locked || _preview.IsEmpty)
                 return;
 
-            base.DrawViewportWires(args);
-            if (this.Hidden || this.Locked) return;
-
-            if (_pointFiber != null)
-            {
-                var points = _pointFiber.Select(x => x.Pos);
-                foreach (var point in points)
-                {
-                    args.Display.DrawPoint(point, Rhino.Display.PointStyle.Pin, 2, System.Drawing.Color.Blue);
-                }
-            }
+            _preview.Draw(args);
         }
 
         /// <summary>

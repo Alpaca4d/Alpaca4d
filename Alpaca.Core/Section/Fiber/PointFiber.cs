@@ -26,7 +26,10 @@ namespace Alpaca4d.Section
         }
         public string WriteTcl()
         {
-            string tcl = $"fiber {this.Pos.X} {this.Pos.Y} {this.Area} {this.Material.Id}\n";
+            // MinMax.FiberTag, not Material.Id: a material wrapped in MinMax is declared
+            // under two tags, and the fibre has to name the wrapper for the strain limits
+            // to apply to it at all.
+            string tcl = $"fiber {TclNumber.Write(this.Pos.X)} {TclNumber.Write(this.Pos.Y)} {TclNumber.Write(this.Area)} {Alpaca4d.Material.MinMax.FiberTag(this.Material)}\n";
             return tcl;
         }
     }

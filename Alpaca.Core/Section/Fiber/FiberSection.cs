@@ -18,10 +18,15 @@ namespace Alpaca4d.Section
         {
             get
             {
+                // Point fibres, then layers, then patches - the order WriteTcl declares
+                // them in, and so the order OpenSees holds them in and reports them in.
+                // These two had layers and patches the other way round, which only stayed
+                // invisible while every fibre had a recorder of its own to be matched by
+                // coordinate.
                 var fibers = new List<PointFiber>();
                 fibers.AddRange(this.PointFibers);
-                fibers.AddRange(this.Patches.SelectMany(x => x.Fibers));
                 fibers.AddRange(this.Layers.SelectMany(x => x.Fibers));
+                fibers.AddRange(this.Patches.SelectMany(x => x.Fibers));
                 var i = 0;
                 foreach(var fiber in fibers)
                 {
@@ -47,9 +52,23 @@ namespace Alpaca4d.Section
 
         public string WriteTcl()
         {
+            return WriteTcl(null);
+        }
+
+        /// <summary>
+        /// The section, under <paramref name="tag"/> in place of its own Id.
+        ///
+        /// A deck holding a single section - the moment-curvature one - wants a known
+        /// tag, and used to get one by assigning to Id. That reached back into the object
+        /// the upstream component still holds and hands to everything else downstream; a
+        /// tag a caller needs for the length of one deck belongs to the call, not to the
+        /// section.
+        /// </summary>
+        public string WriteTcl(int? tag)
+        {
             var sb = new StringBuilder();
 
-            sb.Append($"section Fiber {this.Id} -GJ {this.GJ} {{\n");
+            sb.Append($"section Fiber {tag ?? this.Id} -GJ {TclNumber.Write(this.GJ)} {{\n");
             foreach (var element in PointFibers)
             {
                 sb.Append(element.WriteTcl());

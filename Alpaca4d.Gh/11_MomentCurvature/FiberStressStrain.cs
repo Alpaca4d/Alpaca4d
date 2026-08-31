@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     {
         public FiberStressStrain()
           : base("Fiber Stress Strain (Alpaca4d)", "FBS",
-            "Read the stress strain in a fiber",
+            "Splits a MomentCurvature fibre result into its fibres, stresses and strains - one branch per fibre.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
@@ -20,31 +20,31 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("FiberStressStrain", "FiberStressStrain", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FiberStressStrain", "FiberStressStrain",
+                "The fiberStressStrain output of a MomentCurvature component.",
+                GH_ParamAccess.item);
         }
 
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("FiberPoint", "FiberPoint", "");
-            pManager.Register_GenericParam("Stress", "Stress", "");
-            pManager.Register_GenericParam("Strain", "Strain", "");
+            pManager.Register_GenericParam("FiberPoint", "FiberPoint", "The fibres of the analysed section, one branch each.");
+            pManager.Register_GenericParam("Stress", "Stress", "Stress history of each fibre, in kN/m2, one branch per fibre.");
+            pManager.Register_GenericParam("Strain", "Strain", "Strain history of each fibre, dimensionless, one branch per fibre.");
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             Alpaca4d.Result.PointFiberResult fiberPointResult = null;
 
-            DA.GetData(0, ref fiberPointResult);
+            if (!DA.GetData(0, ref fiberPointResult) || fiberPointResult == null)
+                return;
 
-            var fiberPoint = fiberPointResult.Fibers;
-            var stress = fiberPointResult.Stress;
-            var strain = fiberPointResult.Strain;
-
-            // Finally assign the spiral to the output parameter.
-            DA.SetDataTree(0, fiberPoint);
-            DA.SetDataTree(1, strain);
-            DA.SetDataTree(2, stress);
+            // Stress on the Stress output and strain on the Strain one; these two were
+            // handed to each other's parameter.
+            DA.SetDataTree(0, fiberPointResult.Fibers);
+            DA.SetDataTree(1, fiberPointResult.Stress);
+            DA.SetDataTree(2, fiberPointResult.Strain);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.quarternary;

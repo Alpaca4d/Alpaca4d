@@ -10,7 +10,7 @@ namespace Alpaca4d.Gh
     {
         public Concrete01()
           : base("Concrete01 (Alpaca4d)", "Concrete",
-            "Construct a concrete material with Zero Tensile Strength (Conrete01)",
+            "Construct a concrete material with zero tensile strength (OpenSees Concrete01).\nStresses in kN/m2, strains dimensionless, compression negative.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
@@ -21,22 +21,34 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Material Name", "MatName", "Material name", GH_ParamAccess.item);
+            var preset = Alpaca4d.Material.Concrete01.C2530;
+
+            pManager.AddTextParameter("Material Name", "MatName", "Material name.", GH_ParamAccess.item, preset.MatName);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("fco", "fco", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("fco", "fco",
+                "Compressive strength, in kN/m2. Negative, as every stress and strain in Concrete01 is.",
+                GH_ParamAccess.item, preset.FpCo);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("fcu", "fcu", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("fcu", "fcu",
+                "Crushing strength, in kN/m2 - what is left at EpsilonCu, past the peak. Negative, and no larger in magnitude than fco.",
+                GH_ParamAccess.item, preset.FpCu);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("EpsilonCo", "EpsilonCo", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("EpsilonCo", "EpsilonCo",
+                "Strain at fco. Negative, dimensionless.",
+                GH_ParamAccess.item, preset.EpsilonCo);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddNumberParameter("EpsilonCu", "EpsilonCu", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("EpsilonCu", "EpsilonCu",
+                "Strain at fcu. Negative, dimensionless.",
+                GH_ParamAccess.item, preset.EpsilonCu);
             pManager[pManager.ParamCount - 1].Optional = true;
 
-            pManager.AddBooleanParameter("MinMax", "MinMax", "", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("MinMax", "MinMax",
+                "Wrap the material so a fibre fails once its strain leaves the range between EpsilonCu and zero.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -55,11 +67,15 @@ namespace Alpaca4d.Gh
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string matName = null;
-            double fpco = 28; 
-            double fpcu = 35;
-            double epsilonc0 = 0.002;
-            double epsilonCu = 0.0035;
+            // The registered defaults above are what these are; the fallbacks here only
+            // matter if a wire is connected and carries nothing.
+            var preset = Alpaca4d.Material.Concrete01.C2530;
+
+            string matName = preset.MatName;
+            double fpco = preset.FpCo;
+            double fpcu = preset.FpCu;
+            double epsilonc0 = preset.EpsilonCo;
+            double epsilonCu = preset.EpsilonCu;
             bool minMax = false;
 
 

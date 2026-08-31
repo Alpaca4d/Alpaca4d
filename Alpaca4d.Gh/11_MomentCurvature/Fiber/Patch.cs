@@ -13,7 +13,7 @@ namespace Alpaca4d.Gh
     {
         public Patch()
           : base("Patch (Alpaca4d)", "Patch",
-            "Construct a Patch",
+            "An area of the section filled with fibres - one fibre per mesh face, at its centroid.\nMesh in m, so fibre areas come out in m2.",
             "Alpaca4d", "MomentCurvature_βeta")
         {
             // Draw a Description Underneath the component
@@ -25,8 +25,14 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddMeshParameter("Mesh", "Mesh", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
+            pManager.AddMeshParameter("Mesh", "Mesh",
+                "The area to fill, in m, in the section's local yz plane. Each face becomes one fibre, so the mesh density is the fibre density.",
+                GH_ParamAccess.item);
+
+            pManager.AddGenericParameter("Material", "Material",
+                "Material of the fibres. Defaults to C25/30 concrete.",
+                GH_ParamAccess.item);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>
@@ -45,9 +51,14 @@ namespace Alpaca4d.Gh
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             Rhino.Geometry.Mesh geometry = null;
-            Alpaca4d.Generic.IMaterial material = null;
 
-            DA.GetData(0, ref geometry);
+            // A patch is the filled area of a section, which for a fibre model is
+            // normally the concrete.
+            Alpaca4d.Generic.IMaterial material = Alpaca4d.Material.Concrete01.C2530;
+
+            if (!DA.GetData(0, ref geometry) || geometry == null)
+                return;
+
             DA.GetData(1, ref material);
             
             var patch = new Alpaca4d.Section.Patch(geometry, material);
@@ -59,35 +70,42 @@ namespace Alpaca4d.Gh
 
 
         private List<Alpaca4d.Section.Patch> _patch = new List<Section.Patch>();
+        private readonly FiberPreview _preview = new FiberPreview();
 
         protected override void BeforeSolveInstance()
         {
             _patch.Clear();
+            _preview.Clear();
         }
-        public override void DrawViewportMeshes(IGH_PreviewArgs args)
+
+        protected override void AfterSolveInstance()
         {
-            base.DrawViewportMeshes(args);
-        
-            if (_patch.Count == 0)
+            _preview.AddPatches(_patch);
+        }
+
+        /// <summary>
+        /// Without this the box comes from the output parameter, which holds a patch and
+        /// not geometry - so it is empty, Zoom Extents ignores the preview, and Rhino is
+        /// free to cull the drawing.
+        /// </summary>
+        public override BoundingBox ClippingBox
+        {
+            get { return _preview.Box; }
+        }
+
+        /// <summary>
+        /// Wires, not meshes: a patch is only ever drawn as its mesh edges and the
+        /// centroids of its faces, so it belongs in the wire pass - which is also the pass
+        /// Fiber Section draws it in.
+        /// </summary>
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+            base.DrawViewportWires(args);
+
+            if (this.Hidden || this.Locked || _preview.IsEmpty)
                 return;
 
-            if (this.Hidden || this.Locked) return;
-
-            if (_patch != null)
-            {
-                foreach (var patch in _patch)
-                {
-                    var mesh = patch.PatchGeometry;
-                    args.Display.DrawMeshWires(mesh, System.Drawing.Color.Gray);
-                    
-                }
-
-                var points = _patch.SelectMany(x => x.Fibers).Select(x => x.Pos);
-                foreach (var point in points)
-                {
-                    args.Display.DrawPoint(point, Rhino.Display.PointStyle.RoundSimple, 1, System.Drawing.Color.Black);
-                }
-            }
+            _preview.Draw(args);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;

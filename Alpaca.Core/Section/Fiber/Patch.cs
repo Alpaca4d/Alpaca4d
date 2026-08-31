@@ -23,10 +23,15 @@ namespace Alpaca4d.Section
                 foreach (var meshFace in meshes)
                 {
                     var areaProperty = Rhino.Geometry.AreaMassProperties.Compute(meshFace);
-                    var center = areaProperty.Centroid;
-                    var area = areaProperty.Area;
- 
-                    var fiber = new PointFiber(center, area, this.Material);
+
+                    // A degenerate face - two coincident vertices, say - has no area
+                    // properties at all, and Compute hands back null rather than throwing.
+                    // This used to dereference it regardless, from inside the display
+                    // pipeline, on every redraw. A fibre of no area contributes nothing.
+                    if (areaProperty == null || areaProperty.Area <= 0.0)
+                        continue;
+
+                    var fiber = new PointFiber(areaProperty.Centroid, areaProperty.Area, this.Material);
                     fibers.Add(fiber);
                 }
                 return fibers;
