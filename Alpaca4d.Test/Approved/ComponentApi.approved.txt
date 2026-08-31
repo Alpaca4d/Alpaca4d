@@ -1088,7 +1088,6 @@ Alpaca4d.Gh.Support
   in   4  Rx (Rx) : Param_Boolean item optional
   in   5  Ry (Ry) : Param_Boolean item optional
   in   6  Rz (Rz) : Param_Boolean item optional
-  in   7  Type (Type) : Param_Integer item optional
   out  0  Support (Support) : Param_GenericObject item
 
 Alpaca4d.Gh.Test

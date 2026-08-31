@@ -223,28 +223,19 @@ namespace Alpaca4d.Testing.Tests
         }
 
         /// <summary>
-        /// The Type input is the only practical way to reach most of the seven. Five of
-        /// them need Rx and Ry off and Rz on as well as the translations, so flipping the
-        /// one boolean a user would think to flip lands outside the set and draws the text
-        /// tag instead of a symbol.
+        /// A support restrained the way a preset says has to draw that preset's symbol.
+        /// Anything else means a support falls through to the bare text tag.
         /// </summary>
         [TestCaseSource(nameof(Table))]
-        public void Picking_a_type_on_the_component_gives_that_preset_and_a_symbol(
+        public void A_support_restrained_like_a_preset_draws_its_symbol(
             int position, string id, bool tx, bool ty, bool tz, bool rx, bool ry, bool rz)
         {
-            var result = ComponentHarness.For<Alpaca4d.Gh.Support>()
-                                         .Set("Position", new Point3d(1, 2, 3))
-                                         .Set("Type", position)
-                                         .Solve();
-
-            Assert.That(result.Errors, Is.Empty, result.Describe());
-
-            var support = result.Get<Alpaca4d.Element.Support>(0);
+            var support = new Alpaca4d.Element.Support(new Point3d(1, 2, 3), tx, ty, tz, rx, ry, rz);
             TestContext.WriteLine(support.Description);
 
             Assert.Multiple(() =>
             {
-                Assert.That(support.Preset, Is.Not.Null, "type " + position + " matched no preset");
+                Assert.That(support.Preset, Is.Not.Null, id + " matched no preset");
                 Assert.That(support.Preset.Id, Is.EqualTo(id));
                 // Geometry is dynamic; asserting on it directly would need the C# runtime
                 // binder, which this project does not reference.
@@ -253,9 +244,14 @@ namespace Alpaca4d.Testing.Tests
             });
         }
 
-        /// <summary>Left alone, the component still reads the six booleans as it always did.</summary>
+        /// <summary>
+        /// The component builds its support out of the six booleans, and most combinations
+        /// of them are not presets. Five of the seven need Rx and Ry off and Rz on as well
+        /// as their translations, so flipping the one boolean anybody would think to flip
+        /// lands outside the set and draws the text tag.
+        /// </summary>
         [Test]
-        public void Leaving_the_type_alone_reads_the_six_booleans()
+        public void The_component_reads_the_six_booleans()
         {
             var result = ComponentHarness.For<Alpaca4d.Gh.Support>()
                                          .Set("Position", new Point3d(1, 2, 3))
