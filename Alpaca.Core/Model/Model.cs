@@ -566,37 +566,96 @@ namespace Alpaca4d
             var outputBuilder = new System.Text.StringBuilder();
             var errorBuilder = new System.Text.StringBuilder();
 
-            Process process = new Process();
-            // Configure the process using the StartInfo properties.
-            process.StartInfo.FileName = openSeesPath;
-            process.StartInfo.Arguments = "\"" + this.FileName + "\"";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
+            // Read once: the wait and the message it may produce have to agree, whatever
+            // else does to the setting meanwhile.
+            TimeSpan? timeout = Application.OpenSeesTimeout;
 
-            // Read stdout/stderr via events (not Task/async) so we never block on a full
-            // pipe while the other stream is being written (deadlock risk with ReadToEnd
-            // on both streams sequentially). This stays fully synchronous, which is
-            // required for Grasshopper components.
-            process.OutputDataReceived += (sender, e) =>
+            // The Process owns a process handle and two pipe handles; without the using
+            // they are only released whenever the finalizer happens to run.
+            using (Process process = new Process())
             {
-                if (e.Data != null)
-                    outputBuilder.AppendLine(e.Data);
-            };
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                if (e.Data != null)
-                    errorBuilder.AppendLine(e.Data);
-            };
+                // Configure the process using the StartInfo properties.
+                process.StartInfo.FileName = openSeesPath;
+                process.StartInfo.Arguments = "\"" + this.FileName + "\"";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
 
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+                // Read stdout/stderr via events (not Task/async) so we never block on a full
+                // pipe while the other stream is being written (deadlock risk with ReadToEnd
+                // on both streams sequentially). This stays fully synchronous, which is
+                // required for Grasshopper components.
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null)
+                        outputBuilder.AppendLine(e.Data);
+                };
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null)
+                        errorBuilder.AppendLine(e.Data);
+                };
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                if (!WaitForOpenSees(process, timeout))
+                {
+                    // Nothing is going to end this wait on its own, and a caller with no
+                    // way out is worse than a failed analysis: in Grasshopper it freezes
+                    // the canvas, and in a test run it leaves a host process behind that
+                    // outlives the run that started it.
+                    TryKill(process);
+
+                    throw new TimeoutException(
+                        $"OpenSees did not finish within {timeout.Value} and was stopped. " +
+                        "Raise or clear Alpaca4d.Application.OpenSeesTimeout if the model genuinely needs longer." +
+                        Environment.NewLine + errorBuilder.ToString().Trim());
+                }
+
+                this.IsAnalysed = true;
+                return (outputBuilder.ToString().Trim(), errorBuilder.ToString().Trim(), process.ExitCode);
+            }
+        }
+
+        /// <summary>
+        /// Waits for the solver, up to <paramref name="timeout"/> - null waits forever.
+        /// False if the timeout ran out. The parameterless overload is the one that also
+        /// drains the asynchronous stdout/stderr readers, so both paths end with it.
+        /// </summary>
+        private static bool WaitForOpenSees(Process process, TimeSpan? timeout)
+        {
+            if (!timeout.HasValue)
+            {
+                process.WaitForExit();
+                return true;
+            }
+
+            // Clamped both ends: negative would throw, and anything past int.MaxValue
+            // milliseconds is 24 days, which is the same thing as waiting forever.
+            double milliseconds = Math.Max(0, Math.Min(timeout.Value.TotalMilliseconds, int.MaxValue));
+
+            if (!process.WaitForExit((int)milliseconds))
+                return false;
+
+            // The timed overload returns as soon as the process is gone, without waiting
+            // for the readers, so the last lines can still be in flight. This one blocks
+            // until they are drained - and the process has already exited, so it returns.
             process.WaitForExit();
+            return true;
+        }
 
-            this.IsAnalysed = true;
-            return (outputBuilder.ToString().Trim(), errorBuilder.ToString().Trim(), process.ExitCode);
+        private static void TryKill(Process process)
+        {
+            try
+            {
+                if (!process.HasExited)
+                    process.Kill();
+            }
+            catch (InvalidOperationException) { }   // exited between the check and the kill
+            catch (System.ComponentModel.Win32Exception) { }
         }
 
         public void Serialise()

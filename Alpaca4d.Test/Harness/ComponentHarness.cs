@@ -9,8 +9,9 @@ using Grasshopper.Kernel.Types;
 namespace Alpaca4d.Testing
 {
     /// <summary>
-    /// Drives a single Grasshopper component through one solution, without a
-    /// GH_Document, a canvas or a Rhino instance.
+    /// Drives a single Grasshopper component through one solution, without a canvas and
+    /// without a document solution - see <see cref="Document"/> for the one document all
+    /// harnesses share as context.
     ///
     /// <code>
     /// var result = ComponentHarness.For&lt;RectangleCS&gt;()
@@ -25,8 +26,9 @@ namespace Alpaca4d.Testing
     /// </summary>
     public sealed class ComponentHarness
     {
+        private static GH_Document _document;
+
         private readonly GH_Component _component;
-        private readonly GH_Document _document;
 
         private ComponentHarness(GH_Component component)
         {
@@ -35,8 +37,7 @@ namespace Alpaca4d.Testing
             // Components are entitled to call OnPingDocument(); RunAnalysis, for one,
             // dereferences it to work out where to write the OpenSees input deck.
             // The document is only context - the harness still drives the solve itself.
-            _document = new GH_Document();
-            _document.AddObject(component, false);
+            Document.AddObject(component, false);
         }
 
         public static ComponentHarness For<TComponent>() where TComponent : GH_Component, new()
@@ -57,9 +58,38 @@ namespace Alpaca4d.Testing
             get { return _component; }
         }
 
-        public GH_Document Document
+        /// <summary>
+        /// The one document every harness in the run shares, and the reason it is shared:
+        /// a GH_Document subscribes four <see cref="Rhino.Display.DisplayPipeline"/>
+        /// events in its constructor, and Grasshopper's own documentation says only
+        /// Dispose disconnects them again. Those events are static, so an undisposed
+        /// document is rooted for the life of the process - along with its scheduling
+        /// timer, its components, and everything their outputs hold. A document per
+        /// harness meant a hundred-odd of them per run, all still hooked into the native
+        /// display pipeline when RhinoCore is torn down at the end.
+        ///
+        /// One document costs one handler set and is disposed deterministically, by
+        /// <see cref="DisposeDocument"/>, before Rhino goes down. Components accumulate
+        /// in it for the length of the run, which is the trade: cheap, and bounded by the
+        /// number of components a run solves.
+        /// </summary>
+        public static GH_Document Document
         {
-            get { return _document; }
+            get { return _document ?? (_document = new GH_Document()); }
+        }
+
+        /// <summary>
+        /// Disposes the shared document. Called from SetupFixture's teardown, before
+        /// Rhino itself is disposed - the display pipeline the document unhooks from
+        /// belongs to Rhino, so the order matters.
+        /// </summary>
+        public static void DisposeDocument()
+        {
+            var document = _document;
+            _document = null;
+
+            if (document != null)
+                document.Dispose();
         }
 
         /// <summary>

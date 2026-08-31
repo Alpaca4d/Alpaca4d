@@ -118,18 +118,20 @@ namespace Alpaca4d.Result
         /// <exception cref="Exception"></exception>
         public static (List<List<double>> n, List<List<double>> mz, List<List<double>> vy, List<List<double>> my, List<List<double>> vz, List<List<double>> t) ForceBeamColumn(Model alpacaModel, int step, string resultType = null)
         {
-            // OpenSees writes ForceBeamColumn results under different keys depending on
-            // the integration scheme used:
-            //   [1000:1:0]  ->  NewtonCotes  (ForceBeamColumn)
-            //   [1000:2:0]  ->  HingeRadau   (BeamWithHinges)
-            // A model may contain both types, whose rows are interleaved by element ID.
-            // We therefore build a map  elementId -> row-data  from every present group
-            // and look up each beam by its assigned Id.
+            // MPCORecorder names every element result group
+            //     <classTag>-<className>[<integrationRule>:<customRuleIndex>:<headerIndex>]
+            // (MPCORecorder.cpp, "create a name for this dataset using the following format").
+            // forceBeamColumn always lands on integrationRule 1000 (CustomIntegrationRule), and
+            // customRuleIndex is handed out in order of discovery, one per DISTINCT set of
+            // normalised Gauss point locations - not one per integration type. So the index is
+            // not a stable label: with NewtonCotes and HingeRadau in the same model, whichever
+            // element the domain reaches first takes index 1. Worse, HingeRadau locations depend
+            // on lpI/L and lpJ/L, so every distinct hinge length ratio spawns another group
+            // ([1000:3:0], [1000:4:0], ...). Hard-coding a list of keys silently drops the beams
+            // that fall outside it, so enumerate whatever the file actually holds and key the
+            // rows by element ID, which is unique across the whole model.
             const string BASE = "/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS/section.force";
-            string[] knownKeys = {
-                "74-ForceBeamColumn3d[1000:1:0]",
-                "74-ForceBeamColumn3d[1000:2:0]"
-            };
+            const string BEAM_CLASS = "ForceBeamColumn";
             const int SECTIONFORCES = 6;
 
             var nNested  = new List<List<double>>();
@@ -143,33 +145,43 @@ namespace Alpaca4d.Result
 
             using var h5File = PureHDF.H5File.OpenRead(recorderPath);
 
+            if (!h5File.LinkExists(BASE))
+                throw new Exception(
+                    "The recorder file holds no section forces. Switch \"section.force\" on in the Recorder component.");
+
             // Map: element ID -> row data (all columns for that element)
             var rowById = new Dictionary<int, double[]>();
 
-            foreach (var key in knownKeys)
+            var beamGroups = h5File.Group(BASE)
+                                   .Children()
+                                   .OfType<PureHDF.IH5Group>()
+                                   .Where(group => group.Name.Contains(BEAM_CLASS))
+                                   .ToList();
+
+            foreach (var group in beamGroups)
             {
-                try
+                var stepGroup = group.Group("DATA");
+                if (!stepGroup.LinkExists($"STEP_{step}"))
+                    throw new Exception($"STEP_{step} not defined!");
+
+                var idDataset   = group.Dataset("ID");
+                var dataDataset = stepGroup.Dataset($"STEP_{step}");
+
+                long rows = (long)dataDataset.Space.Dimensions[0];
+                long cols = (long)dataDataset.Space.Dimensions[1];
+                long idRows = (long)idDataset.Space.Dimensions[0];
+
+                double[,] data = dataDataset.Read<double>().ToArray2D(rows, cols);
+                int[,]    ids  = idDataset.Read<int>().ToArray2D(idRows, 1L);
+
+                for (int r = 0; r < rows; r++)
                 {
-                    var idDataset   = h5File.Dataset($"{BASE}/{key}/ID");
-                    var dataDataset = h5File.Dataset($"{BASE}/{key}/DATA/STEP_{step}");
-
-                    long rows = (long)dataDataset.Space.Dimensions[0];
-                    long cols = (long)dataDataset.Space.Dimensions[1];
-                    long idRows = (long)idDataset.Space.Dimensions[0];
-
-                    double[,] data = dataDataset.Read<double>().ToArray2D(rows, cols);
-                    int[,]    ids  = idDataset.Read<int>().ToArray2D(idRows, 1L);
-
-                    for (int r = 0; r < rows; r++)
-                    {
-                        int elemId = ids[r, 0];
-                        var rowData = new double[cols];
-                        for (int c = 0; c < cols; c++)
-                            rowData[c] = data[r, c];
-                        rowById[elemId] = rowData;
-                    }
+                    int elemId = ids[r, 0];
+                    var rowData = new double[cols];
+                    for (int c = 0; c < cols; c++)
+                        rowData[c] = data[r, c];
+                    rowById[elemId] = rowData;
                 }
-                catch { /* group not present in this file – skip */ }
             }
 
             try

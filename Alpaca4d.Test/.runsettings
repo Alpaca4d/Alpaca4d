@@ -4,5 +4,15 @@
   <RunConfiguration>
     <TargetPlatform>x64</TargetPlatform>
     <TargetFrameworkVersion>net48</TargetFrameworkVersion>
+
+    <!-- The backstop for a host that will not come back. Rhino runs in-process here, and
+         a head-less Rhino that wedges on shutdown leaves a test host alive with every
+         assembly it loaded still locked - including the copies in the Grasshopper
+         libraries folder, so the next build cannot deploy over them. Without this,
+         VSTest waits for that host indefinitely; with it, VSTest kills it and the run
+         fails, which is the visible failure the silent one deserves to be.
+
+         Thirty minutes: a full run is a few minutes, dominated by Rhino starting up. -->
+    <TestSessionTimeout>1800000</TestSessionTimeout>
   </RunConfiguration>
 </RunSettings>

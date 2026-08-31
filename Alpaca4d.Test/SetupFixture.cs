@@ -21,22 +21,60 @@ namespace Alpaca4d.Testing
     {
         public override void OneTimeSetup()
         {
+            // Rhino is up the moment this returns, and from here on every exit from this
+            // method has to take it down again - see OneTimeTearDown for what a Rhino
+            // nobody owns costs.
             base.OneTimeSetup();
 
-            // Read on this thread while it still means something - see HeadlessDoc.
-            HeadlessDoc = Rhino.RhinoDoc.ActiveDoc;
+            try
+            {
+                // Read on this thread while it still means something - see HeadlessDoc.
+                HeadlessDoc = Rhino.RhinoDoc.ActiveDoc;
 
-            LoadGrasshopperHeadless();
+                LoadGrasshopperHeadless();
 
-            // Only if starting Grasshopper did not already bring it in. On a machine
-            // that has built this repo it will have: the plug-in build deploys a copy
-            // into the Grasshopper libraries folder every time (CopyToGrasshopperLibraries),
-            // and Grasshopper loads it during startup like any other plug-in. Loading
-            // the copy next to the test assembly on top of that registers every
-            // component a second time, and Grasshopper answers with its "Component ID
-            // conflict" dialog - a modal dialog, in a process with nobody to click it.
-            if (!PluginIsLoaded)
-                LoadGHA(new[] { PluginPath });
+                // Only if starting Grasshopper did not already bring it in. On a machine
+                // that has built this repo it will have: the plug-in build deploys a copy
+                // into the Grasshopper libraries folder every time (CopyToGrasshopperLibraries),
+                // and Grasshopper loads it during startup like any other plug-in. Loading
+                // the copy next to the test assembly on top of that registers every
+                // component a second time, and Grasshopper answers with its "Component ID
+                // conflict" dialog - a modal dialog, in a process with nobody to click it.
+                if (!PluginIsLoaded)
+                    LoadGHA(new[] { PluginPath });
+
+                // Nothing is watching this run, so a solver that hangs must not be able to
+                // hold it open; see Application.OpenSeesTimeout. Generous on purpose - the
+                // workflow fixtures solve in about a second, so anything near this is a
+                // solver that is never coming back.
+                Alpaca4d.Application.OpenSeesTimeout = TimeSpan.FromMinutes(10);
+            }
+            catch
+            {
+                base.OneTimeTearDown();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Takes the head-less Rhino down again, innermost first.
+        ///
+        /// The order is the point. The shared GH_Document holds handlers on Rhino's
+        /// static DisplayPipeline, which is backed by native callbacks; disposing
+        /// RhinoCore while they are still attached tears the native side out from under
+        /// them. That is how a test host ends up half-exited - every managed thread gone,
+        /// one thread stuck in native shutdown, the process still holding every file it
+        /// had loaded until someone terminates it by hand.
+        ///
+        /// Grasshopper itself is not shut down here because it cannot be: Rhino has no
+        /// API to unload a plug-in, so the RunHeadless started in OneTimeSetup lives
+        /// until the process does. TestSessionTimeout in .runsettings is the backstop
+        /// for the case where it does not.
+        /// </summary>
+        public override void OneTimeTearDown()
+        {
+            ComponentHarness.DisposeDocument();
+            base.OneTimeTearDown();
         }
 
         /// <summary>
@@ -128,8 +166,71 @@ namespace Alpaca4d.Testing
             if (grasshopper == null)
                 throw new InvalidOperationException("Grasshopper loaded but handed back no plug-in object.");
 
+            // Between loading the plug-in and starting it: the assembly is in the
+            // AppDomain, so GH_ComponentServer resolves, and the library scan has not run.
+            RestrictPluginsToAlpaca4d();
+
             grasshopper.GetType().InvokeMember(
                 "RunHeadless", BindingFlags.InvokeMethod, null, grasshopper, null);
+        }
+
+        /// <summary>
+        /// Narrows Grasshopper's start-up scan to its own component libraries plus
+        /// Alpaca4d, leaving every other installed plug-in on disk untouched and unloaded.
+        ///
+        /// Starting Grasshopper normally loads every .gha it can find - the user's
+        /// Libraries folder and every Rhino package. That is someone else's code running
+        /// in the test host, and some of it phones home: Karamba3D opens HTTPS
+        /// connections for a licence check during load, and when that call does not come
+        /// back neither does the test run. The host is left alive holding every assembly
+        /// it had loaded, the Grasshopper libraries folder included, so the next build
+        /// cannot copy over them either. None of those plug-ins have anything to do with
+        /// Alpaca4d.
+        ///
+        /// GH_ComponentServer.SetExternalGHAs is Grasshopper's own answer to this -
+        /// "specify a subset of components to load in order to reduce start time", as its
+        /// summary puts it. It is internal and marked work-in-progress, hence the
+        /// reflection and the soft landing: if a future Grasshopper drops it the run still
+        /// works, it just loads everything again.
+        ///
+        /// The filter matches by path suffix and applies to the whole scan, so
+        /// Grasshopper's own libraries have to be named too or the standard components
+        /// disappear with the rest.
+        /// </summary>
+        private static void RestrictPluginsToAlpaca4d()
+        {
+            var setExternalGHAs = typeof(Grasshopper.Kernel.GH_ComponentServer).GetMethod(
+                "SetExternalGHAs", BindingFlags.Static | BindingFlags.NonPublic);
+
+            if (setExternalGHAs == null)
+            {
+                TestContext.WriteLine(
+                    "GH_ComponentServer.SetExternalGHAs is gone from this Grasshopper; " +
+                    "loading every installed plug-in, which is slower and can hang on a " +
+                    "third-party licence check. See RestrictPluginsToAlpaca4d.");
+                return;
+            }
+
+            var allowed = new List<string>();
+
+            // Grasshopper's own component libraries, in Components next to Grasshopper.dll.
+            var components = Path.Combine(
+                Path.GetDirectoryName(typeof(Grasshopper.Kernel.GH_Component).Assembly.Location),
+                "Components");
+
+            if (Directory.Exists(components))
+                allowed.AddRange(Directory.GetFiles(components, "*.gha"));
+
+            // Whichever copy of the plug-in is deployed - matched as a suffix, so this is
+            // the libraries folder copy without having to work out where that is. If none
+            // is deployed nothing matches, PluginIsLoaded stays false, and OneTimeSetup
+            // falls back to the copy next to the test assembly.
+            allowed.Add(Path.DirectorySeparatorChar + "Alpaca4d.Gh.gha");
+
+            setExternalGHAs.Invoke(null, new object[] { allowed });
+
+            TestContext.WriteLine(
+                "Grasshopper plug-in scan restricted to " + allowed.Count + " entries (Alpaca4d and Grasshopper's own).");
         }
 
         /// <summary>

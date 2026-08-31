@@ -21,6 +21,7 @@ namespace Alpaca4d.Testing
         private readonly List<Step> _steps = new List<Step>();
         private readonly string _workingDirectory;
         private readonly string _previousDirectory;
+        private bool _disposed;
 
         private WorkflowRun()
         {
@@ -32,15 +33,29 @@ namespace Alpaca4d.Testing
 
         public static WorkflowRun Begin()
         {
-            var run = new WorkflowRun();
+            // Before the constructor, not after. Without a bundled solver this calls
+            // Assert.Ignore, which throws: anything the constructor had already done
+            // would belong to a run the caller never receives and so can never dispose -
+            // and the working directory it changes is the whole process's.
             OpenSees.UseBundledSolver();
-            return run;
+
+            return new WorkflowRun();
         }
 
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+
             Directory.SetCurrentDirectory(_previousDirectory);
-            try { Directory.Delete(_workingDirectory, true); } catch (IOException) { }
+
+            // Best-effort: a solver that is still writing, or a virus scanner holding a
+            // recorder file open, must not fail the test that just passed.
+            try { Directory.Delete(_workingDirectory, true); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
         }
 
         /// <summary>The OpenSees console output of the last <see cref="Analyse"/>.</summary>

@@ -31,5 +31,22 @@ namespace Alpaca4d.BeamIntegration
         {
             return $"{Type} {Section.Id} {IntegrationPoint}";
         }
+
+        /// <summary>
+        /// Newton-Cotes samples at equally spaced abscissae, ends included
+        /// (NewtonCotesBeamIntegration::getSectionLocations: xi[i] = i/(N-1)).
+        /// </summary>
+        public IReadOnlyList<double> SectionLocations(double length)
+        {
+            int count = this.IntegrationPoint;
+            if (count < 1) return new double[0];
+            if (count == 1) return new[] { 0.5 };
+
+            var xi = new double[count];
+            for (int i = 0; i < count; i++)
+                xi[i] = (double)i / (count - 1);
+
+            return xi;
+        }
     }
 }

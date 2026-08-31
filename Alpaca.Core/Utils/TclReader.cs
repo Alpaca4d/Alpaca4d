@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -661,9 +661,13 @@ namespace Alpaca4d
                 var hingeI = SectionAt(tokens, 7, tag);
                 var hingeJ = SectionAt(tokens, 9, tag);
 
+                // The deck carries lp as a length; BeamWithHinges is set with lp/L.
+                var ratioI = LpRatioIn(curve, Number(tokens, 8), tag, "lpI");
+                var ratioJ = LpRatioIn(curve, Number(tokens, 10), tag, "lpJ");
+
                 beam = new BeamWithHinges(curve, interior, geomTransf,
-                    ReleaseOf(hingeI, interior), Number(tokens, 8),
-                    ReleaseOf(hingeJ, interior), Number(tokens, 10));
+                    ReleaseOf(hingeI, interior), ratioI,
+                    ReleaseOf(hingeJ, interior), ratioJ);
             }
             else
             {
@@ -689,6 +693,26 @@ namespace Alpaca4d
 
             _elements.Add(beam);
             _beamsByTag[tag] = beam;
+        }
+
+        /// <summary>
+        /// Turns a hinge length from the deck into the lp/L that BeamWithHinges is set with.
+        /// A deck written elsewhere may sit outside the range HingeRadau can integrate, and the
+        /// constructor clamps it, so say so rather than let the element change quietly on import.
+        /// </summary>
+        private double? LpRatioIn(Curve curve, double lp, int tag, string which)
+        {
+            double length = BeamWithHinges.ChordLength(curve);
+            if (length <= 0.0 || lp <= 0.0) return null;
+
+            double ratio = lp / length;
+            double resolved = BeamWithHinges.ResolveLpRatio(ratio);
+
+            if (Math.Abs(resolved - ratio) > 1e-12)
+                Warn($"element {tag} has {which}/L = {ratio:G4}, outside " +
+                     $"[{BeamWithHinges.MinLpRatio}, {BeamWithHinges.MaxLpRatio}]; it was clamped to {resolved:G4}.");
+
+            return ratio;
         }
 
         /// <summary>

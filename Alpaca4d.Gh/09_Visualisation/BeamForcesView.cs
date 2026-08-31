@@ -1,4 +1,4 @@
-using Grasshopper;
+﻿using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Special;
 using GH_IO.Serialization;
@@ -224,10 +224,14 @@ namespace Alpaca4d.Gh
             // Get colors for this force type from the Palette
             var (positiveColor, negativeColor) = GetForceTypeColors(forceType);
 
+            // The recorder writes one value per section, and the sections are NOT evenly spaced:
+            // HingeRadau puts two of its six points a short 8/3*lp inside the ends. Ask the
+            // integration rule where they actually sit rather than spreading them out.
+            var stations = SectionStations(beam, integrationPoints);
+
             for (int i = 0; i < integrationPoints; i++)
             {
-                // Get parameter along curve (assuming uniform distribution)
-                double t = (double)i / (integrationPoints - 1);
+                double t = stations[i];
                 Point3d pointOnBeam = curve.PointAtNormalizedLength(t);
                 
                 // Offset point perpendicular to beam in reference direction
@@ -260,6 +264,29 @@ namespace Alpaca4d.Gh
             Mesh mesh = CreateClosedDiagramMesh(beamPoints, diagramPoints, colors);
             
             return mesh;
+        }
+
+        /// <summary>
+        /// Normalised positions of the section results along a beam, from the element's own
+        /// integration rule. Falls back to an even spread when the recorder holds a number of
+        /// sections the rule does not account for, so an unexpected file still draws something.
+        /// </summary>
+        private static IReadOnlyList<double> SectionStations(Alpaca4d.Generic.IBeam beam, int count)
+        {
+            if (beam.BeamIntegration != null)
+            {
+                double length = beam.Curve.PointAtStart.DistanceTo(beam.Curve.PointAtEnd);
+                var xi = beam.BeamIntegration.SectionLocations(length);
+
+                if (xi != null && xi.Count == count)
+                    return xi;
+            }
+
+            var uniform = new double[count];
+            for (int i = 0; i < count; i++)
+                uniform[i] = count == 1 ? 0.5 : (double)i / (count - 1);
+
+            return uniform;
         }
 
         /// <summary>

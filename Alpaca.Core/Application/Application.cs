@@ -16,6 +16,18 @@ namespace Alpaca4d
         public static string assemblyLocation = Assembly.GetExecutingAssembly().Location;
         public static string GhAlpacaFolder = System.IO.Path.GetDirectoryName(assemblyLocation);
 
+        /// <summary>
+        /// How long <see cref="Model.RunOpenSees"/> waits for the solver before killing it
+        /// and throwing. Null - the default - waits forever, because a long analysis on
+        /// the canvas is a legitimate thing to do and no timeout we could pick here would
+        /// be right for every model.
+        ///
+        /// Unattended callers should set it. The test bench does: a solver that never
+        /// returns there is a test run that never finishes, and a host process that
+        /// outlives the run that started it.
+        /// </summary>
+        public static TimeSpan? OpenSeesTimeout { get; set; }
+
         public static string OpenSees
         {
             get
