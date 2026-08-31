@@ -10,7 +10,6 @@ namespace Alpaca4d.Generic
 {
     public interface IUniaxialSection : ISerialize, ISection
     {
-        public int? Id { get; set; }
         public double Area { get; }
         public double Izz { get; }
         public double Iyy { get; }

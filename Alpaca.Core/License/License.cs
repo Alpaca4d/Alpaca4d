@@ -46,8 +46,10 @@ namespace Alpaca4d.License
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
+                    // No licence file, an unreadable one, or one written by something else:
+                    // all of them mean the same thing here, so there is nothing to inspect.
                     return false;
                 }
                 return false;

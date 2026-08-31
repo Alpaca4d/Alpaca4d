@@ -12,7 +12,6 @@ namespace Alpaca4d.Generic
 {
     public interface IBrick : IElement
     {
-        public int? Id { get; set; }
         public Mesh Mesh { get; set; }
         public ElementClass ElementClass { get; }
         public IMultiDimensionMaterial Material { get; set; }

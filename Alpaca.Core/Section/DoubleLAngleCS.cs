@@ -133,11 +133,7 @@ namespace Alpaca4d.Section
                 // Dimensions: (Gap + 0.1 * Thickness) width × Thickness * 0.1 (height)
                 // Position: at the middle (y = 0)
                 var plane = Rhino.Geometry.Plane.WorldXY;
-                double rectWidth = this.Gap + (0.1 * this.Thickness);
-                double halfWidth = rectWidth / 2.0;
-                double rectHeight = this.Thickness * 0.1;
-                double yPosition = 0.0;
-                
+
                 var rectPoints = new List<Point3d>
                 {
                     plane.PointAt(-this.Gap / 2 - this.Thickness * 0.5, this.Thickness * 0.1),
