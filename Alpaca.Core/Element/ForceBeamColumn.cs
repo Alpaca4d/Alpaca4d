@@ -30,7 +30,7 @@ namespace Alpaca4d.Element
         public int? JNode { get; set; }
         public int Ndf => 6;
         public double? MassDens => this.Section.Area * this.Section.Material.Rho;
-        public System.Drawing.Color Color { get; set; }
+        public System.Drawing.Color Color { get; set; } = Alpaca4d.Colors.DefaultBeam;
         public ForceBeamColumn(Curve curve, IUniaxialSection crossSection, GeomTransf geomTransf)
         {
             this.Curve = curve;

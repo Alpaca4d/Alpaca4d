@@ -19,7 +19,7 @@ namespace Alpaca4d.Element
         public List<int?> IndexNodes { get; set; }
         public double? BodyForce { get; set; }
         public int Ndf => 3;
-        public Color Color { get; set; }
+        public Color Color { get; set; } = Alpaca4d.Colors.DefaultBrick;
 
         public SSPbrick(Mesh mesh, IMultiDimensionMaterial material)
         {

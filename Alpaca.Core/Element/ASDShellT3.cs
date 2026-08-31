@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace Alpaca4d.Element
         public ElementClass ElementClass => ElementClass.ASDShellT3;
         public List<int?> IndexNodes { get; set; }
         public int Ndf => 6;
-        public Color Color { get; set; }
+        public Color Color { get; set; } = Alpaca4d.Colors.DefaultShell;
         public bool IsCorotational { get; set; } = false;
         public Vector3d LocalX { get; set; }
 

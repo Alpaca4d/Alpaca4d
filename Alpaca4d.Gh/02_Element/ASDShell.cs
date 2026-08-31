@@ -1,4 +1,4 @@
-using Grasshopper;
+﻿using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -56,11 +56,8 @@ namespace Alpaca4d.Gh
             IMultiDimensionSection section = null;
             DA.GetData(1, ref section);
 
-            Color color = Color.AliceBlue;
-            if (!DA.GetData(2, ref color))
-            {
-                color = Color.IndianRed;
-            }
+            Color color = Alpaca4d.Colors.DefaultShell;
+            DA.GetData(2, ref color);
 
             Vector3d localX = default;
             DA.GetData(3, ref localX);

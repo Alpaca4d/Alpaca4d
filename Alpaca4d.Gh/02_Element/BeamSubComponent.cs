@@ -1,4 +1,4 @@
-using Alpaca4d.UIWidgets;
+﻿using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
@@ -31,7 +31,7 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Vector(), "ZAxis", "ZAxis", "Local Z-axis direction (optional).", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Colour(), "Colour", "Colour", "", GH_ParamAccess.item, new GH_Colour(Color.FromArgb(255, 13, 13, 13)));
+            evaluationUnit.RegisterInputParam(new Param_Colour(), "Colour", "Colour", "", GH_ParamAccess.item, new GH_Colour(Alpaca4d.Colors.DefaultBeam));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
         }
 
@@ -64,7 +64,7 @@ namespace Alpaca4d.Gh
                 geomTransf = new Alpaca4d.Element.GeomTransf(Alpaca4d.Element.GeomTransfType.Linear, line, zAxis);
             }
 
-            Color color = Color.FromArgb(255, 13, 13, 13);
+            Color color = Alpaca4d.Colors.DefaultBeam;
             DA.GetData(4, ref color);
 
             var element = new Alpaca4d.Element.ForceBeamColumn(line, section, geomTransf);

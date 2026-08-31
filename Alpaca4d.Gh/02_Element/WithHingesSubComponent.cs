@@ -1,4 +1,4 @@
-using Alpaca4d.UIWidgets;
+﻿using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
@@ -34,17 +34,31 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "ReleaseI", "ReleaseI", "Release condition at the I end.", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "LpI", "LpI", $"Plastic hinge length at I end [{Units.Length}]. 0 or unset uses 0.05*L; other values are clamped to [0.02*L, 0.10*L].", GH_ParamAccess.item, new GH_Number(0.0));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "LpI", "LpI", LpDescription("I"), GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
             evaluationUnit.RegisterInputParam(new Param_GenericObject(), "ReleaseJ", "ReleaseJ", "Release condition at the J end.", GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "LpJ", "LpJ", $"Plastic hinge length at J end [{Units.Length}]. 0 or unset uses 0.05*L; other values are clamped to [0.02*L, 0.10*L].", GH_ParamAccess.item, new GH_Number(0.0));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "LpJ", "LpJ", LpDescription("J"), GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Colour(), "Colour", "Colour", "", GH_ParamAccess.item, new GH_Colour(Color.FromArgb(255, 13, 13, 13)));
+            evaluationUnit.RegisterInputParam(new Param_Colour(), "Colour", "Colour", "", GH_ParamAccess.item, new GH_Colour(Alpaca4d.Colors.DefaultBeamWithHinges));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+        }
+
+        /// <summary>
+        /// The hinge length is asked for as a fraction of L, not as a length: the released
+        /// flexibility of a 1e-6 hinge section scales with lp/L, so a ratio means the same thing
+        /// whether the model is drawn in metres or millimetres, and on beams of any span.
+        /// </summary>
+        private static string LpDescription(string end)
+        {
+            return $"Plastic hinge length at the {end} end, as a fraction of the element length L "
+                 + $"(so {Alpaca4d.Element.BeamWithHinges.DefaultLpRatio} means "
+                 + $"{Alpaca4d.Element.BeamWithHinges.DefaultLpRatio:P0} of L). "
+                 + $"Leave empty for {Alpaca4d.Element.BeamWithHinges.DefaultLpRatio}; other values are clamped to "
+                 + $"[{Alpaca4d.Element.BeamWithHinges.MinLpRatio}, {Alpaca4d.Element.BeamWithHinges.MaxLpRatio}].";
         }
 
         public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
@@ -80,63 +94,74 @@ namespace Alpaca4d.Gh
             DA.GetData(4, ref releaseI);
             if (releaseI == null) releaseI = Alpaca4d.Element.Release.FullFixed;
 
-            double lpI = 0.0;
-            DA.GetData(5, ref lpI);
+            double? lpRatioI = OptionalRatio(DA, 5);
 
             Alpaca4d.Element.Release releaseJ = null;
             DA.GetData(6, ref releaseJ);
             if (releaseJ == null) releaseJ = Alpaca4d.Element.Release.FullFixed;
 
-            double lpJ = 0.0;
-            DA.GetData(7, ref lpJ);
+            double? lpRatioJ = OptionalRatio(DA, 7);
 
-            ValidateHingeLengths(line, lpI, lpJ, out msg, out level);
+            ValidateHingeRatios(lpRatioI, lpRatioJ, out msg, out level);
 
-            Color color = Color.FromArgb(255, 13, 13, 13);
+            Color color = Alpaca4d.Colors.DefaultBeamWithHinges;
             DA.GetData(8, ref color);
 
-            var element = new Alpaca4d.Element.BeamWithHinges(line, section, geomTransf, releaseI, lpI, releaseJ, lpJ);
+            var element = new Alpaca4d.Element.BeamWithHinges(line, section, geomTransf, releaseI, lpRatioI, releaseJ, lpRatioJ);
             element.Color = color;
 
             DA.SetData(0, element);
         }
 
+        /// <summary>An empty input is left as null, which is what asks for the default ratio.</summary>
+        private static double? OptionalRatio(IGH_DataAccess DA, int index)
+        {
+            double value = 0.0;
+            return DA.GetData(index, ref value) ? (double?)value : null;
+        }
+
         /// <summary>
-        /// Reports how the raw LpI/LpJ inputs will be treated by
-        /// <see cref="Alpaca4d.Element.BeamWithHinges.ResolveLp"/>. The L/4 check runs on the raw
-        /// values, before clamping, so the user still hears about a request that HingeRadau could
-        /// not have integrated: its interior weights are 0.5 - 2*(lpI+lpJ)/L.
+        /// Reports how the raw LpI/LpJ ratios will be treated by
+        /// <see cref="Alpaca4d.Element.BeamWithHinges.ResolveLpRatio"/>. The 1/4 check runs on the
+        /// raw values, before clamping, so the user still hears about a request that HingeRadau
+        /// could not have integrated: its interior weights are 0.5 - 2*(lpI+lpJ)/L.
         /// </summary>
-        private static void ValidateHingeLengths(Curve line, double lpI, double lpJ, out string msg, out GH_RuntimeMessageLevel level)
+        private static void ValidateHingeRatios(double? lpRatioI, double? lpRatioJ, out string msg, out GH_RuntimeMessageLevel level)
         {
             msg = "";
             level = GH_RuntimeMessageLevel.Remark;
 
-            double length = Alpaca4d.Element.BeamWithHinges.ChordLength(line);
-            if (length <= 0.0) return;
-
             // A blank input is not a request for zero, it asks for the default share of L.
-            double requestedI = lpI > 0.0 ? lpI : Alpaca4d.Element.BeamWithHinges.DefaultLpRatio * length;
-            double requestedJ = lpJ > 0.0 ? lpJ : Alpaca4d.Element.BeamWithHinges.DefaultLpRatio * length;
+            double requestedI = lpRatioI.HasValue && lpRatioI.Value > 0.0
+                ? lpRatioI.Value : Alpaca4d.Element.BeamWithHinges.DefaultLpRatio;
+            double requestedJ = lpRatioJ.HasValue && lpRatioJ.Value > 0.0
+                ? lpRatioJ.Value : Alpaca4d.Element.BeamWithHinges.DefaultLpRatio;
 
-            if (requestedI + requestedJ >= 0.25 * length)
+            if (requestedI + requestedJ >= 0.25)
             {
-                msg = $"LpI + LpJ ({requestedI + requestedJ:G4}) must stay below L/4 ({0.25 * length:G4}) or the HingeRadau "
-                    + $"interior weights 0.5-2*(LpI+LpJ)/L turn negative. Clamped to {Alpaca4d.Element.BeamWithHinges.MaxLpRatio:P0} of L.";
+                msg = $"LpI + LpJ ({requestedI + requestedJ:G4}) must stay below 0.25 or the HingeRadau "
+                    + $"interior weights 0.5-2*(LpI+LpJ)/L turn negative. Clamped to {Alpaca4d.Element.BeamWithHinges.MaxLpRatio} each.";
                 level = GH_RuntimeMessageLevel.Warning;
                 return;
             }
 
             var clamped = new System.Collections.Generic.List<string>();
-            if (lpI > 0.0 && Alpaca4d.Element.BeamWithHinges.ResolveLp(lpI, length) != lpI) clamped.Add("LpI");
-            if (lpJ > 0.0 && Alpaca4d.Element.BeamWithHinges.ResolveLp(lpJ, length) != lpJ) clamped.Add("LpJ");
+            if (WasClamped(lpRatioI)) clamped.Add("LpI");
+            if (WasClamped(lpRatioJ)) clamped.Add("LpJ");
 
             if (clamped.Count > 0)
             {
                 msg = $"{string.Join(" and ", clamped)} clamped to the "
-                    + $"[{Alpaca4d.Element.BeamWithHinges.MinLpRatio:P0}, {Alpaca4d.Element.BeamWithHinges.MaxLpRatio:P0}] "
-                    + $"range of the element length L = {length:G4} [{Units.Length}].";
+                    + $"[{Alpaca4d.Element.BeamWithHinges.MinLpRatio}, {Alpaca4d.Element.BeamWithHinges.MaxLpRatio}] "
+                    + "range of lp/L.";
             }
+        }
+
+        private static bool WasClamped(double? ratio)
+        {
+            return ratio.HasValue
+                && ratio.Value > 0.0
+                && Alpaca4d.Element.BeamWithHinges.ResolveLpRatio(ratio) != ratio.Value;
         }
     }
 }

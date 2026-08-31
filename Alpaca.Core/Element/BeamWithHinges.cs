@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Rhino.Geometry;
@@ -25,11 +25,11 @@ namespace Alpaca4d.Element
         public int? JNode { get; set; }
         public int Ndf => 6;
         public double? MassDens => this.Section.Area * this.Section.Material.Rho;
-        public System.Drawing.Color Color { get; set; }
+        public System.Drawing.Color Color { get; set; } = Alpaca4d.Colors.DefaultBeamWithHinges;
 
         private HingeRadauIntegration HingeIntegration => (HingeRadauIntegration)this.BeamIntegration;
 
-        /// <summary>Plastic hinge length used when the caller does not supply one, as a fraction of L.</summary>
+        /// <summary>Hinge length ratio lp/L used when the caller does not supply one.</summary>
         public const double DefaultLpRatio = 0.05;
 
         /// <summary>Lower bound on lp/L. Below this the 1e-6 hinge softening stops reading as a release.</summary>
@@ -45,26 +45,43 @@ namespace Alpaca4d.Element
         /// <summary>Node-to-node distance, which is the length L that OpenSees integrates over.</summary>
         public static double ChordLength(Curve curve) => curve.PointAtStart.DistanceTo(curve.PointAtEnd);
 
-        /// <summary>
-        /// Turns a plastic hinge length into a value that is safe for HingeRadau: a non-positive
-        /// input falls back to <see cref="DefaultLpRatio"/>*L, anything else is clamped to
-        /// [<see cref="MinLpRatio"/>, <see cref="MaxLpRatio"/>]*L. Because the release is modelled by
-        /// scaling the hinge section stiffness by 1e-6, the released flexibility is proportional to
-        /// lp/L, so an absolute lp would behave differently in m and in mm.
-        /// </summary>
-        public static double ResolveLp(double lp, double length)
+        /// <summary>Hinge length at the I end as a fraction of L.</summary>
+        public double LpRatioI => LpRatioOf(this.HingeIntegration.LpI);
+
+        /// <summary>Hinge length at the J end as a fraction of L.</summary>
+        public double LpRatioJ => LpRatioOf(this.HingeIntegration.LpJ);
+
+        private double LpRatioOf(double lp)
         {
-            if (length <= 0.0) return lp;
-            if (lp <= 0.0) return DefaultLpRatio * length;
-            return Math.Min(Math.Max(lp, MinLpRatio * length), MaxLpRatio * length);
+            double length = ChordLength(this.Curve);
+            return length > 0.0 ? lp / length : 0.0;
         }
 
+        /// <summary>
+        /// Turns a requested lp/L into one that is safe for HingeRadau: no value at all, or a
+        /// non-positive one, falls back to <see cref="DefaultLpRatio"/>; anything else is clamped
+        /// to [<see cref="MinLpRatio"/>, <see cref="MaxLpRatio"/>]. The hinge is modelled by scaling
+        /// the section stiffness by 1e-6, so the released flexibility follows lp/L - which is why
+        /// the ratio, and not a length, is what a caller sets: it carries over unchanged between a
+        /// model drawn in metres and the same model in millimetres.
+        /// </summary>
+        public static double ResolveLpRatio(double? ratio)
+        {
+            if (!ratio.HasValue || ratio.Value <= 0.0) return DefaultLpRatio;
+            return Math.Min(Math.Max(ratio.Value, MinLpRatio), MaxLpRatio);
+        }
+
+        /// <summary>The hinge length HingeRadau integrates over, for a requested lp/L.</summary>
+        public static double ResolveLp(double? ratio, double length) => ResolveLpRatio(ratio) * length;
+
+        /// <param name="lpRatioI">Hinge length at the I end as a fraction of L; null for the default.</param>
+        /// <param name="lpRatioJ">Hinge length at the J end as a fraction of L; null for the default.</param>
         public BeamWithHinges(
             Curve curve,
             IUniaxialSection section,
             GeomTransf geomTransf,
-            Release releaseI, double lpI,
-            Release releaseJ, double lpJ)
+            Release releaseI, double? lpRatioI,
+            Release releaseJ, double? lpRatioJ)
         {
             this.Curve = curve;
             this.Section = section;
@@ -75,8 +92,8 @@ namespace Alpaca4d.Element
 
             double length = ChordLength(curve);
             this.BeamIntegration = new HingeRadauIntegration(
-                sectionI, ResolveLp(lpI, length),
-                sectionJ, ResolveLp(lpJ, length),
+                sectionI, ResolveLp(lpRatioI, length),
+                sectionJ, ResolveLp(lpRatioJ, length),
                 section);
         }
 

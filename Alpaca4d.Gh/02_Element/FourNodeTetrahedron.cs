@@ -60,11 +60,8 @@ namespace Alpaca4d.Gh
             DA.GetData(1, ref material);
 
 
-            Color color = Color.AliceBlue;
-            if (!DA.GetData(2, ref color))
-            {
-                color = Color.IndianRed;
-            }
+            Color color = Alpaca4d.Colors.DefaultBrick;
+            DA.GetData(2, ref color);
 
             var _mesh = Utils.CleanTetrahedron(mesh);
 

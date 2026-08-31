@@ -17,7 +17,7 @@ namespace Alpaca4d.Element
         public ElementType Type => ElementType.Shell;
         public List<int?> IndexNodes { get; set; }
         public int Ndf => 6;
-        public Color Color { get; set; }
+        public Color Color { get; set; } = Alpaca4d.Colors.DefaultShell;
         public ElementClass ElementClass => ElementClass.ASDShellQ4;
         public bool IsCorotational { get; set; } = false;
         public Vector3d LocalX { get; set; }

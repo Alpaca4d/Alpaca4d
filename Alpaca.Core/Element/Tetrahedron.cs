@@ -18,7 +18,7 @@ namespace Alpaca4d.Element
         public ElementClass ElementClass => ElementClass.FourNodeTetrahedron;
         public List<int?> IndexNodes { get; set; }
         public double? BodyForce { get; set; }
-        public Color Color { get; set; }
+        public Color Color { get; set; } = Alpaca4d.Colors.DefaultBrick;
         public int Ndf => 3;
 
 

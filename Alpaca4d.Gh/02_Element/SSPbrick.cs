@@ -53,11 +53,8 @@ namespace Alpaca4d.Gh
             DA.GetData(1, ref material);
 
 
-            Color color = Color.Aquamarine;
-            if (!DA.GetData(2, ref color))
-            {
-                color = Color.PaleVioletRed;
-            }
+            Color color = Alpaca4d.Colors.DefaultBrick;
+            DA.GetData(2, ref color);
 
 
             var _mesh = Utils.CleanHexahedron(mesh);

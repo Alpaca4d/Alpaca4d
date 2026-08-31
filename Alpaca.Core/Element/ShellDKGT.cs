@@ -18,7 +18,7 @@ namespace Alpaca4d.Element
         public ElementClass ElementClass => ElementClass.ShellDKGT;
         public List<int?> IndexNodes { get; set; }
         public int Ndf => 6;
-        public Color Color { get; set; }
+        public Color Color { get; set; } = Alpaca4d.Colors.DefaultShell;
         public bool IsNonLinear { get; set; }
 
         public ShellDKGT(Mesh mesh, IMultiDimensionSection section, bool isNonLinear = false)
