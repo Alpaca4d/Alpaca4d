@@ -70,10 +70,11 @@ namespace Alpaca4d.Element
         }
 
         /// <summary>
-        /// Hinged + restraint about Z - a pyramid balanced on its point at the node, with a
-        /// ball at that point. The ball is the hinge: the node is held in place but free to
-        /// turn about X and Y. Rz is held, and unlike a bare pin this one does not say so
-        /// in the drawing - the tooltip carries it.
+        /// Hinged / Pinned - a pyramid balanced on its point at the node, with a ball at
+        /// that point. The ball is the whole statement: a sphere turns freely about every
+        /// axis, so the node is pinned in place and released in all three rotations. The
+        /// five partial supports that do hold Rz are drawn with fins or rollers instead,
+        /// never a sphere.
         /// </summary>
         private static Mesh Hinged()
         {

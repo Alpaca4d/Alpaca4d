@@ -62,7 +62,10 @@ namespace Alpaca4d.Element
         {
             //                id          label                                  Tx     Ty     Tz     Rx     Ry     Rz
             new SupportPreset(Fixed,     "Rigid / Fixed",                       true,  true,  true,  true,  true,  true),
-            new SupportPreset(Hinged,    "Hinged + restraint about Z",          true,  true,  true,  false, false, true),
+            // A ball joint: the symbol carries a sphere, and a sphere means every rotation
+            // is let go. The other five partial supports all keep Rz; this one does not,
+            // which is what makes it the plain pin rather than a hinge about Z.
+            new SupportPreset(Hinged,    "Hinged / Pinned",                     true,  true,  true,  false, false, false),
             new SupportPreset(SlidingXY, "Sliding in X and Y + Rz restraint",   false, false, true,  false, false, true),
             new SupportPreset(SlidingX,  "Sliding in X + Rz restraint",         false, true,  true,  false, false, true),
             new SupportPreset(SlidingY,  "Sliding in Y + Rz restraint",         true,  false, true,  false, false, true),

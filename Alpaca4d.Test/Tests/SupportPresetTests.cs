@@ -21,7 +21,7 @@ namespace Alpaca4d.Testing.Tests
         private static readonly object[] Table =
         {
             new object[] { 0, "fixed",      true,  true,  true,  true,  true,  true  },
-            new object[] { 1, "hinged",     true,  true,  true,  false, false, true  },
+            new object[] { 1, "hinged",     true,  true,  true,  false, false, false },
             new object[] { 2, "sliding-xy", false, false, true,  false, false, true  },
             new object[] { 3, "sliding-x",  false, true,  true,  false, false, true  },
             new object[] { 4, "sliding-y",  true,  false, true,  false, false, true  },
@@ -187,9 +187,9 @@ namespace Alpaca4d.Testing.Tests
         [Test]
         public void A_combination_outside_the_seven_matches_nothing()
         {
-            // A plain pin: held in translation, free in every rotation. A real support,
-            // and deliberately not one of the seven.
-            Assert.That(SupportPreset.Match(true, true, true, false, false, false), Is.Null);
+            // Held in translation and about X, free about Y and Z. A support someone
+            // could reasonably build, and deliberately not one of the seven.
+            Assert.That(SupportPreset.Match(true, true, true, true, false, false), Is.Null);
         }
 
         [Test]
