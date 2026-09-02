@@ -25,8 +25,8 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddPointParameter("Point", "Point", "", GH_ParamAccess.item);
-            pManager.AddVectorParameter("TransMass", "TransMass", $"[{Units.Mass}]", GH_ParamAccess.item); ;
-            pManager.AddVectorParameter("RotationalMass", "RotationalMass", "", GH_ParamAccess.item, Vector3d.Zero);
+            pManager.AddVectorParameter("TransMass", "TransMass", $"Translational mass along each global axis [{Units.Mass}]", GH_ParamAccess.item);
+            pManager.AddVectorParameter("RotationalMass", "RotationalMass", $"Rotational mass about each global axis [{Units.Mass}{Units.Length}\u00b2]. Only written on a 6 DOF node.", GH_ParamAccess.item, Vector3d.Zero);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -53,7 +53,8 @@ namespace Alpaca4d.Gh
             if (!DA.GetData(1, ref transMass)) return;
             DA.GetData(2, ref rotationMass);
 
-            transMass = transMass * 9.81/1000;
+            // Both stay in kg. MassLoad.WriteTcl is what converts them to the model's mass
+            // unit, the same way an element's mass density is converted.
             var load = new Alpaca4d.Loads.MassLoad(pos, transMass, rotationMass);
 
             // Finally assign the spiral to the output parameter.

@@ -17,6 +17,45 @@ namespace Alpaca4d
         public static AngleUnit Angle = AngleUnit.rad;
     }
 
+    /// <summary>
+    /// The one place that knows how to turn a mass the user typed into the mass the solver
+    /// wants.
+    ///
+    /// OpenSees has no unit system. "mass" writes its arguments straight onto the diagonal
+    /// of the node's mass matrix, an nDMaterial's rho is read back by every solid and shell
+    /// as mass per unit volume, and a beam's -mass is mass per unit length; DOF_Group and
+    /// FE_Element then add all of them into the same matrix at a factor of one. So they all
+    /// have to be in one unit, and with <see cref="Units.Force"/> in kN and
+    /// <see cref="Units.Length"/> in m that unit is kN s^2/m - the tonne.
+    ///
+    /// Alpaca4d takes density and mass from the user in kg, so everything crossing into a
+    /// Tcl deck goes through here. It exists because this conversion used to be written out
+    /// by hand at each call site, and three of the four got it wrong: point masses carried a
+    /// stray 9.81 (the kg-to-kN factor for a *weight*, which a mass matrix must not have),
+    /// and the nD materials carried no conversion at all, making every shell, brick and
+    /// tetrahedron a thousand times too heavy.
+    /// </summary>
+    public static class ModelMass
+    {
+        /// <summary>kg to the solver's mass unit.</summary>
+        public const double KgToModelMass = 1.0 / 1000.0;
+
+        /// <summary>A mass, or a mass density, given in kg - converted for the deck.</summary>
+        public static double FromKg(double kg) => kg * KgToModelMass;
+
+        /// <summary>As <see cref="FromKg(double)"/>, treating no value as no mass.</summary>
+        public static double FromKg(double? kg) => (kg ?? 0.0) * KgToModelMass;
+
+        /// <summary>Per-axis masses given in kg - converted for the deck.</summary>
+        public static Vector3d FromKg(Vector3d kg) => kg * KgToModelMass;
+
+        /// <summary>A value read off a deck, back in kg.</summary>
+        public static double ToKg(double mass) => mass / KgToModelMass;
+
+        /// <summary>Per-axis values read off a deck, back in kg.</summary>
+        public static Vector3d ToKg(Vector3d mass) => mass / KgToModelMass;
+    }
+
     public enum AngleUnit
     {
         deg,

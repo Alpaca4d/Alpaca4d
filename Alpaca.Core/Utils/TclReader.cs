@@ -409,7 +409,9 @@ namespace Alpaca4d
 
             var values = ReadTrailingNumbers(tokens, massAt + 1);
             if (values.Count >= 3 && values.Take(Math.Min(6, values.Count)).Any(v => Math.Abs(v) > 0.0))
-                _masses.Add(new MassLoad(position, Vector(values, 0), values.Count >= 6 ? Vector(values, 3) : Vector3d.Zero));
+                _masses.Add(new MassLoad(position,
+                    MassLoad.FromModelUnits(Vector(values, 0)),
+                    values.Count >= 6 ? MassLoad.FromModelUnits(Vector(values, 3)) : Vector3d.Zero));
         }
 
         private void ReadNdMaterial(string[] tokens)
@@ -687,7 +689,7 @@ namespace Alpaca4d
             // unit length in tonnes, which together with the area gives back rho.
             var mass = OptionalFlagValue(tokens, "-mass");
             if (mass.HasValue && beam.Section.Area > 0.0)
-                beam.Section.Material.Rho = mass.Value * 1000.0 / beam.Section.Area;
+                beam.Section.Material.Rho = Alpaca4d.ModelMass.ToKg(mass.Value) / beam.Section.Area;
             else if (!mass.HasValue)
                 Warn($"element {tag} carries no -mass, so its density is unknown and its self weight will read as zero.");
 
@@ -794,7 +796,9 @@ namespace Alpaca4d
                 return;
             }
 
-            _masses.Add(new MassLoad(position, Vector(values, 0), values.Count >= 6 ? Vector(values, 3) : Vector3d.Zero));
+            _masses.Add(new MassLoad(position,
+                MassLoad.FromModelUnits(Vector(values, 0)),
+                values.Count >= 6 ? MassLoad.FromModelUnits(Vector(values, 3)) : Vector3d.Zero));
         }
 
         private void ReadEqualDof(string[] tokens)

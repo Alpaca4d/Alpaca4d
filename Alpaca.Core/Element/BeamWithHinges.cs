@@ -151,7 +151,7 @@ namespace Alpaca4d.Element
             string integration = this.HingeIntegration.WriteTcl();
             // The legacy inline form takes the spec as separate words: TclForceBeamColumnCommand
             // reads argv[6] as the type and argv[7..11] as secTagI lpI secTagJ lpJ secTagE, so no braces.
-            string beam = $"element forceBeamColumn {Id} {INode} {JNode} {GeomTransf.Id} {integration} -mass {MassDens / 1000}\n";
+            string beam = $"element forceBeamColumn {Id} {INode} {JNode} {GeomTransf.Id} {integration} -mass {Alpaca4d.ModelMass.FromKg(MassDens)}\n";
             return geomTransf + sectionI + sectionJ + beam;
         }
     }
