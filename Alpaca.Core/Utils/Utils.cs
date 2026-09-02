@@ -82,6 +82,22 @@ namespace Alpaca4d
 
             return tree;
         }
+        /// <summary>
+        /// Copies every branch of one step's tree into <paramref name="history"/> under a path
+        /// with the step number in front, so a history reads {step; element} where a single
+        /// step reads {element}. The element index keeps its place, which is what lets a
+        /// history branch be matched back to the element it came from.
+        /// </summary>
+        public static void AddStepToHistory(DataTree<object> history, DataTree<object> stepTree, int step)
+        {
+            for (int i = 0; i < stepTree.BranchCount; i++)
+            {
+                var indices = new List<int> { step };
+                indices.AddRange(stepTree.Paths[i].Indices);
+                history.AddRange(stepTree.Branches[i], new GH_Path(indices.ToArray()));
+            }
+        }
+
         public static DataTree<object> DataTreeFromNestedList(List<List<string>> nestedList)
         {
             GH_Path path;

@@ -28,9 +28,12 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("History", "History", "not implemented", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("History", "History",
+                "Read every recorded step instead of one. The outputs then carry a step index in " +
+                "front of the element index, so a branch reads {step; element}. Step is ignored.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Step", "Step", "", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Step", "Step", "Which recorded step to read.", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -64,75 +67,100 @@ namespace Alpaca4d.Gh
             DA.GetData(1, ref history);
             DA.GetData(2, ref step);
 
-            var fxQuad = new List<List<double>>();
-            var fyQuad = new List<List<double>>();
-            var fxyQuad = new List<List<double>>();
-            var mxQuad = new List<List<double>>();
-            var myQuad = new List<List<double>>();
-            var mxyQuad = new List<List<double>>();
-            var vxzQuad = new List<List<double>>();
-            var vyzQuad = new List<List<double>>();
+            var steps = HistorySteps.Of(alpacaModel, history, step, this);
+            if (steps == null) return;
 
-            var fxTri = new List<List<double>>();
-            var fyTri = new List<List<double>>();
-            var fxyTri = new List<List<double>>();
-            var mxTri = new List<List<double>>();
-            var myTri = new List<List<double>>();
-            var mxyTri = new List<List<double>>();
-            var vxzTri = new List<List<double>>();
-            var vyzTri = new List<List<double>>();
+            var fxTree = new DataTree<object>();
+            var fyTree = new DataTree<object>();
+            var fxyTree = new DataTree<object>();
+            var mxTree = new DataTree<object>();
+            var myTree = new DataTree<object>();
+            var mxyTree = new DataTree<object>();
+            var vxzTree = new DataTree<object>();
+            var vyzTree = new DataTree<object>();
+
+            foreach (int current in steps)
+            {
+                var fxQuad = new List<List<double>>();
+                var fyQuad = new List<List<double>>();
+                var fxyQuad = new List<List<double>>();
+                var mxQuad = new List<List<double>>();
+                var myQuad = new List<List<double>>();
+                var mxyQuad = new List<List<double>>();
+                var vxzQuad = new List<List<double>>();
+                var vyzQuad = new List<List<double>>();
+
+                var fxTri = new List<List<double>>();
+                var fyTri = new List<List<double>>();
+                var fxyTri = new List<List<double>>();
+                var mxTri = new List<List<double>>();
+                var myTri = new List<List<double>>();
+                var mxyTri = new List<List<double>>();
+                var vxzTri = new List<List<double>>();
+                var vyzTri = new List<List<double>>();
 
 
-            if (alpacaModel.HasQuadShell)
-                (fxQuad, fyQuad, fxyQuad, mxQuad, myQuad, mxyQuad, vxzQuad, vyzQuad) = Alpaca4d.Result.Read.ASDQ4Forces(alpacaModel, step);
-            if(alpacaModel.HasTriShell)
-                (fxTri, fyTri, fxyTri, mxTri, myTri, mxyTri, vxzTri, vyzTri) = Alpaca4d.Result.Read.ASDT3Forces(alpacaModel, step);
+                if (alpacaModel.HasQuadShell)
+                    (fxQuad, fyQuad, fxyQuad, mxQuad, myQuad, mxyQuad, vxzQuad, vyzQuad) = Alpaca4d.Result.Read.ASDQ4Forces(alpacaModel, current);
+                if(alpacaModel.HasTriShell)
+                    (fxTri, fyTri, fxyTri, mxTri, myTri, mxyTri, vxzTri, vyzTri) = Alpaca4d.Result.Read.ASDT3Forces(alpacaModel, current);
 
-            var ids = alpacaModel.Shells.Select(d => d.Id).ToList();
+                var ids = alpacaModel.Shells.Select(d => d.Id).ToList();
 
-            // Convert Nested List to DataTree
-            var quadShellId = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Select(x => x.Id-1).ToList();
+                // Convert Nested List to DataTree
+                var quadShellId = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellQ4).Select(x => x.Id-1).ToList();
 
-            var fxQuadTree = Utils.DataTreeFromNestedList(fxQuad, quadShellId);
-            var fyQuadTree = Utils.DataTreeFromNestedList(fyQuad, quadShellId);
-            var fxyQuadTree = Utils.DataTreeFromNestedList(fxyQuad, quadShellId);
-            var mxQuadTree = Utils.DataTreeFromNestedList(mxQuad, quadShellId);
-            var myQuadTree = Utils.DataTreeFromNestedList(myQuad, quadShellId);
-            var mxyQuadTree = Utils.DataTreeFromNestedList(mxyQuad, quadShellId);
-            var vxzQuadTree =  Utils.DataTreeFromNestedList(vxzQuad, quadShellId);
-            var vyzQuadTree =  Utils.DataTreeFromNestedList(vyzQuad, quadShellId);
+                var fxQuadTree = Utils.DataTreeFromNestedList(fxQuad, quadShellId);
+                var fyQuadTree = Utils.DataTreeFromNestedList(fyQuad, quadShellId);
+                var fxyQuadTree = Utils.DataTreeFromNestedList(fxyQuad, quadShellId);
+                var mxQuadTree = Utils.DataTreeFromNestedList(mxQuad, quadShellId);
+                var myQuadTree = Utils.DataTreeFromNestedList(myQuad, quadShellId);
+                var mxyQuadTree = Utils.DataTreeFromNestedList(mxyQuad, quadShellId);
+                var vxzQuadTree =  Utils.DataTreeFromNestedList(vxzQuad, quadShellId);
+                var vyzQuadTree =  Utils.DataTreeFromNestedList(vyzQuad, quadShellId);
 
-            // Convert Nested List to DataTree
-            var triShellId = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellT3).Select(x => x.Id-1).ToList();
+                // Convert Nested List to DataTree
+                var triShellId = alpacaModel.Shells.Where(x => x.ElementClass == Element.ElementClass.ASDShellT3).Select(x => x.Id-1).ToList();
 
-            var fxTriTree = Utils.DataTreeFromNestedList(fxTri, triShellId);
-            var fyTriTree = Utils.DataTreeFromNestedList(fyTri, triShellId);
-            var fxyTriTree = Utils.DataTreeFromNestedList(fxyTri, triShellId);
-            var mxTriTree = Utils.DataTreeFromNestedList(mxTri, triShellId);
-            var myTriTree = Utils.DataTreeFromNestedList(myTri, triShellId);
-            var mxyTriTree = Utils.DataTreeFromNestedList(mxyTri, triShellId);
-            var vxzTriTree = Utils.DataTreeFromNestedList(vxzTri, triShellId);
-            var vyzTriTree = Utils.DataTreeFromNestedList(vyzTri, triShellId);
+                var fxTriTree = Utils.DataTreeFromNestedList(fxTri, triShellId);
+                var fyTriTree = Utils.DataTreeFromNestedList(fyTri, triShellId);
+                var fxyTriTree = Utils.DataTreeFromNestedList(fxyTri, triShellId);
+                var mxTriTree = Utils.DataTreeFromNestedList(mxTri, triShellId);
+                var myTriTree = Utils.DataTreeFromNestedList(myTri, triShellId);
+                var mxyTriTree = Utils.DataTreeFromNestedList(mxyTri, triShellId);
+                var vxzTriTree = Utils.DataTreeFromNestedList(vxzTri, triShellId);
+                var vyzTriTree = Utils.DataTreeFromNestedList(vyzTri, triShellId);
             
 
-            fxQuadTree.MergeTree(fxTriTree);
-            fyQuadTree.MergeTree(fyTriTree);
-            fxyQuadTree.MergeTree(fxyTriTree);
-            mxQuadTree.MergeTree(mxTriTree);
-            myQuadTree.MergeTree(myTriTree);
-            mxyQuadTree.MergeTree(mxyTriTree);
-            vxzQuadTree.MergeTree(vxzTriTree);
-            vyzQuadTree.MergeTree(vyzTriTree);
+                fxQuadTree.MergeTree(fxTriTree);
+                fyQuadTree.MergeTree(fyTriTree);
+                fxyQuadTree.MergeTree(fxyTriTree);
+                mxQuadTree.MergeTree(mxTriTree);
+                myQuadTree.MergeTree(myTriTree);
+                mxyQuadTree.MergeTree(mxyTriTree);
+                vxzQuadTree.MergeTree(vxzTriTree);
+                vyzQuadTree.MergeTree(vyzTriTree);
+
+
+                HistorySteps.Collect(fxTree, fxQuadTree, current, history);
+                HistorySteps.Collect(fyTree, fyQuadTree, current, history);
+                HistorySteps.Collect(fxyTree, fxyQuadTree, current, history);
+                HistorySteps.Collect(mxTree, mxQuadTree, current, history);
+                HistorySteps.Collect(myTree, myQuadTree, current, history);
+                HistorySteps.Collect(mxyTree, mxyQuadTree, current, history);
+                HistorySteps.Collect(vxzTree, vxzQuadTree, current, history);
+                HistorySteps.Collect(vyzTree, vyzQuadTree, current, history);
+            }
 
             // Finally assign the spiral to the output parameter.
-            DA.SetDataTree(0, fxQuadTree);
-            DA.SetDataTree(1, fyQuadTree);
-            DA.SetDataTree(2, fxyQuadTree);
-            DA.SetDataTree(3, mxQuadTree);
-            DA.SetDataTree(4, myQuadTree);
-            DA.SetDataTree(5, mxyQuadTree);
-            DA.SetDataTree(6, vxzQuadTree);
-            DA.SetDataTree(7, vyzQuadTree);
+            DA.SetDataTree(0, fxTree);
+            DA.SetDataTree(1, fyTree);
+            DA.SetDataTree(2, fxyTree);
+            DA.SetDataTree(3, mxTree);
+            DA.SetDataTree(4, myTree);
+            DA.SetDataTree(5, mxyTree);
+            DA.SetDataTree(6, vxzTree);
+            DA.SetDataTree(7, vyzTree);
         }
 
 

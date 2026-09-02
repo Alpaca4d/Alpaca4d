@@ -28,9 +28,12 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("History", "History", "not implemented", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("History", "History",
+                "Read every recorded step instead of one. The outputs then carry a step index in " +
+                "front of the element index, so a branch reads {step; element}. Step is ignored.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Step", "Step", "", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Step", "Step", "Which recorded step to read.", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -63,17 +66,28 @@ namespace Alpaca4d.Gh
             DA.GetData(2, ref step);
 
 
-            (var n, var mz, var vy,var my,var vz,var t) = Alpaca4d.Result.Read.ForceBeamColumn(alpacaModel, step);
+            var steps = HistorySteps.Of(alpacaModel, history, step, this);
+            if (steps == null) return;
 
+            var nTree = new DataTree<object>();
+            var vyTree = new DataTree<object>();
+            var vzTree = new DataTree<object>();
+            var tTree = new DataTree<object>();
+            var myTree = new DataTree<object>();
+            var mzTree = new DataTree<object>();
 
-            // Convert Nested List to DataTree
-            var nTree = Utils.DataTreeFromNestedList(n);
-            var mzTree = Utils.DataTreeFromNestedList(mz);
-            var vyTree = Utils.DataTreeFromNestedList(vy);
-            var myTree = Utils.DataTreeFromNestedList(my);
-            var vzTree = Utils.DataTreeFromNestedList(vz);
-            var tTree = Utils.DataTreeFromNestedList(t);
+            foreach (int current in steps)
+            {
+                (var n, var mz, var vy, var my, var vz, var t) = Alpaca4d.Result.Read.ForceBeamColumn(alpacaModel, current);
 
+                // Convert Nested List to DataTree
+                HistorySteps.Collect(nTree, Utils.DataTreeFromNestedList(n), current, history);
+                HistorySteps.Collect(vyTree, Utils.DataTreeFromNestedList(vy), current, history);
+                HistorySteps.Collect(vzTree, Utils.DataTreeFromNestedList(vz), current, history);
+                HistorySteps.Collect(tTree, Utils.DataTreeFromNestedList(t), current, history);
+                HistorySteps.Collect(myTree, Utils.DataTreeFromNestedList(my), current, history);
+                HistorySteps.Collect(mzTree, Utils.DataTreeFromNestedList(mz), current, history);
+            }
 
             // Finally assign the spiral to the output parameter.
             DA.SetDataTree(0, nTree);

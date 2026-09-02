@@ -27,9 +27,12 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("History", "History", "not implemented", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("History", "History",
+                "Read every recorded step instead of one. Each output then becomes a tree with " +
+                "one branch per step, {step}, holding that step's value per element. Step is ignored.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Step", "Step", "", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Step", "Step", "Which recorded step to read.", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -62,6 +65,37 @@ namespace Alpaca4d.Gh
             DA.GetData(1, ref history);
             DA.GetData(2, ref step);
 
+            var steps = HistorySteps.Of(alpacaModel, history, step, this);
+            if (steps == null) return;
+
+            // Six components plus von Mises, in the output order.
+            var outputs = Enumerable.Range(0, 7).Select(_ => new DataTree<double>()).ToArray();
+
+            foreach (int current in steps)
+            {
+                var stresses = StressesAt(alpacaModel, current);
+                for (int i = 0; i < outputs.Length; i++)
+                    outputs[i].AddRange(stresses[i], new Grasshopper.Kernel.Data.GH_Path(current));
+            }
+
+            // Finally assign the spiral to the output parameter.
+            for (int i = 0; i < outputs.Length; i++)
+            {
+                // A single step keeps the flat list it has always been; a history is a tree
+                // with one branch per step.
+                if (history)
+                    DA.SetDataTree(i, outputs[i]);
+                else
+                    DA.SetDataList(i, outputs[i].AllData());
+            }
+        }
+
+        /// <summary>
+        /// The six stress components and von Mises at one step, in the order the outputs are
+        /// registered, each holding one value per brick.
+        /// </summary>
+        private static List<double>[] StressesAt(Alpaca4d.Model alpacaModel, int step)
+        {
             List<double> tetraSigma11 = new List<double>();
             List<double> tetraSigma22 = new List<double>();
             List<double> tetraSigma33 = new List<double>();
@@ -111,14 +145,7 @@ namespace Alpaca4d.Gh
                 vonMises.Add(_vonMises);
             }
 
-            // Finally assign the spiral to the output parameter.
-            DA.SetDataList(0, sigma11);
-            DA.SetDataList(1, sigma22);
-            DA.SetDataList(2, sigma33);
-            DA.SetDataList(3, sigma12);
-            DA.SetDataList(4, sigma23);
-            DA.SetDataList(5, sigma13);
-            DA.SetDataList(6, vonMises);
+            return new[] { sigma11, sigma22, sigma33, sigma12, sigma23, sigma13, vonMises };
         }
 
 

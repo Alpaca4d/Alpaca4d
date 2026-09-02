@@ -30,9 +30,13 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("History", "History", "not implemented", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("History", "History",
+                "Read every recorded step instead of one. Each output then becomes a tree with " +
+                "one branch per step, {step}, holding that step's value per node. Step is ignored.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Step", "Step", "", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Step", "Step",
+                "Which recorded step to read, or which mode after a modal analysis.", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -94,14 +98,21 @@ namespace Alpaca4d.Gh
                     var vel = new DataTree<Vector3d>();
                     var acc = new DataTree<Vector3d>();
 
-                    for(step = 0; step < alpacaModel.Settings.AnalysisStep.NumIncr; step++)
+                    // How many steps were written, not how many were asked for: a model can
+                    // be run with no Settings at all, and an analysis that stops early writes
+                    // fewer steps than NumIncr.
+                    var steps = HistorySteps.Of(alpacaModel, true, step, this);
+                    if (steps == null) return;
+
+                    foreach (int current in steps)
                     {
-                        disp.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, step, Alpaca4d.Result.ResultType.DISPLACEMENT), new Grasshopper.Kernel.Data.GH_Path(step));
-                        rot.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, step, Alpaca4d.Result.ResultType.ROTATION), new Grasshopper.Kernel.Data.GH_Path(step));
+                        var path = new Grasshopper.Kernel.Data.GH_Path(current);
+                        disp.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, current, Alpaca4d.Result.ResultType.DISPLACEMENT), path);
+                        rot.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, current, Alpaca4d.Result.ResultType.ROTATION), path);
                         if (alpacaModel.IsTransient)
                         {
-                            vel.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, step, Alpaca4d.Result.ResultType.VELOCITY), new Grasshopper.Kernel.Data.GH_Path(step));
-                            acc.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, step, Alpaca4d.Result.ResultType.ACCELERATION), new Grasshopper.Kernel.Data.GH_Path(step));
+                            vel.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, current, Alpaca4d.Result.ResultType.VELOCITY), path);
+                            acc.AddRange(Alpaca4d.Result.Read.NodalOutput(alpacaModel, current, Alpaca4d.Result.ResultType.ACCELERATION), path);
                         }
                     }
 

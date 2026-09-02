@@ -35,6 +35,73 @@ namespace Alpaca4d.Result
 
     public partial class Read
     {
+        private const string ON_NODES = "/MODEL_STAGE[1]/RESULTS/ON_NODES";
+        private const string ON_ELEMENTS = "/MODEL_STAGE[1]/RESULTS/ON_ELEMENTS";
+        private const string STEP_PREFIX = "STEP_";
+
+        /// <summary>
+        /// How many steps the recorder actually wrote, which is the count a caller needs to
+        /// walk a whole time history.
+        ///
+        /// Read off the file rather than off Settings.AnalysisStep.NumIncr: a model can be
+        /// run with no Settings at all, an analysis that stops early writes fewer steps than
+        /// it was asked for, and a deserialised model carries no Settings to ask.
+        ///
+        /// A modal run nests its results as STEP_0/MODE_n instead, so this returns 1 there -
+        /// modes are counted by the eigenvalue analysis, not by this.
+        /// </summary>
+        public static int StepCount(Model alpacaModel)
+        {
+            if (alpacaModel == null || alpacaModel.Recorders == null || !alpacaModel.Recorders.Any())
+                return 0;
+
+            string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
+            if (!System.IO.File.Exists(recorderPath))
+                return 0;
+
+            using var h5File = PureHDF.H5File.OpenRead(recorderPath);
+
+            // Every recorded quantity is written for the same steps, so the first group that
+            // holds any settles the count.
+            foreach (var dataGroup in DataGroups(h5File))
+            {
+                int count = dataGroup.Children().Count(child => child.Name.StartsWith(STEP_PREFIX));
+                if (count > 0)
+                    return count;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Every DATA group in the file: one per nodal quantity, and one per element class
+        /// per element quantity. Laid out as ON_NODES/&lt;quantity&gt;/DATA and
+        /// ON_ELEMENTS/&lt;quantity&gt;/&lt;class&gt;/DATA.
+        /// </summary>
+        private static IEnumerable<PureHDF.IH5Group> DataGroups(PureHDF.IH5Group h5File)
+        {
+            if (h5File.LinkExists(ON_NODES))
+            {
+                foreach (var quantity in h5File.Group(ON_NODES).Children().OfType<PureHDF.IH5Group>())
+                {
+                    if (quantity.LinkExists("DATA"))
+                        yield return quantity.Group("DATA");
+                }
+            }
+
+            if (h5File.LinkExists(ON_ELEMENTS))
+            {
+                foreach (var quantity in h5File.Group(ON_ELEMENTS).Children().OfType<PureHDF.IH5Group>())
+                {
+                    foreach (var elementClass in quantity.Children().OfType<PureHDF.IH5Group>())
+                    {
+                        if (elementClass.LinkExists("DATA"))
+                            yield return elementClass.Group("DATA");
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Methods to return nodal Displacement, Rotation, Velocity, Acceleration
         /// </summary>

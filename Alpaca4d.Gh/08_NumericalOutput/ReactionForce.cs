@@ -28,9 +28,13 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("History", "History", "not implemented", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("History", "History",
+                "Read every recorded step instead of one. ReactionForce and ReactionMoment then " +
+                "become trees with one branch per step, {step}, holding that step's value per " +
+                "support. SupportPosition stays a flat list - supports do not move. Step is ignored.",
+                GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntegerParameter("Step", "Step", "", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Step", "Step", "Which recorded step to read.", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -67,13 +71,13 @@ namespace Alpaca4d.Gh
             DA.GetData(1, ref history);
             DA.GetData(2, ref step);
 
+            var steps = HistorySteps.Of(alpacaModel, history, step, this);
+            if (steps == null) return;
+
             // A skewed support carries its fix on a coincident auxiliary node, so that is
             // where OpenSees puts the reaction; the support node itself reads zero. An
             // axis-aligned support has no auxiliary node and is read where it always was.
             var nodes = alpacaModel.Supports.Select(x => x.AuxiliaryNodeId ?? x.Id).ToList();
-
-            var globalForce = Result.Read.NodalOutput(alpacaModel, step, ResultType.REACTION_FORCE, nodes).ToList();
-            var globalMoment = Result.Read.NodalOutput(alpacaModel, step, ResultType.REACTION_MOMENT, nodes).ToList();
 
             // Reactions come out of the recorder in global components whatever the
             // support is turned to, which for a skewed one spreads a reaction that runs
@@ -81,13 +85,35 @@ namespace Alpaca4d.Gh
             // the support's own axes is what makes a released direction read as the zero
             // it is.
             var planes = alpacaModel.Supports.Select(x => x.Plane).ToList();
-            var localForce = globalForce.Select((vector, i) => InAxesOf(vector, planes[i])).ToList();
-            var localMoment = globalMoment.Select((vector, i) => InAxesOf(vector, planes[i])).ToList();
+
+            var forceTree = new DataTree<Vector3d>();
+            var momentTree = new DataTree<Vector3d>();
+
+            foreach (int current in steps)
+            {
+                var globalForce = Result.Read.NodalOutput(alpacaModel, current, ResultType.REACTION_FORCE, nodes).ToList();
+                var globalMoment = Result.Read.NodalOutput(alpacaModel, current, ResultType.REACTION_MOMENT, nodes).ToList();
+
+                var path = new Grasshopper.Kernel.Data.GH_Path(current);
+                forceTree.AddRange(globalForce.Select((vector, i) => InAxesOf(vector, planes[i])), path);
+                momentTree.AddRange(globalMoment.Select((vector, i) => InAxesOf(vector, planes[i])), path);
+            }
 
             // Finally assign the spiral to the output parameter.
+            // The supports do not move, so their planes stay one flat list either way. A
+            // single step keeps the flat lists it has always had; a history is a tree with
+            // one branch per step.
             DA.SetDataList(0, planes);
-            DA.SetDataList(1, localForce);
-            DA.SetDataList(2, localMoment);
+            if (history)
+            {
+                DA.SetDataTree(1, forceTree);
+                DA.SetDataTree(2, momentTree);
+            }
+            else
+            {
+                DA.SetDataList(1, forceTree.AllData());
+                DA.SetDataList(2, momentTree.AllData());
+            }
         }
 
         private static Vector3d InAxesOf(Vector3d vector, Plane frame)
