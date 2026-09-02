@@ -15,7 +15,11 @@ namespace Alpaca4d.Gh
     {
         public NodalDisplacement()
           : base("Nodal Displacements (Alpaca4d)", "Nodal Displacements",
-            "Read Nodal Displacements",
+            "Reads displacement, rotation, velocity and acceleration at every node of an analysed " +
+            "model.\n" +
+            "One value per node, in global axes, in the order the nodes were assembled. Velocity and " +
+            "acceleration are recorded by a transient analysis only. After a Natural Vibration " +
+            "Analysis, Step picks the mode and Displacement and Rotation are that mode's shape.",
             "Alpaca4d", "08_NumericalOutput")
         {
             // Draw a Description Underneath the component

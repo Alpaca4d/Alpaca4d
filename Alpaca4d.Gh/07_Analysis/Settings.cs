@@ -15,7 +15,12 @@ namespace Alpaca4d.Gh
     {
         public AnalysisSettings()
           : base("Analysis Settings (Alpaca4d)", "Analysis Settings",
-            "",
+            "Collects everything OpenSees needs in order to solve - constraint handler, numberer, " +
+            "system of equations, convergence test, solution algorithm, integrator and stepping - " +
+            "into the one object Run Analysis takes.\n" +
+            "Every input has a default, so an unconnected component already describes a valid linear " +
+            "static analysis. For a dynamic one set AnalysisType to Transient, and give it a Newmark " +
+            "or Central Difference Integrator, an Analysis Step with Dt, and a Damping.",
             "Alpaca4d", "07_Analysis")
         {
             // Draw a Description Underneath the component

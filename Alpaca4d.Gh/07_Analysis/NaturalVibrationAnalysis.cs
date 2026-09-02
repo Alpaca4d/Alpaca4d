@@ -19,7 +19,12 @@ namespace Alpaca4d.Gh
     {
         public NaturalVibrationAnalysis()
           : base("Natural Vibration Analysis (Alpaca4d)", "Natural Vibration",
-            "",
+            "Solves the eigenvalue problem of the model and returns its modes, eigenvalues, periods " +
+            "and frequencies.\n" +
+            "It needs no Analysis Settings - an eigenvalue problem has nothing to converge. Connect " +
+            "the assembled model rather than an analysed one, then feed the solved model to Nodal " +
+            "Displacements to read a mode shape, or to Modal Analysis Report for the participating " +
+            "masses.",
             "Alpaca4d", "07_Analysis")
         {
             // Draw a Description Underneath the component

@@ -20,7 +20,11 @@ namespace Alpaca4d.Gh
     {
         public RunAnalysis()
           : base("Run Analysis (Alpaca4d)", "Run Analysis",
-            "",
+            "Writes the assembled model out as an OpenSees script, solves it, and returns the model " +
+            "with its results attached.\n" +
+            "Results are recorded to a recorder.mpco file beside the Grasshopper document and read " +
+            "back by the 08_NumericalOutput components. When a run fails the AlpacaModel output comes " +
+            "out empty - read the log output to find out why.",
             "Alpaca4d", "07_Analysis")
         {
             // Draw a Description Underneath the component

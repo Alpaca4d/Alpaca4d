@@ -13,13 +13,13 @@ namespace Alpaca4d.Gh
     {
         public Damping()
           : base("Damping (Alpaca4d)", "Damping",
-            "This command is used to assign damping to all previously-defined elements and nodes. When using rayleigh damping in OpenSees, the damping matrix for an element or node, D is specified as a combination of stiffness and mass-proportional damping matrices:" +
-                "\nD = alphaM * M + [betaKcurrent * Kcurrent] + [betaKinit * Kinit] + [betaKcomm * KlastCommit]" +
-                "\nxDamp = 0.05;                        # 5% damping ratio" +
-                "\nalphaM = 0.00;                       # M-prop damping;                               alphaM*M" +
-                "\nbetaKcurrent = 0.00;                 # K-proportional damping;                       beatKcurr*KCurrent" +
-                "\nbetaKinit = 0.00;                    # initial-stiffness proportional damping;       beatKinit*Kinit" +
-                "\nbetaKcomm = 2.*xDamp/omega;          # K-prop. damping parameter;                    betaKcomm*KlastCommitt",
+            "Rayleigh damping for every element and node of the model, as a combination of the mass " +
+                "and stiffness matrices:\n" +
+                "D = alphaM*M + betaKcurr*Kcurrent + betaKinit*Kinit + betaKcomm*KlastCommit\n" +
+                "For a damping ratio at a known circular frequency omega, taken from a Natural " +
+                "Vibration Analysis, stiffness-proportional damping is betaKcomm = 2*ratio/omega - so " +
+                "5% at omega gives 0.1/omega. Only a transient analysis uses damping; feeds the " +
+                "Damping input of Analysis Settings.",
             "Alpaca4d", "07_Analysis")
         {
             // Draw a Description Underneath the component

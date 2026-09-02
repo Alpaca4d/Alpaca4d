@@ -14,7 +14,11 @@ namespace Alpaca4d.Gh
     {
         public BrickStress()
           : base("Brick Stresses (Alpaca4d)", "Brick Stresses",
-            "Read the Brick Stresses",
+            "Reads the stress state of every solid element of an analysed model - the six components " +
+            "of the stress tensor plus the Von Mises equivalent stress.\n" +
+            "One value per element, in the element's local axes - an SSP Brick and a Four Node " +
+            "Tetrahedron both have a single integration point, so there is nothing to sample along. " +
+            "These are the only two element types it reads.",
             "Alpaca4d", "08_NumericalOutput")
         {
             // Draw a Description Underneath the component

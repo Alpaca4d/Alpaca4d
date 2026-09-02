@@ -15,7 +15,11 @@ namespace Alpaca4d.Gh
     {
         public BeamForce()
           : base("Beam Forces (Alpaca4d)", "Beam Forces",
-            "Read the Beam Forces",
+            "Reads the internal forces along every beam element of an analysed model - axial force, " +
+            "two shears, torsion and two bending moments.\n" +
+            "Each output is a tree with one branch per element, holding the values at the element's " +
+            "integration sections from the I end to the J end, in local axes. N is positive in " +
+            "tension.",
             "Alpaca4d", "08_NumericalOutput")
         {
             // Draw a Description Underneath the component

@@ -15,7 +15,11 @@ namespace Alpaca4d.Gh
     {
         public ShellForces()
           : base("Shell Forces (Alpaca4d)", "Shell Forces",
-            "Read the Shell Forces",
+            "Reads the stress resultants of every shell element of an analysed model - membrane " +
+            "forces pxx, pyy and pxy, bending moments mxx, myy and mxy, and transverse shears vxz " +
+            "and vyz.\n" +
+            "All of them per unit width and in the shell's local axes. Each output is a tree with " +
+            "one branch per element, holding the values at the element's integration points.",
             "Alpaca4d", "08_NumericalOutput")
         {
             // Draw a Description Underneath the component

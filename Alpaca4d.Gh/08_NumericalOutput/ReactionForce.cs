@@ -15,7 +15,10 @@ namespace Alpaca4d.Gh
     {
         public ReactionForce()
           : base("Reaction Forces (Alpaca4d)", "Reaction Forces",
-            "Read Reaction Forces",
+            "Reads the force and the moment carried by every support of an analysed model.\n" +
+            "One value per support, given in the support's own axes, so a support placed on a Plane " +
+            "reports along that plane rather than along the global axes. SupportPosition gives both " +
+            "where each support sits and the frame its reactions are in.",
             "Alpaca4d", "08_NumericalOutput")
         {
             // Draw a Description Underneath the component

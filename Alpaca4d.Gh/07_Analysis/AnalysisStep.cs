@@ -13,7 +13,11 @@ namespace Alpaca4d.Gh
     {
         public AnalysisStep()
           : base("Analysis Step (Alpaca4d)", "Analysis Step",
-            "",
+            "How many increments the analysis solves, and how long each one lasts.\n" +
+            "NumIncr is also how many steps the recorder writes, so it sets how many steps the " +
+            "08_NumericalOutput components can read back. A transient analysis needs Dt as well; " +
+            $"DtMin, DtMax and Jd let OpenSees shrink the step when a step will not converge. " +
+            $"Times in {Units.Time}. Feeds the AnalysisSteps input of Analysis Settings.",
             "Alpaca4d", "07_Analysis")
         {
             // Draw a Description Underneath the component

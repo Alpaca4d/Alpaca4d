@@ -27,7 +27,10 @@ namespace Alpaca4d.Gh
 
         public IntegratorBase()
             : base("Integrator (Alpaca4d)", "Integrator",
-              "Integrator Base Component",
+              "How the analysis advances from one step to the next.\n" +
+              "Load Control scales the loads by a load factor and is the static integrator; Newmark " +
+              "and Central Difference step forward in time and are the transient ones. Feeds the " +
+              "Integrator input of Analysis Settings.",
               "Alpaca4d", "07_Analysis")
         {
             ((GH_Component)this).Hidden = false;
@@ -40,7 +43,7 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.RegisterParam(new Param_GenericObject(), "Integrator", "Integrator", "Integrator");
+            pManager.RegisterParam(new Param_GenericObject(), "Integrator", "Integrator", "The stepping scheme. Feed it to the Integrator input of Analysis Settings.");
         }
 
         protected override void RegisterEvaluationUnits(EvaluationUnitManager mngr)

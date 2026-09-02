@@ -15,7 +15,11 @@ namespace Alpaca4d.Gh
     {
         public ModalAnalysisReport()
           : base("Modal Analysis Report (Alpaca4d)", "Modal Analysis Report",
-            "Read the Modal Analysis Report",
+            "Splits the report written by a Natural Vibration Analysis into its sections: eigenvalues, " +
+            "total and free mass, centre of mass, modal participation factors, participating masses " +
+            "and their ratios.\n" +
+            "Every output is one section of the report as text, ready for a panel. The cumulative " +
+            "ratio is the one to check against a code threshold such as 90%.",
             "Alpaca4d", "08_NumericalOutput")
         {
             // Draw a Description Underneath the component
