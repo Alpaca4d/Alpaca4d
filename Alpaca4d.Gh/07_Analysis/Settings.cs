@@ -38,11 +38,25 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("Numberer", "Numberer", "Connect a 'ValueList'\nRCM, AMD, Plain", GH_ParamAccess.item, "RCM");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddTextParameter("System", "System", "Connect a 'ValueList'\nBandGen, BandSPD, ProfileSPD, SuperLU, UmfPack, SparseSYM, SparseSPD, SparseGeneral, FullGeneral", GH_ParamAccess.item, "SparseSPD");
+            pManager.AddTextParameter("System", "System",
+                "How the system of equations is stored and solved. Connect a 'ValueList'.\n" +
+                "BandSPD is the default and was the fastest of the nine on every model measured. " +
+                "UmfPack is the one to reach for if a model ever refuses to solve, being a general " +
+                "sparse solver that assumes nothing about the matrix.\n" +
+                "BandGen, BandSPD, ProfileSPD, SuperLU, UmfPack, SparseSYM, SparseSPD, SparseGeneral, FullGeneral",
+                GH_ParamAccess.item, "BandSPD");
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Test", "Test", "Convergence test - what counts as solved, and how many iterations to allow. From the Test component. Defaults to EnergyIncr.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddTextParameter("Algorithm", "Algorithm", "Connect a 'ValueList'\nLinear, Newton, NewtonLineSearch, ModifiedNewton, KrylovNewton, SecantNewton, BFGS, Broyden", GH_ParamAccess.item, "ModifiedNewton");
+            pManager.AddTextParameter("Algorithm", "Algorithm",
+                "How each step is iterated to equilibrium. Connect a 'ValueList'.\n" +
+                "Newton is the default: it re-forms the tangent every iteration, which costs about " +
+                "20% over Linear on an elastic model and is what lets a yielding one converge at all.\n" +
+                "Linear does a single solve with no iteration. On a genuinely linear model it gives " +
+                "the same answer for less work, but on a nonlinear one it reports success and returns " +
+                "the unconverged first guess - so only pick it when the model is elastic throughout.\n" +
+                "Linear, Newton, NewtonLineSearch, ModifiedNewton, KrylovNewton, SecantNewton, BFGS, Broyden",
+                GH_ParamAccess.item, "Newton");
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Integrator", "Integrator", "How to advance from one step to the next, from the Integrator component. Load Control for a static analysis, Newmark or Central Difference for a transient one. Defaults to Load Control with a step of 1.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -82,7 +96,7 @@ namespace Alpaca4d.Gh
             var numbererObj = new Numberer(numberer);
 
             ///
-            var system = "SparseSPD";
+            var system = "BandSPD";
             DA.GetData(3, ref system);
             var systemObj = new Alpaca4d.SystemEquation(system);
 
@@ -91,7 +105,7 @@ namespace Alpaca4d.Gh
             DA.GetData(4, ref test);
 
             ///
-            var algorithm = "ModifiedNewton";
+            var algorithm = "Newton";
             DA.GetData(5, ref algorithm);
             var algorithmObj = new Algorithm(algorithm);
 
