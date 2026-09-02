@@ -1,4 +1,4 @@
-using Alpaca4d.UIWidgets;
+﻿using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
@@ -21,16 +21,33 @@ namespace Alpaca4d.Gh
             evaluationUnit.Icon = Alpaca4d.Gh.Properties.Resources.Load_Control_Integrator__Alpaca4d_;
             mngr.RegisterUnit(evaluationUnit);
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "Lambda", "Lambda", "Load factor increment", GH_ParamAccess.item, new GH_Number(1));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "Lambda", "Lambda",
+                "Load factor added at each step. With the default 1 and an Analysis Step of N " +
+                "increments, the model ends up under N times the load pattern.",
+                GH_ParamAccess.item, new GH_Number(1));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Integer(), "NumIter", "NumIter", "Number of iterations", GH_ParamAccess.item, new GH_Integer(10));
+            // NumIter, MinLambda and MaxLambda have no defaults on purpose. They are one
+            // switch, not three settings: give them and OpenSees stops stepping by Lambda
+            // and starts adapting the step to hit NumIter iterations, anywhere between
+            // MinLambda and MaxLambda. The load factor the model ends up under is then not
+            // Lambda times the number of steps, and nothing reports that it changed.
+            evaluationUnit.RegisterInputParam(new Param_Integer(), "NumIter", "NumIter",
+                "Iterations per step to aim for. Leave empty for uniform steps of Lambda. " +
+                "Setting it - together with MinLambda and MaxLambda - turns on adaptive " +
+                "stepping, which reaches a different total load factor than Lambda times the " +
+                "number of steps.",
+                GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "MinLambda", "MinLambda", "Minimum lambda value", GH_ParamAccess.item, new GH_Number(0.01));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "MinLambda", "MinLambda",
+                "Smallest step adaptive stepping may shrink to. Only read when NumIter is given.",
+                GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "MaxLambda", "MaxLambda", "Maximum lambda value", GH_ParamAccess.item, new GH_Number(10));
+            evaluationUnit.RegisterInputParam(new Param_Number(), "MaxLambda", "MaxLambda",
+                "Largest step adaptive stepping may grow to. Only read when NumIter is given.",
+                GH_ParamAccess.item);
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
         }
 
