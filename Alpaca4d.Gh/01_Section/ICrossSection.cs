@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class ISection : GH_Component
     {
         public ISection()
-          : base(" I Section (Alpaca4d)", "I Section",
+          : base("I Section (Alpaca4d)", "I Section",
             "Construct an I Cross Section",
             "Alpaca4d", "01_Section")
         {

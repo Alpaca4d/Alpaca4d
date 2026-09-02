@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class RectangleCS : GH_Component
     {
         public RectangleCS()
-          : base(" RectangleCS (Alpaca4d)", "RectangleCS",
+          : base("RectangleCS (Alpaca4d)", "RectangleCS",
             "Construct an Rectangle Cross Section",
             "Alpaca4d", "01_Section")
         {

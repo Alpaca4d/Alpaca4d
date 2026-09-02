@@ -19,7 +19,7 @@ namespace Alpaca4d.Gh
     public class RunAnalysis : GH_Component
     {
         public RunAnalysis()
-          : base(" Run Analysis (Alpaca4d)", "Run Analysis",
+          : base("Run Analysis (Alpaca4d)", "Run Analysis",
             "",
             "Alpaca4d", "07_Analysis")
         {

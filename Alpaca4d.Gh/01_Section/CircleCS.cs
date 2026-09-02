@@ -11,7 +11,7 @@ namespace Alpaca4d.Gh
     public class CircleCS : GH_Component
     {
         public CircleCS()
-          : base(" CircleCS (Alpaca4d)", "CircleCS",
+          : base("CircleCS (Alpaca4d)", "CircleCS",
             "Construct an Circle Cross Section",
             "Alpaca4d", "01_Section")
         {
