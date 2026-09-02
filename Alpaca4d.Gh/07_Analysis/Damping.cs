@@ -35,7 +35,8 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("BetaKInit", "BetaKInit", "factor applied to elements initial stiffness matrix.", GH_ParamAccess.item, 0.0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("BetaKComm", "BetaKComm", "factor applied to elements committed stiffness matrix.", GH_ParamAccess.item);
+            pManager.AddNumberParameter("BetaKComm", "BetaKComm", "factor applied to elements committed stiffness matrix. This is the usual place to put stiffness-proportional damping: 2*ratio/omega.", GH_ParamAccess.item, 0.0);
+            pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         /// <summary>

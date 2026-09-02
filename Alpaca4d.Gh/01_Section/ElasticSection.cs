@@ -30,8 +30,10 @@ namespace Alpaca4d.Gh
             pManager.AddNumberParameter("Izz", "Izz", $"Second moment of area about the section's local z axis, which resists bending Mz [{Units.Length}⁴]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Iyy", "Iyy", $"Second moment of area about the section's local y axis, which resists bending My [{Units.Length}⁴]", GH_ParamAccess.item);
             pManager.AddNumberParameter("J", "J", $"Torsion constant [{Units.Length}⁴]. St Venant torsion, not the polar moment of area - the two only agree for a circle.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AlphaY", "AlphaY", "Shear area factor along the local y axis: the fraction of the area that carries shear. 5/6 for a rectangle, 1 to ignore shear deformation.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AlphaZ", "AlphaZ", "Shear area factor along the local z axis: the fraction of the area that carries shear. 5/6 for a rectangle, 1 to ignore shear deformation.", GH_ParamAccess.item);
+            pManager.AddNumberParameter("AlphaY", "AlphaY", "Shear area factor along the local y axis: the fraction of the area that carries shear. 5/6 for a rectangle, 1 to ignore shear deformation.", GH_ParamAccess.item, 5.0 / 6.0);
+            pManager[pManager.ParamCount - 1].Optional = true;
+            pManager.AddNumberParameter("AlphaZ", "AlphaZ", "Shear area factor along the local z axis: the fraction of the area that carries shear. 5/6 for a rectangle, 1 to ignore shear deformation.", GH_ParamAccess.item, 5.0 / 6.0);
+            pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddGenericParameter("Material", "Material", "Material the section is made of. Connect an elastic uniaxial material.", GH_ParamAccess.item);
         }
 
@@ -57,8 +59,9 @@ namespace Alpaca4d.Gh
             double iZZ = 0.00;
             double iYY = 0.00;
             double j = 0.00;
-            double alphaY = 0.00;
-            double alphaZ = 0.00;
+            // Same value the inputs declare, so the two cannot drift apart.
+            double alphaY = 5.0 / 6.0;
+            double alphaZ = 5.0 / 6.0;
             IUniaxialMaterial material = Alpaca4d.Material.UniaxialMaterialElastic.Steel;
 
 

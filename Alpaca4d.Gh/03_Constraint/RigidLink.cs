@@ -22,7 +22,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddPointParameter("RetainedPoint", "RetainedPoint", "Retained node", GH_ParamAccess.item);
             pManager.AddPointParameter("ConstrainedPoint", "ConstrainedPoint", "Constrained node", GH_ParamAccess.item);
-            pManager.AddTextParameter("Type", "Type", "Connect a 'ValueList'\nbar, beam", GH_ParamAccess.item);
+            pManager.AddTextParameter("Type", "Type", "Connect a 'ValueList'\nbar - ties the translations only\nbeam - ties the rotations as well", GH_ParamAccess.item, "beam");
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
