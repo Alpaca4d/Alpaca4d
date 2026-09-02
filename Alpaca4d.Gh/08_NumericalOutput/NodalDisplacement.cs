@@ -105,10 +105,12 @@ namespace Alpaca4d.Gh
                         }
                     }
 
+                    // 2 is the "--------" separator, so velocity and acceleration are
+                    // 3 and 4 - the same indices RegisterOutputParams gives them.
                     DA.SetDataTree(0, disp);
                     DA.SetDataTree(1, rot);
-                    DA.SetDataTree(2, vel);
-                    DA.SetDataTree(3, acc);
+                    DA.SetDataTree(3, vel);
+                    DA.SetDataTree(4, acc);
                 }
 			}
 			else
