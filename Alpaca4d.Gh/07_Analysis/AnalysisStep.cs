@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("NumIncr", "NumIncr", "", GH_ParamAccess.item, 1);
+            pManager.AddIntegerParameter("NumIncr", "NumIncr", "How many increments to solve. This is also how many steps the recorder writes, so it is the number of steps the result components can read back.", GH_ParamAccess.item, 1);
             pManager.AddNumberParameter("Dt", "Dt", "time-step increment", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("DtMin", "DtMin", "Minimum time steps", GH_ParamAccess.item);
@@ -41,7 +41,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("AnalysisStep", "AnalysisStep", "");
+            pManager.Register_GenericParam("AnalysisStep", "AnalysisStep", "The stepping scheme. Feed it to the AnalysisSteps input of Analysis Settings.");
         }
 
         /// <summary>

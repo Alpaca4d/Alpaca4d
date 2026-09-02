@@ -27,7 +27,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Damping", "Damping", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Damping", "Damping", "Rayleigh damping, from the Damping component. Only a transient analysis uses it.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("Constraint", "Constraint", "Connect a 'ValueList'\nPlain, Transformation", GH_ParamAccess.item, "Transformation");
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -35,15 +35,15 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("System", "System", "Connect a 'ValueList'\nBandGen, BandSPD, ProfileSPD, SuperLU, UmfPack, SparseSYM, SparseSPD, SparseGeneral, FullGeneral", GH_ParamAccess.item, "SparseSPD");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Test", "Test", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Test", "Test", "Convergence test - what counts as solved, and how many iterations to allow. From the Test component. Defaults to EnergyIncr.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("Algorithm", "Algorithm", "Connect a 'ValueList'\nLinear, Newton, NewtonLineSearch, ModifiedNewton, KrylovNewton, SecantNewton, BFGS, Broyden", GH_ParamAccess.item, "ModifiedNewton");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Integrator", "Integrator", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Integrator", "Integrator", "How to advance from one step to the next, from the Integrator component. Load Control for a static analysis, Newmark or Central Difference for a transient one. Defaults to Load Control with a step of 1.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("AnalysisType", "AnalysisType", "Connect a 'ValueList'\nStatic, Transient", GH_ParamAccess.item, "Static");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("AnalysisSteps", "AnalysisSteps", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("AnalysisSteps", "AnalysisSteps", "How many increments to solve, from the Analysis Step component. A transient analysis needs one with Dt set. Defaults to a single increment.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -52,7 +52,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Settings", "Settings", "");
+            pManager.Register_GenericParam("Settings", "Settings", "The settings. Feed them to the Settings input of Run Analysis.");
         }
 
         /// <summary>

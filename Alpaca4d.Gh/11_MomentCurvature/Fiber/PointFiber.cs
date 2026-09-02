@@ -42,7 +42,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("PointFiber", "PointFiber", "");
+            pManager.Register_GenericParam("PointFiber", "PointFiber", "The single fibre. Collect it into the PointFiber input of a Fiber Section.");
         }
 
         /// <summary>

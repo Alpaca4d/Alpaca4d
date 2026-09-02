@@ -1,4 +1,4 @@
-using Grasshopper;
+﻿using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -28,7 +28,7 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Constraint", "Constraint", "");
+            pManager.Register_GenericParam("Constraint", "Constraint", "The rigid link. Feed it to the Constraints input of Assemble Model.");
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

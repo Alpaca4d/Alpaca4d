@@ -21,7 +21,7 @@ namespace Alpaca4d.Gh
         /// <inheritdoc />
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddCurveParameter("Polylines", "Polylines", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Polylines", "Polylines", "Sections to loft through, in order. Each has to be a line or a polyline, and they need the same number of points.", GH_ParamAccess.list);
         }
 
 

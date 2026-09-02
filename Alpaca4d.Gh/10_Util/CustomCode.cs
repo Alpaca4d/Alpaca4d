@@ -27,7 +27,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "Model to be serialized.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddTextParameter("CustomCode", "CustomCode", "", GH_ParamAccess.list);
+            pManager.AddTextParameter("CustomCode", "CustomCode", "Tcl to append to the model, one line per item. It is passed to OpenSees untouched, so it can reach anything Alpaca4d has no component for.", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -35,8 +35,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
-            pManager.Register_StringParam("Tcl", "Tcl", "");
+            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "The model with the custom lines appended. Carry on building from here.");
+            pManager.Register_StringParam("Tcl", "Tcl", "The whole Tcl script as it now stands, one line per item.");
         }
 
         /// <summary>

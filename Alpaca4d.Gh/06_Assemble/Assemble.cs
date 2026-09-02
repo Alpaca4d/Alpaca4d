@@ -26,15 +26,15 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Elements", "Elements", "", GH_ParamAccess.list);
-            pManager.AddGenericParameter("Supports", "Supports", "", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Elements", "Elements", "Every element in the model - beams, shells, bricks and tetrahedra together.", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Supports", "Supports", "The supports, from the Support component. A support only takes hold if it lands within Tolerance of a node.", GH_ParamAccess.list);
             pManager.AddGenericParameter("LoadPatterns", "LoadPatterns", "Load patterns and/or mass loads (mixed allowed)", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Constraints", "Constraints", "", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Constraints", "Constraints", "Rigid diaphragms and rigid links.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Recorders", "Recorders", "", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Recorders", "Recorders", "What to write to the results file. Left empty, Run Analysis picks a recorder to suit the analysis type.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Tolerance", "Tolerance", "", GH_ParamAccess.item, 0.01);
+            pManager.AddNumberParameter("Tolerance", "Tolerance", $"Distance below which two positions are treated as the same node [{Units.Length}]. This is what welds elements together and what lands supports and point loads on a node - too small and the model falls apart into pieces that never touch, too large and separate nodes get merged.", GH_ParamAccess.item, 0.01);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -43,7 +43,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
+            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "The assembled model. Feed it to Run Analysis, to Natural Vibration Analysis, or to Model View to check it first.");
             pManager.Register_DoubleParam("Mass", "Mass", $"{Units.Mass}");
         }
 

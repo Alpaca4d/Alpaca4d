@@ -36,7 +36,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Load", "Load", "");
+            pManager.Register_GenericParam("Load", "Load", "The load. Collect it into a Load Pattern, then feed that to Assemble Model.");
         }
 
         /// <summary>

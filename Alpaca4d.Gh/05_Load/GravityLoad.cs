@@ -1,4 +1,4 @@
-using Grasshopper;
+﻿using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -24,7 +24,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Factor", "Factor", "", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("Factor", "Factor", "Multiplier on self weight. 1 is the true weight of the model; use it to apply a load factor.", GH_ParamAccess.item, 1.0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -39,7 +39,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Load", "Load", "");
+            pManager.Register_GenericParam("Load", "Load", "The load. Collect it into a Load Pattern, then feed that to Assemble Model.");
         }
 
         /// <summary>

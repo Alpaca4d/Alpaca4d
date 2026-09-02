@@ -41,7 +41,7 @@ namespace Alpaca4d.Gh
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Layer", "Layer", "");
+            pManager.Register_GenericParam("Layer", "Layer", "The row of fibres. Collect it into the Layer input of a Fiber Section.");
         }
         protected override void SolveInstance(IGH_DataAccess DA)
         {

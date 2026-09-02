@@ -43,7 +43,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Damping", "Damping", "");
+            pManager.Register_GenericParam("Damping", "Damping", "The Rayleigh damping. Feed it to the Damping input of Analysis Settings.");
         }
 
         /// <summary>

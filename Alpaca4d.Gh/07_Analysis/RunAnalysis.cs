@@ -68,8 +68,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Settings", "Settings", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "The assembled model, from Assemble Model.", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Settings", "Settings", "How to solve: solver, algorithm, integrator and steps. From the Analysis Settings component. It can be left empty only with \"Do not use settings\" ticked in the right-click menu.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -78,8 +78,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("log", "log", "");
-            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
+            pManager.Register_GenericParam("log", "log", "What OpenSees printed while solving. Read it when the analysis fails or warns.");
+            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "The analysed model. Feed it to any of the 08_NumericalOutput components to read results. It comes out empty if the analysis failed.");
         }
 
         /// <summary>

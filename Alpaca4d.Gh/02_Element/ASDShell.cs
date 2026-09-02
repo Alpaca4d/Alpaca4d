@@ -26,12 +26,12 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddMeshParameter("Mesh", "Mesh", $"[{Units.Length}]", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Section", "Section", "", GH_ParamAccess.item);
-            pManager.AddColourParameter("Colour", "Colour", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Section", "Section", "Shell section, which carries the thickness and the material. Connect a Plate Fiber Section.", GH_ParamAccess.item);
+            pManager.AddColourParameter("Colour", "Colour", "Colour to draw the element in. Display only; it changes nothing in the analysis.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddVectorParameter("Local X Axis", "LocalX", "", GH_ParamAccess.item);
+            pManager.AddVectorParameter("Local X Axis", "LocalX", "Direction the section's local x axis points in, which is what shell forces and stresses are reported in. Left empty each element takes its own default orientation, so an orthotropic material or a moment read per direction needs this set.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Is Corotational", "IsCorotational", "", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("Is Corotational", "IsCorotational", "Use the corotational formulation, which keeps the element honest through large rotations at the cost of a slower analysis. Leave it off for small displacements.", GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 

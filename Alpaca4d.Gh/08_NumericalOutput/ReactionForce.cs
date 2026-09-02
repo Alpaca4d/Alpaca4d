@@ -27,7 +27,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "The analysed model, from the AlpacaModel output of Run Analysis. Results are read out of the recorder file it points at.", GH_ParamAccess.item);
             pManager.AddBooleanParameter("History", "History",
                 "Read every recorded step instead of one. ReactionForce and ReactionMoment then " +
                 "become trees with one branch per step, {step}, holding that step's value per " +

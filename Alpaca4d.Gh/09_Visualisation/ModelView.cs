@@ -73,8 +73,8 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
-            pManager.Register_StringParam("Info", "Info", "");
+            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "The model passed straight through, so this component can sit in the middle of a chain rather than at the end of one.");
+            pManager.Register_StringParam("Info", "Info", "The Tcl the model has written so far, one line per entry - the script Run Analysis hands to OpenSees.");
         }
 
         #region UI Setup

@@ -40,7 +40,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Patch", "Patch", "");
+            pManager.Register_GenericParam("Patch", "Patch", "The filled area of fibres. Collect it into the Patch input of a Fiber Section.");
         }
 
         /// <summary>

@@ -35,7 +35,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_ColourParam("Colors", "Colors", "");
+            pManager.Register_ColourParam("Colors", "Colors", "The gradient, as an ordered list of colours from its low end to its high. Feed it to the Colors input of a view component or of Legend.");
         }
 
         /// <summary>

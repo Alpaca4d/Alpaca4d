@@ -24,15 +24,15 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("SectionName", "SecName", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("SectionName", "SecName", "A label for the section, carried on the object and readable through Deconstruct. Nothing in the analysis reads it.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Area", "A", $"Cross-sectional area [{Units.Length}\u00b2]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Izz", "Izz", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Iyy", "Iyy", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("J", "J", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AlphaY", "AlphaY", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AlphaZ", "AlphaZ", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Izz", "Izz", $"Second moment of area about the section's local z axis, which resists bending Mz [{Units.Length}⁴]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Iyy", "Iyy", $"Second moment of area about the section's local y axis, which resists bending My [{Units.Length}⁴]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("J", "J", $"Torsion constant [{Units.Length}⁴]. St Venant torsion, not the polar moment of area - the two only agree for a circle.", GH_ParamAccess.item);
+            pManager.AddNumberParameter("AlphaY", "AlphaY", "Shear area factor along the local y axis: the fraction of the area that carries shear. 5/6 for a rectangle, 1 to ignore shear deformation.", GH_ParamAccess.item);
+            pManager.AddNumberParameter("AlphaZ", "AlphaZ", "Shear area factor along the local z axis: the fraction of the area that carries shear. 5/6 for a rectangle, 1 to ignore shear deformation.", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Material", "Material", "Material the section is made of. Connect an elastic uniaxial material.", GH_ParamAccess.item);
         }
 
         /// <summary>

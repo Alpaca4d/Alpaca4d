@@ -22,8 +22,8 @@ namespace Alpaca4d.Gh
         /// <inheritdoc />
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddMeshParameter("Meshes", "Meshes", "", GH_ParamAccess.list);
-            pManager.AddBooleanParameter("Closed", "Closed", "", GH_ParamAccess.item, false);
+            pManager.AddMeshParameter("Meshes", "Meshes", "Meshes to sweep through, in order. Each pair of neighbours becomes a layer of bricks, so they need matching face and vertex counts.", GH_ParamAccess.list);
+            pManager.AddBooleanParameter("Closed", "Closed", "Join the last mesh back to the first, for a series that closes on itself such as a ring.", GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -31,7 +31,7 @@ namespace Alpaca4d.Gh
         /// <inheritdoc />
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.Register_MeshParam("Mesh", "Mesh", "");
+            pManager.Register_MeshParam("Mesh", "Mesh", "One eight-vertex mesh per brick. Feed them to the SSP Brick component.");
         }
 
 

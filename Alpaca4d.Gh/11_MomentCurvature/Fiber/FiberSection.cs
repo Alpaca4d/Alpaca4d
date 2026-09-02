@@ -57,7 +57,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("FiberSection", "FiberSection", "");
+            pManager.Register_GenericParam("FiberSection", "FiberSection", "The fibre section. Feed it to Moment Curvature, or to a beam element that takes a fibre section.");
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

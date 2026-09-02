@@ -26,7 +26,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "The analysed model, from the AlpacaModel output of Run Analysis. Results are read out of the recorder file it points at.", GH_ParamAccess.item);
             pManager.AddBooleanParameter("History", "History",
                 "Read every recorded step instead of one. Each output then becomes a tree with " +
                 "one branch per step, {step}, holding that step's value per element. Step is ignored.",
@@ -41,13 +41,13 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Sigma11", "σ₁₁", "");
-            pManager.Register_GenericParam("Sigma22", "σ₂₂", "");
-            pManager.Register_GenericParam("Sigma33", "σ₃₃", "");
-            pManager.Register_GenericParam("Sigma12", "σ₁₂", "");
-            pManager.Register_GenericParam("Sigma23", "σ₂₃", "");
-            pManager.Register_GenericParam("Sigma13", "σ₁₃", "");
-            pManager.Register_DoubleParam("VonMises", "VonMises", "");
+            pManager.Register_GenericParam("Sigma11", "σ₁₁", $"Direct stress along the element's local 1 axis [{Units.Force}/{Units.Length}²]");
+            pManager.Register_GenericParam("Sigma22", "σ₂₂", $"Direct stress along the element's local 2 axis [{Units.Force}/{Units.Length}²]");
+            pManager.Register_GenericParam("Sigma33", "σ₃₃", $"Direct stress along the element's local 3 axis [{Units.Force}/{Units.Length}²]");
+            pManager.Register_GenericParam("Sigma12", "σ₁₂", $"Shear stress in the local 1-2 plane [{Units.Force}/{Units.Length}²]");
+            pManager.Register_GenericParam("Sigma23", "σ₂₃", $"Shear stress in the local 2-3 plane [{Units.Force}/{Units.Length}²]");
+            pManager.Register_GenericParam("Sigma13", "σ₁₃", $"Shear stress in the local 1-3 plane [{Units.Force}/{Units.Length}²]");
+            pManager.Register_DoubleParam("VonMises", "VonMises", $"Von Mises equivalent stress, derived from the six components above [{Units.Force}/{Units.Length}²]");
         }
 
         /// <summary>

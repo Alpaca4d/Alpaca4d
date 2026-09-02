@@ -29,7 +29,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "The analysed model, from the AlpacaModel output of Run Analysis. Results are read out of the recorder file it points at.", GH_ParamAccess.item);
             pManager.AddBooleanParameter("History", "History",
                 "Read every recorded step instead of one. Each output then becomes a tree with " +
                 "one branch per step, {step}, holding that step's value per node. Step is ignored.",
@@ -47,7 +47,7 @@ namespace Alpaca4d.Gh
         {
             pManager.Register_VectorParam("Displacement", "Displacement", $"[{Units.Length}]");
             pManager.Register_VectorParam("Rotation", "Rotation", $"[{Units.Angle}]");
-            pManager.Register_GenericParam("--------", "--------", "");
+            pManager.Register_GenericParam("--------", "--------", "Separator. Nothing comes out of it - it keeps the static results above apart from the transient ones below.");
             pManager.Register_VectorParam("Velocity", "Velocity", $"[{Units.Length}/{Units.Time}]");
             pManager.Register_VectorParam("Acceleration", "Acceleration", $"[{Units.Length}/{Units.Time}²]");
         }

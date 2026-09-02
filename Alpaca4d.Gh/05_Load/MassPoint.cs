@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Point", "Point", "", GH_ParamAccess.item);
+            pManager.AddPointParameter("Point", "Point", $"Where the mass sits [{Units.Length}]. It has to land on a node of the model.", GH_ParamAccess.item);
             pManager.AddVectorParameter("TransMass", "TransMass", $"Translational mass along each global axis [{Units.Mass}]", GH_ParamAccess.item);
             pManager.AddVectorParameter("RotationalMass", "RotationalMass", $"Rotational mass about each global axis [{Units.Mass}{Units.Length}\u00b2]. Only written on a 6 DOF node.", GH_ParamAccess.item, Vector3d.Zero);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -36,7 +36,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Load", "Load", "");
+            pManager.Register_GenericParam("Load", "Load", "The lumped mass. Feed it to the LoadPatterns input of Assemble Model - it goes in alongside the load patterns, not inside one.");
         }
 
         /// <summary>

@@ -26,8 +26,8 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("Times", "Times", "[s]", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Values", "Values", "", GH_ParamAccess.list);
-            pManager.AddNumberParameter("LoadFactor", "LoadFactor", "", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("Values", "Values", "The value of the series at each of the Times above. The two lists have to be the same length.", GH_ParamAccess.list);
+            pManager.AddNumberParameter("LoadFactor", "LoadFactor", "Constant the whole series is multiplied by. Use it to scale a recorded history without editing the values.", GH_ParamAccess.item, 1.0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -36,8 +36,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("TimeSeries", "TimeSeries", "");
-            pManager.Register_DoubleParam("Graph", "Graph", "");
+            pManager.Register_GenericParam("TimeSeries", "TimeSeries", "The time series. Feed it to a Load Pattern to scale that pattern over time.");
+            pManager.Register_DoubleParam("Graph", "Graph", "The series sampled for plotting, as a list of values. Meant for a chart, not for the analysis.");
         }
 
         /// <summary>

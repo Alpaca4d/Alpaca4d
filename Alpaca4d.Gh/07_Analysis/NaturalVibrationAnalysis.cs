@@ -31,8 +31,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Vibration Modes", "Vibration Modes", "", GH_ParamAccess.item, 1);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "The assembled model, from Assemble Model. Not from Run Analysis - that clears the OpenSees domain when it finishes, leaving nothing to solve.", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Vibration Modes", "Vibration Modes", "How many modes to solve for, starting at the lowest. Ask for enough that the cumulative participating mass reaches whatever your code requires.", GH_ParamAccess.item, 1);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("Solver", "Solver", "Connect a 'ValueList'\n-genBandArpack \n-symmBandLapack \n-fullGenLapack", GH_ParamAccess.item, "-genBandArpack");
             pManager[pManager.ParamCount-1].Optional = true;
@@ -43,11 +43,11 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("log", "log", "");
-            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "");
-            pManager.Register_DoubleParam("Eigenvalues", "Eigenvalues", "");
-            pManager.Register_DoubleParam("Period", "Period", "");
-            pManager.Register_DoubleParam("Frequencies", "Frequencies", "");
+            pManager.Register_GenericParam("log", "log", "What OpenSees printed while solving. Read it when the analysis fails.");
+            pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "The solved model. Feed it to Nodal Displacements to read a mode shape, or to Modal Analysis Report.");
+            pManager.Register_DoubleParam("Eigenvalues", "Eigenvalues", "One eigenvalue per mode, lowest first. Each is omega squared, in rad²/s².");
+            pManager.Register_DoubleParam("Period", "Period", $"One period per mode, longest first [{Units.Time}]");
+            pManager.Register_DoubleParam("Frequencies", "Frequencies", "One frequency per mode, lowest first, in Hz.");
         }
 
         /// <summary>

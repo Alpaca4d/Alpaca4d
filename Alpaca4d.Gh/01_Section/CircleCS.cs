@@ -24,13 +24,13 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("SectionName", "SecName", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("SectionName", "SecName", "A label for the section, carried on the object and readable through Deconstruct. Nothing in the analysis reads it.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Diameter", "Diameter", $"[{Units.Length}]", GH_ParamAccess.item, 0.15);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Thickness", "Thickness", $"[{Units.Length}]", GH_ParamAccess.item, 0.01);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Material", "Material", "Material the section is made of. Connect an elastic uniaxial material.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 

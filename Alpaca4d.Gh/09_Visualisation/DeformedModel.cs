@@ -1,4 +1,4 @@
-using Grasshopper;
+﻿using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
@@ -24,14 +24,14 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Step", "Step", "", GH_ParamAccess.item, 0);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "The analysed model, from the AlpacaModel output of Run Analysis. Results are read out of the recorder file it points at.", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Step", "Step", "Which recorded step to draw, or which mode after a natural vibration analysis.", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Scale", "Scale", "", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("Scale", "Scale", "How far to exaggerate the displacements. 1 draws them at true size, which on a stiff structure is usually too small to see.", GH_ParamAccess.item, 1.0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddColourParameter("Colors", "Colors", "", GH_ParamAccess.list);
+            pManager.AddColourParameter("Colors", "Colors", "Gradient to colour the displacement with, from the low end to the high. Connect the Colors component for a ready-made one.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntervalParameter("Range", "Range", "", GH_ParamAccess.item);
+            pManager.AddIntervalParameter("Range", "Range", "Displacement range the gradient is stretched over. Left empty it fits the model, which is what makes two models with different ranges impossible to compare - set it to compare them.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -40,9 +40,9 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("Beam", "Beam", "");
-            pManager.Register_GenericParam("Shell", "Shell", "");
-            pManager.Register_GenericParam("Brick", "Brick", "");
+            pManager.Register_GenericParam("Beam", "Beam", "The deformed beam elements, as coloured lines.");
+            pManager.Register_GenericParam("Shell", "Shell", "The deformed shell elements, as coloured meshes.");
+            pManager.Register_GenericParam("Brick", "Brick", "The deformed brick and tetrahedron elements, as coloured meshes.");
         }
 
         /// <summary>

@@ -33,8 +33,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("TimeSeries", "TimeSeries", "");
-            pManager.Register_DoubleParam("Graph", "Graph", "");
+            pManager.Register_GenericParam("TimeSeries", "TimeSeries", "The time series. Feed it to a Load Pattern to scale that pattern over time.");
+            pManager.Register_DoubleParam("Graph", "Graph", "The series sampled for plotting, as a list of values. Meant for a chart, not for the analysis.");
         }
 
         /// <summary>

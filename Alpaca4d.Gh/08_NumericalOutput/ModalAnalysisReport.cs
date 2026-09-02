@@ -27,7 +27,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "A model that has been through the Natural Vibration Analysis. The report is read from the file that analysis writes.", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -35,15 +35,15 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("EigenValueAnalysis", "EigenValueAnalysis", "");
-            pManager.Register_GenericParam("TotalMassOfStructure", "TotalMassOfStructure", "");
-            pManager.Register_GenericParam("TotalFreeMass", "TotalFreeMass", "");
-            pManager.Register_GenericParam("CenterOfMass", "CenterOfMass", "");
-            pManager.Register_GenericParam("ModalParticipationFactors", "ModalParticipationFactors", "");
-            pManager.Register_GenericParam("ModalParticipationMasses", "ModalParticipationMasses", "");
-            pManager.Register_GenericParam("ModalParticipationMasses_Cumulative", "ModalParticipationMasses_Cumulative", "");
-            pManager.Register_GenericParam("ModalParticipationMassesRatio(%)", "ModalParticipationMassesRatio(%)", "");
-            pManager.Register_GenericParam("ModalParticipationMassesRatio(%)_Cumulative", "ModalParticipationMassesRatio(%)_Cumulative", "");
+            pManager.Register_GenericParam("EigenValueAnalysis", "EigenValueAnalysis", "Section 2 of the report, as text: eigenvalue, frequency and period per mode.");
+            pManager.Register_GenericParam("TotalMassOfStructure", "TotalMassOfStructure", "Section 3 of the report, as text: the mass of the whole model, per direction.");
+            pManager.Register_GenericParam("TotalFreeMass", "TotalFreeMass", "Section 4 of the report, as text: the mass on unrestrained degrees of freedom, which is the mass the modes can actually move.");
+            pManager.Register_GenericParam("CenterOfMass", "CenterOfMass", "Section 5 of the report, as text: where the mass of the model sits.");
+            pManager.Register_GenericParam("ModalParticipationFactors", "ModalParticipationFactors", "Section 6 of the report, as text: the participation factor of each mode, per direction.");
+            pManager.Register_GenericParam("ModalParticipationMasses", "ModalParticipationMasses", "Section 7 of the report, as text: how much mass each mode moves, per direction.");
+            pManager.Register_GenericParam("ModalParticipationMasses_Cumulative", "ModalParticipationMasses_Cumulative", "Section 8 of the report, as text: participating mass summed over the modes up to each one.");
+            pManager.Register_GenericParam("ModalParticipationMassesRatio(%)", "ModalParticipationMassesRatio(%)", "Section 9 of the report, as text: participating mass as a percentage of the total, per mode and direction.");
+            pManager.Register_GenericParam("ModalParticipationMassesRatio(%)_Cumulative", "ModalParticipationMassesRatio(%)_Cumulative", "Section 10 of the report, as text: the percentages of section 9 summed over the modes up to each one. This is the column a code check against a 90% threshold reads.");
         }
 
         /// <summary>

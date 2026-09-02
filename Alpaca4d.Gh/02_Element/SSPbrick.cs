@@ -26,8 +26,8 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddMeshParameter("Mesh", "Mesh", $"[{Units.Length}]", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Material", "Material", "", GH_ParamAccess.item);
-            pManager.AddColourParameter("Colour", "Colour", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Material", "Material", "Material the solid is made of. Connect an nD material.", GH_ParamAccess.item);
+            pManager.AddColourParameter("Colour", "Colour", "Colour to draw the element in. Display only; it changes nothing in the analysis.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 

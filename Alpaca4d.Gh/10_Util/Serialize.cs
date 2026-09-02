@@ -26,9 +26,9 @@ namespace Alpaca4d.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("AlpacaModel", "AlpacaModel", "Model to be serialized.", GH_ParamAccess.item);
-            pManager.AddTextParameter("FilePath", "FilePath", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("FilePath", "FilePath", "Where to write the .tcl file. Left empty it is written next to the Grasshopper definition.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddBooleanParameter("Save", "Save", "", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("Save", "Save", "Set to true to write the file. It stays in memory until you do.", GH_ParamAccess.item, false);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -37,7 +37,7 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_StringParam("Tcl", "Tcl", "");
+            pManager.Register_StringParam("Tcl", "Tcl", "The serialised model as Tcl, one line per item - the same text that goes into the file.");
         }
 
         /// <summary>

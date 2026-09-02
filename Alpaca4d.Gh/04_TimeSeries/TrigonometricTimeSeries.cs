@@ -30,7 +30,7 @@ namespace Alpaca4d.Gh
             pManager.AddNumberParameter("Period", "Period", "[s]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Shift", "Shift", "[s]", GH_ParamAccess.item, 0.0);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("LoadFactor", "LoadFactor", "", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("LoadFactor", "LoadFactor", "Amplitude - the constant the whole series is multiplied by.", GH_ParamAccess.item, 1.0);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
@@ -39,8 +39,8 @@ namespace Alpaca4d.Gh
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_GenericParam("TimeSeries", "TimeSeries", "");
-            pManager.Register_DoubleParam("Graph", "Graph", "");
+            pManager.Register_GenericParam("TimeSeries", "TimeSeries", "The time series. Feed it to a Load Pattern to scale that pattern over time.");
+            pManager.Register_DoubleParam("Graph", "Graph", "The series sampled for plotting, as a list of values. Meant for a chart, not for the analysis.");
         }
 
         /// <summary>
