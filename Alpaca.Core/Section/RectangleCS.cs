@@ -45,20 +45,31 @@ namespace Alpaca4d.Section
             }
         }
 
+        /// <summary>
+        /// Torsion constant of a solid rectangle, J = k a b^3 with a the long side and b the
+        /// short one, and k = 1 / (3 + 4.1 (b/a)^1.5).
+        ///
+        /// The exponent is 1.5, not 3/2 written as C# integer division - which is 1, and was
+        /// what this used to compute. The two agree on a square, where the ratio is one and
+        /// the exponent cannot matter, so the error stayed hidden there; on a 1:4 rectangle
+        /// it made J about 12% too low, and it is worst near 1:2.5.
+        /// </summary>
         public double J
         {
             get
             {
+                const double exponent = 1.5;
+
                 double j;
                 double k;
                 if(this.Height < this.Width)
                 {
-                    k = 1 / (3 + 4.1 * Math.Pow((this.Height / this.Width), 3 / 2));
+                    k = 1 / (3 + 4.1 * Math.Pow((this.Height / this.Width), exponent));
                     j = k * this.Width * Math.Pow(this.Height, 3);
                 }
                 else
                 {
-                    k = 1 / (3 + 4.1 * Math.Pow((this.Width / this.Height), 3 / 2));
+                    k = 1 / (3 + 4.1 * Math.Pow((this.Width / this.Height), exponent));
                     j = k * this.Height * Math.Pow(this.Width, 3);
                 }
                 return j;
