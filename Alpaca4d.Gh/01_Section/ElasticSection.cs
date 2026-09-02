@@ -26,7 +26,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("SectionName", "SecName", "", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Area", "A", "Young Modulus", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Area", "A", $"Cross-sectional area [{Units.Length}\u00b2]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Izz", "Izz", "", GH_ParamAccess.item);
             pManager.AddNumberParameter("Iyy", "Iyy", "", GH_ParamAccess.item);
             pManager.AddNumberParameter("J", "J", "", GH_ParamAccess.item);

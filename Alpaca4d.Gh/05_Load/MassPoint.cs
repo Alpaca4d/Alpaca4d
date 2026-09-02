@@ -12,7 +12,8 @@ namespace Alpaca4d.Gh
     {
         public MassPointLoad()
           : base("Mass Point (Alpaca4d)", "Mass Point",
-            "Construct a PointLoad",
+            "Construct a lumped mass at a point. Feeds the mass matrix of a natural vibration\n"
+          + "or transient analysis; it applies no force on its own - use Gravity Load for that.",
             "Alpaca4d", "05_Load")
         {
             // Draw a Description Underneath the component
