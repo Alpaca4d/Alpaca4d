@@ -31,7 +31,7 @@ namespace Alpaca4d.Material
 
         public override string WriteTcl()
         {
-            string tclText = $"nDMaterial ElasticIsotropic {this.Id} {this.E} {this.Nu} {this.Rho}\n";
+            string tclText = $"nDMaterial ElasticIsotropic {this.Id} {this.E} {this.Nu} {Alpaca4d.ModelMass.FromKg(this.Rho)}\n";
             return tclText;
         }
 

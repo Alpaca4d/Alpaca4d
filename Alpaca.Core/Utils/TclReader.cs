@@ -423,13 +423,15 @@ namespace Alpaca4d
             {
                 double e = Number(tokens, 3);
                 double nu = Number(tokens, 4);
-                double? rho = tokens.Length > 5 && TryNumber(tokens[5], out double r) ? r : (double?)null;
+                double? rho = tokens.Length > 5 && TryNumber(tokens[5], out double r)
+                    ? Alpaca4d.ModelMass.ToKg(r) : (double?)null;
                 // G is not part of the command; for an isotropic material it is implied by E and nu.
                 _ndMaterials[tag] = new ElasticIsotropicMaterial($"nDMaterial_{tag}", e, e / (2.0 * (1.0 + nu)), nu, rho);
             }
             else if (string.Equals(type, "ElasticOrthotropic", StringComparison.OrdinalIgnoreCase))
             {
-                double? rho = tokens.Length > 12 && TryNumber(tokens[12], out double r) ? r : (double?)null;
+                double? rho = tokens.Length > 12 && TryNumber(tokens[12], out double r)
+                    ? Alpaca4d.ModelMass.ToKg(r) : (double?)null;
                 _ndMaterials[tag] = new ElasticOrthotropicMaterial($"nDMaterial_{tag}",
                     Number(tokens, 3), Number(tokens, 4), Number(tokens, 5),
                     Number(tokens, 9), Number(tokens, 10), Number(tokens, 11),
