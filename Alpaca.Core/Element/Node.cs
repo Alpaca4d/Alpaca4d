@@ -13,7 +13,6 @@ namespace Alpaca4d.Element
         public Point3d Pos { get; set; }
         public int? Id { get; set; }
         public int Ndf { get; set; }
-        public double Mass { get; set; }
 
         public Node()
         {
@@ -45,23 +44,30 @@ namespace Alpaca4d.Element
             }
         }
 
+        /// <summary>
+        /// A node carries no mass of its own.
+        ///
+        /// Concentrated mass belongs to <see cref="Alpaca4d.Loads.MassLoad"/>, which writes a
+        /// "mass" command, converts kg to the solver's mass unit, keeps the translational and
+        /// rotational terms apart, and is counted by <see cref="Model.TotalMass"/>. This used
+        /// to write "-mass" here as well, from a single double applied to every degree of
+        /// freedom - one number standing in for both a mass and a mass moment of inertia, with
+        /// no unit conversion. It was never assigned, and could not be: the nodes that reach a
+        /// deck are built inside CreateNodes from the model's own points.
+        ///
+        /// It could not have worked even if it had been. Both "node -mass" and "mass" land on
+        /// Node::setMass, which assigns rather than accumulates, and Alpaca4d writes every node
+        /// before any mass - so a MassLoad at the same node overwrote it silently.
+        ///
+        /// Omitting "-mass" is equivalent to writing zeros: Node::getMass returns a zeroed
+        /// matrix when none was set.
+        /// </summary>
         public string WriteTcl()
         {
-            string tclText;
-
-            if (this.Ndf == 6)
-            {
-                tclText = $"node {this.Id} {this.Pos.X} {this.Pos.Y} {this.Pos.Z} -mass {this.Mass} {this.Mass} {this.Mass} {this.Mass} {this.Mass} {this.Mass}\n";
-            }
-            else if (this.Ndf == 3)
-            {
-                tclText = $"node {this.Id} {this.Pos.X} {this.Pos.Y} {this.Pos.Z} -mass {this.Mass} {this.Mass} {this.Mass}\n";
-            }
-            else
-            {
+            if (this.Ndf != 3 && this.Ndf != 6)
                 throw new Exception($"No ndf has been assigned");
-            }
-            return tclText;
+
+            return $"node {this.Id} {this.Pos.X} {this.Pos.Y} {this.Pos.Z}\n";
         }
     }
 }
