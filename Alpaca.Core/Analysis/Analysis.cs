@@ -221,12 +221,52 @@ namespace Alpaca4d
         }
 
 
+        /// <summary>
+        /// Every test used to be written as
+        ///     test &lt;Type&gt; &lt;Tol&gt; [&lt;TolR&gt;] &lt;Iter&gt; &lt;Flag&gt; &lt;Norm&gt; &lt;MaxIncr&gt;
+        /// but no OpenSees test takes that. Each one has its own argument list, and a value
+        /// past the end of it is not ignored - it lands on whatever the parser reads next,
+        /// silently. Three ways that went wrong:
+        ///
+        /// Most tests take three ints (iter, flag, norm) and then read one more double as
+        /// maxTol, a divergence guard whose real default is 1.7e307. A trailing MaxIncr of 2
+        /// set maxTol to 2, and the test fails the step as soon as the norm passes it - so an
+        /// analysis that needed more than one iteration reported "failed to converge" for no
+        /// reason. Measured against the bundled solver, the cut-off sits exactly at MaxIncr:
+        /// on a model whose first-iteration norm is 128.7, a trailing 128 fails and 129
+        /// converges. That holds for NormUnbalance too, whatever a newer OpenSees source may
+        /// say about a maxIncr slot, so MaxIncr is written for no type at all.
+        ///
+        /// FixedNumIter reads only ints. Leading with a tolerance made OpenSees stop with
+        /// "no numIter specified in test command", so the test never existed at all.
+        ///
+        /// NormDispAndUnbalance reads its trailing pair back over iter and flag (into
+        /// idata[0] rather than idata[2], unlike NormDispOrUnbalance beside it), so writing
+        /// norm quietly replaced the iteration limit with the norm type.
+        ///
+        /// So write what each type actually accepts, and nothing more.
+        /// </summary>
         public string WriteTcl()
         {
-            if (this.Type == TestType.NormDispAndUnbalance || this.Type == TestType.NormDispOrUnbalance)
-                return $"test {Type} {Tol} {TolR} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
-            else
-                return $"test {Type} {Tol} {Iter} {(int)Flag} {(int)Norm} {MaxIncr}\n";
+            switch (this.Type)
+            {
+                // Ints only - no tolerance.
+                case TestType.FixedNumIter:
+                    return $"test {Type} {Iter} {(int)Flag} {(int)Norm}\n";
+
+                // Two tolerances. TolR is nullable on this class, and a null one would
+                // interpolate to nothing and shift every argument after it along by one, so
+                // fall back to Tol rather than emit a line that parses as something else.
+                case TestType.NormDispAndUnbalance:
+                    return $"test {Type} {Tol} {TolR ?? Tol} {Iter} {(int)Flag}\n";
+
+                case TestType.NormDispOrUnbalance:
+                    return $"test {Type} {Tol} {TolR ?? Tol} {Iter} {(int)Flag} {(int)Norm}\n";
+
+                // Everything else: tolerance and three ints, full stop.
+                default:
+                    return $"test {Type} {Tol} {Iter} {(int)Flag} {(int)Norm}\n";
+            }
         }
 
     }

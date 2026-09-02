@@ -1,4 +1,4 @@
-using Alpaca4d.UIWidgets;
+﻿using Alpaca4d.UIWidgets;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Special;
@@ -27,7 +27,12 @@ namespace Alpaca4d.Gh
 
         public TestBase()
             : base("Test (Alpaca4d)", "Test",
-              "Test Base Component",
+              "When an iteration inside a step has converged, and how many iterations to allow " +
+              "before the step is declared failed.\n" +
+              "NormDispIncr measures how much the model still moves, NormUnbalance how far it is " +
+              "from equilibrium, and EnergyIncr the product of the two; the Relative units compare " +
+              "against the first iteration instead of an absolute tolerance, and FixedNumIter simply " +
+              "iterates a set number of times. Feeds the Test input of Analysis Settings.",
               "Alpaca4d", "07_Analysis")
         {
             ((GH_Component)this).Hidden = false;
@@ -40,7 +45,7 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.RegisterParam(new Param_GenericObject(), "Test", "Test", "Test");
+            pManager.RegisterParam(new Param_GenericObject(), "Test", "Test", "The convergence test. Feed it to the Test input of Analysis Settings.");
         }
 
         protected override void RegisterEvaluationUnits(EvaluationUnitManager mngr)
@@ -119,14 +124,24 @@ namespace Alpaca4d.Gh
     {
         protected abstract Alpaca4d.Test.TestType TestType { get; }
 
+        /// <summary>
+        /// FixedNumIter stops after a set number of iterations whatever the residual is,
+        /// so it has no tolerance to offer - and OpenSees reads its arguments as ints, so
+        /// a tolerance written into the deck stops the analysis outright.
+        /// </summary>
+        protected virtual bool HasTolerance => true;
+
         public override void registerEvaluationUnits(EvaluationUnitManager mngr)
         {
             EvaluationUnit evaluationUnit = new EvaluationUnit(name(), display_name(), $"{TestType} Test");
             evaluationUnit.Icon = Alpaca4d.Gh.Properties.Resources.Analysis_settings__Alpaca4d_;
             mngr.RegisterUnit(evaluationUnit);
 
-            evaluationUnit.RegisterInputParam(new Param_Number(), "Tolerance", "Tol", "Convergence tolerance", GH_ParamAccess.item, new GH_Number(1e-8));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+            if (HasTolerance)
+            {
+                evaluationUnit.RegisterInputParam(new Param_Number(), "Tolerance", "Tol", "Convergence tolerance", GH_ParamAccess.item, new GH_Number(1e-8));
+                evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+            }
 
             evaluationUnit.RegisterInputParam(new Param_Integer(), "Iteration", "Iter", "Maximum number of iterations", GH_ParamAccess.item, new GH_Integer(10));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
@@ -137,8 +152,6 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Integer(), "Norm", "Norm", "0 - MaxNorm\n1 - OneNorm\n2 - TwoNorm", GH_ParamAccess.item, new GH_Integer(2));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Integer(), "MaxIncr", "MaxIncr", "Maximum number of increments", GH_ParamAccess.item, new GH_Integer(2));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
         }
 
         public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
@@ -146,24 +159,28 @@ namespace Alpaca4d.Gh
             msg = "";
             level = GH_RuntimeMessageLevel.Warning;
 
+            // The inputs shift up by one when there is no tolerance to read.
+            int index = 0;
+
             double tol = 1e-8;
-            DA.GetData(0, ref tol);
+            if (HasTolerance)
+                DA.GetData(index++, ref tol);
 
             int iter = 10;
-            DA.GetData(1, ref iter);
+            DA.GetData(index++, ref iter);
 
             int flag = 0;
-            DA.GetData(2, ref flag);
+            DA.GetData(index++, ref flag);
             var flagEnum = (Alpaca4d.Test.FlagType)flag;
 
             int norm = 2;
-            DA.GetData(3, ref norm);
+            DA.GetData(index++, ref norm);
             var normEnum = (Alpaca4d.Test.NormType)norm;
 
-            int maxIncr = 2;
-            DA.GetData(4, ref maxIncr);
-
-            var test = new Alpaca4d.Test(TestType, tol, iter, flagEnum, normEnum, maxIncr);
+            // No MaxIncr input: the bundled OpenSees reads a fifth number as maxTol, a
+            // divergence guard, so any value offered here would cut analyses short rather
+            // than cap increments. See Alpaca4d.Test.WriteTcl.
+            var test = new Alpaca4d.Test(TestType, tol, iter, flagEnum, normEnum);
 
             DA.SetData(0, test);
         }
@@ -213,11 +230,12 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Integer(), "Flag", "Flag", "0 - Nothing\n1 - EachTime\n2 - Successful\n4 - EachStep\n5 - ErrorMessage", GH_ParamAccess.item, new GH_Integer(0));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Integer(), "Norm", "Norm", "0 - MaxNorm\n1 - OneNorm\n2 - TwoNorm", GH_ParamAccess.item, new GH_Integer(2));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
-
-            evaluationUnit.RegisterInputParam(new Param_Integer(), "MaxIncr", "MaxIncr", "Maximum number of increments", GH_ParamAccess.item, new GH_Integer(2));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
+            // No Norm or MaxIncr here. OpenSees reads this test's trailing pair back over
+            // the iteration limit and the print flag rather than into the norm and maxIncr
+            // slots - see NormDispAndUnbalance.cpp, which writes into idata[0] where
+            // NormDispOrUnbalance beside it writes into idata[2]. Offering them would only
+            // let a user overwrite their own iteration limit. Use NormDispOrUnbalance if
+            // you need to choose the norm.
         }
 
         public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
@@ -238,14 +256,7 @@ namespace Alpaca4d.Gh
             DA.GetData(3, ref flag);
             var flagEnum = (Alpaca4d.Test.FlagType)flag;
 
-            int norm = 2;
-            DA.GetData(4, ref norm);
-            var normEnum = (Alpaca4d.Test.NormType)norm;
-
-            int maxIncr = 2;
-            DA.GetData(5, ref maxIncr);
-
-            var test = Alpaca4d.Test.NormDispAndUnbalance(tolIncr, tolR, iter, flagEnum, normEnum, maxIncr);
+            var test = Alpaca4d.Test.NormDispAndUnbalance(tolIncr, tolR, iter, flagEnum);
 
             DA.SetData(0, test);
         }
@@ -277,8 +288,6 @@ namespace Alpaca4d.Gh
             evaluationUnit.RegisterInputParam(new Param_Integer(), "Norm", "Norm", "0 - MaxNorm\n1 - OneNorm\n2 - TwoNorm", GH_ParamAccess.item, new GH_Integer(2));
             evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
 
-            evaluationUnit.RegisterInputParam(new Param_Integer(), "MaxIncr", "MaxIncr", "Maximum number of increments", GH_ParamAccess.item, new GH_Integer(2));
-            evaluationUnit.Inputs[evaluationUnit.Inputs.Count - 1].Parameter.Optional = true;
         }
 
         public override void SolveInstance(IGH_DataAccess DA, out string msg, out GH_RuntimeMessageLevel level)
@@ -303,10 +312,9 @@ namespace Alpaca4d.Gh
             DA.GetData(4, ref norm);
             var normEnum = (Alpaca4d.Test.NormType)norm;
 
-            int maxIncr = 2;
-            DA.GetData(5, ref maxIncr);
 
-            var test = Alpaca4d.Test.NormDispOrUnbalance(tolIncr, tolR, iter, flagEnum, normEnum, maxIncr);
+
+            var test = Alpaca4d.Test.NormDispOrUnbalance(tolIncr, tolR, iter, flagEnum, normEnum);
 
             DA.SetData(0, test);
         }
@@ -345,5 +353,6 @@ namespace Alpaca4d.Gh
         public override string name() => "FixedNumIter";
         public override string display_name() => "FixedNumIter";
         protected override Alpaca4d.Test.TestType TestType => Alpaca4d.Test.TestType.FixedNumIter;
+        protected override bool HasTolerance => false;
     }
 }
