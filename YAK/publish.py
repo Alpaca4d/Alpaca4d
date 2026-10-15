@@ -184,6 +184,8 @@ def collect_files(paths: dict, version: str) -> Path:
 
     safe_copy_file(output_dir / "data.bin", version_dir)
     safe_copy_tree(output_dir / "UserObject", version_dir / "UserObject")
+    # The Explorer components follow Colibri, whose MIT license asks for its notice to travel along.
+    safe_copy_file(project_root / "THIRD-PARTY-NOTICES.md", version_dir)
 
     # Copy manifest + icon for yak build
     safe_copy_file(paths["manifest_file"], version_dir)
