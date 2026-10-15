@@ -46,6 +46,15 @@ namespace Alpaca4d.Interop
         /// <summary>The same for the torsion constant, whose formulas differ more between programs.</summary>
         public const double TorsionTolerance = 0.05;
 
+        /// <summary>
+        /// The ends of a truss: free to turn in bending at both, and in torsion at one only, which is
+        /// enough to take the torsion out without leaving the member free to spin about its own axis.
+        /// Checked in OpenSees on a triangle truss whose joints only trusses reach: the forces and the
+        /// deflection come out as by hand, and the joints need no rotation held.
+        /// </summary>
+        private static readonly Release TrussEndI = new Release(tx: true, ty: true, tz: true, rx: false, ry: false, rz: false);
+        private static readonly Release TrussEndJ = new Release(tx: true, ty: true, tz: true, rx: true, ry: false, rz: false);
+
         /// <summary>Upper bound on the node tolerance handed to the Alpaca model [m].</summary>
         public const double MaxNodeTolerance = 0.001;
 
@@ -139,8 +148,18 @@ namespace Alpaca4d.Interop
                 SupportOk = new bool[source.Supports.Count],
             };
 
+            // A section only trusses use is only ever loaded along its axis, so its bending properties
+            // need not be ones Alpaca can represent.
+            var bendingSections = new HashSet<ImportBeamSection>(
+                source.Beams.Where(beam => !beam.AxialOnly && beam.Section != null).Select(beam => beam.Section));
+
             for (int i = 0; i < source.Beams.Count; i++)
-                plan.BeamOk[i] = PlanBeam(source, source.Beams[i], plan, report);
+                plan.BeamOk[i] = PlanBeam(source, source.Beams[i], plan, bendingSections, report);
+
+            if (source.Beams.Any(beam => beam.AxialOnly))
+                report.Remark("Trusses become beams with hinges, released in bending at both ends and in torsion at one, so they carry axial " +
+                              "force only. A load along a truss bends it between its ends, where the source passes it straight to the nodes: " +
+                              "the nodes move the same, but the truss shows bending inside it.");
 
             if (source.Beams.Any())
                 report.Remark("Beam axes follow Alpaca's convention, with local y along the depth of the section: Alpaca's y is the source's z " +
@@ -180,7 +199,7 @@ namespace Alpaca4d.Interop
             return plan;
         }
 
-        private static bool PlanBeam(ImportModel source, ImportBeam beam, Plan plan, ConversionReport report)
+        private static bool PlanBeam(ImportModel source, ImportBeam beam, Plan plan, HashSet<ImportBeamSection> bendingSections, ConversionReport report)
         {
             string label = beam.Id ?? "(no id)";
 
@@ -211,7 +230,7 @@ namespace Alpaca4d.Interop
 
             if (!plan.SectionShapes.TryGetValue(beam.Section, out var shape))
             {
-                shape = PlanSection(beam.Section, report);
+                shape = PlanSection(beam.Section, report, axialOnly: !bendingSections.Contains(beam.Section));
                 plan.SectionShapes[beam.Section] = shape;
             }
 
@@ -232,7 +251,7 @@ namespace Alpaca4d.Interop
         /// the section goes in as a general elastic section with the source's numbers, so the beam is
         /// exactly as stiff as in the source, and the difference is reported.
         /// </summary>
-        public static ImportSectionShape? PlanSection(ImportBeamSection section, ConversionReport report)
+        public static ImportSectionShape? PlanSection(ImportBeamSection section, ConversionReport report, bool axialOnly = false)
         {
             string label = SectionLabel(section);
 
@@ -248,7 +267,7 @@ namespace Alpaca4d.Interop
                 return null;
             }
 
-            if (Math.Abs(section.Iyz) > 1e-3 * Math.Sqrt(section.Iyy * section.Izz))
+            if (!axialOnly && Math.Abs(section.Iyz) > 1e-3 * Math.Sqrt(section.Iyy * section.Izz))
             {
                 report.Error("These beam sections have principal axes turned away from the local axes (Iyz is not zero, as in an angle). " +
                              "Alpaca's elastic section has no product of inertia, so they cannot be built yet", label);
@@ -469,7 +488,9 @@ namespace Alpaca4d.Interop
 
                 var curve = new LineCurve(start, end);
                 var geomTransf = new GeomTransf(GeomTransfType.Linear, curve, AlpacaLocalZ(end - start, item.LocalZ));
-                var beam = new ForceBeamColumn(curve, section, geomTransf) { ElementId = item.Id };
+                IBeam beam = item.AxialOnly
+                    ? new BeamWithHinges(curve, section, geomTransf, TrussEndI, null, TrussEndJ, null) { ElementId = item.Id }
+                    : new ForceBeamColumn(curve, section, geomTransf) { ElementId = item.Id };
 
                 beams[i] = beam;
                 elements.Add(beam);

@@ -124,6 +124,11 @@ class KarambaImport
         };
         Check("an angle (Iyz not zero) cannot be built", ImportModelBuilder.PlanSection(angle, report) == null && report.HasErrors);
 
+        // Only loaded along its axis, a truss does not care that the angle's axes are turned.
+        report = new ConversionReport();
+        shape = ImportModelBuilder.PlanSection(angle, report, axialOnly: true);
+        Check("the same angle as a truss becomes a general section", shape == ImportSectionShape.General && !report.HasErrors, string.Join(" | ", report.Lines()));
+
         report = new ConversionReport();
         var empty = Rectangle(0.2, 0.4);
         empty.A = 0;

@@ -11,7 +11,7 @@ knows nothing of Karamba.
 
 | check | what it pins down |
 |---|---|
-| section planning | a rectangle or pipe that matches Alpaca's own shape stays that shape; a 20% gap in J, a T-section or an unknown shape becomes a general elastic section with a warning; an angle (Iyz not zero) or a section without area is an error |
+| section planning | a rectangle or pipe that matches Alpaca's own shape stays that shape; a 20% gap in J, a T-section or an unknown shape becomes a general elastic section with a warning; an angle (Iyz not zero) or a section without area is an error, unless only trusses use the angle |
 | axes | Alpaca's local y is Karamba's local z (the depth), so Karamba's Iyy is Alpaca's Izz and its Az gives Alpaca's alphaY |
 | shear | a section without shear area writes `section Elastic` without alphaY and alphaZ, since OpenSees fails on zero |
 | report | a hundred elements with one problem make one message, naming five |
@@ -38,7 +38,8 @@ Th.I for each load case. They should agree to well under 1%.
 | line load: global, local and projected, on an inclined beam | the three orientations |
 | plate on four corners with a mesh load | ASDShellT3 and the mesh load's nodal loads; no load counted twice |
 | point mass on a cantilever, eigen analysis | masses in kg, density from gamma and Karamba's g |
-| a model with a hinge, a truss and a spring | each reported as an error, and no output unless AllowPartial |
+| a truss: a triangle or a Pratt girder of trusses, loaded at the joints | trusses become beams with hinges; axial forces and joint displacements as in Karamba |
+| a model with a hinge and a spring | each reported as an error, and no output unless AllowPartial |
 | the portal frame with a beam of your own added, and a Uniform Excitation instead of Karamba's patterns | your elements join Karamba's nodes; a dynamic run on Karamba's masses |
 
 The Report output lists, per load case, the total load applied. It should match the sum of the

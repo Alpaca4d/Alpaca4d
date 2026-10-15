@@ -118,6 +118,9 @@ namespace Alpaca4d.Interop
 
         /// <summary>The source's local z axis: the direction of the section's depth.</summary>
         public Vector3d LocalZ { get; set; }
+
+        /// <summary>A truss: pin-jointed, so it carries axial force only and its bending properties do not matter.</summary>
+        public bool AxialOnly { get; set; }
     }
 
     /// <summary>One triangular shell element.</summary>

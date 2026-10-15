@@ -133,10 +133,10 @@ namespace Alpaca4d.Karamba3D
             switch (element)
             {
                 case ModelBeam beam:
-                    ReadBeam(index, id, beam);
+                    ReadBeam(index, id, beam, axialOnly: false);
                     break;
-                case ModelTruss _:
-                    _report.Error("Trusses (beams without bending stiffness) are not converted yet: Alpaca4d has no truss element", id);
+                case ModelTruss truss:
+                    ReadBeam(index, id, truss, axialOnly: true);
                     break;
                 case ModelSpring _:
                     _report.Error("Springs are not converted yet", id);
@@ -153,7 +153,8 @@ namespace Alpaca4d.Karamba3D
             }
         }
 
-        private void ReadBeam(int index, string id, ModelBeam beam)
+        /// <summary>A beam, or a truss - a ModelTruss that is not a ModelBeam, pin-jointed and axial only.</summary>
+        private void ReadBeam(int index, string id, ModelTruss beam, bool axialOnly)
         {
             // Any joint at all, whatever its values: which of a joint's entries means "released" has
             // not been checked against Karamba3D yet, and a misread release is a silent error.
@@ -199,6 +200,7 @@ namespace Alpaca4d.Karamba3D
                 NodeJ = beam.node_inds[1],
                 Section = section,
                 LocalZ = Vector(axes[2]),
+                AxialOnly = axialOnly,
             });
 
             ReadBeamLoads(index, id, beam, axes);
@@ -512,7 +514,7 @@ namespace Alpaca4d.Karamba3D
             }
         }
 
-        private void ReadBeamLoads(int index, string id, ModelBeam beam, KG.Vector3[] axes)
+        private void ReadBeamLoads(int index, string id, ModelTruss beam, KG.Vector3[] axes)
         {
             foreach (var load in beam.Elem_loads ?? new List<ElementLoad>())
             {
