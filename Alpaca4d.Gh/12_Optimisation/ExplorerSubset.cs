@@ -22,7 +22,7 @@ namespace Alpaca4d.Gh
           : base("Explorer Subset (Alpaca4d)", "Explorer Subset",
             "Runs part of a study. Divisions take fewer steps of each input; Ranges run some of the designs, " +
             "by number, to split a study between machines.",
-            "Alpaca4d", "12_Explorer")
+            "Alpaca4d", "12_Optimisation")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }

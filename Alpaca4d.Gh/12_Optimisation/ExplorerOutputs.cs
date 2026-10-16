@@ -34,7 +34,7 @@ namespace Alpaca4d.Gh
             "Names the results of a design - mass, deflection, utilisation, period - for Explorer Record to save, " +
             "and for the explorer to show as the axes to the right of the inputs.\n" +
             "Each input is one result, named after the input: rename an input to name its column.",
-            "Alpaca4d", "12_Explorer")
+            "Alpaca4d", "12_Optimisation")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
             Params.ParameterSourcesChanged += OnSourcesChanged;

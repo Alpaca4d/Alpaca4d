@@ -2,7 +2,7 @@
 
 ## Colibri
 
-The Explorer components (`Alpaca4d.Gh/12_Explorer`, `Alpaca.Core/Explorer`) do what Colibri's
+The Explorer components (`Alpaca4d.Gh/12_Optimisation`, `Alpaca.Core/Explorer`) do what Colibri's
 Iterator, Outputs, Aggregator, Image Setting and Iteration Subdomain components did, and write
 the same study format, so that studies open in Design Explorer and in the Alpaca4d Explorer
 alike. They were written for Alpaca4d rather than copied, but follow Colibri's design closely.

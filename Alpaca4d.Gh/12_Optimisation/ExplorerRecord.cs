@@ -51,7 +51,7 @@ namespace Alpaca4d.Gh
             "and a picture and a 3D model of each design.\n" +
             "Set Write to true and press Fly on Explorer Inputs. Designs already saved are not saved again. " +
             "Right-click to open the folder or the explorer, or to start the study over.",
-            "Alpaca4d", "12_Explorer")
+            "Alpaca4d", "12_Optimisation")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }

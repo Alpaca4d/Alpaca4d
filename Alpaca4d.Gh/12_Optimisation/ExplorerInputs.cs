@@ -64,7 +64,7 @@ namespace Alpaca4d.Gh
             "one solution each, for Explorer Record to save and the Alpaca4d Explorer to show.\n" +
             "Press Fly on the component, or set Fly to true, to start. Press it again, or Esc, to stop. " +
             "Designs already recorded are skipped, so a stopped study goes on where it left off.",
-            "Alpaca4d", "12_Explorer")
+            "Alpaca4d", "12_Optimisation")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
             Params.ParameterSourcesChanged += OnSourcesChanged;

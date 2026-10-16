@@ -19,7 +19,7 @@ namespace Alpaca4d.Gh
           : base("Explorer Image (Alpaca4d)", "Explorer Image",
             "Which views Explorer Record takes a picture of for each design, and at what size. " +
             "Without it, Explorer Record takes the active viewport at 800 × 600.",
-            "Alpaca4d", "12_Explorer")
+            "Alpaca4d", "12_Optimisation")
         {
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);
         }
