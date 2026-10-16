@@ -51,6 +51,9 @@ Everything that needs Grasshopper running. Check these in Rhino, on Windows and 
   vertex colours.
 * **Explorer Image** with two viewports writes two pictures per design and an `img:` column
   each; a named view is restored into the active viewport and the view is put back after.
+* Without a license **Explorer Inputs** is red with the license message and its Fly button refuses,
+  and **Explorer Record** refuses once Write is on; adding a license from the License window
+  runs both again without touching anything upstream.
 
 The page itself was checked in Chromium against the sample study, a study written by
 `StudyFile` and `GlbWriter`, and a Design Explorer study.

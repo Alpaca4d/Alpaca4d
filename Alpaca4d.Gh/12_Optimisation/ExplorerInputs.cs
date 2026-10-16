@@ -102,6 +102,13 @@ namespace Alpaca4d.Gh
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            // Needs a license whatever the study.
+            if (!LicenseGate.Allows(this, "Explorer Inputs"))
+            {
+                Message = Status("");
+                return;
+            }
+
             bool fly = false;
             DA.GetData(0, ref fly);
 
@@ -319,6 +326,14 @@ namespace Alpaca4d.Gh
             if (!GH_Document.EnableSolutions || !document.Enabled)
             {
                 Tell("The Grasshopper solver is disabled. Enable it to fly.");
+                return;
+            }
+            // The Fly button and the menu start a flight without a solution, so the license is
+            // checked here as well; the solution has already opened the License window if it was due.
+            string refusal = LicenseGate.Refusal("Explorer Inputs", showForm: false);
+            if (refusal != null)
+            {
+                Tell(refusal);
                 return;
             }
 

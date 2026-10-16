@@ -155,6 +155,15 @@ namespace Alpaca4d.Gh
                 return;
             }
 
+            // Saving a study needs a license; showing what a folder already holds does not.
+            if (!LicenseGate.Allows(this, "Explorer Record"))
+            {
+                _pending = null;
+                DA.SetData(1, _study.Count);
+                Message = Status($"Not recording\n{Designs(_study.Count)}");
+                return;
+            }
+
             // A design noted in the last solution and not written yet: something is solving the
             // definition without letting Rhino go idle in between, as Galapagos does. Write it now,
             // rather than lose it; its picture may show the design after it.
