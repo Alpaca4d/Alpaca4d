@@ -27,7 +27,9 @@ Point it elsewhere with `DOCS=/path/to/doc`, and at other builds with `GHA`, `GH
 1. **Export.cs** loads the plugin with Grasshopper's own types and writes every component shown
    in the toolbar to `components.json`, with its 24 px icon as a PNG. That covers the name,
    nickname, tab, inputs and outputs, message, the fold-out menus of extendable components, and
-   the button of those that draw one.
+   the button of those that draw one. Objects linked by grips of their own rather than wires,
+   such as Non-Linear Optimisation, come after the components: their grips are read from the
+   `...Grip` points their attributes declare, and what they show over themselves from `Status`.
 2. **nodepen.py** turns each component into an SVG: `<slug>.svg` as it is placed, plus
    `<slug>-open.svg` with every menu open for a component whose menus start closed.
 3. **render.mjs** renders them in Chromium, at twice their size and on a transparent
@@ -52,7 +54,10 @@ for the docs:
   Grasshopper hangs it;
 * the fold-out menus of extendable components inside the body, with their controls on a pale
   panel when open;
-* a button the component draws, such as Explorer Inputs' **Fly**, as a dark bar.
+* a button the component draws, such as Explorer Inputs' **Fly**, as a dark bar;
+* an object linked by grips rather than wires, such as Non-Linear Optimisation, with its grips
+  where it has them, on the left and underneath, each named inside the body, and what it shows
+  over itself above the body, as Grasshopper draws it.
 
 `python3 nodepen.py components.json out_dir --names` writes the nickname in the label column
 instead of the icon, as NodePen does by default.

@@ -9,7 +9,9 @@ using System.Text;
 using Grasshopper.Kernel;
 
 // Writes what the docs images need about every component shown in the toolbar - names, tab,
-// inputs and outputs, message - as JSON, and its 24 px icon as a PNG.
+// inputs and outputs, message - as JSON, and its 24 px icon as a PNG. Objects in the toolbar that
+// are linked by grips of their own rather than wires, such as Non-Linear Optimisation, come after
+// the components, with their grips in place of inputs and outputs.
 class Export
 {
     static void Main(string[] args)
@@ -22,16 +24,7 @@ class Export
         {
             var c = (GH_Component)Activator.CreateInstance(type);
             if (c.Exposure == GH_Exposure.hidden) continue;
-            string icon = "";
-            try
-            {
-                if (c.Icon_24x24 != null)
-                {
-                    icon = "icons/" + type.Name + ".png";
-                    c.Icon_24x24.Save(Path.Combine(outDir, icon), ImageFormat.Png);
-                }
-            }
-            catch (Exception) { icon = ""; }
+            string icon = SaveIcon(c, outDir);
             Func<IGH_Param, string> param = p => $"{{\"name\":{Q(p.Name)},\"nick\":{Q(p.NickName)},\"optional\":{(p.Optional ? "true" : "false")}}}";
             entries.Add("{" +
                 $"\"type\":{Q(type.Name)},\"name\":{Q(c.Name)},\"nick\":{Q(c.NickName)},\"category\":{Q(c.Category)},\"subcategory\":{Q(c.SubCategory)}," +
@@ -40,8 +33,32 @@ class Export
                 $"\"menus\":[{string.Join(",", MenusOf(c))}],\"button\":{Q(ButtonOf(c))}" +
                 "}");
         }
+        foreach (var type in Types(gha).Where(IsCanvasObject).OrderBy(t => t.Name))
+        {
+            var o = (GH_DocumentObject)Activator.CreateInstance(type);
+            if (o.Exposure == GH_Exposure.hidden) continue;
+            string icon = SaveIcon(o, outDir);
+            entries.Add("{" +
+                $"\"type\":{Q(type.Name)},\"name\":{Q(o.Name)},\"nick\":{Q(o.NickName)},\"category\":{Q(o.Category)},\"subcategory\":{Q(o.SubCategory)}," +
+                $"\"message\":{Q(StatusOf(o))},\"icon\":{Q(icon)},\"inputs\":[],\"outputs\":[],\"menus\":[],\"button\":\"\"," +
+                $"\"object\":true,\"grips\":[{string.Join(",", GripsOf(o))}]" +
+                "}");
+        }
         File.WriteAllText(Path.Combine(outDir, "components.json"), "[\n" + string.Join(",\n", entries) + "\n]\n", new UTF8Encoding(false));
         Console.WriteLine($"{entries.Count} components");
+    }
+
+    // Saves the 24 px icon as icons/<type>.png and returns that path, or "" when there is none.
+    static string SaveIcon(GH_DocumentObject o, string outDir)
+    {
+        try
+        {
+            if (o.Icon_24x24 == null) return "";
+            string icon = "icons/" + o.GetType().Name + ".png";
+            o.Icon_24x24.Save(Path.Combine(outDir, icon), ImageFormat.Png);
+            return icon;
+        }
+        catch (Exception) { return ""; }
     }
 
     // The fold-out menus of an extendable component: each menu, the inputs and outputs it holds,
@@ -125,6 +142,35 @@ class Export
     static string ButtonOf(GH_Component c)
     {
         return c.GetType().GetProperty("ButtonText", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(c) as string ?? "";
+    }
+
+    // An object in the toolbar that is neither a component nor a parameter, such as Non-Linear
+    // Optimisation: linked by dragging from grips of its own, as Galapagos is, rather than by wires.
+    static bool IsCanvasObject(Type t) =>
+        !t.IsAbstract && typeof(GH_DocumentObject).IsAssignableFrom(t) && !typeof(GH_Component).IsAssignableFrom(t) &&
+        !typeof(IGH_Param).IsAssignableFrom(t) && t.GetConstructor(Type.EmptyTypes) != null;
+
+    // Its grips, from the public "...Grip" points its attributes declare (not Grasshopper's own
+    // InputGrip and OutputGrip), once laid out at the origin: on the left edge of the body, or under it.
+    static IEnumerable<string> GripsOf(GH_DocumentObject o)
+    {
+        o.CreateAttributes();
+        var attributes = o.Attributes;
+        attributes.Pivot = new System.Drawing.PointF(0, 0);
+        attributes.ExpireLayout();
+        attributes.PerformLayout();
+        return attributes.GetType().GetProperties()
+            .Where(p => p.DeclaringType.Assembly == o.GetType().Assembly)
+            .Where(p => p.PropertyType == typeof(System.Drawing.PointF) && p.Name.EndsWith("Grip") && p.Name != "Grip")
+            .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 4), At = (System.Drawing.PointF)p.GetValue(attributes) })
+            .OrderBy(g => g.At.X)
+            .Select(g => $"{{\"name\":{Q(g.Name)},\"side\":{Q(Math.Abs(g.At.X - attributes.Pivot.X) < 0.5f ? "left" : "bottom")}}}");
+    }
+
+    /// <summary>What such an object shows over itself on the canvas, such as the algorithm it will run.</summary>
+    static string StatusOf(GH_DocumentObject o)
+    {
+        return o.GetType().GetProperty("Status", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(o) as string ?? "";
     }
 
     static object Get(object o, string name) => o.GetType().GetProperty(name)?.GetValue(o);

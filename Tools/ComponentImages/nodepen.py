@@ -9,6 +9,8 @@ Two additions to NodePen's look, for the docs: the component's message as a dark
 as Grasshopper hangs its message balloon there, and a larger icon in a wider label column. The tab is
 sized in the browser (render.mjs), which knows how wide the text really is. Extendable components
 show their fold-out menus inside the body, and a button they draw (Explorer Inputs' Fly) as a dark bar.
+An object linked by grips rather than wires (Non-Linear Optimisation) is drawn with its grips where
+it has them, on the left and underneath, and what it shows over itself above the body.
 
     python3 nodepen.py components.json out_dir [ComponentType ...] [--names]
 
@@ -286,6 +288,66 @@ def node_svg(component, icon_dir, names=False, open_all=False):
     return "\n".join(out)
 
 
+GRIP_LABEL = 11          # Overpass Mono at 18 px, per character
+STATUS_FONT = 13
+STATUS_H = 22
+
+
+def object_svg(obj, icon_dir):
+    """An object linked by grips of its own rather than wires, such as Non-Linear Optimisation: its
+    grips on the left edge and under the body, each named inside the body next to it, the icon in
+    the label column, and what it shows over itself on the canvas, as Grasshopper draws it there."""
+    left = [g["name"] for g in obj["grips"] if g["side"] == "left"]
+    bottom = [g["name"] for g in obj["grips"] if g["side"] == "bottom"]
+    rows = max(len(left), 1) + (1 if bottom else 0)
+    # The names under the body sit in cells of their own, side by side, each over its grip.
+    cells = [len(t) * GRIP_LABEL + 24 for t in bottom]
+    left_w = max([PORT_OFFSET + len(t) * GRIP_LABEL + 16 for t in left] + [sum(cells), PORT_MIN_W])
+    width = PAD + left_w + PAD + LABEL_W_ICON + PAD
+    height = 2 * PAD + max(MIN_H, rows * PORT_H)
+    status = (obj.get("message") or "").strip()
+
+    ox, oy = MARGIN + R, MARGIN + (STATUS_H if status else 0)
+    total_w = width + 2 * (MARGIN + R)
+    total_h = oy + height + R + 2 + MARGIN
+    mono = f'font-family="Overpass Mono, monospace" font-weight="600" font-size="{PORT_FONT}" fill="{DARK}"'
+
+    grips = [(ox, oy + PAD + PORT_H * (i + 0.5)) for i in range(len(left))]
+    bottom_x, x = [], ox + PAD
+    for w in cells:
+        bottom_x.append(x + w / 2)
+        x += w
+    grips += [(gx, oy + height) for gx in bottom_x]
+
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{total_h}" viewBox="0 0 {total_w} {total_h}">']
+    if status:
+        out.append(f'<text x="{ox + width / 2}" y="{MARGIN + STATUS_FONT}" font-family="Overpass Mono, monospace" font-weight="600" '
+                   f'font-size="{STATUS_FONT}" fill="{MUTED}" text-anchor="middle">{html.escape(status)}</text>')
+    # Shadow: the body and every grip again, 2 px lower, solid.
+    out.append(f'<rect x="{ox}" y="{oy + 2}" width="{width}" height="{height}" rx="7" ry="7" fill="{DARK}" stroke="{DARK}" stroke-width="2"/>')
+    for gx, gy in grips:
+        out.append(f'<rect x="{gx - R}" y="{gy - R}" width="{2 * R}" height="{2 * R + 2}" rx="{R}" ry="{R}" fill="{DARK}" stroke="{DARK}" stroke-width="2"/>')
+    out.append(f'<rect x="{ox}" y="{oy}" width="{width}" height="{height}" rx="7" ry="7" fill="{LIGHT}" stroke="{DARK}" stroke-width="2"/>')
+
+    lx = ox + PAD + left_w + PAD
+    out.append(f'<rect x="{lx}" y="{oy + PAD}" width="{LABEL_W_ICON}" height="{height - 2 * PAD}" rx="7" ry="7" fill="{LIGHT}" stroke="{DARK}" stroke-width="2"/>')
+    icon = obj.get("icon")
+    if icon and os.path.exists(os.path.join(icon_dir, icon)):
+        data = base64.b64encode(open(os.path.join(icon_dir, icon), "rb").read()).decode()
+        out.append(f'<image href="data:image/png;base64,{data}" x="{lx + LABEL_W_ICON / 2 - ICON / 2}" y="{oy + height / 2 - ICON / 2}" '
+                   f'width="{ICON}" height="{ICON}" preserveAspectRatio="xMidYMid meet"/>')
+
+    for (gx, gy), name in zip(grips[:len(left)], left):
+        out.append(f'<text x="{gx + PORT_OFFSET}" y="{gy + 1.5 + PORT_FONT / 4}" {mono}>{html.escape(name)}</text>')
+    label_y = oy + PAD + PORT_H * (rows - 0.5) + 1.5 + PORT_FONT / 4
+    for gx, name in zip(bottom_x, bottom):
+        out.append(f'<text x="{gx}" y="{label_y}" {mono} text-anchor="middle">{html.escape(name)}</text>')
+    for gx, gy in grips:
+        out.append(f'<circle cx="{gx}" cy="{gy}" r="{R}" fill="{LIGHT}" stroke="{DARK}" stroke-width="2"/>')
+    out.append("</svg>")
+    return "\n".join(out)
+
+
 def slug(name):
     """The file name of a component's image: "Run Analysis (Alpaca4d)" -> "run-analysis"."""
     stem = name.replace("(Alpaca4d)", "").strip().lower()
@@ -304,7 +366,7 @@ def main():
             continue
         name = slug(component["name"])
         with open(os.path.join(out_dir, name + ".svg"), "w") as f:
-            f.write(node_svg(component, icon_dir, names))
+            f.write(object_svg(component, icon_dir) if component.get("object") else node_svg(component, icon_dir, names))
         # A component with a menu that starts closed gets a second image with every menu open,
         # so every option it has can be seen in the docs.
         if any(not m["expanded"] for m in component.get("menus") or []):
