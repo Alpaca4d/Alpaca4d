@@ -130,3 +130,14 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
+
+## FEM-Design StruXml library
+
+Alpaca4DToFEM-Design (`Alpaca4d.Gh/10_Util`, `Alpaca4d.FemDesign`) writes FEM-Design models with
+the StruXml classes of StruSoft's FEM-Design API, femdesign-api-2.0, which ship with Alpaca4d as
+`FemDesign.Communication.dll`. The library holds FEM-Design's StruXml schema and its material and
+section libraries. `Alpaca4d.FemDesign/lib/build-net48.sh` builds it for .NET Framework 4.8 from a
+copy of femdesign-api-2.0's sources, adding only what .NET Framework lacks; see
+`Alpaca4d.FemDesign/lib/README.md`.
+
+Copyright (c) StruSoft AB.
