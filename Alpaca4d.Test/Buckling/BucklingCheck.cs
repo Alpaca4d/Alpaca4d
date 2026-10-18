@@ -37,10 +37,11 @@ class BucklingCheck
     sealed class Deck
     {
         readonly Dictionary<(long, long, long), int> at = new Dictionary<(long, long, long), int>();
-        readonly List<string> nodes = new List<string>(), fixes = new List<string>(), sections = new List<string>(),
-                              elements = new List<string>(), ties = new List<string>(), patterns = new List<string>();
+        readonly List<string> nodes = new List<string>(), fixes = new List<string>(), materials = new List<string>(),
+                              sections = new List<string>(), elements = new List<string>(), ties = new List<string>(),
+                              patterns = new List<string>();
         public readonly Dictionary<int, double[]> Coordinates = new Dictionary<int, double[]>();
-        int element = 0, section = 100, pattern = 0;
+        int element = 0, material = 0, section = 100, pattern = 0;
 
         public int Node(double x, double y, double z)
         {
@@ -62,9 +63,33 @@ class BucklingCheck
             return section;
         }
 
-        public int ShellSection(double t)
+        /// <summary>As ElasticIsotropicMaterial.WriteTcl.</summary>
+        public int Isotropic()
         {
-            sections.Add($"section ElasticMembranePlateSection {++section} {N(E)} {N(Nu)} {N(t)} 0.0\n");
+            materials.Add($"nDMaterial ElasticIsotropic {++material} {N(E)} {N(Nu)} 0.0\n");
+            return material;
+        }
+
+        /// <summary>As ElasticOrthotropicMaterial.WriteTcl.</summary>
+        public int Orthotropic(Orthotropy o)
+        {
+            materials.Add($"nDMaterial ElasticOrthotropic {++material} {N(o.E1)} {N(o.E2)} {N(o.E2)} {N(o.Nu12)} {N(o.Nu12)} {N(o.Nu12)} " +
+                          $"{N(o.G12)} {N(o.G12)} {N(o.G12)} 0.0\n");
+            return material;
+        }
+
+        /// <summary>As PlateFiberSection.WriteTcl, the section Alpaca4d gives a shell.</summary>
+        public int PlateFiber(int mat, double t)
+        {
+            sections.Add($"section PlateFiber {++section} {mat} {N(t)}\n");
+            return section;
+        }
+
+        /// <summary>As LayeredShellSection.WriteTcl, of equal layers of one material.</summary>
+        public int Layered(int mat, double t, int layers)
+        {
+            sections.Add($"section LayeredShell {++section} {layers}" +
+                         string.Concat(Enumerable.Repeat($" {mat} {N(t / layers)}", layers)) + "\n");
             return section;
         }
 
@@ -77,13 +102,23 @@ class BucklingCheck
             return tag;
         }
 
-        /// <summary>As ASDShellQ4.WriteTcl with -corotational.</summary>
-        public int Quad(int a, int b, int c, int d, int sec)
+        /// <summary>As ASDShellQ4.WriteTcl with -corotational, and -local when a local x is given.</summary>
+        public int Quad(int a, int b, int c, int d, int sec, double[] localX = null)
         {
             int tag = ++element;
-            elements.Add($"element ASDShellQ4 {tag} {a} {b} {c} {d} {sec} -corotational \n");
+            elements.Add($"element ASDShellQ4 {tag} {a} {b} {c} {d} {sec} -corotational {Local(localX)}\n");
             return tag;
         }
+
+        /// <summary>As ASDShellT3.WriteTcl with -corotational, and -local when a local x is given.</summary>
+        public int Triangle(int a, int b, int c, int sec, double[] localX = null)
+        {
+            int tag = ++element;
+            elements.Add($"element ASDShellT3 {tag} {a} {b} {c} {sec} -corotational {Local(localX)}\n");
+            return tag;
+        }
+
+        static string Local(double[] x) => x == null ? "" : $"-local {N(x[0])} {N(x[1])} {N(x[2])}";
 
         public void Tie(string tcl) => ties.Add(tcl + "\n");
 
@@ -98,7 +133,7 @@ class BucklingCheck
         public (List<string> tcl, int patternStart, int nodes) Build()
         {
             var tcl = new List<string> { "model BasicBuilder -ndm 3 -ndf 6\n" };
-            tcl.AddRange(nodes); tcl.AddRange(fixes); tcl.AddRange(sections);
+            tcl.AddRange(nodes); tcl.AddRange(fixes); tcl.AddRange(materials); tcl.AddRange(sections);
             tcl.AddRange(elements); tcl.AddRange(ties);
             int start = tcl.Count;
             tcl.AddRange(patterns);
@@ -279,43 +314,281 @@ class BucklingCheck
         Check($"extrapolated {F(richardson)} = {F(exact)}", Math.Abs(richardson / exact - 1) < 2e-3, Pct(richardson, exact));
     }
 
-    /// <summary>A square plate in the XY plane, simply supported, compressed along X, as ASDShellQ4 -corotational.</summary>
-    static Deck Plate(int n, double t = 0.01)
+    // ------------------------------------------------------------------ shells
+
+    /// <summary>An orthotropic material, axis 1 along the shell's local x; out of its plane as across it.</summary>
+    struct Orthotropy
+    {
+        public double E1, E2, Nu12, G12;
+
+        /// <summary>D11, D22, D12, D66 of a plate t thick: the plane stress PlateFiber condenses to, times t³/12.</summary>
+        public double[] D(double t)
+        {
+            double k = t * t * t / 12, q = 1 - Nu12 * Nu12 * E2 / E1;
+            return new[] { E1 / q * k, E2 / q * k, Nu12 * E2 / q * k, G12 * k };
+        }
+    }
+
+    /// <summary>
+    /// A plate a × b in the plane of global axes u and v (0 X, 1 Y, 2 Z), na × nb quads or, each
+    /// split in two with the diagonals alternating, triangles. Simply supported: every edge held
+    /// along the normal, the edge u = 0 along u, its first node along v and about the normal.
+    /// Hard, as Kirchhoff's plate is: each edge is also held from turning about its own normal.
+    /// The ASD shells are Mindlin plates, and with that rotation free their edges soften in a
+    /// layer as thin as the plate, which a fine mesh resolves: 44 x 44 quads were 0.4 % under k = 4.
+    /// </summary>
+    sealed class Plate
+    {
+        public readonly Deck Deck = new Deck();
+        public readonly int[,] Tag;
+        public readonly int Na, Nb, U, V;
+        public readonly double A, B;
+
+        public Plate(int na, int nb, double a, double b, Func<Deck, int> section, int u = 0, int v = 1,
+                     bool triangles = false, double[] localX = null, bool hard = true)
+        {
+            Na = na; Nb = nb; A = a; B = b; U = u; V = v;
+            int n = 3 - u - v;
+            Tag = new int[na + 1, nb + 1];
+            for (int i = 0; i <= na; i++)
+                for (int j = 0; j <= nb; j++)
+                {
+                    var x = new double[3];
+                    x[u] = a * i / na;
+                    x[v] = b * j / nb;
+                    Tag[i, j] = Deck.Node(x[0], x[1], x[2]);
+                }
+            int sec = section(Deck);
+            for (int i = 0; i < na; i++)
+                for (int j = 0; j < nb; j++)
+                {
+                    int p = Tag[i, j], q = Tag[i + 1, j], r = Tag[i + 1, j + 1], s = Tag[i, j + 1];
+                    if (!triangles)
+                        Deck.Quad(p, q, r, s, sec, localX);
+                    else if ((i + j) % 2 == 0)
+                    {
+                        Deck.Triangle(p, q, r, sec, localX);
+                        Deck.Triangle(p, r, s, sec, localX);
+                    }
+                    else
+                    {
+                        Deck.Triangle(p, q, s, sec, localX);
+                        Deck.Triangle(q, r, s, sec, localX);
+                    }
+                }
+            for (int i = 0; i <= na; i++)
+                for (int j = 0; j <= nb; j++)
+                {
+                    if (i > 0 && i < na && j > 0 && j < nb) continue;
+                    var held = new int[6];
+                    held[n] = 1;
+                    if (hard && (i == 0 || i == na)) held[3 + u] = 1;
+                    if (hard && (j == 0 || j == nb)) held[3 + v] = 1;
+                    if (i == 0) held[u] = 1;
+                    if (i == 0 && j == 0) { held[v] = 1; held[3 + n] = 1; }
+                    Deck.Fix(Tag[i, j], string.Join(" ", held));
+                }
+        }
+
+        /// <summary>A push along u on the edge u = a, n per unit length, lumped on its nodes.</summary>
+        public Plate Compressed(double n)
+        {
+            Deck.Pattern(Enumerable.Range(0, Nb + 1).Select(j =>
+                Load(Tag[Na, j], U, -n * B / Nb * (j == 0 || j == Nb ? 0.5 : 1.0))));
+            return this;
+        }
+
+        /// <summary>A shear flow q round all four edges, lumped on their nodes.</summary>
+        public Plate Sheared(double q)
+        {
+            var loads = new List<string>();
+            for (int j = 0; j <= Nb; j++)
+            {
+                double f = q * B / Nb * (j == 0 || j == Nb ? 0.5 : 1.0);
+                loads.Add(Load(Tag[Na, j], V, f));
+                loads.Add(Load(Tag[0, j], V, -f));
+            }
+            for (int i = 0; i <= Na; i++)
+            {
+                double f = q * A / Na * (i == 0 || i == Na ? 0.5 : 1.0);
+                loads.Add(Load(Tag[i, Nb], U, f));
+                loads.Add(Load(Tag[i, 0], U, -f));
+            }
+            Deck.Pattern(loads);
+            return this;
+        }
+    }
+
+    /// <summary>A force f along one global axis, as Alpaca4d writes the nodal share of a mesh load.</summary>
+    static string Load(int node, int axis, double f)
+    {
+        var load = new double[6];
+        load[axis] = f;
+        return $"load {node} {string.Join(" ", load.Select(N))}";
+    }
+
+    /// <summary>The square plate the dense-limit edge case uses: n × n quads, 1 x 1 m, 10 mm.</summary>
+    static Deck SquarePlate(int n) => new Plate(n, n, 1, 1, d => d.PlateFiber(d.Isotropic(), 0.01)).Compressed(P).Deck;
+
+    /// <summary>
+    /// A square tube b wide at the middle of its walls, t thick and L tall along Z, of shells: clamped
+    /// at the foot, P spread over the nodes of its head. Its walls meet at right angles.
+    /// </summary>
+    static Deck Tube(int perSide, int along, double b, double t, double L, bool diaphragm = false)
     {
         var d = new Deck();
-        var tag = new int[n + 1, n + 1];
-        for (int i = 0; i <= n; i++)
-            for (int j = 0; j <= n; j++)
-                tag[i, j] = d.Node((double)i / n, (double)j / n, 0);
-        int sec = d.ShellSection(t);
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                d.Quad(tag[i, j], tag[i + 1, j], tag[i + 1, j + 1], tag[i, j + 1], sec);
-        for (int i = 0; i <= n; i++)
-            for (int j = 0; j <= n; j++)
+        int around = 4 * perSide;
+        var ring = new int[along + 1, around];
+        for (int k = 0; k <= along; k++)
+            for (int s = 0; s < around; s++)
             {
-                bool edge = i == 0 || i == n || j == 0 || j == n;
-                if (i == 0 && j == 0) d.Fix(tag[i, j], "1 1 1 0 0 1");   // one drilling dof
-                else if (i == 0) d.Fix(tag[i, j], "1 0 1 0 0 0");
-                else if (edge) d.Fix(tag[i, j], "0 0 1 0 0 0");
+                double f = b * (s % perSide) / perSide - b / 2;
+                double[] xy = (s / perSide) == 0 ? new[] { f, -b / 2 } : (s / perSide) == 1 ? new[] { b / 2, f }
+                            : (s / perSide) == 2 ? new[] { -f, b / 2 } : new[] { -b / 2, -f };
+                ring[k, s] = d.Node(xy[0], xy[1], L * k / along);
             }
-        d.Pattern(Enumerable.Range(0, n + 1).Select(j =>
-            $"load {tag[n, j]} {N(-P / n * (j == 0 || j == n ? 0.5 : 1.0))} 0 0 0 0 0"));
+        int sec = d.PlateFiber(d.Isotropic(), t);
+        for (int k = 0; k < along; k++)
+            for (int s = 0; s < around; s++)
+                d.Quad(ring[k, s], ring[k, (s + 1) % around], ring[k + 1, (s + 1) % around], ring[k + 1, s], sec);
+        for (int s = 0; s < around; s++)
+            d.Fix(ring[0, s], "1 1 1 1 1 1");
+        if (diaphragm)
+        {
+            // The head held in shape by a rigid diaphragm: its nodes slaves, of a node in the middle.
+            int middle = d.Node(0, 0, L);
+            d.Fix(middle, "0 0 1 1 1 0");
+            d.Tie($"rigidDiaphragm 3 {middle} " + string.Join(" ", Enumerable.Range(0, around).Select(s => ring[along, s])));
+        }
+        d.Pattern(Enumerable.Range(0, around).Select(s => Load(ring[along, s], 2, -P / around)));
         return d;
     }
 
-    static void Plates(string os, bool sparse)
+    /// <summary>
+    /// A wall b wide along X and L tall along Z, of shells, held out of its plane: clamped at the
+    /// foot, P spread over its head, it can only sway in its own plane.
+    /// </summary>
+    static Deck Wall(int across, int along, double b, double t, double L)
     {
-        Console.WriteLine("Square plate 1 x 1 m, t = 10 mm, simply supported, uniaxial compression, as ASDShellQ4");
-        double dPlate = E * 1e-6 / (12 * (1 - Nu * Nu));
-        double exact = 4 * Math.PI * Math.PI * dPlate / P;
-        foreach (int n in new[] { 8, 16 })
+        var d = new Deck();
+        var tag = new int[across + 1, along + 1];
+        for (int i = 0; i <= across; i++)
+            for (int k = 0; k <= along; k++)
+            {
+                tag[i, k] = d.Node(b * i / across, 0, L * k / along);
+                d.Fix(tag[i, k], k == 0 ? "1 1 1 1 1 1" : "0 1 0 0 0 0");
+            }
+        int sec = d.PlateFiber(d.Isotropic(), t);
+        for (int i = 0; i < across; i++)
+            for (int k = 0; k < along; k++)
+                d.Quad(tag[i, k], tag[i + 1, k], tag[i + 1, k + 1], tag[i, k + 1], sec);
+        d.Pattern(Enumerable.Range(0, across + 1).Select(i => Load(tag[i, along], 2, -P / across * (i == 0 || i == across ? 0.5 : 1.0))));
+        return d;
+    }
+
+    static void Close(string what, double[] l, int mode, double exact, double tolerance)
+    {
+        bool found = l.Length > mode;
+        Check($"{what}: {(found ? F(l[mode]) : "none")} = {F(exact)}",
+              found && Math.Abs(l[mode] / exact - 1) < tolerance, found ? Pct(l[mode], exact) : "");
+    }
+
+    static void Shells(string os, bool sparse)
+    {
+        const double t = 0.01;
+        double unit = Math.PI * Math.PI * E * t * t * t / (12 * (1 - Nu * Nu)) / P;   // λ per k, a 1 m wide plate under P per m
+        Func<Deck, int> plateFiber = d => d.PlateFiber(d.Isotropic(), t);
+
+        Console.WriteLine("Shells as Assemble writes them: ASDShellQ4 / ASDShellT3 -corotational, PlateFiber sections");
+        Console.WriteLine("  plates t = 10 mm, simply supported, P = 1000 kN per m of edge");
+
+        var outcome = Run(os, sparse, new Plate(16, 16, 1, 1, plateFiber).Compressed(P).Deck, 1, 2);
+        Check("1 x 1 m, 16 x 16 quads: every ASDShellQ4 run linear, its stress stiffness added",
+              outcome.Deck.Shells.Count == 256 && !outcome.Deck.Model.Any(e => e.Contains("-corotational")));
+        Close("1 x 1 m, 16 x 16 quads, k = 4", outcome.Factors, 0, 4 * unit, 0.002);
+        if (outcome.Shapes.Count > 0)
         {
-            var outcome = Run(os, sparse, Plate(n), 1, 2);
-            Check($"{n} x {n}: the ASDShellQ4 became ShellNLDKGQ", outcome.Deck.QuadShellsReplaced == n * n);
-            var l = outcome.Factors;
-            Check($"{n} x {n}: {(l.Length > 0 ? F(l[0]) : "none")} = {F(exact)} (k = 4)",
-                  l.Length > 0 && Math.Abs(l[0] / exact - 1) < (n == 8 ? 0.005 : 0.002), l.Length > 0 ? Pct(l[0], exact) : "");
+            // The first mode is sin(πx) sin(πy), out of the plane.
+            var shape = outcome.Shapes[0];
+            var nodes = shape.Keys.ToList();
+            var deckNodes = outcome.Deck.Nodes;
+            Func<int, double> wave = n => Math.Sin(Math.PI * deckNodes[n].X) * Math.Sin(Math.PI * deckNodes[n].Y);
+            double dot = nodes.Sum(n => shape[n][2] * wave(n));
+            double fit = Math.Abs(dot) / Math.Sqrt(nodes.Sum(n => shape[n][2] * shape[n][2]) * nodes.Sum(n => wave(n) * wave(n)));
+            double inPlane = nodes.Max(n => Math.Max(Math.Abs(shape[n][0]), Math.Abs(shape[n][1])));
+            Check("its first shape is sin(πx) sin(πy) across the plate", fit > 0.9999, $"fit {fit:0.000000}, in plane at most {inPlane:g2}");
+        }
+
+        outcome = Run(os, sparse, new Plate(16, 16, 1, 1, plateFiber, triangles: true).Compressed(P).Deck, 1, 1);
+        Check("1 x 1 m, 2 x 16 x 16 triangles: every ASDShellT3 run linear, its stress stiffness added",
+              outcome.Deck.Shells.Count == 512 && !outcome.Deck.Model.Any(e => e.Contains("-corotational")));
+        Close("1 x 1 m, 2 x 16 x 16 triangles, k = 4", outcome.Factors, 0, 4 * unit, 0.01);
+
+        // LayeredShell takes each layer at its middle: with n equal layers its D is (1 - 1/n²) of t³/12.
+        outcome = Run(os, sparse, new Plate(16, 16, 1, 1, d => d.Layered(d.Isotropic(), t, 5)).Compressed(P).Deck, 1, 1);
+        Close("1 x 1 m, LayeredShell of 5 layers, k = 4 × (1 - 1/25)", outcome.Factors, 0, 4 * unit * (1 - 1.0 / 25), 0.002);
+
+        outcome = Run(os, sparse, new Plate(16, 16, 1, 1, plateFiber, u: 2, v: 1).Compressed(P).Deck, 1, 1);
+        Close("a wall in YZ, loaded from above, k = 4", outcome.Factors, 0, 4 * unit, 0.002);
+
+        // m half waves along a = 2 b: k = (m/2 + 2/m)², 4 at m = 2, 4.694 at m = 3, 6.25 at m = 1 and 4.
+        outcome = Run(os, sparse, new Plate(32, 16, 2, 1, plateFiber).Compressed(P).Deck, 1, 3);
+        var halfWaves = new[] { 2, 3, 1 };
+        for (int mode = 0; mode < 3; mode++)
+        {
+            double k = Math.Pow(halfWaves[mode] / 2.0 + 2.0 / halfWaves[mode], 2);
+            Close($"2 x 1 m, mode {mode + 1}, {halfWaves[mode]} half waves, k = {k:0.###}", outcome.Factors, mode, k * unit, 0.01);
+        }
+
+        // Shear: k = 9.34 for a square (Timoshenko & Gere, table 9-7), positive and negative alike.
+        foreach (int n in new[] { 16, 24 })
+        {
+            outcome = Run(os, sparse, new Plate(n, n, 1, 1, plateFiber).Sheared(P).Deck, 1, 1);
+            Close($"1 x 1 m in shear, {n} x {n} quads, k = 9.34", outcome.Factors, 0, 9.34 * unit, 0.01);
+        }
+
+        // Orthotropic, 10 : 1, on a 1.5 x 1 m plate. Local X decides which way the stiff axis lies.
+        var wood = new Orthotropy { E1 = 210e6, E2 = 21e6, Nu12 = 0.3, G12 = 10e6 };
+        var D = wood.D(t);
+        double H = D[2] + 2 * D[3];
+        Func<double, double, double> Ortho = (dx, dy) =>
+            Enumerable.Range(1, 8).Min(m => Math.PI * Math.PI * (dx * m * m / 2.25 + 2 * H + dy * 2.25 / (m * m))) / P;
+        Func<Deck, int> orthotropic = d => d.PlateFiber(d.Orthotropic(wood), t);
+        var cases = new (string what, bool triangles, double[] localX, double exact)[]
+        {
+            ("quads, no Local X: stiff along X", false, null, Ortho(D[0], D[1])),
+            ("quads, Local X = Y: stiff along Y", false, new[] { 0.0, 1, 0 }, Ortho(D[1], D[0])),
+            ("triangles, Local X = X", true, new[] { 1.0, 0, 0 }, Ortho(D[0], D[1])),
+            ("triangles, Local X = Y", true, new[] { 0.0, 1, 0 }, Ortho(D[1], D[0])),
+            ("quads, Local X = -X", false, new[] { -1.0, 0, 0 }, Ortho(D[0], D[1])),
+        };
+        foreach (var c in cases)
+        {
+            outcome = Run(os, sparse, new Plate(24, 16, 1.5, 1, orthotropic, triangles: c.triangles, localX: c.localX).Compressed(P).Deck, 1, 1);
+            Close($"orthotropic 1.5 x 1 m, {c.what}", outcome.Factors, 0, c.exact, 0.01);
+        }
+
+
+        // A cantilever tube 6 m tall: Euler, less its shear, P_E = π² E I / 4 L², I = 2/3 t b³ + b t³ / 6.
+        double b = 0.2, L = 6, I = 2.0 / 3 * t * b * b * b + b * t * t * t / 6;
+        double euler = Math.PI * Math.PI * E * I / (4 * L * L);
+        double tube = euler / (1 + euler / (G * 2 * b * t)) / P;
+        outcome = Run(os, sparse, Wall(4, 30, b, t, L), 1, 1);
+        Close("wall 0.2 m wide, 6 m tall, swaying in its own plane", outcome.Factors, 0,
+              Math.PI * Math.PI * E * t * b * b * b / 12 / (4 * L * L) / P, 0.01);
+        outcome = Run(os, sparse, Tube(2, 30, b, t, L), 1, 2);
+        Close("tube of shells, 0.2 m, 6 m tall, sways one way", outcome.Factors, 0, tube, 0.01);
+        Close("tube of shells, and the other", outcome.Factors, 1, tube, 0.01);
+        outcome = Run(os, sparse, Tube(2, 30, b, t, L, diaphragm: true), 1, 1);
+        Check("tube with a rigid diaphragm on its head: shells on tied nodes, so on penalty", outcome.Constraints.StartsWith("Penalty"));
+        Close("tube with a rigid diaphragm on its head", outcome.Factors, 0, tube, 0.01);
+
+        if (sparse)
+        {
+            var clock = Stopwatch.StartNew();
+            outcome = Run(os, sparse, new Plate(44, 44, 1, 1, plateFiber).Compressed(P).Deck, 1, 1);
+            Close($"{outcome.Equations} equations, 44 x 44 quads, k = 4, in {clock.Elapsed.TotalSeconds:0.0} s",
+                  outcome.Factors, 0, 4 * unit, 0.002);
         }
     }
 
@@ -460,7 +733,7 @@ class BucklingCheck
 
         if (!sparse)
         {
-            outcome = Run(os, false, Plate(32), 1, 1);
+            outcome = Run(os, false, SquarePlate(32), 1, 1);
             Check($"dense refuses {outcome.Equations} equations (over {Buckling.DenseLimit})",
                   outcome.Failure != null && outcome.Equations > Buckling.DenseLimit);
         }
@@ -493,7 +766,7 @@ class BucklingCheck
                 Columns(os, sparse);
                 Portals(os, sparse);
                 Greenhill(os, sparse);
-                Plates(os, sparse);
+                Shells(os, sparse);
                 Ties(os, sparse);
                 Edges(os, sparse);
                 Recorder(os, sparse);
