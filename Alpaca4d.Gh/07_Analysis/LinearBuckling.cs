@@ -25,9 +25,8 @@ namespace Alpaca4d.Gh
             "critical load factor α_cr - and the shapes it buckles into.\n" +
             "The loads are those of the assembled model at load factor 1, as one step of Run Analysis applies them. " +
             "The analysis is linear: elastic, about the undeformed shape, with the axial forces of a first-order analysis.\n" +
-            "For it every beam gets a PDelta transformation, and ASDShellQ4 / ASDShellT3 shells become ShellNLDKGQ / " +
-            "ShellNLDKGT, whose stress stiffness OpenSees gets right. Beam elements buckle in bending only: lateral-" +
-            "torsional and torsional buckling need warping, which they do not have.\n" +
+            "For it every beam gets a PDelta transformation. Beam elements buckle in bending only: lateral-torsional " +
+            "and torsional buckling need warping, which they do not have.\n" +
             "Connect the assembled model, then feed the buckled model to Nodal Displacements or View Results: its " +
             "steps are the buckling modes, step 0 the first.",
             "Alpaca4d", "07_Analysis")
@@ -174,12 +173,6 @@ namespace Alpaca4d.Gh
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Remark,
                     $"{deck.TransformsMadePDelta} beam transformation{(deck.TransformsMadePDelta == 1 ? " was" : "s were")} made " +
                     "PDelta for the analysis: that is what gives a beam a geometric stiffness.");
-            if (deck.QuadShellsReplaced + deck.TriangleShellsReplaced > 0)
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark,
-                    $"{deck.QuadShellsReplaced + deck.TriangleShellsReplaced} shell{(deck.QuadShellsReplaced + deck.TriangleShellsReplaced == 1 ? "" : "s")} " +
-                    "became ShellNLDKGQ / ShellNLDKGT for the analysis, the shells whose geometric stiffness OpenSees gets right: " +
-                    "ShellDKGT has none, and in OpenSees 3.8.0 the corotational ASDShellQ4 and ASDShellT3 leave the stress stiffness " +
-                    "of membrane forces out of their tangent, so they would not buckle.");
             if (deck.Solids > 0)
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Remark,
                     "Solid elements have no geometric stiffness in OpenSees: they stiffen the model without ever softening under load.");
