@@ -71,6 +71,8 @@
     <ProjectReference Include="..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" />
     <!-- Karamba3DToAlpaca4D. Only this project knows Karamba3D's API, and it ships none of Karamba's files. -->
     <ProjectReference Include="..\Alpaca4d.Karamba\Alpaca4d.Karamba.csproj" />
+    <!-- Alpaca4DToFEM-Design. Ships FEM-Design's StruXml library, FemDesign.Communication.dll, with Alpaca4d. -->
+    <ProjectReference Include="..\Alpaca4d.FemDesign\Alpaca4d.FemDesign.csproj" />
   </ItemGroup>
 
   <!-- ==========================================
@@ -103,6 +105,9 @@
        EMBEDDED RESOURCES (ICONS)
        ========================================== -->
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Alpaca to FEM-Design (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Analysis settings (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
