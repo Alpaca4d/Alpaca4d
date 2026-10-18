@@ -108,6 +108,7 @@ class FemDesignExportCheck
             Trusses();
             Sections();
             Shells();
+            ShellEdgeCases();
             Connections();
             Loads();
             Countries();
@@ -325,6 +326,55 @@ class FemDesignExportCheck
         }
     }
 
+    /// <summary>Openings that touch at a corner, duplicate elements, a section without thickness.</summary>
+    static void ShellEdgeCases()
+    {
+        Console.WriteLine("\nshell edge cases");
+        var m = new ExportModel();
+        int concrete = AddMaterial(m, new ExportMaterial { Name = "C30_37", E = 3.0e7, G = 1.6e7, Nu = 0.2, Rho = 2500 });
+        m.ShellSections.Add(new ExportShellSection { Thickness = 0.2, Material = concrete });
+        m.ShellSections.Add(new ExportShellSection { Thickness = 0.0, Material = concrete });
+
+        // A 3 x 3 floor without bays (1,1) and (2,2), which touch at (2,2); the first face starts there.
+        Shell(m, 0, new Point3d(2, 2, 0), new Point3d(2, 3, 0), new Point3d(1, 3, 0), new Point3d(1, 2, 0));
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (!(i == 1 && j == 1) && !(i == 2 && j == 2) && !(i == 1 && j == 2))
+                    Shell(m, 0, new Point3d(i, j, 0), new Point3d(i + 1, j, 0), new Point3d(i + 1, j + 1, 0), new Point3d(i, j + 1, 0));
+        // Two elements on the same corners and a neighbour, off to one side, at z = 5.
+        Shell(m, 0, new Point3d(0, 0, 5), new Point3d(1, 0, 5), new Point3d(1, 1, 5), new Point3d(0, 1, 5));
+        Shell(m, 0, new Point3d(0, 0, 5), new Point3d(1, 0, 5), new Point3d(1, 1, 5), new Point3d(0, 1, 5));
+        Shell(m, 0, new Point3d(1, 0, 5), new Point3d(2, 0, 5), new Point3d(2, 1, 5), new Point3d(1, 1, 5));
+        // A section without thickness.
+        Shell(m, 1, new Point3d(10, 0, 0), new Point3d(11, 0, 0), new Point3d(11, 1, 0), new Point3d(10, 1, 0));
+        // Pressure on all of them, as a load without an element gives.
+        var live = new ExportLoadCase { Name = "Live" };
+        for (int s = 0; s < m.Shells.Count; s++)
+            live.ShellLoads.Add(new ExportShellLoad { Shell = s, Pressure = new Vector3d(0, 0, -1) });
+        m.LoadCases.Add(live);
+
+        var (root, result) = Export("shell-edge-cases", m);
+        var plates = All(root, "slab").ToList();
+        var level0 = plates.Where(p => p.Descendants(Fd + "point").All(x => D(x, "z") == 0)).ToList();
+        var level5 = plates.Where(p => p.Descendants(Fd + "point").All(x => D(x, "z") == 5)).ToList();
+        Check("bays touching at a corner make one plate per element, never one that covers a bay", level0.Count == 7 && level0.All(p => p.Descendants(Fd + "contour").Count() == 1),
+            $"{level0.Count} plates at z = 0");
+        Check("... with a warning", result.Report.Entries.Any(e => e.Level == ReportLevel.Warning && e.Message.Contains("touches itself")), Messages(result));
+        Check("a duplicate element goes in once, its neighbour with it in one plate", level5.Count == 1 && level5[0].Descendants(Fd + "edge").Count() == 4, $"{level5.Count} plates at z = 5");
+        Check("... with a warning", result.Report.Entries.Any(e => e.Level == ReportLevel.Warning && e.Message.Contains("same corners")));
+        Check("a section without thickness is an error, not a plate", plates.Count == 8 && result.Report.Entries.Any(e => e.Level == ReportLevel.Error && e.Message.Contains("thickness")));
+
+        var loads = All(root, "surface_load").ToList();
+        double area = loads.Sum(l =>
+        {
+            var pts = l.Descendants(Fd + "edge").Select(e => e.Element(Fd + "point")).Select(x => (X: D(x, "x"), Y: D(x, "y"))).ToList();
+            double a = 0;
+            for (int i = 0; i < pts.Count; i++) a += pts[i].X * pts[(i + 1) % pts.Count].Y - pts[(i + 1) % pts.Count].X * pts[i].Y;
+            return Math.Abs(a / 2);
+        });
+        Check("the pressure covers the 7 + 2 bays loaded, not the missing ones", Near(area, 9.0), $"{loads.Count} loads over {area} m2");
+    }
+
     /// <summary>Springs, rigid links, Equal DOF, diaphragms and masses.</summary>
     static void Connections()
     {
@@ -337,6 +387,7 @@ class FemDesignExportCheck
         m.EqualDofs.Add(new EqualDOF(new Point3d(2, 0, 0), new Point3d(2, 0, 0.001), true, true, true, false, false, false));
         m.RigidDiaphragms.Add(new RigidDiaphragm(new List<Point3d> { new Point3d(0, 0, 3), new Point3d(4, 0, 3), new Point3d(4, 3, 3), new Point3d(0, 3, 3), new Point3d(2, 1, 3) }));
         m.Masses.Add(new MassLoad(new Point3d(0, 0, 0), new Vector3d(500, 500, 500), Vector3d.Zero));
+        m.Masses.Add(new MassLoad(new Point3d(2, 1.4, 3), new Vector3d(800, 800, 800), Vector3d.Zero));   // the diaphragm's retained node, at its nodes' centroid
         m.Masses.Add(new MassLoad(new Point3d(1, 0, 0), new Vector3d(500, 0, 0), Vector3d.Zero));
 
         var (root, result) = Export("connections", m);
@@ -355,7 +406,8 @@ class FemDesignExportCheck
         var diaphragm = All(root, "diaphragm").SingleOrDefault();
         Check("the diaphragm covers the hull of its nodes, leaving out the inner one", diaphragm != null && diaphragm.Descendants(Fd + "edge").Count() == 4);
         var masses = All(root, "mass").ToList();
-        Check("masses are in tonnes", masses.Count == 2 && masses.All(x => D(x, "value") == 0.5), string.Join(" ", masses.Select(x => (string)x.Attribute("value"))));
+        Check("masses are in tonnes", masses.Select(x => D(x, "value")).OrderBy(x => x).SequenceEqual(new[] { 0.5, 0.5, 0.8 }), string.Join(" ", masses.Select(x => (string)x.Attribute("value"))));
+        Check("a mass on a diaphragm's retained node is reported", result.Report.Entries.Any(e => e.Message.Contains("retained node")), Messages(result));
         Check("a mass along one direction only is reported", result.Report.Entries.Any(e => e.Message.Contains("every direction")));
     }
 
@@ -376,19 +428,22 @@ class FemDesignExportCheck
         m.LoadCases.Add(live);
         m.LoadCases.Add(new ExportLoadCase { Factor = 1.0, GravityFactor = 1.35 });
         var wind = new ExportLoadCase { Name = "Live", Factor = 0.9 };   // a second pattern called Live
+        var gusts = new ExportLoadCase { Name = "Wind @ 0deg <gusts>", Factor = 1.0 };
+        gusts.PointLoads.Add(new PointLoad(new Point3d(12, 0, 0), new Vector3d(1, 0, 0), Vector3d.Zero, null));
         wind.BeamLoads.Add(new ExportBeamLoad { Beam = 1, Force = new Vector3d(0, 1, 0) });
         m.LoadCases.Add(wind);
+        m.LoadCases.Add(gusts);
         m.LoadCases.Add(new ExportLoadCase { Name = "Empty" });
 
         var (root, result) = Export("loads", m);
         var cases = root.Element(Fd + "entities").Element(Fd + "loads").Elements(Fd + "load_case").ToList();
         var names = cases.Select(c => (string)c.Attribute("name")).ToList();
-        Check("a load case per pattern with loads, then the self-weight", names.SequenceEqual(new[] { "Live", "Live (2)", "Self-weight" }), string.Join(", ", names));
+        Check("a load case per pattern with loads, then the self-weight", names.SequenceEqual(new[] { "Live", "Live (2)", "Wind _ 0deg _gusts_", "Self-weight" }), string.Join(", ", names));
         Check("... the self-weight a dead-load case", (string)cases.Last().Attribute("type") == "dead_load");
         Check("the result lists them", result.LoadCases.SequenceEqual(names));
 
         var points = All(root, "point_load").ToList();
-        Check("a point load's force and moment are two loads", points.Count == 2 && points.Any(p => (string)p.Attribute("load_type") == "moment"), $"{points.Count}");
+        Check("a point load's force and moment are two loads", points.Count == 3 && points.Any(p => (string)p.Attribute("load_type") == "moment"), $"{points.Count}");
         var lines = All(root, "line_load").ToList();
         Check("two loads on one beam are one line load of their sum", lines.Count == 2 && lines.Any(l => l.Elements(Fd + "load").All(x => D(x, "val") == 5)), $"{lines.Count}");
 
@@ -397,7 +452,7 @@ class FemDesignExportCheck
         Check("one combination, Alpaca", combination != null && (string)combination.Attribute("name") == "Alpaca");
         if (factors != null)
             Check("... with the patterns' factors, and gravity's factor times its pattern's on the self-weight",
-                factors.Select(f => f.Gamma).SequenceEqual(new[] { 1.5, 0.9, 1.35 })
+                factors.Select(f => f.Gamma).SequenceEqual(new[] { 1.5, 0.9, 1.0, 1.35 })
                 && factors.Select(f => f.Guid).SequenceEqual(cases.Select(c => (string)c.Attribute("guid"))), string.Join(", ", factors.Select(f => f.Gamma)));
         Check("the empty pattern is remarked", result.Report.Entries.Any(e => e.Message.Contains("without loads")));
     }

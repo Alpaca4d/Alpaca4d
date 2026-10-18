@@ -39,6 +39,8 @@ namespace Alpaca4d.FemDesign
             public Point3d Origin;
             /// <summary>The region's normal: up for a plate, the first face's for a wall.</summary>
             public Vector3d Normal;
+            /// <summary>Whether a plate or wall was made of it, so that its loads have something to go on.</summary>
+            public bool Written;
         }
 
         private PointWelder welder;
@@ -104,6 +106,7 @@ namespace Alpaca4d.FemDesign
                             ? Slab_type.CreateUniformWall(region, section.Thickness, V(localX), V(localY), material.Guid, Ver_align.Center, name: NextName("W"))
                             : Slab_type.CreateUniformPlate(region, section.Thickness, V(localX), V(localY), material.Guid, Ver_align.Center, name: NextName("P"));
                         Add(slab, slab.Guid);
+                        group.Written = true;
                         if (isWall) wallCount++; else plateCount++;
                     }
                     catch (ArgumentException e)

@@ -140,7 +140,7 @@ namespace Alpaca4d.FemDesign
 
             string PressureKey(Vector3d v) => string.Join(",", new[] { v.X, v.Y, v.Z }.Select(x => x.ToString("R", CultureInfo.InvariantCulture)));
 
-            var parts = pressureOn.Where(pair => pair.Value.Length > NoLoad)
+            var parts = pressureOn.Where(pair => pair.Value.Length > NoLoad && groups[faces[pair.Key].Group].Written)
                                   .GroupBy(pair => (faces[pair.Key].Group, PressureKey(pair.Value)));
             foreach (var part in parts)
             {
