@@ -143,7 +143,22 @@ namespace Alpaca4d
         public bool IsModal { get; set; }
         public int NumberOfModes { get; set; }
 
+        /// <summary>
+        /// Set by Linear Buckling Analysis on the model it hands on: its steps are buckling modes,
+        /// step 0 the first, and its beams may be split.
+        /// </summary>
+        public bool IsBuckling { get; set; }
+
+        /// <summary>The load factors of the buckling modes, lowest first, when <see cref="IsBuckling"/>.</summary>
+        public List<double> BucklingFactors { get; set; } = new List<double>();
+
         public List<string> Tcl { get; set; } = new List<string> { };
+
+        /// <summary>
+        /// Where the load patterns begin in <see cref="Tcl"/>: Assemble writes them last, and a
+        /// linear buckling analysis needs the model without them first. -1 when not assembled.
+        /// </summary>
+        public int LoadPatternTclStart { get; set; } = -1;
 
         public bool HasSSpBrick
         {
@@ -1305,6 +1320,7 @@ namespace Alpaca4d
                 this.Tcl.Add(item.WriteTcl());
             }
 
+            this.LoadPatternTclStart = this.Tcl.Count;
             this.addLoadPattern(this.LoadPatterns);
         }
 
