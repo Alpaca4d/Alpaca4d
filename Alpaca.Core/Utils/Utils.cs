@@ -64,6 +64,27 @@ namespace Alpaca4d
         }
 
         /// <summary>
+        /// <see cref="RTreeSearch"/> on a <see cref="NodeIndex"/>: the node nearest each point,
+        /// as an index into the index's points, one per point in order, and an error naming
+        /// <paramref name="owner"/> for a point with no node within tolerance.
+        /// </summary>
+        public static List<int> NodeSearch(NodeIndex nodes, IList<Point3d> searchPoints, string owner = null)
+        {
+            var found = new List<int>(searchPoints.Count);
+            foreach (var pt in searchPoints)
+            {
+                int index = nodes.Nearest(pt);
+                if (index == -1)
+                    throw new Exception(
+                        $"{owner ?? "Something"} reaches {pt}, where the model has no node within the " +
+                        $"tolerance of {nodes.Tolerance}. Nodes are made by the elements that arrive at them, so a " +
+                        "point no element reaches has nothing to attach to.");
+                found.Add(index);
+            }
+            return found;
+        }
+
+        /// <summary>
         /// The search behind <see cref="RTreeSearch"/> for a single point: the index of the node
         /// nearest <paramref name="point"/> within <paramref name="tol"/>, or -1 when there is none.
         /// For a caller with somewhere else to look when a point finds nothing, where an exception
