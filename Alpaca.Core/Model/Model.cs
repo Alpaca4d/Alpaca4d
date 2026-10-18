@@ -20,12 +20,47 @@ namespace Alpaca4d
         public List<Point3d> UniquePoints { get; set; }
         public List<Point3d> UniquePointsThreeNDF { get; set; } = new List<Point3d>();
         public List<Point3d> UniquePointsSixNDF { get; set; } = new List<Point3d>();
+
+        /// <summary>
+        /// The nodes of each pool by where they stand, which Assemble finds every node through:
+        /// an element's ends, a support, a load. See <see cref="NodeIndex"/>.
+        /// </summary>
+        public NodeIndex NodeIndexThreeNDF { get; set; } = new NodeIndex(0.0);
+        public NodeIndex NodeIndexSixNDF { get; set; } = new NodeIndex(0.0);
+
         public PointCloud PointCloud { get; set; }
-        public PointCloud CloudPointThreeNDF { get; set; }
-        public PointCloud CloudPointSixNDF { get; set; }
+
+        // The clouds and trees of the nodes, for whoever still asks for them; Assemble itself goes
+        // through the node indexes. Made when first read, since building them costs as much as
+        // the rest of a large model.
+        private PointCloud _cloudPointThreeNDF, _cloudPointSixNDF;
+        private RTree _rTreeCloudPointThreeNDF, _rTreeCloudPointSixNDF;
+
+        public PointCloud CloudPointThreeNDF
+        {
+            get => _cloudPointThreeNDF ?? (_cloudPointThreeNDF = this.UniquePointsThreeNDF.Count > 0 ? new PointCloud(this.UniquePointsThreeNDF) : null);
+            set => _cloudPointThreeNDF = value;
+        }
+
+        public PointCloud CloudPointSixNDF
+        {
+            get => _cloudPointSixNDF ?? (_cloudPointSixNDF = this.UniquePointsSixNDF.Count > 0 ? new PointCloud(this.UniquePointsSixNDF) : null);
+            set => _cloudPointSixNDF = value;
+        }
+
         public RTree RTreeCloudPoint { get; set; }
-        public RTree RTreeCloudPointThreeNDF { get; set; }
-        public RTree RTreeCloudPointSixNDF { get; set; }
+
+        public RTree RTreeCloudPointThreeNDF
+        {
+            get => _rTreeCloudPointThreeNDF ?? (_rTreeCloudPointThreeNDF = this.UniquePointsThreeNDF.Count > 0 ? RTree.CreateFromPointArray(this.UniquePointsThreeNDF) : null);
+            set => _rTreeCloudPointThreeNDF = value;
+        }
+
+        public RTree RTreeCloudPointSixNDF
+        {
+            get => _rTreeCloudPointSixNDF ?? (_rTreeCloudPointSixNDF = this.UniquePointsSixNDF.Count > 0 ? RTree.CreateFromPointArray(this.UniquePointsSixNDF) : null);
+            set => _rTreeCloudPointSixNDF = value;
+        }
         public static int NumberOfBeam { get; set; }
         public List<Node> Nodes { get; set; } = new List<Node> { };
         public List<IBeam> Beams { get; set; } = new List<IBeam> { };
@@ -481,67 +516,61 @@ namespace Alpaca4d
             return (Model)this.MemberwiseClone();
         }
 
+        /// <summary>
+        /// The nodes of the model: every point an element or a constraint reaches, welded within
+        /// <see cref="Tollerance"/>, in the order they are reached - beams, shells, constraints for
+        /// the six degree of freedom nodes, solids for the three. Each point joins the node already
+        /// within tolerance of it, or becomes one, which is what Point3d.CullDuplicates kept, in the
+        /// same order, at a fraction of the cost.
+        /// </summary>
         public void GetUniquePoints(List<IBeam> beams, List<IShell> shells, List<IBrick> bricks, List<IConstraint> constraints)
         {
-            var threeNdfPoints = new List<Point3d>();
-            var sixNdfPoints = new List<Point3d>();
+            var three = new NodeIndex(this.Tollerance);
+            var six = new NodeIndex(this.Tollerance);
 
             foreach (var beam in beams)
             {
-                var PointAtStart = beam.Curve.PointAtStart;
-                var PointAtEnd = beam.Curve.PointAtEnd;
-                sixNdfPoints.Add(PointAtStart);
-                sixNdfPoints.Add(PointAtEnd);
+                six.Weld(beam.Curve.PointAtStart);
+                six.Weld(beam.Curve.PointAtEnd);
             }
 
             foreach (var shell in shells)
-            {
-                var points = shell.Mesh.Vertices.ToPoint3dArray();
-                sixNdfPoints.AddRange(points);
-
-            }
+                foreach (var point in shell.Mesh.Vertices.ToPoint3dArray())
+                    six.Weld(point);
 
             foreach (var brick in bricks)
-            {
-                var points = brick.Mesh.Vertices.ToPoint3dArray();
-                threeNdfPoints.AddRange(points);
-            }
+                foreach (var point in brick.Mesh.Vertices.ToPoint3dArray())
+                    three.Weld(point);
 
             foreach (var constraint in constraints)
             {
                 if(constraint.ConstraintType == Constraints.ConstraintType.RigidDiaphgram)
                 {
                     var rigid = (Alpaca4d.Constraints.RigidDiaphragm)constraint;
-                    sixNdfPoints.Add((Point3d)rigid.MasterNode);
-                    sixNdfPoints.AddRange(rigid.SlaveNodes);
+                    six.Weld((Point3d)rigid.MasterNode);
+                    foreach (var point in rigid.SlaveNodes)
+                        six.Weld(point);
                 }
                 else if (constraint.ConstraintType == Constraints.ConstraintType.EqualDof)
                 {
                     var equalDOF = (Alpaca4d.Constraints.EqualDOF)constraint;
-                    sixNdfPoints.Add((Point3d)equalDOF.MasterNode);
-                    sixNdfPoints.Add(equalDOF.SlaveNode);
+                    six.Weld((Point3d)equalDOF.MasterNode);
+                    six.Weld(equalDOF.SlaveNode);
                 }
                 else if (constraint.ConstraintType == Constraints.ConstraintType.RigidLink)
                 {
                     var rigidLink = (Alpaca4d.Constraints.RigidLink)constraint;
-                    sixNdfPoints.Add(rigidLink.RetainedNode);
-                    sixNdfPoints.Add(rigidLink.ConstrainedNode);
+                    six.Weld(rigidLink.RetainedNode);
+                    six.Weld(rigidLink.ConstrainedNode);
                 }
             }
 
-            if (threeNdfPoints.Any())
-            {
-                this.UniquePointsThreeNDF = Rhino.Geometry.Point3d.CullDuplicates(threeNdfPoints, this.Tollerance).ToList();
-                this.CloudPointThreeNDF = new Rhino.Geometry.PointCloud(this.UniquePointsThreeNDF);
-                this.RTreeCloudPointThreeNDF = Rhino.Geometry.RTree.CreateFromPointArray(this.UniquePointsThreeNDF);
-            }
-
-            if (sixNdfPoints.Any())
-            {
-                this.UniquePointsSixNDF = Rhino.Geometry.Point3d.CullDuplicates(sixNdfPoints, this.Tollerance).ToList();
-                this.CloudPointSixNDF = new Rhino.Geometry.PointCloud(this.UniquePointsSixNDF);
-                this.RTreeCloudPointSixNDF = Rhino.Geometry.RTree.CreateFromPointArray(this.UniquePointsSixNDF);
-            }
+            this.NodeIndexThreeNDF = three;
+            this.NodeIndexSixNDF = six;
+            this.UniquePointsThreeNDF = three.Points;
+            this.UniquePointsSixNDF = six.Points;
+            this._cloudPointThreeNDF = this._cloudPointSixNDF = null;
+            this._rTreeCloudPointThreeNDF = this._rTreeCloudPointSixNDF = null;
 
             if (!this.UniquePointsThreeNDF.Any())
                 this.UniquePoints = this.UniquePointsSixNDF;
@@ -553,8 +582,6 @@ namespace Alpaca4d
             {
                 this.UniquePoints = this.UniquePointsThreeNDF.Concat(this.UniquePointsSixNDF).ToList();
             }
-
-
         }
 
         /// <summary>
@@ -572,32 +599,39 @@ namespace Alpaca4d
         /// </summary>
         public int NodeTagAt(Point3d point, out int ndf, string owner)
         {
-            if (this.RTreeCloudPointSixNDF != null)
-            {
-                var found = Alpaca4d.Utils.NearestWithin(this.RTreeCloudPointSixNDF, point, this.Tollerance,
-                                                         this.UniquePointsSixNDF);
-                if (found >= 0)
-                {
-                    ndf = 6;
-                    return found + 1 + this.UniquePointsThreeNDF.Count;
-                }
-            }
-
-            if (this.RTreeCloudPointThreeNDF != null)
-            {
-                var found = Alpaca4d.Utils.NearestWithin(this.RTreeCloudPointThreeNDF, point, this.Tollerance,
-                                                         this.UniquePointsThreeNDF);
-                if (found >= 0)
-                {
-                    ndf = 3;
-                    return found + 1;
-                }
-            }
+            int tag = this.NodeTagNear(point, out ndf);
+            if (tag > 0)
+                return tag;
 
             throw new Exception($"{owner} sits at {point}, where the model has no node. A spring joins " +
                                 $"nodes that are already there; it does not make them. Move the end onto a " +
                                 $"beam end, a mesh vertex or another node, or raise the model tolerance " +
                                 $"(currently {this.Tollerance}).");
+        }
+
+        /// <summary>
+        /// The tag of the node within tolerance of <paramref name="point"/> - six degree of freedom
+        /// nodes first, as <see cref="NodeTagAt"/> explains - and through <paramref name="ndf"/> its
+        /// degrees of freedom; 0 when there is none.
+        /// </summary>
+        public int NodeTagNear(Point3d point, out int ndf)
+        {
+            int found = this.NodeIndexSixNDF.Nearest(point);
+            if (found >= 0)
+            {
+                ndf = 6;
+                return found + 1 + this.UniquePointsThreeNDF.Count;
+            }
+
+            found = this.NodeIndexThreeNDF.Nearest(point);
+            if (found >= 0)
+            {
+                ndf = 3;
+                return found + 1;
+            }
+
+            ndf = 0;
+            return 0;
         }
 
         /// <summary>
@@ -804,14 +838,13 @@ namespace Alpaca4d
 
         private void CreateNodes()
         {
+            // A node's tag is its place in its pool, from one, the three degree of freedom pool first.
             if (this.UniquePointsThreeNDF.Count != 0)
             {
                 this.Tcl.Add(Model.Initialise3ndf());
-                foreach (var point in this.UniquePointsThreeNDF)
+                for (int i = 0; i < this.UniquePointsThreeNDF.Count; i++)
                 {
-                    var node = new Alpaca4d.Element.Node(point);
-                    node.Ndf = 3;
-                    node.SetNodeTag(this); // it can accept a list
+                    var node = new Alpaca4d.Element.Node(this.UniquePointsThreeNDF[i]) { Ndf = 3, Id = i + 1 };
                     this.Nodes.Add(node);
 
                     this.Tcl.Add(node.WriteTcl());
@@ -821,11 +854,9 @@ namespace Alpaca4d
             if (this.UniquePointsSixNDF.Count != 0)
             {
                 this.Tcl.Add(Model.Initialise6ndf());
-                foreach (var point in this.UniquePointsSixNDF)
+                for (int i = 0; i < this.UniquePointsSixNDF.Count; i++)
                 {
-                    var node = new Alpaca4d.Element.Node(point);
-                    node.Ndf = 6;
-                    node.SetNodeTag(this);
+                    var node = new Alpaca4d.Element.Node(this.UniquePointsSixNDF[i]) { Ndf = 6, Id = i + 1 + this.UniquePointsThreeNDF.Count };
                     this.Nodes.Add(node);
 
                     this.Tcl.Add(node.WriteTcl());
@@ -835,46 +866,18 @@ namespace Alpaca4d
 
         private void CreateSupports()
         {
-            Rhino.Geometry.Point3d closestPointInThreeNDF = Rhino.Geometry.Point3d.Origin;
-            Rhino.Geometry.Point3d closestPointInSixNDF = Rhino.Geometry.Point3d.Origin;
-
-            //var uniquePoints = this.Supports.Select(x => x.Pos).ToHashSet();
-
-            //if (uniquePoints.Count != this.Supports.Count)
-            //{
-            //    var diff = this.Supports.Count - uniquePoints.Count;
-            //    throw new Exception($"{diff} duplicate support points found!");
-            //}
-
-
+            // A support lands on the node within tolerance of it, the six degree of freedom one when
+            // a point has one of each, as NodeTagAt has it. It used to have to be in both pools of
+            // a model with both, so no support of a mixed model could sit on a node of only one.
             foreach (var supportNode in this.Supports)
             {
-                if (this.UniquePointsThreeNDF.Count != 0)
-                {
-                    closestPointInThreeNDF = Rhino.Collections.Point3dList.ClosestPointInList(this.UniquePointsThreeNDF, supportNode.Pos);
-                    if (supportNode.Pos.DistanceTo(closestPointInThreeNDF) <= this.Tollerance)
-                    {
-                        supportNode.ndf = 3;
-                        this.ThreeNdfModel.Add(supportNode);
-                        supportNode.SetNodeTag(this);
-                    }
-                    else
-                        throw new Exception($"Support node at location '{supportNode.Pos}' is not part of the model!");
-                }
+                int tag = this.NodeTagNear(supportNode.Pos, out int ndf);
+                if (tag == 0)
+                    throw new Exception($"Support node at location '{supportNode.Pos}' is not part of the model!");
 
-                if (this.UniquePointsSixNDF.Count != 0)
-                {
-                    closestPointInSixNDF = Rhino.Collections.Point3dList.ClosestPointInList(this.UniquePointsSixNDF, supportNode.Pos);
-                    if (supportNode.Pos.DistanceTo(closestPointInSixNDF) <= this.Tollerance)
-                    {
-                        supportNode.ndf = 6;
-                        this.SixNdfModel.Add(supportNode);
-                        supportNode.SetNodeTag(this);
-                    }
-                    else
-                        throw new Exception($"Support node at location '{supportNode.Pos}' is not part of the model!");
-                }
-
+                supportNode.ndf = ndf;
+                supportNode.Id = tag;
+                (ndf == 3 ? this.ThreeNdfModel : this.SixNdfModel).Add(supportNode);
             }
 
             this.CreateSupportSprings();
@@ -1203,35 +1206,22 @@ namespace Alpaca4d
             // create equalDOF when the model has 3df and 6df together
             // TODO
 
-            var Id = new List<int>();
-            var IdB = new List<int>();
-
-            void SearchCallback(object sender, RTreeEventArgs e)
+            // Where a solid meets a beam or a shell, a three and a six degree of freedom node stand
+            // together: their translations are tied, every pair within tolerance, in the order of
+            // the solid's nodes.
+            if (this.UniquePointsThreeNDF.Count != 0 && this.UniquePointsSixNDF.Count != 0)
             {
-                Id.Add(e.Id);
-                IdB.Add(e.IdB);
-            }
-
-
-            var lenThreeNDF = this.UniquePointsThreeNDF.Count;
-            var lenSixNDF = this.UniquePointsSixNDF.Count;
-
-            if(lenThreeNDF != 0 && lenSixNDF != 0)
-            {
-                Console.WriteLine("brick and beam together");
-                Rhino.Geometry.RTree.SearchOverlaps(this.RTreeCloudPointThreeNDF, this.RTreeCloudPointSixNDF, this.Tollerance, SearchCallback);
-
-                int i = 0;
-                for(i = 0; i < Id.Count; i++)
+                for (int i = 0; i < this.UniquePointsThreeNDF.Count; i++)
                 {
-                    Console.WriteLine($"{Id[i]} {IdB[i]}");
-                    var node_i = this.UniquePointsThreeNDF[Id[i]];
-                    var node_j = this.UniquePointsSixNDF[IdB[i]];
-
-                    var equalConstraint = new Alpaca4d.Constraints.EqualDOF(node_i, node_j, true, true, true, false, false, false);
-                    equalConstraint.MasterNodeId = this.CloudPointThreeNDF.ClosestPoint(node_i) + 1;
-                    equalConstraint.SlaveNodeId = this.CloudPointSixNDF.ClosestPoint(node_j) + 1 + (this.UniquePointsThreeNDF.Count);
-                    this.Tcl.Add(equalConstraint.WriteTcl());
+                    var node_i = this.UniquePointsThreeNDF[i];
+                    foreach (int j in this.NodeIndexSixNDF.Within(node_i))
+                    {
+                        var node_j = this.UniquePointsSixNDF[j];
+                        var equalConstraint = new Alpaca4d.Constraints.EqualDOF(node_i, node_j, true, true, true, false, false, false);
+                        equalConstraint.MasterNodeId = i + 1;
+                        equalConstraint.SlaveNodeId = j + 1 + this.UniquePointsThreeNDF.Count;
+                        this.Tcl.Add(equalConstraint.WriteTcl());
+                    }
                 }
             }
 

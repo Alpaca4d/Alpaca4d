@@ -154,8 +154,7 @@ namespace Alpaca4d.Element
         {
             var ends = new[] { this.Curve.PointAtStart, this.Curve.PointAtEnd };
 
-            var nodes = Alpaca4d.Utils.RTreeSearch(model.RTreeCloudPointSixNDF, ends, model.Tollerance,
-                                                   $"Beam With Hinges {this.Id}", model.UniquePointsSixNDF);
+            var nodes = Alpaca4d.Utils.NodeSearch(model.NodeIndexSixNDF, ends, $"Beam With Hinges {this.Id}");
 
             this.INode = nodes[0] + 1 + model.UniquePointsThreeNDF.Count;
             this.JNode = nodes[1] + 1 + model.UniquePointsThreeNDF.Count;
