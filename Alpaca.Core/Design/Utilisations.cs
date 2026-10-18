@@ -28,9 +28,33 @@ namespace Alpaca4d.Design
         /// back with its type and nothing checked.
         /// </summary>
         /// <param name="elementLengths">Each beam's length, node to node, in the order of Model.Beams.</param>
-        /// <param name="bucklingLengths">Each beam's L_cr, or null to take its length.</param>
+        /// <param name="bucklingLengths">Each beam's L_cr about both axes and its L_LT, or null to take its length.</param>
         public static List<MemberUtilisation> Of(Model model, int step, IReadOnlyList<double> elementLengths,
                                                  IReadOnlyList<double> bucklingLengths, DesignSettings settings)
+        {
+            var members = new List<SteelMember>();
+            for (int i = 0; i < model.Beams.Count; i++)
+            {
+                double length = elementLengths != null && i < elementLengths.Count ? elementLengths[i] : 0.0;
+                double lcr = bucklingLengths != null && i < bucklingLengths.Count ? bucklingLengths[i] : length;
+                members.Add(new SteelMember
+                {
+                    Length = length,
+                    BucklingLengthY = lcr,
+                    BucklingLengthZ = lcr,
+                    LateralTorsionalLength = length,
+                });
+            }
+
+            return Of(model, step, members, settings);
+        }
+
+        /// <summary>
+        /// The utilisation of every beam in the model at one recorded step, in the order of Model.Beams,
+        /// each with what its check needs to know about how it is held and loaded.
+        /// </summary>
+        /// <param name="members">One per beam, in the order of Model.Beams: its length, node to node, and its buckling lengths.</param>
+        public static List<MemberUtilisation> Of(Model model, int step, IReadOnlyList<SteelMember> members, DesignSettings settings)
         {
             settings = settings ?? new DesignSettings();
             var output = new List<MemberUtilisation>();
@@ -78,8 +102,8 @@ namespace Alpaca4d.Design
                     continue;
                 }
 
-                double length = elementLengths != null && i < elementLengths.Count ? elementLengths[i] : 0.0;
-                double lcr = bucklingLengths != null && i < bucklingLengths.Count ? bucklingLengths[i] : length;
+                var member = members != null && i < members.Count && members[i] != null ? members[i] : new SteelMember();
+                double length = member.Length;
 
                 var forces = new List<SectionForces>();
                 for (int k = 0; k < n[i].Count; k++)
@@ -92,7 +116,7 @@ namespace Alpaca4d.Design
                     if (stations.Count != forces.Count) stations = null;
                 }
 
-                output.Add(SteelCheck.Run(section, forces, lcr, settings.GammaM0, settings.GammaM1, stations, settings.Report));
+                output.Add(SteelCheck.Run(section, forces, member, settings.GammaM0, settings.GammaM1, stations, settings.Report));
             }
 
             return output;
