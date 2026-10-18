@@ -87,22 +87,23 @@ namespace Alpaca4d.Gh
 
         // The body in Alpaca light green, the green of the logo's hindquarters, with dark-tech
         // labels (7.4 : 1). Grasshopper shows selection in green, which a green body would hide,
-        // so a selected optimiser is lighter and outlined in dark tech instead. Orange while
-        // running, as Explorer Inputs is while flying.
+        // so a selected optimiser turns Alpaca light blue instead (4 : 1), with no outline.
+        // Orange while running, as Explorer Inputs is while flying, unless it is selected.
         private static readonly Color Body = Alpaca4d.Colors.AlpacaLightGreen;
         private static readonly Color BodyEdge = Color.FromArgb(105, 121, 29);
-        private static readonly Color BodySelected = Color.FromArgb(198, 217, 110);
         private static readonly Color BodyText = Alpaca4d.Colors.DarkTech;
         private static readonly Color BodyTextFaint = Color.FromArgb(104, 118, 46);
-        private static readonly Color SelectedEdge = Alpaca4d.Colors.DarkTech;
+        private static readonly Color Selection = Alpaca4d.Colors.AlpacaLightBlue;
+        private static readonly Color SelectionEdge = Color.FromArgb(40, 82, 148);
+        private static readonly Color SelectionTextFaint = Color.FromArgb(28, 72, 140);
 
         private GH_PaletteStyle Style()
         {
+            if (Selected)
+                return new GH_PaletteStyle(Selection, SelectionEdge, BodyText);
             if (Owner.IsRunning)
-                return new GH_PaletteStyle(Alpaca4d.Colors.AlpacaOrange, Selected ? SelectedEdge : Color.FromArgb(150, 70, 41), Alpaca4d.Colors.DarkTech);
-            return Selected
-                ? new GH_PaletteStyle(BodySelected, SelectedEdge, BodyText)
-                : new GH_PaletteStyle(Body, BodyEdge, BodyText);
+                return new GH_PaletteStyle(Alpaca4d.Colors.AlpacaOrange, Color.FromArgb(150, 70, 41), BodyText);
+            return new GH_PaletteStyle(Body, BodyEdge, BodyText);
         }
 
         internal static Pen ThickWire(Color colour)
@@ -155,14 +156,10 @@ namespace Alpaca4d.Gh
 
             var style = Style();
             _capsule.Render(graphics, style);
-            // Selected: a 2 px outline, as the capsule's own edge is a hairline.
-            if (Selected && _capsule.OutlineShape != null)
-                using (var outline = new Pen(SelectedEdge, 2f))
-                    graphics.DrawPath(outline, _capsule.OutlineShape);
 
             using (var format = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap })
             using (var text = new SolidBrush(style.Text))
-            using (var faint = new SolidBrush(Owner.IsRunning ? style.Text : BodyTextFaint))
+            using (var faint = new SolidBrush(Selected ? SelectionTextFaint : Owner.IsRunning ? style.Text : BodyTextFaint))
             {
                 graphics.DrawString("Variables", GH_FontServer.StandardAdjusted, text, VariablesBox, format);
                 graphics.DrawString("Objective", GH_FontServer.StandardAdjusted, text, ObjectiveBox, format);
