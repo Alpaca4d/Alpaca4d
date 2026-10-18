@@ -267,10 +267,10 @@ namespace Alpaca4d
         {
             Dictionary<int?, Vector3d> result = new Dictionary<int?, Vector3d>();
             var _resultType = this.IsModal == false ? Result.ResultType.DISPLACEMENT : Result.ResultType.MODES_OF_VIBRATION_U;
-            var dispVector = Alpaca4d.Result.Read.NodalOutput(this, step, _resultType);
+            var dispVector = Alpaca4d.Result.Read.NodalOutput(this, step, _resultType).ToList();
             foreach(var node in this.Nodes)
             {
-                result.Add(node.Id, dispVector.ElementAt( (int)node.Id - 1));
+                result.Add(node.Id, dispVector[(int)node.Id - 1]);
             }
             return result;
         }
