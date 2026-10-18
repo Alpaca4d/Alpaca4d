@@ -176,6 +176,29 @@ namespace Alpaca4d
             return FromEntries(a.Size, rows.ToArray(), cols.ToArray(), vals.ToArray(), vals.Count);
         }
 
+        /// <summary>The matrix with more entries added to it, summed where they meet its own.</summary>
+        public SparseMatrix Plus(IList<int> rows, IList<int> columns, IList<double> values)
+        {
+            int own = NonZeros, count = own + values.Count;
+            var r = new int[count];
+            var c = new int[count];
+            var v = new double[count];
+            for (int i = 0; i < Size; i++)
+                for (int k = RowStart[i]; k < RowStart[i + 1]; k++)
+                {
+                    r[k] = i;
+                    c[k] = Columns[k];
+                    v[k] = Values[k];
+                }
+            for (int k = 0; k < values.Count; k++)
+            {
+                r[own + k] = rows[k];
+                c[own + k] = columns[k];
+                v[own + k] = values[k];
+            }
+            return FromEntries(Size, r, c, v, count);
+        }
+
         /// <summary>The matrix with its rows and columns renumbered: entry (i, j) moves to (map[i], map[j]).</summary>
         public SparseMatrix Renumbered(int[] map)
         {
