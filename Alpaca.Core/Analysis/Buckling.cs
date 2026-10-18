@@ -16,9 +16,10 @@ namespace Alpaca4d
     ///
     /// For that the deck is rewritten (<see cref="Rewrite"/>): beams get a PDelta transformation,
     /// which is what gives them a geometric stiffness, and may be split, because PDelta only sees
-    /// the sway of each element's chord. Shells become ShellNLDKGQ / ShellNLDKGT: the corotational
-    /// ASDShellQ4 and ASDShellT3 of OpenSees 3.8.0 leave the stress stiffness of membrane forces out
-    /// of their tangent, so they would never buckle. Everything else in the deck stays as it was.
+    /// the sway of each element's chord. No shell of OpenSees has the whole of its stress
+    /// stiffness, so shells run linear, OpenSees reports their membrane forces under the load, and
+    /// <see cref="ShellStiffness"/> adds their stress stiffness to K_geo. Everything else in the
+    /// deck stays as it was.
     ///
     /// Two runs. The first (<see cref="ExportDeck"/>) prints the matrices; the second
     /// (<see cref="ModesDeck"/>) writes the buckled shapes to an MPCO file as steps, one per mode,
@@ -65,6 +66,15 @@ namespace Alpaca4d
             public int Perpendicular;
         }
 
+        /// <summary>A shell of the deck, whose stress stiffness <see cref="ShellStiffness"/> adds.</summary>
+        public sealed class Shell
+        {
+            public int Tag;
+            public int[] Nodes;
+            /// <summary>The -local it was given, which its membrane forces are reported along; null for none.</summary>
+            public double[] LocalX;
+        }
+
         /// <summary>The deck as the buckling analysis runs it, and what it takes to read the results back.</summary>
         public sealed class Deck
         {
@@ -86,8 +96,10 @@ namespace Alpaca4d
             public List<Tie> Ties { get; } = new List<Tie>();
 
             public int TransformsMadePDelta;
-            public int QuadShellsReplaced;
-            public int TriangleShellsReplaced;
+
+            /// <summary>The shells, run linear, whose stress stiffness is added to K_geo.</summary>
+            public List<Shell> Shells { get; } = new List<Shell>();
+
             public int Solids;
             public int PatternsDropped;
             public List<string> Warnings { get; } = new List<string>();
@@ -240,17 +252,13 @@ namespace Alpaca4d
             switch (type)
             {
                 case "ASDShellQ4":
-                case "ShellDKGQ":
                 case "ShellMITC4":
-                    if (t.Length < 8) break;
-                    deck.QuadShellsReplaced++;
-                    return $"element ShellNLDKGQ {t[2]} {t[3]} {t[4]} {t[5]} {t[6]} {t[7]}\n";
-
+                case "ShellDKGQ":
+                case "ShellNLDKGQ":
                 case "ASDShellT3":
                 case "ShellDKGT":
-                    if (t.Length < 7) break;
-                    deck.TriangleShellsReplaced++;
-                    return $"element ShellNLDKGT {t[2]} {t[3]} {t[4]} {t[5]} {t[6]}\n";
+                case "ShellNLDKGT":
+                    return LinearShell(deck, t);
 
                 case "SSPbrick":
                 case "FourNodeTetrahedron":
@@ -268,6 +276,36 @@ namespace Alpaca4d
                     break;
             }
             return string.Join(" ", t) + "\n";
+        }
+
+        /// <summary>
+        /// A shell as the buckling analysis runs it: linear, so that its tangent is its material
+        /// stiffness alone, and noted, so that <see cref="ShellStiffness"/> adds the whole of its
+        /// stress stiffness. OpenSees has no shell that gives it all: the corotational ASDShellQ4
+        /// and ASDShellT3 leave the stress stiffness of membrane forces out of their tangent
+        /// (OpenSees#1843), and ShellNLDKGQ / ShellNLDKGT keep only the part out of their plane, so
+        /// a wall swaying in its own plane - the web of a box column - would never soften.
+        /// </summary>
+        private static string LinearShell(Deck deck, string[] t)
+        {
+            int count = t[1] == "ASDShellT3" || t[1].EndsWith("DKGT") ? 3 : 4;
+            var nodes = new int[count];
+            if (t.Length < 4 + count || !int.TryParse(t[2], out int tag) || Enumerable.Range(0, count).Any(i => !int.TryParse(t[3 + i], out nodes[i])))
+            {
+                deck.Warnings.Add($"Shell {(t.Length > 2 ? t[2] : "?")} could not be read, and has no stress stiffness in the analysis.");
+                return string.Join(" ", t) + "\n";
+            }
+
+            double[] localX = null;
+            int at = Array.IndexOf(t, "-local");
+            if (at >= 0 && at + 3 < t.Length)
+                localX = new[] { Number(t[at + 1]), Number(t[at + 2]), Number(t[at + 3]) };
+            deck.Shells.Add(new Shell { Tag = tag, Nodes = nodes, LocalX = localX });
+
+            var linear = t.Where(w => w != "-corotational").ToArray();
+            if (linear[1].StartsWith("ShellNL"))
+                linear[1] = "Shell" + linear[1].Substring("ShellNL".Length);
+            return string.Join(" ", linear) + "\n";
         }
 
         /// <summary>
@@ -465,7 +503,7 @@ namespace Alpaca4d
         /// <summary>Where the first run leaves the matrices and the equation numbers of the nodes.</summary>
         public sealed class Files
         {
-            public string KMat, KT, DofsMat, DofsT;
+            public string KMat, KT, DofsMat, DofsT, ShellForces;
 
             public static Files In(string folder, string stem, bool sparse)
             {
@@ -476,10 +514,11 @@ namespace Alpaca4d
                     KT = Path.Combine(folder, stem + "_Kt" + ext),
                     DofsMat = Path.Combine(folder, stem + "_dofs_mat.txt"),
                     DofsT = Path.Combine(folder, stem + "_dofs_t.txt"),
+                    ShellForces = Path.Combine(folder, stem + "_shell_forces.txt"),
                 };
             }
 
-            public IEnumerable<string> All => new[] { KMat, KT, DofsMat, DofsT };
+            public IEnumerable<string> All => new[] { KMat, KT, DofsMat, DofsT, ShellForces };
         }
 
         /// <summary>
@@ -498,8 +537,8 @@ namespace Alpaca4d
             string analysis =
                 // One Newton iteration: a single solve from no load, so the state is first order,
                 // as the buckling problem defines it - and then the resisting forces at that state,
-                // which Linear never asks for. ShellNLDKGQ only updates its stresses there; after a
-                // Linear step it would commit the stresses of before it and have no K_geo at all.
+                // which Linear never asks for: the forces the elements commit, and report, are
+                // those of the loaded state.
                 "numberer Plain\n" +
                 "test FixedNumIter 1 0\n" +
                 "algorithm Newton\n" +
@@ -548,9 +587,23 @@ namespace Alpaca4d
                 $"if {{[analyze 1] != 0}} {{ puts \"{Label} failed loaded\"; exit }}\n" +
                 PrintMatrix(files.KT, sparse) +
                 $"alpaca4dDofs {TclPath.Write(files.DofsT)}\n" +
+                PrintShellForces(deck, files.ShellForces) +
                 $"puts \"{Label} done\"\n" +
                 "wipe\n");
             return lines;
+        }
+
+        /// <summary>"tag p11 p22 p12 m11 ... q2 p11 ..." per shell: its forces at each Gauss point, eight to a point.</summary>
+        private static string PrintShellForces(Deck deck, string path)
+        {
+            if (deck.Shells.Count == 0)
+                return "";
+            var tags = new StringBuilder();
+            for (int i = 0; i < deck.Shells.Count; i++)
+                tags.Append(i % 20 == 0 ? "\n    " : " ").Append(deck.Shells[i].Tag);
+            return $"set f [open {TclPath.Write(path)} w]\n" +
+                   $"foreach e {{{tags}\n}} {{ puts $f \"$e [eleResponse $e stresses]\" }}\n" +
+                   "close $f\n";
         }
 
         private static string PrintMatrix(string path, bool sparse)
@@ -766,6 +819,235 @@ namespace Alpaca4d
             }
             return dofs;
         }
+
+        // ----------------------------------------------------------------- the stress stiffness of shells
+
+        /// <summary>
+        /// The membrane forces of each shell, N11, N22, N12 along its section axes, averaged over its
+        /// Gauss points, by tag, from the lines <see cref="PrintShellForces"/> writes.
+        /// </summary>
+        public static Dictionary<int, double[]> ReadShellForces(string path)
+        {
+            var forces = new Dictionary<int, double[]>();
+            foreach (var line in File.ReadLines(path))
+            {
+                var t = Tokens(line);
+                if (t.Length < 9 || (t.Length - 1) % 8 != 0 || !int.TryParse(t[0], out int tag))
+                    continue;
+                int points = (t.Length - 1) / 8;
+                var n = new double[3];
+                for (int p = 0; p < points; p++)
+                    for (int k = 0; k < 3; k++)
+                        n[k] += Number(t[1 + 8 * p + k]) / points;
+                forces[tag] = n;
+            }
+            return forces;
+        }
+
+        /// <summary>
+        /// The stress stiffness of the shells, as K_geo has it (K_mat − K_T), entry by equation:
+        /// k = ∫ Gᵀ N G dA, N the membrane forces of a shell, along its section axes, and G the
+        /// gradients of what a membrane force turns. In its plane those are the two translations
+        /// along it, interpolated as its membrane is, bilinear or linear. Out of it, the slopes of
+        /// a discrete Kirchhoff plate (<see cref="DiscreteKirchhoff"/>), from the deflection and
+        /// the two rotations in its plane at each node, as ShellNLDKGQ and ShellNLDKGT take them -
+        /// which converges much faster than the slopes of a bilinear deflection. Equations are as
+        /// <paramref name="dofs"/> gives them, so a shell's nodes must have their own: none of them
+        /// the slave of a tie under Transformation.
+        /// </summary>
+        public static (List<int> rows, List<int> columns, List<double> values) ShellStiffness(
+            Deck deck, Dictionary<int, double[]> forces, Dictionary<int, int[]> dofs)
+        {
+            var rows = new List<int>();
+            var columns = new List<int>();
+            var values = new List<double>();
+            foreach (var shell in deck.Shells)
+            {
+                if (!forces.TryGetValue(shell.Tag, out var n))
+                    throw new InvalidDataException($"OpenSees reported no forces for shell {shell.Tag}.");
+                int count = shell.Nodes.Length;
+                var c = shell.Nodes.Select(tag => deck.Nodes.TryGetValue(tag, out var node)
+                    ? new[] { node.X, node.Y, node.Z }
+                    : throw new InvalidDataException($"Shell {shell.Tag} has a node, {tag}, the deck does not.")).ToArray();
+
+                var k = ShellStressStiffness(c, shell.LocalX, n);
+                for (int a = 0; a < count; a++)
+                {
+                    if (!dofs.TryGetValue(shell.Nodes[a], out var da))
+                        continue;
+                    for (int b = 0; b < count; b++)
+                    {
+                        if (!dofs.TryGetValue(shell.Nodes[b], out var db))
+                            continue;
+                        for (int p = 0; p < 6 && p < da.Length; p++)
+                            for (int q = 0; q < 6 && q < db.Length; q++)
+                            {
+                                double v = k[6 * a + p, 6 * b + q];
+                                if (v == 0.0 || da[p] < 0 || db[q] < 0)
+                                    continue;
+                                rows.Add(da[p]);
+                                columns.Add(db[q]);
+                                values.Add(-v);
+                            }
+                    }
+                }
+            }
+            return (rows, columns, values);
+        }
+
+        /// <summary>
+        /// The stress stiffness of one shell, three or four nodes at <paramref name="c"/>, on the
+        /// six dofs of each node along the global axes. Its section axes, which OpenSees reports
+        /// the forces along: e3 normal to it - across the diagonals of a quad - and e1 along its
+        /// -local flattened onto it or, without one, as ASDShellQ4 and ShellMITC4 take it, from
+        /// the middle of side 4-1 to the middle of side 2-3, or as ASDShellT3 and ShellDKGT do, from
+        /// node 1 to node 2.
+        /// </summary>
+        private static double[,] ShellStressStiffness(double[][] c, double[] localX, double[] n)
+        {
+            int count = c.Length;
+            bool quad = count == 4;
+            var normal = quad ? Cross(Minus(c[2], c[0]), Minus(c[3], c[1])) : Cross(Minus(c[1], c[0]), Minus(c[2], c[0]));
+            var e3 = Scaled(normal, 1 / Math.Sqrt(Dot(normal, normal)));
+            var along = localX ?? (quad ? Minus(Plus(c[1], c[2]), Plus(c[0], c[3])) : Minus(c[1], c[0]));
+            var e1 = Minus(along, Scaled(e3, Dot(along, e3)));
+            e1 = Scaled(e1, 1 / Math.Sqrt(Dot(e1, e1)));
+            var e2 = Cross(e3, e1);
+            var x = c.Select(p => Dot(Minus(p, c[0]), e1)).ToArray();
+            var y = c.Select(p => Dot(Minus(p, c[0]), e2)).ToArray();
+
+            var membrane = new double[count, count];
+            var plate = new double[3 * count, 3 * count];
+            if (quad)
+            {
+                double[] xi = { -1, 1, 1, -1 }, eta = { -1, -1, 1, 1 };
+                double g = 1 / Math.Sqrt(3);
+                foreach (var (s, r) in new[] { (-g, -g), (g, -g), (g, g), (-g, g) })
+                {
+                    double j11 = 0, j12 = 0, j21 = 0, j22 = 0;
+                    var ds = new double[4];
+                    var dr = new double[4];
+                    for (int a = 0; a < 4; a++)
+                    {
+                        ds[a] = 0.25 * xi[a] * (1 + eta[a] * r);
+                        dr[a] = 0.25 * eta[a] * (1 + xi[a] * s);
+                        j11 += ds[a] * x[a]; j12 += ds[a] * y[a];
+                        j21 += dr[a] * x[a]; j22 += dr[a] * y[a];
+                    }
+                    double det = j11 * j22 - j12 * j21;
+                    var dx = new double[4];
+                    var dy = new double[4];
+                    for (int a = 0; a < 4; a++)
+                    {
+                        dx[a] = (j22 * ds[a] - j12 * dr[a]) / det;
+                        dy[a] = (-j21 * ds[a] + j11 * dr[a]) / det;
+                    }
+                    AddStressStiffness(membrane, dx, dy, n, Math.Abs(det));
+
+                    var corner = new double[4];
+                    for (int a = 0; a < 4; a++)
+                        corner[a] = 0.25 * (1 + xi[a] * s) * (1 + eta[a] * r) * (xi[a] * s + eta[a] * r - 1);
+                    var middle = new[] { 0.5 * (1 - s * s) * (1 - r), 0.5 * (1 + s) * (1 - r * r), 0.5 * (1 - s * s) * (1 + r), 0.5 * (1 - s) * (1 - r * r) };
+                    var (hx, hy) = DiscreteKirchhoff(corner, middle, x, y);
+                    AddStressStiffness(plate, hx, hy, n, Math.Abs(det));
+                }
+            }
+            else
+            {
+                double twice = (x[1] - x[0]) * (y[2] - y[0]) - (x[2] - x[0]) * (y[1] - y[0]), area = Math.Abs(twice) / 2;
+                var dx = new[] { (y[1] - y[2]) / twice, (y[2] - y[0]) / twice, (y[0] - y[1]) / twice };
+                var dy = new[] { (x[2] - x[1]) / twice, (x[0] - x[2]) / twice, (x[1] - x[0]) / twice };
+                AddStressStiffness(membrane, dx, dy, n, area);
+
+                // The four points ShellNLDKGT integrates at, in area coordinates.
+                foreach (var (l1, l2, l3, w) in new[] { (1 / 3.0, 1 / 3.0, 1 / 3.0, -27 / 48.0), (0.2, 0.6, 0.2, 25 / 48.0),
+                                                        (0.6, 0.2, 0.2, 25 / 48.0), (0.2, 0.2, 0.6, 25 / 48.0) })
+                {
+                    var corner = new[] { (2 * l1 - 1) * l1, (2 * l2 - 1) * l2, (2 * l3 - 1) * l3 };
+                    var middle = new[] { 4 * l1 * l2, 4 * l2 * l3, 4 * l3 * l1 };
+                    var (hx, hy) = DiscreteKirchhoff(corner, middle, x, y);
+                    AddStressStiffness(plate, hx, hy, n, w * area);
+                }
+            }
+
+            // In its plane on the translations along e1 and e2; out of it on the translation along
+            // e3 and the rotations about e1 and e2.
+            var k = new double[6 * count, 6 * count];
+            var axis = new[] { e3, e1, e2 };
+            var first = new[] { 0, 3, 3 };
+            for (int a = 0; a < count; a++)
+                for (int b = 0; b < count; b++)
+                {
+                    for (int i = 0; i < 3; i++)
+                        for (int j = 0; j < 3; j++)
+                            k[6 * a + i, 6 * b + j] += membrane[a, b] * (e1[i] * e1[j] + e2[i] * e2[j]);
+                    for (int p = 0; p < 3; p++)
+                        for (int q = 0; q < 3; q++)
+                        {
+                            double v = plate[3 * a + p, 3 * b + q];
+                            if (v == 0.0) continue;
+                            for (int i = 0; i < 3; i++)
+                                for (int j = 0; j < 3; j++)
+                                    k[6 * a + first[p] + i, 6 * b + first[q] + j] += v * axis[p][i] * axis[q][j];
+                        }
+                }
+            return k;
+        }
+
+        /// <summary>
+        /// The rotations β_x and β_y of a discrete Kirchhoff plate - DKQ, Batoz and Tahar 1982, or
+        /// DKT, Batoz 1980 - as Hx · d and Hy · d, d being the deflection and the rotations about
+        /// local x and y, (w, θx, θy), at each node in turn. In a thin plate they are the slopes of
+        /// its deflection, which is what a membrane force turns. <paramref name="corner"/> holds the
+        /// quadratic functions of the corners at the point, <paramref name="middle"/> those of the
+        /// middles of the sides, side s running from node s to the next; written as ShellNLDKGQ and
+        /// ShellNLDKGT write them.
+        /// </summary>
+        private static (double[] hx, double[] hy) DiscreteKirchhoff(double[] corner, double[] middle, double[] x, double[] y)
+        {
+            int count = corner.Length;
+            double[] a = new double[count], b = new double[count], c = new double[count], d = new double[count], e = new double[count];
+            for (int s = 0; s < count; s++)
+            {
+                int t = (s + 1) % count;
+                double xs = x[s] - x[t], ys = y[s] - y[t], l = xs * xs + ys * ys;
+                a[s] = -xs / l;
+                b[s] = 0.75 * xs * ys / l;
+                c[s] = (xs * xs - 2 * ys * ys) / (4 * l);
+                d[s] = -ys / l;
+                e[s] = (ys * ys - 2 * xs * xs) / (4 * l);
+            }
+
+            var hx = new double[3 * count];
+            var hy = new double[3 * count];
+            for (int i = 0; i < count; i++)
+            {
+                int m = i, p = (i + count - 1) % count;   // the side after node i, and the one before
+                double nm = middle[m], np = middle[p];
+                hx[3 * i] = 1.5 * (a[m] * nm - a[p] * np);
+                hx[3 * i + 1] = b[m] * nm + b[p] * np;
+                hx[3 * i + 2] = corner[i] - c[m] * nm - c[p] * np;
+                hy[3 * i] = 1.5 * (d[m] * nm - d[p] * np);
+                hy[3 * i + 1] = -corner[i] + e[m] * nm + e[p] * np;
+                hy[3 * i + 2] = -b[m] * nm - b[p] * np;
+            }
+            return (hx, hy);
+        }
+
+        /// <summary>k_ab += w (gx_a, gy_a) · [N11 N12; N12 N22] · (gx_b, gy_b).</summary>
+        private static void AddStressStiffness(double[,] k, double[] gx, double[] gy, double[] n, double weight)
+        {
+            for (int a = 0; a < gx.Length; a++)
+                for (int b = 0; b < gx.Length; b++)
+                    k[a, b] += weight * (gx[a] * (n[0] * gx[b] + n[2] * gy[b]) + gy[a] * (n[2] * gx[b] + n[1] * gy[b]));
+        }
+
+        private static double[] Plus(double[] a, double[] b) => new[] { a[0] + b[0], a[1] + b[1], a[2] + b[2] };
+        private static double[] Minus(double[] a, double[] b) => new[] { a[0] - b[0], a[1] - b[1], a[2] - b[2] };
+        private static double[] Scaled(double[] a, double f) => new[] { a[0] * f, a[1] * f, a[2] * f };
+        private static double Dot(double[] a, double[] b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+        private static double[] Cross(double[] a, double[] b) =>
+            new[] { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0] };
 
         // ----------------------------------------------------------------- mode shapes
 
@@ -1058,13 +1340,22 @@ namespace Alpaca4d
 
             if (constraints == null)
             {
-                constraints = deck.ChainedNodes.Count > 0 ? Penalty(sparse) : "Transformation";
+                // The stress stiffness of a shell goes on the equations of its nodes, which a slave
+                // of a tie has none of its own for under Transformation.
+                var slaves = new HashSet<int>(deck.Ties.SelectMany(tie => tie.Slaves));
+                var tiedShells = deck.Shells.Where(shell => shell.Nodes.Any(slaves.Contains)).ToList();
+                constraints = deck.ChainedNodes.Count > 0 || tiedShells.Count > 0 ? Penalty(sparse) : "Transformation";
                 if (deck.ChainedNodes.Count > 0)
                     deck.Warnings.Add(
                         $"Node{(deck.ChainedNodes.Count > 1 ? "s" : "")} {string.Join(", ", deck.ChainedNodes.Take(10))}" +
                         $"{(deck.ChainedNodes.Count > 10 ? ", ..." : "")} {(deck.ChainedNodes.Count > 1 ? "are" : "is")} tied twice over, " +
                         "which OpenSees's Transformation handler gets wrong without a word, so the ties were enforced by penalty." +
                         (sparse ? "" : " With the matrices printed dense that costs some accuracy on the tied nodes."));
+                else if (tiedShells.Count > 0 && !sparse)
+                    deck.Warnings.Add(
+                        $"Shell{(tiedShells.Count > 1 ? "s" : "")} {string.Join(", ", tiedShells.Take(10).Select(shell => shell.Tag))}" +
+                        $"{(tiedShells.Count > 10 ? ", ..." : "")} {(tiedShells.Count > 1 ? "are" : "is")} tied, so the ties were enforced by " +
+                        "penalty. With the matrices printed dense that costs some accuracy on the tied nodes.");
             }
             outcome.Constraints = constraints;
 
@@ -1105,6 +1396,19 @@ namespace Alpaca4d
 
             var matrices = Read(files, sparse);
             outcome.Asymmetry = matrices.Asymmetry;
+            if (deck.Shells.Count > 0)
+            {
+                try
+                {
+                    var (rows, columns, values) = ShellStiffness(deck, ReadShellForces(files.ShellForces), matrices.Dofs);
+                    matrices.KGeo = matrices.KGeo.Plus(rows, columns, values);
+                }
+                catch (Exception ex) when (ex is IOException || ex is InvalidDataException)
+                {
+                    outcome.Failure = "The shells' forces under the load could not be read: " + ex.Message + " See log.";
+                    return outcome;
+                }
+            }
             foreach (var file in files.All)
                 TryDelete(file);
 
