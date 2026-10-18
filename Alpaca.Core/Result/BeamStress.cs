@@ -123,6 +123,19 @@ namespace Alpaca4d.Result
         /// <summary>Peak shear stress per unit torque.</summary>
         public double Torsion { get; private set; }
 
+        /// <summary>
+        /// The St. Venant torsion constant It, worked out from the shape: Σ a·b³/3 for an open one,
+        /// Bredt's 4Am² / ∮ds/t for a box, the polar moment for a circle. Not the section's own J,
+        /// which for an ISection is Iy + Iz - see <see cref="OpenTorsion"/>.
+        /// </summary>
+        public double TorsionConstant { get; private set; }
+
+        /// <summary>
+        /// ∫ y (y² + z²) dA, centroidal: what the monosymmetry constant of lateral-torsional buckling
+        /// under Mz is made from. Zero for a shape symmetric about z, and for a circle.
+        /// </summary>
+        public double WagnerY { get; private set; }
+
         /// <summary>Elastic section modulus for My: Iy over the distance to the furthest fibre in z.</summary>
         public double WelY { get; private set; }
         /// <summary>Elastic section modulus for Mz: Iz over the distance to the furthest fibre in y.</summary>
@@ -264,6 +277,9 @@ namespace Alpaca4d.Result
             double correction = 1.0 + 0.6095 * r + 0.8865 * r * r - 1.8023 * r * r * r + 0.9100 * r * r * r * r;
             section.Torsion = a > 0.0 && b > 0.0 ? 3.0 / (a * b * b) * correction : 0.0;
 
+            // The k of RectangleCS.J, so the check and the solver agree on the bar.
+            section.TorsionConstant = a > 0.0 ? a * b * b * b / (3.0 + 4.1 * Math.Pow(r, 1.5)) : 0.0;
+
             return section;
         }
 
@@ -308,6 +324,7 @@ namespace Alpaca4d.Result
             // peak is on the outside.
             double polar = Math.PI * r4 / 2.0;
             section.Torsion = polar > 0.0 ? outer / polar : 0.0;
+            section.TorsionConstant = polar;
 
             return section;
         }
@@ -336,6 +353,13 @@ namespace Alpaca4d.Result
             double thinnest = Math.Min(web, Math.Min(topFlange, bottomFlange));
             section.Torsion = enclosed > 0.0 && thinnest > 0.0 ? 1.0 / (2.0 * enclosed * thinnest) : 0.0;
 
+            // ∮ds/t round the same centre line: two side walls and the top and bottom ones.
+            double wallHeight = height - (topFlange + bottomFlange) / 2.0;
+            double round = web > 0.0 && topFlange > 0.0 && bottomFlange > 0.0
+                ? 2.0 * wallHeight / web + (width - web) / topFlange + (width - web) / bottomFlange
+                : 0.0;
+            section.TorsionConstant = round > 0.0 ? 4.0 * enclosed * enclosed / round : 0.0;
+
             return section;
         }
 
@@ -354,6 +378,7 @@ namespace Alpaca4d.Result
             });
 
             section.Torsion = OpenTorsion(section);
+            section.WagnerY = Wagner(section);
             return section;
         }
 
@@ -389,6 +414,7 @@ namespace Alpaca4d.Result
 
             var section = FromBoxes(boxes);
             section.Torsion = OpenTorsion(section);
+            section.WagnerY = Wagner(section);
             return section;
         }
 
@@ -650,7 +676,26 @@ namespace Alpaca4d.Result
                 thickest = Math.Max(thickest, shortSide);
             }
 
+            section.TorsionConstant = j;
             return j > 0.0 ? thickest / j : 0.0;
+        }
+
+        /// <summary>∫ y (y² + z²) dA over the rectangles, each integrated exactly.</summary>
+        private static double Wagner(BeamSectionStress section)
+        {
+            if (section._boxes == null) return 0.0;
+
+            double total = 0.0;
+            foreach (var b in section._boxes)
+            {
+                double w = b.Z2 - b.Z1;
+                double y4 = (Math.Pow(b.Y2, 4) - Math.Pow(b.Y1, 4)) / 4.0;
+                double y2 = (b.Y2 * b.Y2 - b.Y1 * b.Y1) / 2.0;
+                double z3 = (Math.Pow(b.Z2, 3) - Math.Pow(b.Z1, 3)) / 3.0;
+                total += w * y4 + y2 * z3;
+            }
+
+            return total;
         }
 
         #endregion
