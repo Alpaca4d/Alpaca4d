@@ -1,9 +1,11 @@
 #! python3
 # Test cases for Alpaca4d's Non-Linear Optimisation, built on the Grasshopper canvas.
 #
-# Run it in Rhino with Grasshopper and Alpaca4d installed - in Rhino 8 from the ScriptEditor
+# Tools/Examples/make.sh writes it straight to NonLinearOptimisationCases.gh, without Rhino:
+#     Tools/Examples/make.sh Alpaca4d.Test/Optimisation/NonLinearOptimisationCases.py
+# It also runs in Rhino with Grasshopper and Alpaca4d installed - in Rhino 8 from the ScriptEditor
 # (open this file and press Run) or with _-RunPythonScript; in Rhino 7 with _RunPythonScript.
-# It opens a new Grasshopper document with one group per case: the sliders, the objective and
+# It builds a Grasshopper document with one group per case: the sliders, the objective and
 # constraints as Expression components, an optimiser already linked to them and set to the
 # algorithm the case is for, and a panel saying what to do and what to expect. Double-click an
 # optimiser, press Start, and compare the end with the panel. Save the document to keep it.
@@ -51,10 +53,21 @@ def open_canvas():
     return doc
 
 
+# Makes an object from its GUID. Inside Rhino, Grasshopper's component server does; WriteGh.py,
+# which writes the .gh without Rhino, sets its own.
+make_object = None
+
+
 def emit(guid, what):
-    obj = Grasshopper.Instances.ComponentServer.EmitObject(System.Guid(guid))
+    if make_object is not None:
+        obj = make_object(guid)
+    else:
+        obj = Grasshopper.Instances.ComponentServer.EmitObject(System.Guid(guid))
     if obj is None:
         raise Exception("{0} is not installed in this Grasshopper.".format(what))
+    # Python 3 in Rhino 8 hands back an object by the interface a method returns; the component
+    # itself is needed for its own members, such as the optimiser's Variables and Configure.
+    obj = getattr(obj, "__implementation__", obj)
     obj.CreateAttributes()
     return obj
 
@@ -172,7 +185,7 @@ def branin(doc, x0, y0):
     sx, sy = two_sliders(doc, case, x0, y0, -5, 10, (2.5, 7.5), 3, lo2=0, hi2=15)
     f = expression(doc, case,
                    "f(x,y)=(y-5.1/(4*Pi^2)*x^2+5/Pi*x-6)^2+10*(1-1/(8*Pi))*Cos(x)+10",
-                   [sx, sy], x0 + 260, y0 + 95)
+                   [sx, sy], x0 + 330, y0 + 95)   # its formula makes it wide: clear of the sliders
     optimiser(doc, case, [sx, sy], f, [], x0 + 290, y0 + 10, "DirectL", evaluations=500)
     note(doc, case,
          "DIRECT-L, global, on Branin: three valleys of the same depth.\n"
@@ -280,8 +293,7 @@ def refusals(doc, x0, y0, list_of_twelve):
     group(doc, "8 - What must be refused or warned about", case, WARN_COLOUR)
 
 
-def main():
-    doc = open_canvas()
+def build(doc):
     rosenbrock(doc, 0, 0 * ROW)
     branin(doc, 0, 1 * ROW)
     hill(doc, 0, 2 * ROW)
@@ -290,10 +302,16 @@ def main():
     rastrigin(doc, 1000, 1 * ROW)
     twelve = genes(doc, 1000, 2 * ROW)
     refusals(doc, 1000, 3 * ROW, twelve)
+
+
+def main():
+    doc = open_canvas()
+    build(doc)
     doc.NewSolution(False)
     Grasshopper.Instances.ActiveCanvas.Refresh()
     print("Non-Linear Optimisation: 8 test cases built. Double-click an optimiser, press Start, "
           "and compare the end with the panel beside it. Without a license, Start refuses.")
 
 
-main()
+if __name__ == "__main__":
+    main()

@@ -62,8 +62,13 @@ not fuse by default. The library has to match mono's architecture.
 
 `NonLinearOptimisationCases.py` builds a Grasshopper document of eight cases, each with a known
 answer, its optimiser already linked and set to the algorithm it is for, and a panel saying what
-to expect. In Rhino 8 open it in the ScriptEditor and press Run (or `_-RunPythonScript` it); in
-Rhino 7 use `_RunPythonScript`. Save the document it opens to keep the cases.
+to expect. `NonLinearOptimisationCases.gh`, next to it, is that document: open it in Grasshopper.
+After changing the script, write it again without Rhino:
+
+    Tools/Examples/make.sh Alpaca4d.Test/Optimisation/NonLinearOptimisationCases.py
+
+The script also runs in Rhino, where it opens the cases on the canvas: in Rhino 8 open it in the
+ScriptEditor and press Run (or `_-RunPythonScript` it); in Rhino 7 use `_RunPythonScript`.
 
 | case | algorithm | expect |
 | --- | --- | --- |
