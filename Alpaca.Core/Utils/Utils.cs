@@ -85,6 +85,60 @@ namespace Alpaca4d
         }
 
         /// <summary>
+        /// The area of a mesh as Rhino's AreaMassProperties gives it, without the trip into native
+        /// code: each quad split along its shorter diagonal, which is how Rhino splits it, so a
+        /// warped quad comes out the same to the last digit or so.
+        /// </summary>
+        public static double MeshArea(Mesh mesh)
+        {
+            var v = mesh.Vertices.ToPoint3dArray();
+            double area = 0.0;
+            for (int f = 0; f < mesh.Faces.Count; f++)
+            {
+                var face = mesh.Faces[f];
+                if (!face.IsQuad)
+                    area += TriangleArea(v[face.A], v[face.B], v[face.C]);
+                else if (v[face.A].DistanceTo(v[face.C]) <= v[face.B].DistanceTo(v[face.D]))
+                    area += TriangleArea(v[face.A], v[face.B], v[face.C]) + TriangleArea(v[face.A], v[face.C], v[face.D]);
+                else
+                    area += TriangleArea(v[face.A], v[face.B], v[face.D]) + TriangleArea(v[face.B], v[face.C], v[face.D]);
+            }
+            return area;
+        }
+
+        /// <summary>
+        /// The volume a closed mesh encloses, as Rhino's VolumeMassProperties gives it: signed,
+        /// negative when its faces point inwards, and quads split along their shorter diagonal.
+        /// </summary>
+        public static double MeshVolume(Mesh mesh)
+        {
+            var v = mesh.Vertices.ToPoint3dArray();
+            double volume = 0.0;
+            for (int f = 0; f < mesh.Faces.Count; f++)
+            {
+                var face = mesh.Faces[f];
+                if (!face.IsQuad)
+                    volume += TetrahedronVolume(v[face.A], v[face.B], v[face.C]);
+                else if (v[face.A].DistanceTo(v[face.C]) <= v[face.B].DistanceTo(v[face.D]))
+                    volume += TetrahedronVolume(v[face.A], v[face.B], v[face.C]) + TetrahedronVolume(v[face.A], v[face.C], v[face.D]);
+                else
+                    volume += TetrahedronVolume(v[face.A], v[face.B], v[face.D]) + TetrahedronVolume(v[face.B], v[face.C], v[face.D]);
+            }
+            return volume;
+        }
+
+        private static double TriangleArea(Point3d a, Point3d b, Point3d c)
+        {
+            return Vector3d.CrossProduct(b - a, c - a).Length / 2.0;
+        }
+
+        /// <summary>The signed volume of the tetrahedron the triangle makes with the origin.</summary>
+        private static double TetrahedronVolume(Point3d a, Point3d b, Point3d c)
+        {
+            return (a.X * (b.Y * c.Z - b.Z * c.Y) + a.Y * (b.Z * c.X - b.X * c.Z) + a.Z * (b.X * c.Y - b.Y * c.X)) / 6.0;
+        }
+
+        /// <summary>
         /// The search behind <see cref="RTreeSearch"/> for a single point: the index of the node
         /// nearest <paramref name="point"/> within <paramref name="tol"/>, or -1 when there is none.
         /// For a caller with somewhere else to look when a point finds nothing, where an exception

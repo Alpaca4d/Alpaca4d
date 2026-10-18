@@ -130,7 +130,7 @@ namespace Alpaca4d
                     {
                         var shell = (IShell)item;
 
-                        double meshArea = Rhino.Geometry.AreaMassProperties.Compute(shell.Mesh).Area;
+                        double meshArea = Alpaca4d.Utils.MeshArea(shell.Mesh);
                         var areaDensity = shell.Section.Thickness * (shell.Section.Material.Rho ?? 0.0);
                         mass += areaDensity * meshArea;
                     }
@@ -138,7 +138,7 @@ namespace Alpaca4d
                     else if (item.Type == ElementType.Brick)
                     {
                         var brick = (IBrick)item;
-                        var meshVolume = Rhino.Geometry.VolumeMassProperties.Compute(brick.Mesh).Volume;
+                        var meshVolume = Alpaca4d.Utils.MeshVolume(brick.Mesh);
                         var density = brick.Material.Rho ?? 0.0;
                         mass += density * meshVolume;
                     }
@@ -1065,7 +1065,7 @@ namespace Alpaca4d
                 {
                     var shell = (IShell)item;
 
-                    double meshArea = Rhino.Geometry.AreaMassProperties.Compute(shell.Mesh).Area;
+                    double meshArea = Alpaca4d.Utils.MeshArea(shell.Mesh);
                     var areaDensity = shell.Section.Thickness * (shell.Section.Material.Rho ?? 0.0) * 9.81 / 1000.0;
                     mass += areaDensity * meshArea;
                     if (gravityLoad != null)
@@ -1099,7 +1099,7 @@ namespace Alpaca4d
                 if (item.Type == ElementType.Brick)
                 {
                     var brick = (IBrick)item;
-                    var meshVolume = Rhino.Geometry.VolumeMassProperties.Compute(brick.Mesh).Volume;
+                    var meshVolume = Alpaca4d.Utils.MeshVolume(brick.Mesh);
                     // A material given no density weighs nothing, which is a model, rather than a
                     // reason to stop: the cast this replaces threw on every nD material left at
                     // its default.
