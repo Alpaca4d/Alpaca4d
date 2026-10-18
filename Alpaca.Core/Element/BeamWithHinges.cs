@@ -115,6 +115,31 @@ namespace Alpaca4d.Element
                 baseSection.Material);
         }
 
+        /// <summary>
+        /// Recovers the release a hinge section was made from. <see cref="CreateHingeSection"/>
+        /// multiplies each released property by 1e-6, so a hinge property that is still close to the
+        /// interior one means that degree of freedom was held. The beam keeps only its hinge
+        /// sections, so this is how a reader of the model - Tcl, an export - gets the releases back.
+        /// </summary>
+        public static Release ReleaseOf(IUniaxialSection hinge, IUniaxialSection interior)
+        {
+            bool Held(double hingeValue, double interiorValue)
+            {
+                // A property that is zero to begin with carries no information; call it held.
+                if (Math.Abs(interiorValue) <= double.Epsilon)
+                    return true;
+                return Math.Abs(hingeValue / interiorValue) > 1e-3;
+            }
+
+            return new Release(
+                Held(hinge.Area, interior.Area),
+                Held(hinge.AlphaY, interior.AlphaY),
+                Held(hinge.AlphaZ, interior.AlphaZ),
+                Held(hinge.J, interior.J),
+                Held(hinge.Iyy, interior.Iyy),
+                Held(hinge.Izz, interior.Izz));
+        }
+
         public void SetTags()
         {
             this.GeomTransf.Id = this.Id;
