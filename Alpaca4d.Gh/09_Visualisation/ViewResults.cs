@@ -115,7 +115,7 @@ namespace Alpaca4d.Gh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.Register_StringParam("Info", "Info", "What is drawn, and the range it spans.");
-            pManager.Register_DoubleParam("Values", "Values", "Every value drawn. Feed it to the Data input of Legend - and when Range is set, give Legend the same Range, or its labels will not match.");
+            pManager.Register_DoubleParam("Values", "Values", "The value each colour stands for, one per colour of Colors, from the low end to the high - over Range when it is set. Feed it to the Data input of Legend, so the legend and the model agree.");
             pManager.Register_ColourParam("Colors", "Colors", "The gradient used. Feed it to the Colors input of Legend, so the legend and the model agree.");
         }
 
@@ -559,7 +559,8 @@ namespace Alpaca4d.Gh
             var shown = ShownValues(filter).ToList();
 
             var range = new Interval();
-            if (DA.GetData(4, ref range))
+            bool ranged = DA.GetData(4, ref range);
+            if (ranged)
             {
                 _min = range.Min;
                 _max = range.Max;
@@ -583,7 +584,11 @@ namespace Alpaca4d.Gh
 
             DA.SetData(0, $"{ResultField.FamilyNames[(int)family]} - {_field.Label}, " +
                           $"step {step}, min {_min:G4}, max {_max:G4}");
-            DA.SetDataList(1, shown);
+            // The scale, not the values drawn: Legend reads its range from the ends of what it is
+            // given, and the values drawn knew nothing of a Range, so it took a second wire to put
+            // Range into Legend as well. Nothing drawn and no Range gives no scale.
+            if (ranged || shown.Count > 0)
+                DA.SetDataList(1, ColourScale.LabelValues(_min, _max, palette.Count));
             DA.SetDataList(2, palette);
 
             Rhino.RhinoDoc.ActiveDoc?.Views?.Redraw();

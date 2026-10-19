@@ -33,7 +33,7 @@ namespace Alpaca4d.Gh
         {
             pManager.AddTextParameter("Title", "Title", "Legend title", GH_ParamAccess.item, "");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Data", "Data", "Numeric data the labels run from the smallest to the largest of." +
+            pManager.AddNumberParameter("Data", "Data", "Numeric data the labels run from the smallest to the largest of - the Values output of View Results." +
                 (HasRange ? " Ignored when Range is set." : ""), GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddColourParameter("Colors", "Colors", "Legend colors, from the low end to the high - the list given to View Results, so the legend and the model agree. " +
@@ -47,7 +47,7 @@ namespace Alpaca4d.Gh
             if (HasRange)
             {
                 pManager.AddIntervalParameter("Range", "Range", "Range the colors span, in place of the one Data gives. " +
-                    "Set it to the Range given to View Results, or the labels will not match the model.", GH_ParamAccess.item);
+                    "Not needed with Data from View Results, whose Values already run over the Range it was given.", GH_ParamAccess.item);
                 pManager[pManager.ParamCount - 1].Optional = true;
             }
         }
