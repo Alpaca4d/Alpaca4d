@@ -29,7 +29,7 @@ namespace Alpaca4d.Loads
                 var pointsLoads = new List<PointLoad>();
                 var indexes = this.Element.IndexNodes;
                 var numberOfPoints = indexes.Count;
-                var meshArea = Rhino.Geometry.AreaMassProperties.Compute(this.Element.Mesh).Area;
+                var meshArea = Alpaca4d.Utils.MeshArea(this.Element.Mesh);
                 foreach (var nodeId in indexes)
                 {
                     var forceX = this.GlobalForce.X * meshArea / numberOfPoints;

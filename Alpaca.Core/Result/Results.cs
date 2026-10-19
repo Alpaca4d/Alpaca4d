@@ -143,7 +143,10 @@ namespace Alpaca4d.Result
         /// <exception cref="Exception"></exception>
         public static IEnumerable<Rhino.Geometry.Vector3d> NodalOutput(Model alpacaModel, int step, ResultType resultType, List<int?> nodeIndex = null)
         {
-            var dataOutput = Enumerable.Empty<Rhino.Geometry.Vector3d>();
+            // A list, not Enumerable.Append in a loop: that chains one iterator per node, and a
+            // caller reading node i walks the chain from the start, so reading every node of a
+            // large model took time growing as the square of its size.
+            var dataOutput = new List<Rhino.Geometry.Vector3d>();
 
             string recorderPath = System.IO.Path.GetFullPath(alpacaModel.Recorders.First().FileName);
 
@@ -183,7 +186,7 @@ namespace Alpaca4d.Result
                         double x = (double)values.GetValue(i, 0);
                         double y = (double)values.GetValue(i, 1);
                         double z = (double)values.GetValue(i, 2);
-                        dataOutput = dataOutput.Append(new Rhino.Geometry.Vector3d(x, y, z));
+                        dataOutput.Add(new Rhino.Geometry.Vector3d(x, y, z));
                     }
                     h5File.Dispose();
                 }
@@ -195,7 +198,7 @@ namespace Alpaca4d.Result
                         double x = (double)values.GetValue(i - 1, 0);
                         double y = (double)values.GetValue(i - 1, 1);
                         double z = (double)values.GetValue(i - 1, 2);
-                        dataOutput = dataOutput.Append(new Rhino.Geometry.Vector3d(x, y, z));
+                        dataOutput.Add(new Rhino.Geometry.Vector3d(x, y, z));
                     }
                     h5File.Dispose();
                 }

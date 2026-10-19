@@ -14,6 +14,7 @@ Rhino 7 use `_RunPythonScript`.
 | --- | --- |
 | `FootbridgeStudy.py` | The Explorer example: a steel truss footbridge analysed with Alpaca4d, and a design study of 108 designs over its span, depth, panels and chord section. |
 | `SteelCantilever.py` | The Utilisation example: a 4 m steel cantilever checked to EN 1993-1-1, with the buckling lengths a cantilever needs and the Design menu open on the report. |
+| `MixedModelSpeed.py` | A speed test of Assemble Model: a shell slab on steel beams and columns, cut at the slab's nodes, on a brick raft, with point, line, mesh and gravity loads in one pattern. One slider takes it from a hundred elements to forty thousand. |
 | `../../Alpaca4d.Test/Optimisation/NonLinearOptimisationCases.py` | The eight test cases of Non-Linear Optimisation, each with a known answer. |
 
 A script works with make.sh when it makes its objects through `emit()`, which uses `make_object`
@@ -24,7 +25,8 @@ when it is set, and has a `build(doc)` that adds them to `doc` and runs nothing 
 * A Release build of `Alpaca4d.Gh`.
 * mono with libgdiplus (`brew install mono`).
 * Rhino 7 for Mac, for the IronPython it ships, the Visual Basic runtime Grasshopper needs and
-  Grasshopper's component libraries. Point `R7` elsewhere if it is not in `/Applications`.
+  Grasshopper's component libraries - curve, maths, vector, transform, surface and mesh, and
+  Galapagos. Point `R7` elsewhere if it is not in `/Applications`.
 * Grasshopper and RhinoCommon 7.18 from the NuGet cache, which the build has already restored.
 
 ## How it works

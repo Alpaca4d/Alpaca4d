@@ -39,7 +39,7 @@ cp "$PY"/IronPython.dll "$PY"/IronPython.Modules.dll "$PY"/Microsoft.Dynamic.dll
 # IronPython reads every type of an assembly it loads, so Grasshopper's dependencies must resolve too.
 cp "$R7"/Resources/Mono.Cecil*.dll "$R7"/Resources/Newtonsoft.Json.Rhino.dll "$R7"/Resources/Rhino.UI.dll \
    "$R7"/Resources/Yak.Core.dll "$R7"/Resources/Eto.dll "$R7"/Resources/ManagedPlugIns/GrasshopperPlugin.rhp/GH_Util.dll "$work/"
-for gha in CurveComponents MathComponents VectorComponents XformComponents GalapagosComponents; do cp "$COMPONENTS/$gha.gha" "$work/"; done
+for gha in CurveComponents MathComponents VectorComponents XformComponents GalapagosComponents SurfaceComponents; do cp "$COMPONENTS/$gha.gha" "$work/"; done
 cp GhHost.cs WriteGh.py "$work/"
 export DYLD_FALLBACK_LIBRARY_PATH=${DYLD_FALLBACK_LIBRARY_PATH:-/opt/homebrew/lib:/usr/local/lib}
 
@@ -47,5 +47,5 @@ export DYLD_FALLBACK_LIBRARY_PATH=${DYLD_FALLBACK_LIBRARY_PATH:-/opt/homebrew/li
   mcs -nologo -r:IronPython.dll -r:Microsoft.Scripting.dll -r:Microsoft.Dynamic.dll -r:System.Drawing.dll GhHost.cs
   mono GhHost.exe WriteGh.py "$script_dir" "$module" "$OUT" \
     "$work/CurveComponents.gha" "$work/MathComponents.gha" "$work/VectorComponents.gha" \
-    "$work/XformComponents.gha" "$work/GalapagosComponents.gha" "$work/Grasshopper.dll" \
+    "$work/XformComponents.gha" "$work/GalapagosComponents.gha" "$work/SurfaceComponents.gha" "$work/Grasshopper.dll" \
     "$work/$(basename "$GHA")" 2>&1 | grep -v "Carbon driver" )
