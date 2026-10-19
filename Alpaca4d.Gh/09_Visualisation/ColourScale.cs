@@ -44,6 +44,9 @@ namespace Alpaca4d.Gh
         /// places them. Labelling the edges of <paramref name="count"/> equal bands instead put
         /// each colour up to a band away from where the model shows it. A flat range has the one
         /// value, which is all the model shows: everything is the first colour.
+        ///
+        /// The last is <paramref name="max"/> itself, not min + span, which can round a hair off:
+        /// View Results hands these to Legend, which reads its range back from the ends.
         /// </summary>
         internal static List<double> LabelValues(double min, double max, int count)
         {
@@ -55,8 +58,9 @@ namespace Alpaca4d.Gh
                 return values;
             }
 
-            for (int k = 0; k < count; k++)
+            for (int k = 0; k < count - 1; k++)
                 values.Add(min + span * k / (count - 1));
+            values.Add(max);
 
             return values;
         }

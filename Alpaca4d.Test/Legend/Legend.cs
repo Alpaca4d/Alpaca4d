@@ -96,6 +96,18 @@ class LegendTest
             }
         }
 
+        Section("The values View Results hands Legend end on its range exactly");
+        {
+            // Legend labels from the smallest of its Data to the largest, so the ends have to be
+            // the range View Results painted over, not min + span rounded a hair past it.
+            foreach (var range in new[] { Tuple.Create(-0.0034, 0.0012), Tuple.Create(-0.3, 0.1), Tuple.Create(0.07, 0.31) })
+            {
+                var values = new[] { 2, 3, 10, 17 }.Select(count => Values(range.Item1, range.Item2, count)).ToList();
+                Check(values.All(x => x.First() == range.Item1 && x.Last() == range.Item2),
+                      $"[{range.Item1}, {range.Item2}] in 2, 3, 10 and 17 colours ends on {string.Join(", ", values.Select(x => x.Last().ToString("R")))}");
+            }
+        }
+
         Section("A flat range is one swatch, at the value the model shows in the first colour");
         {
             var palette = Enumerable.Range(0, 10).Select(k => Color.FromArgb(k, k, k)).ToList();
