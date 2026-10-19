@@ -517,17 +517,6 @@ namespace Alpaca4d
         }
 
         /// <summary>
-        /// A mesh split into one mesh per face. Works on a copy: unwelding rewrites the mesh it is
-        /// called on, and the caller's mesh is the one the user drew.
-        /// </summary>
-        private static List<Mesh> MeshToShell(Mesh mesh)
-        {
-            var working = mesh.DuplicateMesh();
-            working.Unweld(0, true);
-
-            return working.ExplodeAtUnweldedEdges().ToList();
-        }
-        /// <summary>
         /// A run of meshes swept into a layer of bricks between each neighbouring pair.
         ///
         /// Each brick takes its near face from one mesh and its far face from the next, pairing
@@ -543,39 +532,41 @@ namespace Alpaca4d
 
             var solid = new List<Mesh>();
 
-            // Every mesh split into its own faces, so that a mesh of many faces sweeps into many
-            // bricks rather than one. A single face mesh explodes to a list of one and takes the
-            // same path.
-            var meshExpl = MeshList.Select(MeshToShell).ToList();
+            // Each face read straight off its mesh, corners in the order the face lists them, so
+            // that a mesh of many faces sweeps into many bricks rather than one. The meshes used
+            // to be exploded into a mesh per face first, with Unweld and ExplodeAtUnweldedEdges,
+            // which took time growing as the square of the faces: 1.4 s of a 27 648 brick raft.
+            var vertices = MeshList.Select(m => m.Vertices.ToPoint3dArray()).ToList();
 
-            int faceCount = meshExpl[0].Count;
-            for (int i = 1; i < meshExpl.Count; i++)
+            int faceCount = MeshList[0].Faces.Count;
+            for (int i = 1; i < MeshList.Count; i++)
             {
-                if (meshExpl[i].Count != faceCount)
+                if (MeshList[i].Faces.Count != faceCount)
                     throw new Exception(
-                        $"Mesh {i + 1} of the series has {meshExpl[i].Count} faces where the first has " +
+                        $"Mesh {i + 1} of the series has {MeshList[i].Faces.Count} faces where the first has " +
                         $"{faceCount}. Each pair of neighbours becomes a layer of bricks, so every mesh in " +
                         "the series has to carry the same faces in the same order.");
             }
 
-            for (int index1 = 0; index1 < meshExpl.Count - 1; index1++)
+            for (int index1 = 0; index1 < MeshList.Count - 1; index1++)
             {
                 for (int index2 = 0; index2 < faceCount; index2++)
                 {
-                    var near = meshExpl[index1][index2];
-                    var far = meshExpl[index1 + 1][index2];
+                    var near = MeshList[index1].Faces[index2];
+                    var far = MeshList[index1 + 1].Faces[index2];
 
                     // A triangle would sweep into a wedge, which is not an element Alpaca4d has;
                     // saying so beats dropping it and returning fewer bricks than faces.
-                    if (near.Vertices.Count != 4 || far.Vertices.Count != 4)
+                    if (!near.IsQuad || !far.IsQuad)
                         throw new Exception(
-                            $"Face {index2 + 1} of mesh {index1 + 1} or {index1 + 2} in the series has " +
-                            $"{Math.Min(near.Vertices.Count, far.Vertices.Count)} corners. A brick sweeps " +
-                            "between quadrilaterals, so triangulated meshes have to be quadrangulated first.");
+                            $"Face {index2 + 1} of mesh {index1 + 1} or {index1 + 2} in the series has 3 corners. " +
+                            "A brick sweeps between quadrilaterals, so triangulated meshes have to be " +
+                            "quadrangulated first.");
 
-                    var nodes = near.Vertices.ToPoint3dArray()
-                                    .Concat(far.Vertices.ToPoint3dArray())
-                                    .ToList();
+                    var v = vertices[index1];
+                    var w = vertices[index1 + 1];
+                    var nodes = new List<Point3d> { v[near.A], v[near.B], v[near.C], v[near.D],
+                                                    w[far.A], w[far.B], w[far.C], w[far.D] };
 
                     // Both faces reversed together flips the sign without disturbing the pairing,
                     // exactly as CleanHexahedron does it.
