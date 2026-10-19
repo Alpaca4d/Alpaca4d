@@ -25,7 +25,7 @@ namespace Alpaca4d.Gh
             "Each load pattern becomes a load case, gravity a dead-load case, and the combination Alpaca adds them with the patterns' factors, which is what Alpaca analyses. " +
             "Whatever cannot be exported is reported: as an error when leaving it out changes the structure or its loads, " +
             "as a warning when it is approximated, and as a remark when it is worth knowing.",
-            "Alpaca4d", "10_Utility")
+            "Alpaca4d", "06_Assemble")
         {
             // Draw a Description Underneath the component
             this.Message = Alpaca4d.Gh.ComponentMessage.MyMessage(this);

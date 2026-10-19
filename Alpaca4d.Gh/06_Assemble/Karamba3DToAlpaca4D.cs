@@ -176,7 +176,7 @@ namespace Alpaca4d.Gh
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.tertiary;
 
         protected override System.Drawing.Bitmap Icon => Alpaca4d.Gh.Properties.Resources.Karamba_to_Alpaca__Alpaca4d_;
 
