@@ -183,6 +183,10 @@ namespace Alpaca4d.Gh
             private int _position;
             private double _scale = 1.5;
 
+            // Only the size of a measured box is used, so text is measured in the middle of the
+            // viewport, where no part of the box can be off the screen.
+            private Point2d _measureAt;
+
             public LegendConduit(Func<bool> shouldDraw)
             {
                 _shouldDraw = shouldDraw;
@@ -205,6 +209,7 @@ namespace Alpaca4d.Gh
                 e.Viewport.GetScreenPort(out int left, out int right, out int bottom, out int top, out _, out _);
                 int width = right - left;
                 int height = bottom - top;
+                _measureAt = new Point2d(0.5 * width, 0.5 * height);
 
                 if (_position == 2)
                     DrawHorizontal(e.Display, width, height);
@@ -222,7 +227,7 @@ namespace Alpaca4d.Gh
                 int titlePx = Px(1.8 * unit);
 
                 bool hasTitle = !string.IsNullOrWhiteSpace(_title);
-                var titleBox = hasTitle ? Measure(display, _title, titlePx) : Rectangle.Empty;
+                var titleBox = hasTitle ? Measure(display, _title, titlePx) : Size.Empty;
                 double titleBlock = hasTitle ? titleBox.Height + gap : 0.0;
 
                 double available = height * (1.0 - MarginTop - MarginBottomVertical) - titleBlock;
@@ -279,7 +284,7 @@ namespace Alpaca4d.Gh
                 }
 
                 bool hasTitle = !string.IsNullOrWhiteSpace(_title);
-                var titleBox = hasTitle ? Measure(display, _title, titlePx) : Rectangle.Empty;
+                var titleBox = hasTitle ? Measure(display, _title, titlePx) : Size.Empty;
 
                 // Stacked up from the bottom margin: title, then the bar, then the labels.
                 double titleTop = height * (1.0 - MarginBottomHorizontal) - titleBox.Height;
@@ -300,20 +305,23 @@ namespace Alpaca4d.Gh
                     DrawText(display, _title, titleBox, titlePx, 0.5 * (width - titleBox.Width), titleTop);
             }
 
-            /// <summary>The box <paramref name="text"/> takes up, relative to the point it is drawn from.</summary>
-            private static Rectangle Measure(DisplayPipeline display, string text, int height)
+            /// <summary>The size of <paramref name="text"/> drawn <paramref name="height"/> pixels high.</summary>
+            private Size Measure(DisplayPipeline display, string text, int height)
             {
-                return display.Measure2dText(text, Point2d.Origin, false, 0.0, height, FontFace);
+                var box = display.Measure2dText(text, _measureAt, true, 0.0, height, FontFace);
+                return new Size(Math.Abs(box.Width), Math.Abs(box.Height));
             }
 
             /// <summary>
-            /// Draws <paramref name="text"/> with the top-left of its box at (x, y). Draw2dText
-            /// places text by a corner of its own choosing, so the box is measured first and the
-            /// text placed by that instead.
+            /// Draws <paramref name="text"/> in a box of <paramref name="size"/> with its top-left at
+            /// (x, y), centred in it. Text that is not centred hangs from a corner: Rhino's
+            /// documentation says the lower-left, the hand-tuned offsets this legend first had only
+            /// worked from the top-left, and placing it by the corner Measure2dText reports put the
+            /// title well off in every position. Centred text has no corner to disagree about.
             /// </summary>
-            private static void DrawText(DisplayPipeline display, string text, Rectangle box, int height, double x, double y)
+            private static void DrawText(DisplayPipeline display, string text, Size size, int height, double x, double y)
             {
-                display.Draw2dText(text, Ink, new Point2d(x - box.Left, y - box.Top), false, height, FontFace);
+                display.Draw2dText(text, Ink, new Point2d(x + 0.5 * size.Width, y + 0.5 * size.Height), true, height, FontFace);
             }
 
             private static int Px(double value) => (int)Math.Round(value);
