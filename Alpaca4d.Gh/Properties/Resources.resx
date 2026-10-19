@@ -336,6 +336,9 @@ IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT
   <data name="MeshLoad (Alpaca4d)" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MeshLoad (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Mesh_Brep__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mesh Brep (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Mesh_Loft__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Mesh Loft (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
