@@ -11,8 +11,9 @@ namespace Alpaca4d.Gh
     {
         private static readonly List<string> Methods = new List<string> { "Constant N", "Proportional" };
 
+        // One space before the name: second in its toolbar group, after Interaction Domain.
         public DomainCheck()
-          : base("Domain Check (Alpaca4d)", "Domain Check",
+          : base(" Domain Check (Alpaca4d)", "Domain Check",
             "Checks design forces against an interaction domain: the safety factor of each combination, and the point where " +
             "it meets the boundary.\n" +
             "Constant N holds the axial force and scales the moments, as RC-SEC and most column checks do; Proportional scales " +

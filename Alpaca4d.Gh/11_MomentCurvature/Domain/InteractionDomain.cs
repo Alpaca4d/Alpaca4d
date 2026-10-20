@@ -10,8 +10,10 @@ namespace Alpaca4d.Gh
 {
     public class InteractionDomain : GH_Component
     {
+        // Two spaces before the name, one before Domain Check's: Grasshopper lays a toolbar group out
+        // in the order of its components' names, and the domain comes first, its check second.
         public InteractionDomain()
-          : base("Interaction Domain (Alpaca4d)", "Domain",
+          : base("  Interaction Domain (Alpaca4d)", "Interaction Domain",
             "The N-My-Mz resistance domain of a fibre section at the ultimate limit state: every combination of axial force and " +
             "biaxial bending it carries before a fibre passes its material's ultimate strain.\n" +
             "OpenSees traces each material's stress-strain curve; the ultimate strain planes are then swept through the section " +
