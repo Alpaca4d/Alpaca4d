@@ -94,6 +94,24 @@ namespace Alpaca4d.Gh
             }
         }
 
+        /// <summary>
+        /// What kind of quantity a component of a family is, which is what decides the units it is
+        /// offered in. Beam forces and reactions are forces for the first half of their list and
+        /// moments for the rest; shell forces are a force per width, but for the three bending
+        /// moments in the middle.
+        /// </summary>
+        public static Quantity QuantityOf(ResultFamily family, int component)
+        {
+            switch (family)
+            {
+                case ResultFamily.Displacement: return Quantity.Length;
+                case ResultFamily.BeamForce: return component >= 3 ? Quantity.Moment : Quantity.Force;
+                case ResultFamily.ShellForce: return component >= 3 && component <= 5 ? Quantity.MomentPerLength : Quantity.ForcePerLength;
+                case ResultFamily.Reaction: return component >= 4 ? Quantity.Moment : Quantity.Force;
+                default: return Quantity.Stress;
+            }
+        }
+
         /// <summary>The ways a reaction can be drawn at a support.</summary>
         public static readonly string[] ReactionStyles = { "Selected component", "Resultant", "All three" };
 
@@ -189,6 +207,25 @@ namespace Alpaca4d.Gh
 
                 return Enumerable.Empty<double>();
             }
+        }
+
+        /// <summary>
+        /// Every value multiplied by <paramref name="factor"/>, to show the field in another unit
+        /// than the solver's. Into new lists, so nothing a reader handed back is changed under it.
+        /// </summary>
+        public void Scale(double factor)
+        {
+            if (factor == 1.0) return;
+
+            if (this.ByNode != null)
+                this.ByNode = this.ByNode.ToDictionary(x => x.Key, x => x.Value * factor);
+
+            if (this.ByElement != null)
+                this.ByElement = this.ByElement.ToDictionary(x => x.Key, x => x.Value?.Select(v => v * factor).ToList());
+
+            // The vector too, which the arrows are drawn and labelled from.
+            if (this.Reactions != null)
+                this.Reactions = this.Reactions.Select(x => Tuple.Create(x.Item1, x.Item2 * factor, x.Item3 * factor)).ToList();
         }
 
         public static ResultField Read(Alpaca4d.Model model, ResultFamily family, int component, int layer, int step,
