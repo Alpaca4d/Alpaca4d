@@ -281,7 +281,9 @@ namespace Alpaca4d.Gh
     /// <summary>
     /// Swaps <see cref="MomentCurvature_obsolete"/> for <see cref="MomentCurvature"/>. Its five
     /// inputs come first on the new one, in the same order, so they carry over with their wires and
-    /// values - a MaxPhi given stays given - and its eight outputs keep their names.
+    /// values - a MaxPhi given stays given - and its eight outputs keep their names. Direction was
+    /// text, "y" or "z", and is degrees now: a value typed into it becomes 0 or 90, and a Value List
+    /// of y and z wired to it - the old component kept one up to date - becomes one of 0 and 90.
     /// </summary>
     public class MomentCurvatureUpgrader : IGH_UpgradeObject
     {
@@ -294,10 +296,61 @@ namespace Alpaca4d.Gh
 
         public IGH_DocumentObject Upgrade(IGH_DocumentObject target, GH_Document document)
         {
-            if (!(target is IGH_Component component))
+            if (!(target is IGH_Component old))
+                return null;
+            if (!(Grasshopper.Instances.ComponentServer.EmitObject(UpgradeTo) is IGH_Component upgraded))
                 return null;
 
-            return UpgradeByName.Swap(component, UpgradeTo);
+            // Wired before the swap: the swap takes the old component out of the document, and with
+            // it whatever is still connected to it.
+            GH_UpgradeUtil.MigrateInputParameters(old, upgraded, new[] { 0, 1, 3, 4 }, new[] { 0, 1, 3, 4 });
+            MigrateDirection(old.Params.Input[2], upgraded.Params.Input[2]);
+            foreach (var output in old.Params.Output)
+            {
+                var match = upgraded.Params.Output.FirstOrDefault(param => param.Name == output.Name);
+                if (match != null)
+                    GH_UpgradeUtil.MigrateRecipients(output, match);
+            }
+
+            return GH_UpgradeUtil.SwapComponents(old, upgraded, false) ? upgraded : null;
         }
+
+        private static void MigrateDirection(IGH_Param from, IGH_Param to)
+        {
+            foreach (var source in from.Sources.ToList())
+            {
+                if (!(source is Grasshopper.Kernel.Special.GH_ValueList list) || list.ListItems.Count == 0 ||
+                    !list.ListItems.All(item => IsAxis(item.Name)))
+                    continue;
+
+                bool z = string.Equals(list.SelectedItems.FirstOrDefault()?.Name?.Trim(), "z", StringComparison.OrdinalIgnoreCase);
+                list.ListItems.Clear();
+                list.ListItems.Add(new Grasshopper.Kernel.Special.GH_ValueListItem("0", "0"));
+                list.ListItems.Add(new Grasshopper.Kernel.Special.GH_ValueListItem("90", "90"));
+                list.SelectItem(z ? 1 : 0);
+            }
+            GH_UpgradeUtil.MigrateSources(from, to);
+
+            if (from is Grasshopper.Kernel.Parameters.Param_String text && to is Grasshopper.Kernel.Parameters.Param_Number number)
+            {
+                var typed = text.PersistentData.AllData(true).OfType<Grasshopper.Kernel.Types.GH_String>().FirstOrDefault()?.Value;
+                if (typed == null)
+                    return;
+                try
+                {
+                    double degrees = Alpaca4d.Template.MomentCurvature.Direction(typed) * 180.0 / Math.PI;
+                    number.PersistentData.Clear();
+                    number.PersistentData.Append(new Grasshopper.Kernel.Types.GH_Number(degrees));
+                }
+                catch (ArgumentException)
+                {
+                    // Left at the new default, 0; the old one would have refused it anyway.
+                }
+            }
+        }
+
+        private static bool IsAxis(string name) =>
+            string.Equals(name?.Trim(), "y", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(name?.Trim(), "z", StringComparison.OrdinalIgnoreCase);
     }
 }

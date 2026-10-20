@@ -29,11 +29,11 @@ namespace Alpaca4d.Gh
                 "Axial force, in kN, held constant while the curvature is applied.\npositive value - tension\nnegative value - compression",
                 GH_ParamAccess.item, 0.0);
 
-            pManager.AddTextParameter("Direction", "Direction",
-                "The moment direction: \"y\" to bend about the section's local y axis, \"z\" about its z axis, or an angle in degrees " +
-                "from y towards z - 30, say. The moment is held to that direction and the curvature across it left free, so a " +
-                "section bent off its axes turns its neutral axis as it needs to.",
-                GH_ParamAccess.item, "y");
+            pManager.AddNumberParameter("Direction", "Direction",
+                "The moment direction, in degrees from the section's local y axis towards z, 0 to 90: 0 bends it about y, 90 " +
+                "about z. The moment is held to that direction and the curvature across it left free, so a section bent off its " +
+                "axes turns its neutral axis as it needs to.",
+                GH_ParamAccess.item, 0.0);
 
             pManager.AddIntegerParameter("NumIncr", "NumIncr",
                 "Number of increments used to reach MaxPhi - the number of points on the curve, when it does not stop sooner.",
@@ -99,8 +99,8 @@ namespace Alpaca4d.Gh
             double axial = 0.0;
             DA.GetData(1, ref axial);
 
-            string dir = "y";
-            DA.GetData(2, ref dir);
+            double degrees = 0.0;
+            DA.GetData(2, ref degrees);
 
             int numIncr = 100;
             DA.GetData(3, ref numIncr);
@@ -117,16 +117,13 @@ namespace Alpaca4d.Gh
             bool stop = true;
             DA.GetData(7, ref stop);
 
-            double angle;
-            try
+            if (!(degrees >= 0.0 && degrees <= 90.0))
             {
-                angle = Alpaca4d.Template.MomentCurvature.Direction(dir);
-            }
-            catch (ArgumentException ex)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, ex.Message);
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
+                    $"Direction has to be between 0 and 90 degrees, not {degrees}: 0 bends the section about y, 90 about z.");
                 return;
             }
+            double angle = degrees * Math.PI / 180.0;
 
             // Everything the deck writes is relative to the current directory, which is where
             // OpenSees runs: settled first, and only then used. Prepared the other way round, the
@@ -247,12 +244,6 @@ namespace Alpaca4d.Gh
             var all = log.Split(new[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             return string.Join(Environment.NewLine, all.Skip(Math.Max(0, all.Length - lines)));
-        }
-
-        protected override void BeforeSolveInstance()
-        {
-            List<string> directions = new List<string> { "y", "z" };
-            ValueListUtils.UpdateValueLists(this, 2, directions, null);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
