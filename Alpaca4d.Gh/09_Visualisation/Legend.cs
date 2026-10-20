@@ -9,9 +9,9 @@ using System.Linq;
 namespace Alpaca4d.Gh
 {
     /// <summary>
-    /// Legend, as two components that differ only in the Range input: <see cref="Legend"/>, which
-    /// has it, and the one it replaced, kept hidden so older definitions open without Grasshopper
-    /// reporting a missing input (see <see cref="Legend_obsolete"/>).
+    /// Legend, as two components that differ only in their GUID: <see cref="Legend"/>, and the
+    /// one 0.12.0-beta.1 shipped with a Range input, kept hidden so its definitions still open
+    /// (see <see cref="Legend_obsolete"/>).
     /// </summary>
     public abstract class LegendBase : GH_Component
     {
@@ -26,30 +26,20 @@ namespace Alpaca4d.Gh
             _conduit = new LegendConduit(ShouldDraw);
         }
 
-        /// <summary>Whether the component has the Range input. Only the obsolete one does not.</summary>
-        protected virtual bool HasRange => true;
-
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("Title", "Title", "Legend title", GH_ParamAccess.item, "");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Data", "Data", "Numeric data the labels run from the smallest to the largest of - the Values output of View Results." +
-                (HasRange ? " Ignored when Range is set." : ""), GH_ParamAccess.list);
+            pManager.AddNumberParameter("Data", "Data", "Numeric data the labels run from the smallest to the largest of - the Values output of View Results, " +
+                "which follows the Range given to it. To label a range of your own, give its two ends.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddColourParameter("Colors", "Colors", "Legend colors, from the low end to the high - the list given to View Results, so the legend and the model agree. " +
+            pManager.AddColourParameter("Colors", "Colors", "Legend colors, from the low end to the high - the Colors output of View Results, so the legend and the model agree. " +
                 "Fewer than two fall back to the default gradient, as in View Results.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddIntegerParameter("Position", "Pos", "0: Left, 1: Right, 2: Bottom Center", GH_ParamAccess.item, 0);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Scale", "Scale", "Size scale factor. The legend shrinks below it where it would not fit the viewport.", GH_ParamAccess.item, 1.5);
             pManager[pManager.ParamCount - 1].Optional = true;
-
-            if (HasRange)
-            {
-                pManager.AddIntervalParameter("Range", "Range", "Range the colors span, in place of the one Data gives. " +
-                    "Not needed with Data from View Results, whose Values already run over the Range it was given.", GH_ParamAccess.item);
-                pManager[pManager.ParamCount - 1].Optional = true;
-            }
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
@@ -88,20 +78,11 @@ namespace Alpaca4d.Gh
 
             double min = -1.0;
             double max = 1.0;
-            var range = Interval.Unset;
-            if (HasRange && DA.GetData(5, ref range) && range.IsValid)
+            var finite = data.Where(x => !double.IsNaN(x) && !double.IsInfinity(x)).ToList();
+            if (finite.Count > 0)
             {
-                min = range.Min;
-                max = range.Max;
-            }
-            else
-            {
-                var finite = data.Where(x => !double.IsNaN(x) && !double.IsInfinity(x)).ToList();
-                if (finite.Count > 0)
-                {
-                    min = finite.Min();
-                    max = finite.Max();
-                }
+                min = finite.Min();
+                max = finite.Max();
             }
 
             var values = ColourScale.LabelValues(min, max, colors.Count);
@@ -328,8 +309,12 @@ namespace Alpaca4d.Gh
         }
     }
 
+    /// <summary>
+    /// The GUID Legend had up to 0.11.0, and has again now that its inputs are the same five, so
+    /// definitions from then open as the current Legend.
+    /// </summary>
     public class Legend : LegendBase
     {
-        public override Guid ComponentGuid => new Guid("{C942420B-9CE2-4898-BAFF-0A65A95DA4A7}");
+        public override Guid ComponentGuid => new Guid("{A6B3B5C9-DB8D-4B6A-9E7E-63C6D2E2F9F5}");
     }
 }

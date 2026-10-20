@@ -12,6 +12,8 @@ the colours through `ColourScale`, so what is checked here is that the labels si
   bands instead, which put each colour up to a band away from where the model shows it - with
   nothing looking wrong. The labels are pinned against `ColourScale.Stops`, which View Results
   paints by, for several palette sizes and ranges.
+* **The values View Results hands Legend end on its range exactly.** Legend reads its range from
+  the smallest and largest of its Data, and `min + span` rounded a hair past the maximum.
 * **A flat range is one swatch**, at the value the model shows in its first colour.
 * **Every label of a legend reads to the same step**, four significant figures of the larger end
   of the range. Two fixed decimals printed every displacement in metres as `0.00`; four figures of
@@ -31,5 +33,7 @@ Everything that needs a viewport - to be looked at in Rhino:
   than most viewports, and the labels of a legend on the right ran off the edge
 * that the legend goes when its document is closed or another one is brought forward, and when
   Grasshopper's preview is switched off
-* that an older definition opens with the old Legend, tagged OLD, and no "Input parameter chunk is
-  missing" error, and that Upgrade Components swaps it for the one with a Range input
+* that the title sits where it was measured to go, in all three positions
+* that a 0.11.0 definition opens with the current Legend, and a 0.12.0-beta.1 one, whose Legend
+  had a Range input, with the hidden Legend tagged OLD and no error, Upgrade Components swapping
+  it for the current one
