@@ -459,6 +459,8 @@ class InteractionDomainCheck
         Check("MaxPhi from the domain leaves it most of its increments", r.N.Count > 300 && r.N.Count < 400, $"{r.N.Count} of 400");
         Relative("ultimate moment against the domain's N-My cut", r.UltimateMoment, Far(domain, -1000.0, 0.0), 3e-3);
         Check("the concrete governs, and says where", r.Failure != null && r.Failure.Contains("crushes"), r.Failure ?? "");
+        // The right-hand rule about y and z, with x = y x z: positive My stretches +z and crushes -z.
+        Check("positive My crushes the -z side", r.Failure != null && r.Failure.Contains("z = -0.25"), r.Failure ?? "");
         Check("first yield comes before the ultimate state", r.YieldCurvature > 0 && r.YieldCurvature < r.UltimateCurvature && r.Ductility > 1,
               $"κy {F(r.YieldCurvature)}, κu {F(r.UltimateCurvature)}, ductility {F(r.Ductility)}");
 
@@ -470,6 +472,8 @@ class InteractionDomainCheck
             double across = -Math.Sin(a) * t.My[last] + Math.Cos(a) * t.Mz[last];
             Near($"{degrees} deg: the moment stays in its direction, the moment across it at the end", across, 0.0, 1e-5 * Math.Abs(t.Moment[last]) + 1e-9);
             Relative($"{degrees} deg: ultimate moment against the domain's cut at {degrees} deg", t.UltimateMoment, Far(domain, -1000.0, degrees), 3e-3);
+            if (degrees == 90.0)
+                Check("positive Mz crushes the +y side", t.Failure != null && t.Failure.Contains("y = 0.15,"), t.Failure ?? "");
         }
 
         // The other way about y: the 2 phi 16 now in tension, the 3 phi 20 in compression.
