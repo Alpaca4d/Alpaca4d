@@ -192,7 +192,8 @@ namespace Alpaca4d.Template
             var (output, error, exitCode) = run(deckPath);
             log = string.Join(Environment.NewLine, new[] { output, error }.Where(x => !string.IsNullOrWhiteSpace(x)));
 
-            if (exitCode != 0 || (output ?? "").Contains(FailedMarker))
+            // In both streams: OpenSees 3.8 sends a deck's puts to stderr.
+            if (exitCode != 0 || log.Contains(FailedMarker))
                 throw new InvalidOperationException(
                     "OpenSees could not trace the materials' stress-strain curves. See the log output.");
 
