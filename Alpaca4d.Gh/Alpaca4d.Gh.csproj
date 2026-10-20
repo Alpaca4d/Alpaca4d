@@ -318,6 +318,9 @@
     <EmbeddedResource Include="Resources\My-Mz Diagram (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Moment Curvature Diagram (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Non-Linear Optimisation (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>

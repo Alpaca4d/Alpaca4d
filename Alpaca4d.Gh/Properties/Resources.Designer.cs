@@ -1303,6 +1303,16 @@ namespace Alpaca4d.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Moment_Curvature_Diagram__Alpaca4d_ {
+            get {
+                object obj = ResourceManager.GetObject("Moment_Curvature_Diagram__Alpaca4d_", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Non_Linear_Optimisation__Alpaca4d_ {
             get {
                 object obj = ResourceManager.GetObject("Non_Linear_Optimisation__Alpaca4d_", resourceCulture);
