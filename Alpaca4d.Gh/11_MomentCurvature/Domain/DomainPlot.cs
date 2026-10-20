@@ -37,6 +37,7 @@ namespace Alpaca4d.Gh
         public readonly List<Point3d> Demands = new List<Point3d>();
         public readonly List<Point3d> Capacities = new List<Point3d>();
         public readonly List<Line> CheckLines = new List<Line>();
+        public readonly List<(Point3d At, Color Colour)> Marks = new List<(Point3d, Color)>();
         public Mesh Mesh;
 
         public BoundingBox Box
@@ -50,7 +51,7 @@ namespace Alpaca4d.Gh
                     box.Union(line.BoundingBox);
                 foreach (var label in Labels)
                     box.Union(label.At);
-                foreach (var point in Demands.Concat(Capacities))
+                foreach (var point in Demands.Concat(Capacities).Concat(Marks.Select(m => m.At)))
                     box.Union(point);
                 if (Mesh != null)
                     box.Union(Mesh.GetBoundingBox(false));
@@ -70,6 +71,7 @@ namespace Alpaca4d.Gh
             Demands.Clear();
             Capacities.Clear();
             CheckLines.Clear();
+            Marks.Clear();
             Mesh = null;
         }
 
@@ -173,6 +175,8 @@ namespace Alpaca4d.Gh
                 args.Display.DrawPoint(point, PointStyle.RoundSimple, 5, DemandColor);
             foreach (var point in Capacities)
                 args.Display.DrawPoint(point, PointStyle.RoundSimple, 5, CapacityColor);
+            foreach (var mark in Marks)
+                args.Display.DrawPoint(mark.At, PointStyle.RoundSimple, 5, mark.Colour);
         }
 
         /// <summary>The domain checks wired to a view, read off a list of anything.</summary>
