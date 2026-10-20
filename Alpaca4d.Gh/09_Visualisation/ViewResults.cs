@@ -67,6 +67,12 @@ namespace Alpaca4d.Gh
         private MenuDropDown _ddLayer;
         private MenuDropDown _ddReaction;
         private MenuDropDown _ddAxes;
+
+        // One per kind of quantity, by Quantity, and only the one the result is shown: each
+        // remembers its own unit, so going from N to My and back finds N still in the unit it
+        // was in.
+        private MenuDropDown[] _ddUnits;
+
         private MenuCheckBox _ckDeformed;
         private MenuSlider _slDeformScale;
         private MenuCheckBox _ckAnimate;
@@ -91,7 +97,7 @@ namespace Alpaca4d.Gh
           : base("View Results_WIP (Alpaca4d)", "View Results_WIP",
             "Draw any result on the model: displacements, beam force diagrams, beam stresses, shell " +
             "forces, shell stresses, solid stresses, reactions.\n" +
-            "Pick the result and the component from the dropdowns. ElementId shows only some of the " +
+            "Pick the result, the component and the unit from the dropdowns. ElementId shows only some of the " +
             "elements and greys the rest, so what you are looking at stays in the model around it.\n" +
             "Work in progress, and meant to grow into the replacement for the separate view components.",
             "Alpaca4d", "09_Visualisation")
@@ -108,14 +114,14 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddColourParameter("Colors", "Colors", "Gradient to colour with, from the low end to the high. Connect the Colors component for a ready-made one.\nBeam force diagrams ignore it and use the colour that belongs to the force.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddIntervalParameter("Range", "Range", "Range the gradient is stretched over. Left empty it fits what is drawn, which is what makes two steps impossible to compare - set it to compare them.", GH_ParamAccess.item);
+            pManager.AddIntervalParameter("Range", "Range", "Range the gradient is stretched over, in the unit picked under Unit. Left empty it fits what is drawn, which is what makes two steps impossible to compare - set it to compare them.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.Register_StringParam("Info", "Info", "What is drawn, and the range it spans.");
-            pManager.Register_DoubleParam("Values", "Values", "The value each colour stands for, one per colour of Colors, from the low end to the high - over Range when it is set. Feed it to the Data input of Legend, so the legend and the model agree.");
+            pManager.Register_StringParam("Info", "Info", "What is drawn, the unit it is in, and the range it spans.");
+            pManager.Register_DoubleParam("Values", "Values", "The value each colour stands for, one per colour of Colors, from the low end to the high - over Range when it is set - in the unit picked under Unit. Feed it to the Data input of Legend, so the legend and the model agree.");
             pManager.Register_ColourParam("Colors", "Colors", "The gradient used. Feed it to the Colors input of Legend, so the legend and the model agree.");
         }
 
@@ -159,6 +165,21 @@ namespace Alpaca4d.Gh
                 _ddAxes.AddItem(name, name);
             _ddAxes.ValueChanged += OnWidgetChanged;
 
+            var quantities = (Quantity[])Enum.GetValues(typeof(Quantity));
+            _ddUnits = new MenuDropDown[quantities.Length];
+            foreach (var quantity in quantities)
+            {
+                var units = ResultUnits.Of(quantity);
+                var dropdown = new MenuDropDown(5 + (int)quantity, "Unit" + quantity, "Unit") { VisibleItemCount = units.Length };
+                foreach (var unit in units)
+                    dropdown.AddItem(unit.Symbol, unit.Caption);
+
+                // A file read after this puts back the unit it was saved with.
+                dropdown.Value = ResultUnits.Default(quantity);
+                dropdown.ValueChanged += OnWidgetChanged;
+                _ddUnits[(int)quantity] = dropdown;
+            }
+
             _txLayer = Caption("Layer through the thickness");
             _txReaction = Caption("Reactions drawn as");
             _txAxes = Caption("Read in which axes");
@@ -167,6 +188,9 @@ namespace Alpaca4d.Gh
             resultPanel.AddControl(_ddFamily);
             resultPanel.AddControl(Caption("Component"));
             resultPanel.AddControl(_ddComponent);
+            resultPanel.AddControl(Caption("Unit"));
+            foreach (var dropdown in _ddUnits)
+                resultPanel.AddControl(dropdown);
             resultPanel.AddControl(_txLayer);
             resultPanel.AddControl(_ddLayer);
             resultPanel.AddControl(_txReaction);
@@ -238,6 +262,8 @@ namespace Alpaca4d.Gh
             _ddLayer.ValueChanged += OnWidgetChanged;
             _ddReaction.ValueChanged += OnWidgetChanged;
             _ddAxes.ValueChanged += OnWidgetChanged;
+            foreach (var dropdown in _ddUnits)
+                dropdown.ValueChanged += OnWidgetChanged;
             _ckDeformed.ValueChanged += OnWidgetChanged;
             _slDeformScale.ValueChanged += OnWidgetChanged;
             _ckAnimate.ValueChanged += OnAnimateChanged;
@@ -257,6 +283,20 @@ namespace Alpaca4d.Gh
                 if (saved >= 0 && saved < families.Length)
                     _ddFamily.Value = Array.IndexOf(ResultField.MenuOrder, families[saved]);
                 _savedInEnumOrder = false;
+            }
+
+            // Saved before there was a Unit to pick, a result was shown in the unit the solver
+            // works in - bar beam stresses, which were in MPa - and a Range wired into it was read
+            // in that unit. Put back, so the file draws what it drew; the defaults are for new ones.
+            if (_savedBeforeUnits)
+            {
+                foreach (Quantity quantity in Enum.GetValues(typeof(Quantity)))
+                    _ddUnits[(int)quantity].Value = ResultUnits.ModelUnit(quantity);
+
+                if (Family == ResultFamily.BeamStress)
+                    _ddUnits[(int)Quantity.Stress].Value = ResultUnits.IndexOf(Quantity.Stress, "MPa");
+
+                _savedBeforeUnits = false;
             }
 
             // A file never reopens mid-animation: the checkbox is saved, the timer is not.
@@ -301,6 +341,10 @@ namespace Alpaca4d.Gh
             Show(ResultField.HasAxes(family), _txAxes, _ddAxes);
             Show(ResultField.HasReactionStyle(family), _txReaction, _ddReaction);
             Show(ResultField.HasScale(family), _txDiagramScale, _slDiagramScale);
+
+            var quantity = ResultField.QuantityOf(family, _ddComponent?.Value ?? 0);
+            for (int i = 0; i < _ddUnits.Length; i++)
+                Show(i == (int)quantity, _ddUnits[i]);
 
             // A scale and an animation over a shape that is not being deformed do nothing.
             bool deformed = _ckDeformed?.Active ?? false;
@@ -369,9 +413,18 @@ namespace Alpaca4d.Gh
 
         private bool _savedInEnumOrder;
 
+        /// <summary>
+        /// Marks a saved file as holding a Unit for each kind of quantity. A file without it was
+        /// saved when every result was shown in the solver's unit, and is put back in it on load.
+        /// </summary>
+        private const string UnitsKey = "ResultUnits";
+
+        private bool _savedBeforeUnits;
+
         public override bool Write(GH_IO.Serialization.GH_IWriter writer)
         {
             writer.SetInt32(MenuOrderKey, 1);
+            writer.SetInt32(UnitsKey, 1);
             return base.Write(writer);
         }
 
@@ -379,7 +432,14 @@ namespace Alpaca4d.Gh
         {
             // Before base.Read, which reads the dropdown and then calls OnComponentLoaded.
             _savedInEnumOrder = !reader.ItemExists(MenuOrderKey);
+            _savedBeforeUnits = !reader.ItemExists(UnitsKey);
             return base.Read(reader);
+        }
+
+        /// <summary>The unit a quantity is shown in: the one picked in its dropdown.</summary>
+        private int UnitIndex(Quantity quantity)
+        {
+            return _ddUnits?[(int)quantity].Value ?? ResultUnits.Default(quantity);
         }
 
         #endregion
@@ -533,12 +593,21 @@ namespace Alpaca4d.Gh
             int layer = _ddLayer?.Value ?? 0;
             bool localAxes = (_ddAxes?.Value ?? 0) == 1;
 
-            var key = $"{_model.GetHashCode()}|{family}|{component}|{layer}|{step}|{localAxes}";
+            var quantity = ResultField.QuantityOf(family, component);
+            int unitIndex = UnitIndex(quantity);
+            var unit = ResultUnits.At(quantity, unitIndex);
+
+            var key = $"{_model.GetHashCode()}|{family}|{component}|{layer}|{step}|{localAxes}|{unit.Symbol}";
             if (key != _cacheKey)
             {
                 try
                 {
+                    // Into the unit picked straight away, so everything after - the range, Range
+                    // itself, the colours, the values written on the model, Values - is in it.
+                    // The diagrams and arrows are sized against their own largest value, so they
+                    // come out the same in any unit.
                     _cachedField = ResultField.Read(_model, family, component, layer, step, localAxes);
+                    _cachedField.Scale(ResultUnits.Factor(quantity, unitIndex));
                     _cachedDisplacement = NodalOffsets(step);
                 }
                 catch (Exception ex)
@@ -582,7 +651,7 @@ namespace Alpaca4d.Gh
 
             Build(filter, family, component, displacement);
 
-            DA.SetData(0, $"{ResultField.FamilyNames[(int)family]} - {_field.Label}, " +
+            DA.SetData(0, $"{ResultField.FamilyNames[(int)family]} - {_field.Label} [{unit.Symbol}], " +
                           $"step {step}, min {_min:G4}, max {_max:G4}");
             // The scale, not the values drawn: Legend reads its range from the ends of what it is
             // given, and the values drawn knew nothing of a Range, so it took a second wire to put

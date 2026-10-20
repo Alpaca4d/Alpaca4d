@@ -309,7 +309,7 @@ namespace Alpaca4d.Gh
             var field = new ResultField
             {
                 ByElement = new Dictionary<int, List<double>>(),
-                Label = BeamStressNames[component] + " [MPa]"
+                Label = BeamStressNames[component]
             };
 
             if (model.Beams.Count == 0)
@@ -328,8 +328,9 @@ namespace Alpaca4d.Gh
                 if (!stresses[0].HasShape && component != 0)
                     continue;
 
-                // In MPa, as the Beam Stresses component gives them, so the two read the same numbers.
-                field.ByElement[model.Beams[i].Id.Value] = stresses.Select(x => ModelStress.ToMPa(Of(x, component))).ToList();
+                // In the solver's kN/m², as every other family is: View Results turns them into the
+                // unit picked, which starts at MPa - the unit Beam Stresses gives them in.
+                field.ByElement[model.Beams[i].Id.Value] = stresses.Select(x => Of(x, component)).ToList();
             }
 
             return field;
