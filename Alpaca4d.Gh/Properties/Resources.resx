@@ -495,6 +495,21 @@ IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT
   <data name="Linear_Buckling_Analysis__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Linear Buckling Analysis (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Interaction_Domain__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Interaction Domain (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Domain_Check__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Domain Check (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Domain_3D__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Domain 3D (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="N_M_Diagram__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\N-M Diagram (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="My_Mz_Diagram__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\My-Mz Diagram (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Non_Linear_Optimisation__Alpaca4d_" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Non-Linear Optimisation (Alpaca4d).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
