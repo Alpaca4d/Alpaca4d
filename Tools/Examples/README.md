@@ -3,6 +3,7 @@
     ./make.sh                                   # FootbridgeStudy.gh, next to its script
     ./make.sh path/to/Script.py [out.gh]         # any script with a build(doc), next to it
     ./make.sh SteelCantilever.py                # the Utilisation example
+    ./make.sh ColumnDomain.py                   # the Interaction Domain example
 
 Each example is a Python script that builds a Grasshopper definition from the real Grasshopper
 and Alpaca4d components: it places them, wires them, names and groups them. `make.sh` writes it
@@ -14,6 +15,7 @@ Rhino 7 use `_RunPythonScript`.
 | --- | --- |
 | `FootbridgeStudy.py` | The Explorer example: a steel truss footbridge analysed with Alpaca4d, and a design study of 108 designs over its span, depth, panels and chord section. |
 | `SteelCantilever.py` | The Utilisation example: a 4 m steel cantilever checked to EN 1993-1-1, with the buckling lengths a cantilever needs and the Design menu open on the report. |
+| `ColumnDomain.py` | The Interaction Domain example: a 400 x 600 reinforced concrete column's N-My-Mz domain, three combinations checked against it, and the domain drawn with Domain 3D, N-M Diagram and My-Mz Diagram beside the section. |
 | `MixedModelSpeed.py` | A speed test of Assemble Model: a shell slab on steel beams and columns, cut at the slab's nodes, on a brick raft, with point, line, mesh and gravity loads in one pattern. One slider takes it from a hundred elements to forty thousand. |
 | `../../Alpaca4d.Test/Optimisation/NonLinearOptimisationCases.py` | The eight test cases of Non-Linear Optimisation, each with a known answer. |
 
