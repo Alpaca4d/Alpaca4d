@@ -30,9 +30,10 @@ namespace Alpaca4d.Gh
                 GH_ParamAccess.item, 0.0);
 
             pManager.AddNumberParameter("Direction", "Direction",
-                "The moment direction, in degrees from the section's local y axis towards z, 0 to 90: 0 bends it about y, 90 " +
-                "about z. The moment is held to that direction and the curvature across it left free, so a section bent off its " +
-                "axes turns its neutral axis as it needs to.",
+                "The moment direction, in degrees from the section's local y axis towards z, -180 to 180: 0 bends it about y, " +
+                "90 about z, and 180 and -90 the other way about each - the other side of a section that is not symmetric, " +
+                "hogging where 0 is sagging. The moment is held to that direction and the curvature across it left free, so a " +
+                "section bent off its axes turns its neutral axis as it needs to.",
                 GH_ParamAccess.item, 0.0);
 
             pManager.AddIntegerParameter("NumIncr", "NumIncr",
@@ -117,10 +118,10 @@ namespace Alpaca4d.Gh
             bool stop = true;
             DA.GetData(7, ref stop);
 
-            if (!(degrees >= 0.0 && degrees <= 90.0))
+            if (!(degrees >= -180.0 && degrees <= 180.0))
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
-                    $"Direction has to be between 0 and 90 degrees, not {degrees}: 0 bends the section about y, 90 about z.");
+                    $"Direction has to be between -180 and 180 degrees, not {degrees}: 0 bends the section about y, 90 about z.");
                 return;
             }
             double angle = degrees * Math.PI / 180.0;

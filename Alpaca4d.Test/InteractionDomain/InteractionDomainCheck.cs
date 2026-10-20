@@ -472,6 +472,15 @@ class InteractionDomainCheck
             Relative($"{degrees} deg: ultimate moment against the domain's cut at {degrees} deg", t.UltimateMoment, Far(domain, -1000.0, degrees), 3e-3);
         }
 
+        // The other way about y: the 2 phi 16 now in tension, the 3 phi 20 in compression.
+        var hogging = Mc(s, -1000.0, 180.0, 400);
+        Relative("180 deg: ultimate moment against the domain's cut at 180 deg", hogging.UltimateMoment, Far(domain, -1000.0, 180.0), 3e-3);
+        Check("and it is not the moment the other way, the bars being unequal",
+              Math.Abs(hogging.UltimateMoment / r.UltimateMoment - 1) > 0.02,
+              $"{F(hogging.UltimateMoment)} against {F(r.UltimateMoment)} at 0 deg");
+        var down = Mc(s, -1000.0, -90.0, 400);
+        Relative("-90 deg: ultimate moment against the domain's cut at -90 deg", down.UltimateMoment, Far(domain, -1000.0, -90.0), 3e-3);
+
         var full = Mc(s, -1000.0, 0.0, 200, maxPhi: 2.0 * r.UltimateCurvature, stop: false);
         Check("told not to stop, it runs to MaxPhi and still reads the ultimate state",
               full.N.Count == 200 && !full.StoppedAtUltimate && Math.Abs(full.UltimateMoment / r.UltimateMoment - 1) < 5e-3,
