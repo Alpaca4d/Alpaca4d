@@ -429,6 +429,86 @@ class InteractionDomainCheck
         Check("and not safe", !outside.IsSafe);
     }
 
+    // ------------------------------------------------------------------ Moment Curvature, read against the domain
+
+    static MomentCurvatureResult Mc(Section s, double n, double degrees, int steps, double? maxPhi = null,
+                                    DomainSettings limits = null, bool stop = true)
+    {
+        var clock = Stopwatch.StartNew();
+        var r = MomentCurvatureAnalysis.Run(s.FiberSection(), s.Layout, n, degrees * Math.PI / 180, steps, maxPhi,
+                                            limits ?? new DomainSettings(), stop, Folder, Folder, "mc_materials", deck => Run(deck));
+        Console.WriteLine($"        (N {n}, {degrees} deg: {r.N.Count} increments of {steps}, MaxPhi {F(r.MaxPhi)}{(r.MaxPhiFromDomain ? " from the domain" : "")}, {clock.ElapsedMilliseconds} ms)");
+        return r;
+    }
+
+    static double Far(InteractionDomain domain, double n, double degrees)
+    {
+        double a = degrees * Math.PI / 180;
+        domain.LineHits(n, a, out _, out var far);
+        return Math.Cos(a) * far.My + Math.Sin(a) * far.Mz;
+    }
+
+    static void MomentCurvatureCases()
+    {
+        Console.WriteLine("Moment Curvature on the rectangle, stopped at its ultimate strain");
+        var s = Rectangle(out _, out _);
+        var domain = Domain(s.Layout, new DomainSettings(), "rectangle_mc");
+
+        var r = Mc(s, -1000.0, 0.0, 400);
+        Check("it stopped itself at the ultimate state", r.StoppedAtUltimate && !r.Incomplete);
+        Check("MaxPhi from the domain leaves it most of its increments", r.N.Count > 300 && r.N.Count < 400, $"{r.N.Count} of 400");
+        Relative("ultimate moment against the domain's N-My cut", r.UltimateMoment, Far(domain, -1000.0, 0.0), 3e-3);
+        Check("the concrete governs, and says where", r.Failure != null && r.Failure.Contains("crushes"), r.Failure ?? "");
+        Check("first yield comes before the ultimate state", r.YieldCurvature > 0 && r.YieldCurvature < r.UltimateCurvature && r.Ductility > 1,
+              $"κy {F(r.YieldCurvature)}, κu {F(r.UltimateCurvature)}, ductility {F(r.Ductility)}");
+
+        foreach (var degrees in new[] { 30.0, 90.0 })
+        {
+            var t = Mc(s, -1000.0, degrees, 400);
+            double a = degrees * Math.PI / 180;
+            int last = t.N.Count - 1;
+            double across = -Math.Sin(a) * t.My[last] + Math.Cos(a) * t.Mz[last];
+            Near($"{degrees} deg: the moment stays in its direction, the moment across it at the end", across, 0.0, 1e-5 * Math.Abs(t.Moment[last]) + 1e-9);
+            Relative($"{degrees} deg: ultimate moment against the domain's cut at {degrees} deg", t.UltimateMoment, Far(domain, -1000.0, degrees), 3e-3);
+        }
+
+        var full = Mc(s, -1000.0, 0.0, 200, maxPhi: 2.0 * r.UltimateCurvature, stop: false);
+        Check("told not to stop, it runs to MaxPhi and still reads the ultimate state",
+              full.N.Count == 200 && !full.StoppedAtUltimate && Math.Abs(full.UltimateMoment / r.UltimateMoment - 1) < 5e-3,
+              $"{full.N.Count} increments, Mu {F(full.UltimateMoment)}");
+
+        bool threw = false;
+        try { Mc(s, 1.1 * domain.Nc, 0.0, 100); } catch (InvalidOperationException) { threw = true; }
+        Check("an axial force past the section's resistance is refused before anything runs", threw);
+
+        Check("Direction reads y, z and degrees", Alpaca4d.Template.MomentCurvature.Direction("y") == 0.0 &&
+              Math.Abs(Alpaca4d.Template.MomentCurvature.Direction("Z") - Math.PI / 2) < 1e-15 &&
+              Math.Abs(Alpaca4d.Template.MomentCurvature.Direction("30") - Math.PI / 6) < 1e-15);
+        threw = false;
+        try { Alpaca4d.Template.MomentCurvature.Direction("x"); } catch (ArgumentException) { threw = true; }
+        Check("and refuses anything else", threw);
+
+        Console.WriteLine("Moment Curvature on the L, bent at 45 deg, its neutral axis turning");
+        var l = LShape();
+        var lDomain = Domain(l.Layout, new DomainSettings(), "lshape_mc");
+        var lr = Mc(l, -1000.0, 45.0, 400);
+        Relative("ultimate moment against the domain's cut at 45 deg", lr.UltimateMoment, Far(lDomain, -1000.0, 45.0), 3e-3);
+
+        Console.WriteLine("Moment Curvature on the HEA 300, N = 0, eud = 5%");
+        var steel = new Steel01("S355", fy, E, 0.0);
+        var h = Hea300(steel);
+        double iy = h.Layout.Fibres.Sum(f => f.Area * f.Z * f.Z);
+        double wply = h.Layout.Fibres.Sum(f => f.Area * Math.Abs(f.Z));
+        var hr = Mc(h, 0.0, 0.0, 500, limits: new DomainSettings { SteelUltimateStrain = 0.05 });
+        Relative("first yield at Wel,y fy", hr.YieldMoment, fy * iy / (Hh / 2), 1e-4);
+        Relative("at the curvature fy/E over half the depth", hr.YieldCurvature, fy / E / (Hh / 2), 2e-3);
+        Relative("its secant stiffness is E Iy", hr.YieldStiffness, E * iy, 1e-4);
+        Relative("ultimate at eud over half the depth", hr.UltimateCurvature, 0.05 / (Hh / 2), 2e-3);
+        Relative("with Mpl,y", hr.UltimateMoment, wply * fy, 3e-3);
+        Relative("ductility eud / ey", hr.Ductility, 0.05 / (fy / E), 3e-3);
+        Check("the steel governs, in tension or compression at a flange", hr.Failure != null && hr.Failure.Contains("S355"), hr.Failure ?? "");
+    }
+
     static void MinMaxCases()
     {
         Console.WriteLine("MinMax");
@@ -454,6 +534,7 @@ class InteractionDomainCheck
             LCases();
             SteelCases();
             MinMaxCases();
+            MomentCurvatureCases();
         }
         finally
         {
