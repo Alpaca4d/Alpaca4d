@@ -70,6 +70,12 @@ namespace Alpaca4d.Section
         /// <summary>εc2, positive, for a concrete with a pivot C; NaN otherwise.</summary>
         public double PivotStrain { get; internal set; } = double.NaN;
 
+        /// <summary>
+        /// The strain it first yields at, either way - fy over its elastic modulus, for Steel01 and
+        /// ReinforcingSteel - or NaN for a material that has no yield of its own to report.
+        /// </summary>
+        public double YieldStrain { get; internal set; } = double.NaN;
+
         /// <summary>The material's stress-strain curve, as OpenSees traced it.</summary>
         public StressStrainCurve Curve { get; internal set; }
 
@@ -244,6 +250,11 @@ namespace Alpaca4d.Section
                 result.IsConcrete = false;
                 result.TensionLimit = settings.SteelUltimateStrain;
                 result.CompressionLimit = settings.SteelUltimateStrain;
+
+                if (material is Steel01 steel && steel.E0 > 0.0)
+                    result.YieldStrain = Math.Abs(steel.Fy) / steel.E0;
+                else if (material is ReinforcingSteel bar && bar.Es > 0.0)
+                    result.YieldStrain = Math.Abs(bar.Fy) / bar.Es;
 
                 var wrapper = MinMaxOf(material);
                 if (wrapper != null)
@@ -423,12 +434,57 @@ namespace Alpaca4d.Section
         // ---------------------------------------------------------------- strain planes
 
         /// <summary>
-        /// The factor that takes the plane (e0, ky, kz) to its first limit: the most any fibre's
-        /// strain can grow by before one reaches its material's ultimate strain.
+        /// How far the plane (e0, ky, kz) has taken the section towards its ultimate strains: the
+        /// largest strain over its limit of every material, so 1 where the first fibre reaches one.
+        /// Zero for the unstrained section.
         /// </summary>
-        public double LimitFactor(double e0, double ky, double kz)
+        public double UltimateRatio(double e0, double ky, double kz) => Ratio(e0, ky, kz, out _);
+
+        /// <summary>What reaches its limit first under the plane (e0, ky, kz), in words.</summary>
+        public string Governs(double e0, double ky, double kz)
         {
-            double factor = double.PositiveInfinity;
+            Ratio(e0, ky, kz, out var governing);
+            if (governing.Material == null)
+                return "Nothing is strained.";
+
+            string at = governing.Point >= 0
+                ? $" at y = {governing.Material.HullY[governing.Point] + CentroidY:0.###}, z = {governing.Material.HullZ[governing.Point] + CentroidZ:0.###}"
+                : "";
+            switch (governing.Kind)
+            {
+                case LimitKind.Pivot:
+                    return $"{governing.Material.Name} reaches εc2 = {governing.Material.PivotStrain:0.#####} at point C, all in compression.";
+                case LimitKind.Compression:
+                    return governing.Material.IsConcrete
+                        ? $"{governing.Material.Name} crushes at εcu = {governing.Material.CompressionLimit:0.#####}{at}."
+                        : $"{governing.Material.Name} reaches -{governing.Material.CompressionLimit:0.#####} in compression{at}.";
+                default:
+                    return $"{governing.Material.Name} reaches +{governing.Material.TensionLimit:0.#####} in tension{at}.";
+            }
+        }
+
+        private enum LimitKind { Compression, Tension, Pivot }
+
+        private struct Limit
+        {
+            public DomainMaterial Material;
+            public LimitKind Kind;
+            public int Point;
+        }
+
+        private double Ratio(double e0, double ky, double kz, out Limit governing)
+        {
+            double ratio = 0.0;
+            var best = new Limit { Point = -1 };
+
+            void Take(double r, DomainMaterial material, LimitKind kind, int point)
+            {
+                if (r > ratio)
+                {
+                    ratio = r;
+                    best = new Limit { Material = material, Kind = kind, Point = point };
+                }
+            }
 
             foreach (var material in _materials)
             {
@@ -438,17 +494,18 @@ namespace Alpaca4d.Section
                     continue;
 
                 double low = double.PositiveInfinity, high = double.NegativeInfinity;
+                int lowAt = -1, highAt = -1;
                 for (int i = 0; i < hy.Length; i++)
                 {
                     double strain = e0 - hy[i] * kz + hz[i] * ky;
-                    if (strain < low) low = strain;
-                    if (strain > high) high = strain;
+                    if (strain < low) { low = strain; lowAt = i; }
+                    if (strain > high) { high = strain; highAt = i; }
                 }
 
                 if (low < 0.0 && !double.IsInfinity(material.CompressionLimit))
-                    factor = Math.Min(factor, material.CompressionLimit / -low);
+                    Take(-low / material.CompressionLimit, material, LimitKind.Compression, lowAt);
                 if (high > 0.0 && !double.IsInfinity(material.TensionLimit))
-                    factor = Math.Min(factor, material.TensionLimit / high);
+                    Take(high / material.TensionLimit, material, LimitKind.Tension, highAt);
 
                 // Eurocode 2 6.1(5), Figure 6.1: with the concrete all in compression the strain
                 // pivots about C, (1 - εc2/εcu2) of the depth from the most compressed edge, where it
@@ -458,9 +515,22 @@ namespace Alpaca4d.Section
                 {
                     double atC = low + (high - low) * (1.0 - material.PivotStrain / material.CompressionLimit);
                     if (atC < 0.0)
-                        factor = Math.Min(factor, material.PivotStrain / -atC);
+                        Take(-atC / material.PivotStrain, material, LimitKind.Pivot, -1);
                 }
             }
+
+            governing = best;
+            return ratio;
+        }
+
+        /// <summary>
+        /// The factor that takes the plane (e0, ky, kz) to its first limit: the most any fibre's
+        /// strain can grow by before one reaches its material's ultimate strain.
+        /// </summary>
+        public double LimitFactor(double e0, double ky, double kz)
+        {
+            double ratio = UltimateRatio(e0, ky, kz);
+            double factor = ratio > 0.0 ? 1.0 / ratio : double.PositiveInfinity;
 
             // No limit at all binds a plane that only stretches concrete; it stops where the curves do.
             double largest = 0.0;
@@ -470,6 +540,69 @@ namespace Alpaca4d.Section
                 factor = Math.Min(factor, MaxStrain / largest);
 
             return factor;
+        }
+
+        /// <summary>
+        /// How far the plane (e0, ky, kz) has taken the section towards first yield: the largest
+        /// strain over its yield strain of every material that has one, so 1 where the first such
+        /// fibre yields. NaN when no material of the section yields.
+        /// </summary>
+        public double YieldRatio(double e0, double ky, double kz)
+        {
+            double ratio = double.NaN;
+            foreach (var material in _materials)
+            {
+                if (double.IsNaN(material.YieldStrain) || !(material.YieldStrain > 0.0) || material.HullY.Length == 0)
+                    continue;
+
+                double largest = 0.0;
+                for (int i = 0; i < material.HullY.Length; i++)
+                    largest = Math.Max(largest, Math.Abs(e0 - material.HullY[i] * kz + material.HullZ[i] * ky));
+
+                double r = largest / material.YieldStrain;
+                ratio = double.IsNaN(ratio) ? r : Math.Max(ratio, r);
+            }
+            return ratio;
+        }
+
+        /// <summary>
+        /// <see cref="UltimateRatio"/> as a Tcl proc, for a deck to stop itself at the ultimate state:
+        /// <c>name e0 kz ky</c>, the order "section deformation" reports them in, returns the ratio.
+        /// </summary>
+        public string UltimateRatioTcl(string name)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"proc {name} {{e0 kz ky args}} {{\n");
+            sb.Append("\tset ratio 0.0\n");
+            foreach (var material in _materials)
+            {
+                if (material.HullY.Length == 0)
+                    continue;
+
+                // ASCII only: the interpreter reads the deck in the system's encoding.
+                sb.Append($"\t# material {material.Tag}\n");
+                sb.Append("\tset low 1e30\n\tset high -1e30\n");
+                sb.Append("\tforeach {y z} {");
+                for (int i = 0; i < material.HullY.Length; i++)
+                    sb.Append(i == 0 ? "" : " ").Append(TclNumber.Write(material.HullY[i])).Append(' ').Append(TclNumber.Write(material.HullZ[i]));
+                sb.Append("} {\n");
+                sb.Append("\t\tset s [expr {$e0 - $y*$kz + $z*$ky}]\n");
+                sb.Append("\t\tif {$s < $low} {set low $s}\n");
+                sb.Append("\t\tif {$s > $high} {set high $s}\n");
+                sb.Append("\t}\n");
+                if (!double.IsInfinity(material.CompressionLimit))
+                    sb.Append($"\tif {{$low < 0.0}} {{set ratio [expr {{max($ratio, -$low / {TclNumber.Write(material.CompressionLimit)})}}]}}\n");
+                if (!double.IsInfinity(material.TensionLimit))
+                    sb.Append($"\tif {{$high > 0.0}} {{set ratio [expr {{max($ratio, $high / {TclNumber.Write(material.TensionLimit)})}}]}}\n");
+                if (material.IsConcrete && !double.IsNaN(material.PivotStrain))
+                {
+                    double share = 1.0 - material.PivotStrain / material.CompressionLimit;
+                    sb.Append($"\tset c [expr {{$low + ($high - $low) * {TclNumber.Write(share)}}}]\n");
+                    sb.Append($"\tif {{$c < 0.0}} {{set ratio [expr {{max($ratio, -$c / {TclNumber.Write(material.PivotStrain)})}}]}}\n");
+                }
+            }
+            sb.Append("\treturn $ratio\n}\n");
+            return sb.ToString();
         }
 
         /// <summary>The section's forces under the strain plane (e0, ky, kz), as OpenSees' fibre section gives them.</summary>
