@@ -143,7 +143,9 @@ namespace Alpaca4d.Gh
             // the log output either way, which is what a failure message can point at.
             DA.SetData(0, text + Environment.NewLine + solverLog);
 
-            if (exitCode != 0 || output.Contains(Alpaca4d.Template.MomentCurvature.AxialFailedMarker))
+            // In both streams: OpenSees 3.8 sends a deck's puts to stderr, and the markers were
+            // looked for in stdout alone.
+            if (exitCode != 0 || solverLog.Contains(Alpaca4d.Template.MomentCurvature.AxialFailedMarker))
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
                     "The axial step did not converge, so no curvature was applied. See the log output." +
@@ -151,7 +153,7 @@ namespace Alpaca4d.Gh
                 return;
             }
 
-            var incomplete = output.Contains(Alpaca4d.Template.MomentCurvature.CurvatureIncompleteMarker);
+            var incomplete = solverLog.Contains(Alpaca4d.Template.MomentCurvature.CurvatureIncompleteMarker);
 
             var force = ReadHistory(Alpaca4d.Template.MomentCurvature.ForceFilePath);
             var deformation = ReadHistory(Alpaca4d.Template.MomentCurvature.DeformationFilePath);
