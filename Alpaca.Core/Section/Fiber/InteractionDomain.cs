@@ -768,6 +768,11 @@ namespace Alpaca4d.Section
             check.CapacityMz = low * mz;
         }
 
+        /// <summary>What a Panel shows of the domain.</summary>
+        public override string ToString() =>
+            $"Interaction domain: N {Nc:0.#} to {Nt:0.#} kN, My {MinMy:0.#} to {MaxMy:0.#} kN m, Mz {MinMz:0.#} to {MaxMz:0.#} kN m " +
+            $"({Levels.Length} levels x {Thetas.Length} points)";
+
         private static string Join(string a, string b) =>
             string.IsNullOrEmpty(b) ? a : string.IsNullOrEmpty(a) ? b : a + " " + b;
 
