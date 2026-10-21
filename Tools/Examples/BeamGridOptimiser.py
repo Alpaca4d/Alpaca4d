@@ -21,7 +21,7 @@ import System
 import Rhino
 import Grasshopper
 from Grasshopper.Kernel import GH_Document, GH_DataMapping
-from Grasshopper.Kernel.Types import GH_Number
+from Grasshopper.Kernel.Types import GH_Number, GH_Integer, GH_String
 from Grasshopper.Kernel.Special import (GH_NumberSlider, GH_Group, GH_Panel, GH_ValueList,
                                         GH_ValueListItem, GH_ValueListMode, GH_BooleanToggle)
 from Grasshopper.GUI.Base import GH_SliderAccuracy
@@ -49,12 +49,16 @@ ASSEMBLE = "B6978C42-7B88-4F1A-A5DF-85EF89F154F9"           # Assemble Model
 MODEL_VIEW = "5EDB6364-D458-43D6-81E9-324DECA1FEA6"         # Model View
 VIEW_RESULTS = "4D8A0F26-3B71-4E59-9C84-A2F70D51B6E3"       # View Results
 OPTIMISER = "56302D3A-734F-4B03-899E-F6C273CF1B9F"          # Section Optimiser
+LEGEND = "A6B3B5C9-DB8D-4B6A-9E7E-63C6D2E2F9F5"             # Legend
 
 # ForceBeamColumn's inputs, by place.
 B_LINE, B_SECTION, B_ELEMENT_ID = 0, 1, 5
 # Section Optimiser's inputs and outputs, by place.
 O_MODEL, O_MAX_UTILISATION, O_ITERATIONS = 0, 3, 4
 O_MODEL_OUT, O_MASS, O_CONVERGED, O_HISTORY = 0, 4, 5, 8
+# View Results' outputs and Legend's inputs, by place.
+R_VALUES, R_COLORS = 1, 2
+L_TITLE, L_DATA, L_COLORS, L_POSITION = 0, 1, 2, 3
 
 # Faint group colours from Alpaca4d's palette, one per stage of the definition.
 RED = Color.FromArgb(50, 254, 0, 0)
@@ -215,6 +219,20 @@ def number(param, *values):
     return param
 
 
+def integer(param, value):
+    """Types a whole number into an unwired input."""
+    param.PersistentData.Clear()
+    param.PersistentData.Append(GH_Integer(int(value)))
+    return param
+
+
+def words(param, value):
+    """Types a text into an unwired input."""
+    param.PersistentData.Clear()
+    param.PersistentData.Append(GH_String(value))
+    return param
+
+
 def slider(grid, name, lo, hi, value, decimals, col, row=None, gap=0):
     s = GH_NumberSlider()
     s.CreateAttributes()
@@ -324,7 +342,7 @@ def open_menus(c):
 
 # Columns in the order the data flows...
 INPUTS, NUMBERS, SERIES_, POINTS, LINES, DIVIDED, POLYLINES, SEGMENTS, NAMES, ELEMENT, LOADS, PATTERN = range(12)
-MODEL, OPTIMISE, RESULTS = range(12, 15)
+MODEL, OPTIMISE, RESULTS, KEY = range(12, 16)
 # ...and rows, one per part of the model.
 ALONG_X, ALONG_Y, BEARINGS, LOADING = range(4)
 
@@ -431,7 +449,8 @@ def build(doc):
 
     # 6 - The optimiser: no design group, so every element goes to the first section of its family -
     # the HEAs, for an HEA300 - that holds it, smallest area first. Model View draws the sections it
-    # chose; View Results, hidden, the deformed grid. Switch Model View off and View Results on to see it.
+    # chose; View Results, hidden, how far the grid moves, with a Legend on the right of the view,
+    # hidden with it. Switch Model View off and View Results and Legend on to see them.
     assemble = component(grid, ASSEMBLE, "Assemble Model", None, MODEL, ALONG_X)
     wire(inp(assemble, 0), out(beam))
     wire(inp(assemble, 1), out(support))
@@ -451,6 +470,11 @@ def build(doc):
     wire(inp(view, 0), out(optimiser, O_MODEL_OUT))
     results = component(grid, VIEW_RESULTS, "View Results", None, RESULTS, ALONG_Y, gap=10)
     wire(inp(results, 0), out(optimiser, O_MODEL_OUT))
+    legend = component(grid, LEGEND, "Legend", None, KEY, ALONG_Y)
+    words(inp(legend, L_TITLE), "Displacement [mm]")
+    wire(inp(legend, L_DATA), out(results, R_VALUES))
+    wire(inp(legend, L_COLORS), out(results, R_COLORS))
+    integer(inp(legend, L_POSITION), 1)
 
     grid.arrange(0, 0, stages=(NUMBERS, NAMES, MODEL))
 
@@ -461,7 +485,7 @@ def build(doc):
     group(doc, "4 - Supports", [offset, near, far] + corners + [held, free, support], GREEN)
     group(doc, "5 - Loads", [down, direction, node_load, gravity, pattern], BLUE)
     group(doc, "6 - Every element on its own, within its family",
-          [assemble, max_utilisation, optimiser, mass, converged, history, view, results], YELLOW)
+          [assemble, max_utilisation, optimiser, mass, converged, history, view, results, legend], YELLOW)
 
     # Only the sized grid draws in Rhino, not the construction lines behind it.
     for obj in doc.Objects:
@@ -479,7 +503,8 @@ def build(doc):
          "material gathers over the supports and the edges go light.\n\n"
          "The Section Optimiser has no design group, so every element is sized on its own, within the "
          "family of the section it starts with - the HEAs, for an HEA300 - smallest area first. Model "
-         "View draws the sections it chose; switch it off and View Results on for the deformed grid.\n\n"
+         "View draws the sections it chose; switch it off, and View Results and Legend on, for how far "
+         "the grid moves.\n\n"
          "The sections are only a start: choose your own, or give lines of beams a Design Group each "
          "so that every line ends up with one section.",
          0, -380, 620, 320)
