@@ -41,6 +41,18 @@ namespace Alpaca4d.Element
             this.BeamIntegration = new NewtonContes(crossSection, 5);
         }
 
+        public IBeam WithSection(IUniaxialSection section)
+        {
+            var beam = new ForceBeamColumn(this.Curve, section, this.GeomTransf.Copy())
+            {
+                ElementId = this.ElementId,
+                Color = this.Color,
+            };
+            if (this.BeamIntegration is NewtonContes newtonCotes)
+                beam.BeamIntegration = new NewtonContes(section, newtonCotes.IntegrationPoint);
+            return beam;
+        }
+
         // each element will have a unique tag for TransfTag, IntegrationTag
         public void SetTags()
         {

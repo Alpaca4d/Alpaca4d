@@ -140,6 +140,22 @@ namespace Alpaca4d.Element
                 Held(hinge.Izz, interior.Izz));
         }
 
+        /// <summary>
+        /// The releases and hinge lengths are read back off the hinge sections, which are made again
+        /// from the new section.
+        /// </summary>
+        public IBeam WithSection(IUniaxialSection section)
+        {
+            var hinges = this.HingeIntegration;
+            return new BeamWithHinges(this.Curve, section, this.GeomTransf.Copy(),
+                                      ReleaseOf(hinges.SectionI, hinges.Section), this.LpRatioI,
+                                      ReleaseOf(hinges.SectionJ, hinges.Section), this.LpRatioJ)
+            {
+                ElementId = this.ElementId,
+                Color = this.Color,
+            };
+        }
+
         public void SetTags()
         {
             this.GeomTransf.Id = this.Id;

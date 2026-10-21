@@ -810,6 +810,8 @@ class SteelCheckTest
         public void SetTags() { }
         public void SetTopologyRTree(Model model) { }
         public string WriteTcl() => "";
+        public IBeam WithSection(IUniaxialSection section) =>
+            new StubBeam { Id = Id, ElementId = ElementId, Section = section, BeamIntegration = new Alpaca4d.BeamIntegration.NewtonContes(section, BeamIntegration?.IntegrationPoint ?? 5) };
     }
 
     static void Chain(string folder)
