@@ -87,6 +87,37 @@ namespace Alpaca4d.Design
         }
 
         /// <summary>
+        /// A lower bound on the Max of <see cref="Run"/>, for ruling a section out without the whole check:
+        /// axial force, shear and bending each against the section's full plastic resistance, before
+        /// anything reduces it - torsion, shear, an elastic modulus for Class 3 - and before buckling, which
+        /// only adds checks. Run makes each of these against a resistance no larger, so whenever it has a
+        /// Max, the Max is at least this. A section whose bound is above the target fails without Run.
+        /// </summary>
+        public static double LowerBound(SteelSection section, IReadOnlyList<SectionForces> forces, double gammaM0 = 1.0)
+        {
+            if (section == null || forces == null)
+                return 0.0;
+
+            double fy = section.Fy;
+            double nplRd = section.A * fy / gammaM0;
+            double vplY = Ec3.PlasticShear(section.AvY, fy, gammaM0);
+            double vplZ = Ec3.PlasticShear(section.AvZ, fy, gammaM0);
+            double mplY = section.WplY * fy / gammaM0;
+            double mplZ = section.WplZ * fy / gammaM0;
+
+            double bound = 0.0;
+            foreach (var f in forces)
+            {
+                bound = Math.Max(bound, Ratio(f.N, nplRd));
+                bound = Math.Max(bound, Ratio(f.Vy, vplY));
+                bound = Math.Max(bound, Ratio(f.Vz, vplZ));
+                bound = Math.Max(bound, Ratio(f.My, mplY));
+                bound = Math.Max(bound, Ratio(f.Mz, mplZ));
+            }
+            return bound;
+        }
+
+        /// <summary>
         /// Checks one member.
         /// </summary>
         /// <param name="forces">The section forces at each integration section, I end to J end.</param>

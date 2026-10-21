@@ -232,41 +232,17 @@ namespace Alpaca4d.Gh
                 return;
             }
 
-            const string AnalyzeResultTag = "ALPACA_ANALYZE_RESULT";
             string log = string.IsNullOrEmpty(error) ? output : error + "\n" + output;
 
-            if (exitCode != 0)
+            string failure = AnalysisOutcome.Failure(output, exitCode);
+            if (failure != null)
             {
-                // A non-zero exit code means the Tcl script itself errored out
-                // (e.g. bad command, undefined material) - see TclInterpreter::run.
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Analysis Failed: OpenSees exited with an error. See log for details.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, failure);
                 analysisModel = null;
             }
-            else
+            else if (error.Contains("WARNING"))
             {
-                // analyze() always returns TCL_OK to Tcl even on non-convergence; the
-                // actual result is a negative integer captured via the sentinel below.
-                int? analyzeResult = null;
-                var resultLine = output
-                    .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
-                    .LastOrDefault(l => l.Contains(AnalyzeResultTag));
-
-                if (resultLine != null)
-                {
-                    var token = resultLine.Substring(resultLine.IndexOf(AnalyzeResultTag) + AnalyzeResultTag.Length).Trim();
-                    if (int.TryParse(token, out int parsed))
-                        analyzeResult = parsed;
-                }
-
-                if (analyzeResult.HasValue && analyzeResult.Value < 0)
-                {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Analysis Failed: OpenSees 'analyze' did not converge.");
-                    analysisModel = null;
-                }
-                else if (error.Contains("WARNING"))
-                {
-                    AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Warning! Double check the log!");
-                }
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Warning! Double check the log!");
             }
 
             DA.SetData(ModelOutput, analysisModel);

@@ -268,11 +268,11 @@ namespace Alpaca4d.Gh
             var kept = ElementFilterInput.Select(filter, beams, alpacaModel, "beams", this);
 
             string lengthY = this.MemberInputs ? "LengthY" : "Length";
-            if (!Spread(lengthsY, kept.Count, lengthY, out var eachY) ||
-                !Spread(lengthsZ, kept.Count, "LengthZ", out var eachZ) ||
-                !Spread(lengthsLT, kept.Count, "LengthLT", out var eachLT) ||
-                !Spread(loads, kept.Count, "Load", out var eachLoad) ||
-                !Spread(sways, kept.Count, "Sway", out var eachSway))
+            if (!Spread(this, lengthsY, kept.Count, lengthY, out var eachY) ||
+                !Spread(this, lengthsZ, kept.Count, "LengthZ", out var eachZ) ||
+                !Spread(this, lengthsLT, kept.Count, "LengthLT", out var eachLT) ||
+                !Spread(this, loads, kept.Count, "Load", out var eachLoad) ||
+                !Spread(this, sways, kept.Count, "Sway", out var eachSway))
                 return;
 
             if (lengthsY.Concat(lengthsZ).Concat(lengthsLT).Any(x => x <= 0.0))
@@ -345,7 +345,7 @@ namespace Alpaca4d.Gh
         /// One value per kept beam from a list of none (no value for any), one (the same for all) or
         /// one each. False, with an error, for any other count.
         /// </summary>
-        private bool Spread<T>(List<T> values, int count, string name, out List<T?> each) where T : struct
+        internal static bool Spread<T>(GH_Component component, List<T> values, int count, string name, out List<T?> each) where T : struct
         {
             each = Enumerable.Range(0, count)
                              .Select(j => values.Count == 0 ? (T?)null : values.Count == 1 ? values[0] : j < values.Count ? values[j] : (T?)null)
@@ -353,7 +353,7 @@ namespace Alpaca4d.Gh
 
             if (values.Count > 1 && values.Count != count)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
+                component.AddRuntimeMessage(GH_RuntimeMessageLevel.Error,
                     $"{name} has {values.Count} values for {count} beams. Give one for all of them, or one each.");
                 return false;
             }
@@ -440,7 +440,7 @@ namespace Alpaca4d.Gh
             });
         }
 
-        private static bool TryFabrication(string text, out Fabrication fabrication)
+        internal static bool TryFabrication(string text, out Fabrication fabrication)
         {
             var key = (text ?? "").Replace(" ", "").Replace("-", "").ToLowerInvariant();
             switch (key)
@@ -461,7 +461,7 @@ namespace Alpaca4d.Gh
             }
         }
 
-        private static bool TryLoad(string text, out LoadPosition load)
+        internal static bool TryLoad(string text, out LoadPosition load)
         {
             var key = (text ?? "").Replace(" ", "").Replace("-", "").Replace("_", "").ToLowerInvariant();
             switch (key)

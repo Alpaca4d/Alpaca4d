@@ -517,6 +517,71 @@ namespace Alpaca4d
         }
 
         /// <summary>
+        /// This model again, assembled, with other sections on its beams: one section per beam, in the
+        /// order of <see cref="Beams"/>. A beam that keeps its section is the same object; the others are
+        /// new beams (<see cref="IBeam.WithSection"/>), so nothing upstream changes. Supports,
+        /// constraints, masses and loads are this model's own, except that a line load on a beam that
+        /// changed is moved onto the new one. Self-weight follows the new sections.
+        /// </summary>
+        public Model WithBeamSections(IReadOnlyList<IUniaxialSection> sections)
+        {
+            if (sections == null || sections.Count != this.Beams.Count)
+                throw new ArgumentException($"{sections?.Count ?? 0} sections for {this.Beams.Count} beams.");
+
+            var replaced = new Dictionary<IBeam, IBeam>();
+            for (int i = 0; i < this.Beams.Count; i++)
+            {
+                var beam = this.Beams[i];
+                if (!ReferenceEquals(sections[i], beam.Section))
+                    replaced[beam] = beam.WithSection(sections[i]);
+            }
+
+            var elements = this.Elements
+                .Select(item => item is IBeam beam && replaced.TryGetValue(beam, out var other) ? other : item)
+                .ToList();
+
+            var model = new Model(elements, this.Supports, this.LoadPatterns.Select(pattern => Repointed(pattern, replaced)).ToList(),
+                                  this.Constraint, this.Recorders)
+            {
+                Mass = this.Mass,
+                Tollerance = this.Tollerance,
+            };
+            model.Assemble();
+            return model;
+        }
+
+        /// <summary>The pattern with its line loads on <paramref name="replaced"/> beams moved onto the new ones; itself when none are.</summary>
+        private static LoadPattern Repointed(LoadPattern pattern, Dictionary<IBeam, IBeam> replaced)
+        {
+            if (pattern.PatternType == PatternType.UniformExcitation || pattern.Load == null ||
+                !pattern.Load.Any(load => load is Alpaca4d.Loads.LineLoad line && line.Element != null && replaced.ContainsKey(line.Element)))
+                return pattern;
+
+            var loads = pattern.Load.Select(load =>
+            {
+                if (!(load is Alpaca4d.Loads.LineLoad line) || line.Element == null || !replaced.TryGetValue(line.Element, out var beam))
+                    return load;
+
+                return new Alpaca4d.Loads.LineLoad
+                {
+                    Id = line.Id,
+                    Range = line.Range,
+                    AllElements = line.AllElements,
+                    Element = beam,
+                    GlobalForce = line.GlobalForce,
+                    LocalForce = line.LocalForce,
+                    Ndf = line.Ndf,
+                    Type = line.Type,
+                    PatternTag = line.PatternTag,
+                    TimeSeries = line.TimeSeries,
+                    IsLocal = line.IsLocal,
+                };
+            }).ToList();
+
+            return new LoadPattern(pattern.PatternType, pattern.TimeSeries, loads, pattern.Factor) { Name = pattern.Name };
+        }
+
+        /// <summary>
         /// The nodes of the model: every point an element or a constraint reaches, welded within
         /// <see cref="Tollerance"/>, in the order they are reached - beams, shells, constraints for
         /// the six degree of freedom nodes, solids for the three. Each point joins the node already

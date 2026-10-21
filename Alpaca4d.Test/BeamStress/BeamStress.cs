@@ -623,6 +623,8 @@ class BeamStressTest
         public void SetTags() { }
         public void SetTopologyRTree(Alpaca4d.Model model) { }
         public string WriteTcl() => "";
+        public Alpaca4d.Generic.IBeam WithSection(Alpaca4d.Generic.IUniaxialSection section) =>
+            new StubBeam { Id = Id, ElementId = ElementId, Section = section, BeamIntegration = new Alpaca4d.BeamIntegration.NewtonContes(section, BeamIntegration?.IntegrationPoint ?? 5) };
     }
 
     static void ReaderTests(string folder)
