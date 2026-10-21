@@ -55,10 +55,17 @@ namespace Alpaca4d.Gh
             // Material is optional, defaulting to elastic steel if not supplied
             pManager.AddGenericParameter("Material", "Material", "Section material (defaults to Elastic Steel)", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
+
+            // Colour is optional: left empty, Model View picks one for each section
+            pManager.AddParameter(ColourInput.Make(ColourDescription));
             
             // Gap parameter for double L-sections (2L) will be added dynamically
-            // when the 2L family is selected
+            // when the 2L family is selected, after Material
         }
+
+        private const string ColourDescription =
+            "The colour the section is drawn in when Model View colours the elements by section - every section of the list, with Section set to All. " +
+            "Left empty, Model View gives each section a colour of its own.";
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
@@ -145,16 +152,8 @@ namespace Alpaca4d.Gh
 
             if (is2LFamily && !hasGapParameter)
             {
-                // Add Gap parameter after Section Name (at index 2)
-                var newGapParam = new Grasshopper.Kernel.Parameters.Param_Number();
-                newGapParam.Name = "Gap";
-                newGapParam.NickName = "Gap";
-                newGapParam.Description = "Gap between two L-sections (in meters)";
-                newGapParam.Access = GH_ParamAccess.item;
-                newGapParam.Optional = true;
-                newGapParam.SetPersistentData(0.01); // Default value 10mm
-                
-                Params.RegisterInputParam(newGapParam, 2);
+                // Add Gap parameter after Material (at index 2)
+                Params.RegisterInputParam(GapParam(), 2);
                 Params.OnParametersChanged();
                 OnDisplayExpired(true);
             }
@@ -165,6 +164,26 @@ namespace Alpaca4d.Gh
                 Params.OnParametersChanged();
                 OnDisplayExpired(true);
             }
+        }
+
+        private static IGH_Param GapParam()
+        {
+            var gapParam = new Grasshopper.Kernel.Parameters.Param_Number();
+            gapParam.Name = "Gap";
+            gapParam.NickName = "Gap";
+            gapParam.Description = "Gap between two L-sections (in meters)";
+            gapParam.Access = GH_ParamAccess.item;
+            gapParam.Optional = true;
+            gapParam.SetPersistentData(0.01); // Default value 10mm
+            return gapParam;
+        }
+
+        /// <summary>The inputs this component makes for itself, for <see cref="StoredInputs.Match"/>.</summary>
+        private static IGH_Param MakeInput(string name)
+        {
+            if (name == "Gap") return GapParam();
+            if (name == ColourInput.Name) return ColourInput.Make(ColourDescription);
+            return null;
         }
 
         #endregion
@@ -348,6 +367,9 @@ namespace Alpaca4d.Gh
                 try { DA.GetData(1, ref material); } catch { }
             }
 
+            // Colour input (optional) - left null, Model View picks one
+            System.Drawing.Color? colour = ColourInput.Read(this, DA);
+
             // Gap input (optional, for L-sections)
             double gap = 0.01; // Default 10mm gap
             var gapParamIndex = Params.Input.FindIndex(p => p.Name == "Gap");
@@ -397,7 +419,10 @@ namespace Alpaca4d.Gh
 
             if (selSection == All)
             {
-                DA.SetDataList(0, AllSections(selFamily, material, gap));
+                var sections = AllSections(selFamily, material, gap);
+                foreach (var each in sections)
+                    each.Color = colour;
+                DA.SetDataList(0, sections);
                 return;
             }
 
@@ -409,6 +434,7 @@ namespace Alpaca4d.Gh
                 return;
             }
 
+            section.Color = colour;
             DA.SetData(0, section);
         }
 
@@ -559,7 +585,12 @@ namespace Alpaca4d.Gh
                 try { storedSection = chunk.GetString("Section"); } catch { storedSection = null; }
             }
 
-            return base.Read(reader);
+            // The inputs as the file saved them, Gap included when it had one, so each is read into
+            // its own - and a file from before the Colour input gets one after.
+            StoredInputs.Match(this, reader, MakeInput);
+            bool read = base.Read(reader);
+            StoredInputs.Ensure(this, () => ColourInput.Make(ColourDescription), ColourInput.Name);
+            return read;
         }
 
         #endregion
