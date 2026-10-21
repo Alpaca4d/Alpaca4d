@@ -12,6 +12,7 @@ namespace Alpaca4d.Section
     public partial class ElasticSection : ISerialize, IUniaxialSection
     {
         public string SectionName { get; set; }
+        public System.Drawing.Color? Color { get; set; }
         public double Area { get; set; }
         public double Izz { get; set; }
         public double Iyy { get; set; }
