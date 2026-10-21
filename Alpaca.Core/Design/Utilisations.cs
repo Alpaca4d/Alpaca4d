@@ -152,6 +152,24 @@ namespace Alpaca4d.Design
 
             return SteelCheck.Run(steelSection, forces, member, settings.GammaM0, settings.GammaM1, stations, settings.Report);
         }
+
+        /// <summary>
+        /// A lower bound on the Max of <see cref="Check"/> for the same beam, section and forces
+        /// (<see cref="SteelCheck.LowerBound"/>): when it is above a target, so is the Max, if the check has one.
+        /// Zero for a section the check has nothing to say about, which rules nothing out.
+        /// </summary>
+        public static double LowerBound(IUniaxialSection section, IReadOnlyList<SectionForces> forces,
+                                        DesignSettings settings, SteelSections sections)
+        {
+            settings = settings ?? new DesignSettings();
+            sections = sections ?? new SteelSections();
+
+            if (!(DesignGrades.Of(section?.Material) is SteelGrade steel))
+                return 0.0;
+
+            var steelSection = sections.Of(section, steel, settings.Fabrication);
+            return steelSection == null ? 0.0 : SteelCheck.LowerBound(steelSection, forces, settings.GammaM0);
+        }
     }
 
     /// <summary>
