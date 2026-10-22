@@ -282,8 +282,9 @@ namespace Alpaca4d.Gh
     /// Swaps <see cref="MomentCurvature_obsolete"/> for <see cref="MomentCurvature"/>. Its five
     /// inputs come first on the new one, in the same order, so they carry over with their wires and
     /// values - a MaxPhi given stays given - and its eight outputs keep their names. Direction was
-    /// text, "y" or "z", and is degrees now: a value typed into it becomes 0 or 90, and a Value List
-    /// of y and z wired to it - the old component kept one up to date - becomes one of 0 and 90.
+    /// text, "y" or "z", and is degrees now: a value typed into it becomes 0 or 90, a Value List
+    /// of y and z wired to it - the old component kept one up to date - becomes one of 0 and 90,
+    /// and a Panel wired to it saying y or z says 0 or 90.
     /// </summary>
     public class MomentCurvatureUpgrader : IGH_UpgradeObject
     {
@@ -319,6 +320,15 @@ namespace Alpaca4d.Gh
         {
             foreach (var source in from.Sources.ToList())
             {
+                // A Panel saying y or z - the documentation's own example has one - would hand the
+                // number input text it cannot convert, so it says the angle instead.
+                if (source is Grasshopper.Kernel.Special.GH_Panel panel && IsAxis(panel.UserText))
+                {
+                    bool aboutZ = string.Equals(panel.UserText.Trim(), "z", StringComparison.OrdinalIgnoreCase);
+                    panel.SetUserText(aboutZ ? "90" : "0");
+                    continue;
+                }
+
                 if (!(source is Grasshopper.Kernel.Special.GH_ValueList list) || list.ListItems.Count == 0 ||
                     !list.ListItems.All(item => IsAxis(item.Name)))
                     continue;
