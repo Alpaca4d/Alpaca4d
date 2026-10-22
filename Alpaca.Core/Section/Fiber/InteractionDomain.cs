@@ -530,16 +530,16 @@ namespace Alpaca4d.Section
         public double LimitFactor(double e0, double ky, double kz)
         {
             double ratio = UltimateRatio(e0, ky, kz);
-            double factor = ratio > 0.0 ? 1.0 / ratio : double.PositiveInfinity;
+            if (ratio > 0.0)
+                return 1.0 / ratio;
 
             // No limit at all binds a plane that only stretches concrete; it stops where the curves do.
+            // Only then: the concrete's tension edge lies past the bars, and capped at the curves'
+            // end along with the rest it stopped a plane the bars govern before they reached εud.
             double largest = 0.0;
             for (int i = 0; i < _allY.Length; i++)
                 largest = Math.Max(largest, Math.Abs(e0 - _allY[i] * kz + _allZ[i] * ky));
-            if (largest > 0.0)
-                factor = Math.Min(factor, MaxStrain / largest);
-
-            return factor;
+            return largest > 0.0 ? MaxStrain / largest : double.PositiveInfinity;
         }
 
         /// <summary>
