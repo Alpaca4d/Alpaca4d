@@ -568,6 +568,7 @@ namespace Alpaca4d
                     Range = line.Range,
                     AllElements = line.AllElements,
                     Element = beam,
+                    Filter = line.Filter,
                     GlobalForce = line.GlobalForce,
                     LocalForce = line.LocalForce,
                     Ndf = line.Ndf,
@@ -1208,14 +1209,11 @@ namespace Alpaca4d
                         {
                             item.SetTag(this);
                             var lineLoad = (Alpaca4d.Loads.LineLoad)item;
-                            // Assign the load to all the elements if the user does not specify the elements.
+                            // Without a beam of its own, the load goes on every beam its filter names, or on every beam.
                             if (lineLoad.Element == null)
                             {
-                                foreach (var beam in this.Beams)
-                                {
-                                    lineLoad = new Alpaca4d.Loads.LineLoad(beam, lineLoad.GlobalForce, lineLoad.TimeSeries);
-                                    myLoads.Add(lineLoad);
-                                }
+                                foreach (var beam in lineLoad.AppliedTo(this.Beams))
+                                    myLoads.Add(new Alpaca4d.Loads.LineLoad(beam, lineLoad.GlobalForce, lineLoad.TimeSeries));
                             }
                             else
                                 myLoads.Add(lineLoad);
@@ -1224,14 +1222,11 @@ namespace Alpaca4d
                         {
                             item.SetTag(this);
                             var meshLoad = (Alpaca4d.Loads.MeshLoad)item;
-                            // Assign the load to all the elements if the user does not specify the elements.
+                            // Without a shell of its own, the load goes on every shell its filter names, or on every shell.
                             if (meshLoad.Element == null)
                             {
-                                foreach (var mesh in this.Shells)
-                                {
-                                    meshLoad = new Alpaca4d.Loads.MeshLoad(mesh, meshLoad.GlobalForce, meshLoad.TimeSeries);
-                                    myLoads.Add(meshLoad);
-                                }
+                                foreach (var shell in meshLoad.AppliedTo(this.Shells))
+                                    myLoads.Add(new Alpaca4d.Loads.MeshLoad(shell, meshLoad.GlobalForce, meshLoad.TimeSeries));
                             }
                             else
                                 myLoads.Add(meshLoad);
