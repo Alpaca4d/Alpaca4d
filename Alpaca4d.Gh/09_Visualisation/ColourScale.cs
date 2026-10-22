@@ -66,6 +66,32 @@ namespace Alpaca4d.Gh
         }
 
         /// <summary>
+        /// The band <paramref name="value"/> falls in, from 0 at the low end, when [min, max] is
+        /// cut into <paramref name="count"/> equal bands - one per colour, for iso-surfaces. Below
+        /// the range is the first band and above it the last, as the gradient holds its end
+        /// colours; a flat range is all the first band, as it is all the first colour.
+        /// </summary>
+        internal static int Band(double value, double min, double max, int count)
+        {
+            double span = max - min;
+            if (count < 2 || !(span > 0.0) || double.IsNaN(value)) return 0;
+
+            double at = Math.Floor((value - min) / span * count);
+            return at < 0.0 ? 0 : at >= count ? count - 1 : (int)at;
+        }
+
+        /// <summary>
+        /// Where band <paramref name="k"/> of <see cref="Band"/> starts, the edge it shares with
+        /// band k - 1; edge <paramref name="count"/> is max. The same values LabelValues gives for
+        /// one more than <paramref name="count"/>, which is what View Results hands Legend so it
+        /// writes them at the edges between its swatches.
+        /// </summary>
+        internal static double Edge(int k, double min, double max, int count)
+        {
+            return k >= count ? max : min + (max - min) * k / count;
+        }
+
+        /// <summary>
         /// <paramref name="value"/> to four significant figures of the larger end of the range,
         /// so every label of a legend reads to the same step. Two fixed decimals printed every
         /// displacement in metres as 0.00; four figures of each label's own put a 5E-05 among
