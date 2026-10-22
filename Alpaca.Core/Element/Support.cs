@@ -281,13 +281,9 @@ namespace Alpaca4d.Element
         public void SetNodeTag(Model model)
         {
             if(this.ndf == 3)
-            {
-                this.Id = model.CloudPointThreeNDF.ClosestPoint(this.Pos) + 1;
-            }
+                this.Id = model.NodeIndexThreeNDF.Nearest(this.Pos) + 1;
             else // ndf == 6
-            {
-                this.Id = model.CloudPointSixNDF.ClosestPoint(this.Pos) + 1 + model.UniquePointsThreeNDF.Count();
-            }
+                this.Id = model.NodeIndexSixNDF.Nearest(this.Pos) + 1 + model.UniquePointsThreeNDF.Count;
         }
     }
 }

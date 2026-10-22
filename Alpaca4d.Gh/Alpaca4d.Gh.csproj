@@ -69,6 +69,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Alpaca.Core\Alpaca4d.Core.csproj" />
     <ProjectReference Include="..\Alpaca4d.Utils\Alpaca4d.Utils.csproj" />
+    <!-- Karamba3DToAlpaca4D. Only this project knows Karamba3D's API, and it ships none of Karamba's files. -->
+    <ProjectReference Include="..\Alpaca4d.Karamba\Alpaca4d.Karamba.csproj" />
+    <!-- Alpaca4DToFEM-Design. Ships FEM-Design's StruXml library, FemDesign.Communication.dll, with Alpaca4d. -->
+    <ProjectReference Include="..\Alpaca4d.FemDesign\Alpaca4d.FemDesign.csproj" />
   </ItemGroup>
 
   <!-- ==========================================
@@ -101,6 +105,9 @@
        EMBEDDED RESOURCES (ICONS)
        ========================================== -->
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Alpaca to FEM-Design (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Analysis settings (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -216,6 +223,18 @@
     <EmbeddedResource Include="Resources\Equal DOF (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Explorer Inputs (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Explorer Outputs (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Explorer Record (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Explorer Subset (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Fiber Aggregated(Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -275,7 +294,40 @@
     <EmbeddedResource Include="Resources\Mass Point (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Mesh Brep (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Mesh Loft (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Linear Buckling Analysis (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Interaction Domain (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Domain Check (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Domain 3D (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\N-M Diagram (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\My-Mz Diagram (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Moment Curvature Diagram (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Non-Linear Optimisation (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Section Optimiser (Alpaca4d).png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Design Group (Alpaca4d).png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Mesh Series to Brick (Alpaca4d).png">

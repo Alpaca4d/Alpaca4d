@@ -813,29 +813,9 @@ namespace Alpaca4d
             return ratio;
         }
 
-        /// <summary>
-        /// Recovers the end releases of a BeamWithHinges. BeamWithHinges.CreateHingeSection multiplies
-        /// each released property by 1e-6, so a hinge property that is still close to the interior one
-        /// means that degree of freedom was held.
-        /// </summary>
+        /// <summary>Recovers the end releases of a BeamWithHinges from its hinge sections.</summary>
         private static Release ReleaseOf(IUniaxialSection hinge, IUniaxialSection interior)
-        {
-            bool Held(double hingeValue, double interiorValue)
-            {
-                // A property that is zero to begin with carries no information; call it held.
-                if (Math.Abs(interiorValue) <= double.Epsilon)
-                    return true;
-                return Math.Abs(hingeValue / interiorValue) > 1e-3;
-            }
-
-            return new Release(
-                Held(hinge.Area, interior.Area),
-                Held(hinge.AlphaY, interior.AlphaY),
-                Held(hinge.AlphaZ, interior.AlphaZ),
-                Held(hinge.J, interior.J),
-                Held(hinge.Iyy, interior.Iyy),
-                Held(hinge.Izz, interior.Izz));
-        }
+            => BeamWithHinges.ReleaseOf(hinge, interior);
 
         private void ReadShell(string[] tokens, int vertexCount, string type)
         {

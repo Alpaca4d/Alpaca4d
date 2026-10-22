@@ -33,6 +33,8 @@ namespace Alpaca4d.Gh
         private MenuCheckBox _ckElementIds;
         private MenuCheckBox _ckSectionNames;
         private MenuCheckBox _ckLocalAxes;
+        private MenuStaticText _txColourBy;
+        private MenuDropDown _ddColourBy;
         private MenuStaticText _txTextSize;
         private MenuSlider   _slTextSize;
         private MenuStaticText _txAxesSize;
@@ -41,8 +43,12 @@ namespace Alpaca4d.Gh
         // What the viewport draws, worked out in SolveInstance; see Extent.
         private BoundingBox _box = BoundingBox.Empty;
 
+        // The colour each element is drawn in, by the Colour by dropdown; worked out in SolveInstance.
+        private Alpaca4d.Visualisation.ElementColours _colours;
+
         // Widget controls – Loads menu
         private MenuCheckBox _ckShowLoads;
+        private MenuCheckBox _ckShowLoadValues;
         private MenuSlider   _slLoadScale;
 
         // Widget controls – Supports menu
@@ -84,7 +90,6 @@ namespace Alpaca4d.Gh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.Register_GenericParam("AlpacaModel", "AlpacaModel", "The model passed straight through, so this component can sit in the middle of a chain rather than at the end of one.");
-            pManager.Register_StringParam("Info", "Info", "The Tcl the model has written so far, one line per entry - the script Run Analysis hands to OpenSees.");
         }
 
         #region UI Setup
@@ -116,6 +121,17 @@ namespace Alpaca4d.Gh
             elemPanel.AddControl(_ckSectionNames);
             elemPanel.AddControl(_ckLocalAxes);
 
+            // Each element in its own colour, or every element of a section, or of a material, in
+            // one - the one the Section or Material Library gave it, or one picked here. In the
+            // order of ColourBy, which the saved index is read back against.
+            _txColourBy = new MenuStaticText { Text = "Colour by" };
+            _ddColourBy = new MenuDropDown(0, "ColourBy", "ColourBy") { VisibleItemCount = 3 };
+            foreach (var name in Enum.GetNames(typeof(Alpaca4d.Visualisation.ColourBy)))
+                _ddColourBy.AddItem(name, name);
+            _ddColourBy.ValueChanged += OnWidgetChanged;
+            elemPanel.AddControl(_txColourBy);
+            elemPanel.AddControl(_ddColourBy);
+
             // Height of the ids and section names, in model units, as View Results sizes its
             // values; and how long the local axes are drawn. Each shown only while it has
             // something to size.
@@ -141,13 +157,17 @@ namespace Alpaca4d.Gh
 
             var loadsPanel = new MenuPanel(1, "loads_panel");
             _ckShowLoads = new MenuCheckBox(0, "ShowLoads", "Show Loads");
+            // What each load is worth, written at the tail of its arrow; with or without the arrows.
+            _ckShowLoadValues = new MenuCheckBox(1, "ShowLoadValues", "Show Values");
             _slLoadScale = new MenuSlider(0, "LoadScale", 0.1, 10.0, 1.0, 1);
             _slLoadScale.Name = "Load Scale";
 
-            _ckShowLoads.ValueChanged += OnWidgetChanged;
-            _slLoadScale.ValueChanged += OnWidgetChanged;
+            _ckShowLoads.ValueChanged      += OnWidgetChanged;
+            _ckShowLoadValues.ValueChanged += OnWidgetChanged;
+            _slLoadScale.ValueChanged      += OnWidgetChanged;
 
             loadsPanel.AddControl(_ckShowLoads);
+            loadsPanel.AddControl(_ckShowLoadValues);
             loadsPanel.AddControl(_slLoadScale);
             loadsMenu.AddControl(loadsPanel);
             _loadsMenu = loadsMenu;       // store for plug registration in CreateAttributes
@@ -190,12 +210,14 @@ namespace Alpaca4d.Gh
             _ckSectionNames.ValueChanged += OnWidgetChanged;
             _ckLocalAxes.ValueChanged    += OnWidgetChanged;
             _ckShowLoads.ValueChanged    += OnWidgetChanged;
+            _ckShowLoadValues.ValueChanged += OnWidgetChanged;
             _slLoadScale.ValueChanged    += OnWidgetChanged;
             _ckShowSupports.ValueChanged    += OnWidgetChanged;
             _slSupportScale.ValueChanged    += OnWidgetChanged;
             _ckShowConstraints.ValueChanged += OnWidgetChanged;
             _slTextSize.ValueChanged        += OnWidgetChanged;
             _slAxesSize.ValueChanged        += OnWidgetChanged;
+            _ddColourBy.ValueChanged        += OnWidgetChanged;
 
             // Visibility is not saved: it follows from the checkboxes.
             UpdateVisibility();
@@ -213,7 +235,7 @@ namespace Alpaca4d.Gh
             if (_slTextSize == null) return;
 
             bool labelled = (_ckNodeIds?.Active ?? false) || (_ckElementIds?.Active ?? false)
-                         || (_ckSectionNames?.Active ?? false);
+                         || (_ckSectionNames?.Active ?? false) || (_ckShowLoadValues?.Active ?? false);
             bool axes = _ckLocalAxes?.Active ?? false;
 
             _txTextSize.Visible = labelled;
@@ -233,6 +255,7 @@ namespace Alpaca4d.Gh
             _shellMeshes.Clear();
             _brickMeshes.Clear();
             _lineBeams.Clear();
+            _colours = null;
             _box = BoundingBox.Empty;
         }
 
@@ -259,6 +282,8 @@ namespace Alpaca4d.Gh
             if (DA.GetDataList(2, elemIdList) && elemIdList.Count > 0)
                 _visibleElementIds = new HashSet<int>(elemIdList);
 
+            _colours = new Alpaca4d.Visualisation.ElementColours(_model, ColourBy);
+
             foreach (var item in _model.Beams)
             {
                 if (_visibleElementIds != null && item.Id.HasValue && !_visibleElementIds.Contains(item.Id.Value)) continue;
@@ -270,7 +295,7 @@ namespace Alpaca4d.Gh
                     continue;
                 }
 
-                beamMesh.VertexColors.CreateMonotoneMesh(item.Color);
+                beamMesh.VertexColors.CreateMonotoneMesh(_colours.Of(item));
                 _beamMeshes.Add(beamMesh);
             }
             foreach (var item in _model.Shells)
@@ -285,7 +310,7 @@ namespace Alpaca4d.Gh
 
                 // An offset Rhino could not make leaves the shell drawn flat, not missing.
                 if (myMesh.Vertices.Count == 0) myMesh = item.Mesh.DuplicateMesh();
-                myMesh.VertexColors.CreateMonotoneMesh(item.Color);
+                myMesh.VertexColors.CreateMonotoneMesh(_colours.Of(item));
                 _shellMeshes.Add(myMesh);
             }
             foreach (var item in _model.Bricks)
@@ -293,12 +318,11 @@ namespace Alpaca4d.Gh
                 if (_visibleElementIds != null && item.Id.HasValue && !_visibleElementIds.Contains(item.Id.Value)) continue;
 
                 var brick = item.Mesh;
-                brick.VertexColors.CreateMonotoneMesh(item.Color);
+                brick.VertexColors.CreateMonotoneMesh(_colours.Of(item));
                 _brickMeshes.Add(brick);
             }
 
             DA.SetData(0, _model);
-            DA.SetDataList(1, _model.Tcl);
 
             _box = Extent();
 
@@ -312,6 +336,7 @@ namespace Alpaca4d.Gh
 
             bool extruded       = _ckExtruded?.Active     ?? false;
             bool showLoads      = _ckShowLoads?.Active    ?? false;
+            bool showLoadValues = _ckShowLoadValues?.Active ?? false;
             bool showSupports   = _ckShowSupports?.Active ?? false;
             bool showConstraints= _ckShowConstraints?.Active ?? false;
             bool showNodeIds    = _ckNodeIds?.Active      ?? false;
@@ -332,7 +357,7 @@ namespace Alpaca4d.Gh
                     args.Display.DrawMeshWires(mesh, System.Drawing.Color.Black, 2);
                 }
                 foreach (var beam in _lineBeams)
-                    args.Display.DrawCurve(beam.Curve, beam.Color);
+                    args.Display.DrawCurve(beam.Curve, Colour(beam));
                 foreach (var mesh in _shellMeshes)
                 {
                     args.Display.DrawMeshFalseColors(mesh);
@@ -349,13 +374,13 @@ namespace Alpaca4d.Gh
                 foreach (var beam in _model.Beams)
                 {
                     if (_visibleElementIds != null && beam.Id.HasValue && !_visibleElementIds.Contains(beam.Id.Value)) continue;
-                    args.Display.DrawCurve(beam.Curve, beam.Color);
+                    args.Display.DrawCurve(beam.Curve, Colour(beam));
                 }
                 foreach (var shell in _model.Shells)
                 {
                     if (_visibleElementIds != null && shell.Id.HasValue && !_visibleElementIds.Contains(shell.Id.Value)) continue;
                     var mesh = shell.Mesh;
-                    mesh.VertexColors.CreateMonotoneMesh(shell.Color);
+                    mesh.VertexColors.CreateMonotoneMesh(Colour(shell));
                     args.Display.DrawMeshFalseColors(mesh);
                     args.Display.DrawMeshWires(mesh, System.Drawing.Color.Black, 2);
                 }
@@ -404,9 +429,7 @@ namespace Alpaca4d.Gh
                 {
                     if (_visibleElementIds != null && beam.Id.HasValue && !_visibleElementIds.Contains(beam.Id.Value)) continue;
                     var mid  = beam.Curve.PointAtNormalizedLength(0.5);
-                    var name = (beam.Section as Alpaca4d.Section.ISection)?.SectionName
-                            ?? (beam.Section as Alpaca4d.Section.ElasticSection)?.SectionName
-                            ?? beam.Section.GetType().Name;
+                    var name = beam.Section?.SectionName ?? beam.Section?.GetType().Name;
                     Label(args, name, AlpacaSettings.Colour(DisplayItem.SectionNames), mid, textSize);
                 }
             }
@@ -485,7 +508,7 @@ namespace Alpaca4d.Gh
             }
 
             // ── Loads ─────────────────────────────────────────────────────────
-            if (showLoads)
+            if (showLoads || showLoadValues)
             {
                 var relevantPatterns = _loadPatternId.HasValue
                     ? _model.LoadPatterns.Where(x => x.Id == _loadPatternId.Value)
@@ -494,33 +517,40 @@ namespace Alpaca4d.Gh
                 var patternLoads = relevantPatterns.SelectMany(x => x.Load);
 
                 foreach (var pointLoad in patternLoads.OfType<Alpaca4d.Loads.PointLoad>())
-                    VisualisePointLoad(args, pointLoad.Pos, pointLoad.Force * loadScale);
+                {
+                    var arrow = pointLoad.Force * loadScale;
+                    if (showLoads)
+                        VisualisePointLoad(args, pointLoad.Pos, arrow);
+                    string value = showLoadValues ? PointLoadValue(pointLoad) : "";
+                    if (value.Length > 0)
+                        Label(args, value, AlpacaSettings.Colour(DisplayItem.PointLoads), pointLoad.Pos - arrow, textSize);
+                }
 
                 foreach (var meshLoad in patternLoads.OfType<Alpaca4d.Loads.MeshLoad>())
                 {
                     var forceValue = meshLoad.GlobalForce.Length;
                     var unitVector = meshLoad.GlobalForce / forceValue;
-                    if (meshLoad.Element == null)
+                    foreach (var shell in meshLoad.AppliedTo(_model.Shells))
                     {
-                        foreach (var shell in _model.Shells)
+                        if (showLoads)
                             VisualiseMeshLoad(args, shell.Mesh, forceValue, unitVector, loadScale);
-                    }
-                    else
-                    {
-                        VisualiseMeshLoad(args, meshLoad.Element.Mesh, forceValue, unitVector, loadScale);
+                        if (showLoadValues && forceValue > 0.0)
+                            Label(args, LoadValue(forceValue, $"{Units.Force}/{Units.Length}²"), AlpacaSettings.Colour(DisplayItem.AreaLoads),
+                                  shell.Mesh.GetBoundingBox(false).Center + meshLoad.GlobalForce * loadScale, textSize);
                     }
                 }
 
                 foreach (var lineLoad in patternLoads.OfType<Alpaca4d.Loads.LineLoad>())
                 {
-                    if (lineLoad.Element != null)
+                    var arrow = lineLoad.GlobalForce * loadScale;
+                    foreach (var beam in lineLoad.AppliedTo(_model.Beams))
                     {
-                        VisualiseLineLoad(args, lineLoad.Element.Curve, lineLoad.GlobalForce, loadScale);
-                    }
-                    else
-                    {
-                        foreach (var beam in _model.Beams)
+                        if (showLoads)
                             VisualiseLineLoad(args, beam.Curve, lineLoad.GlobalForce, loadScale);
+                        // Once a beam, over the middle arrow, rather than over all seven.
+                        if (showLoadValues && lineLoad.GlobalForce.Length > 0.0)
+                            Label(args, LoadValue(lineLoad.GlobalForce.Length, $"{Units.Force}/{Units.Length}"), AlpacaSettings.Colour(DisplayItem.LineLoads),
+                                  beam.Curve.PointAtNormalizedLength(0.5) - arrow, textSize);
                     }
                 }
             }
@@ -552,6 +582,13 @@ namespace Alpaca4d.Gh
         }
 
         public override bool IsPreviewCapable => true;
+
+        private Alpaca4d.Visualisation.ColourBy ColourBy =>
+            (Alpaca4d.Visualisation.ColourBy)Math.Max(0, Math.Min(2, _ddColourBy?.Value ?? 0));
+
+        private System.Drawing.Color Colour(Alpaca4d.Generic.IBeam beam) => _colours?.Of(beam) ?? beam.Color;
+
+        private System.Drawing.Color Colour(Alpaca4d.Generic.IShell shell) => _colours?.Of(shell) ?? shell.Color;
 
         /// <summary>
         /// A label squared to the camera, <paramref name="height"/> tall in model units - the Text
@@ -599,8 +636,9 @@ namespace Alpaca4d.Gh
         /// local axes - the section's x along local z, its y along local y, as View Results and
         /// Beam Stresses read it. Every outline, so a hollow section shows its inside and a double
         /// angle both angles. Null when there is no outline to carry, and the beam is drawn as a line.
+        /// Explorer Record draws a model's beams with it too, so the 3D view matches this one.
         /// </summary>
-        private static Mesh ExtrudedBeam(Alpaca4d.Generic.IBeam beam)
+        internal static Mesh ExtrudedBeam(Alpaca4d.Generic.IBeam beam)
         {
             var curves = beam.Section?.Curves;
             if (curves == null || curves.Count == 0 || beam.GeomTransf == null) return null;
@@ -661,7 +699,7 @@ namespace Alpaca4d.Gh
 
             // A load is drawn as the geometry it acts on, moved back along it: arrows ending on a
             // node or a beam, a sheet standing off a shell.
-            if (_ckShowLoads?.Active ?? false)
+            if ((_ckShowLoads?.Active ?? false) || (_ckShowLoadValues?.Active ?? false))
             {
                 double scale = _slLoadScale?.Value ?? 1.0;
                 foreach (var load in _model.LoadPatterns.SelectMany(x => x.Load))
@@ -703,7 +741,8 @@ namespace Alpaca4d.Gh
                 foreach (var shell in _model.Shells) reach = Math.Max(reach, AxesReach(shell) * size);
                 foreach (var brick in _model.Bricks) reach = Math.Max(reach, AxesReach(brick) * size);
             }
-            if ((_ckNodeIds?.Active ?? false) || (_ckElementIds?.Active ?? false) || (_ckSectionNames?.Active ?? false))
+            if ((_ckNodeIds?.Active ?? false) || (_ckElementIds?.Active ?? false) || (_ckSectionNames?.Active ?? false)
+                || (_ckShowLoadValues?.Active ?? false))
                 reach = Math.Max(reach, 2.0 * (_slTextSize?.Value ?? 0.5));
 
             box.Inflate(reach);
@@ -712,13 +751,44 @@ namespace Alpaca4d.Gh
 
         public override BoundingBox ClippingBox => _box.IsValid ? _box : base.ClippingBox;
 
+        /// <summary>How wide a load arrow's shaft is drawn, in pixels. DrawArrow draws it at one, which was hard to pick out.</summary>
+        private const int LoadArrowThickness = 3;
+
+        /// <summary>A load arrow: a shaft <see cref="LoadArrowThickness"/> wide, and the head DrawArrow gives it.</summary>
+        private static void DrawLoadArrow(IGH_PreviewArgs args, Line line, System.Drawing.Color colour)
+        {
+            args.Display.DrawLine(line, colour, LoadArrowThickness);
+            args.Display.DrawArrowHead(line.To, line.Direction, colour, 24, 0);
+        }
+
+        /// <summary>A point load's force, and its moment when it has one.</summary>
+        private static string PointLoadValue(Alpaca4d.Loads.PointLoad load)
+        {
+            var parts = new List<string>();
+            if (load.Force.Length > 0.0) parts.Add(LoadValue(load.Force.Length, $"{Units.Force}"));
+            if (load.Moment.Length > 0.0) parts.Add(LoadValue(load.Moment.Length, $"{Units.Force}·{Units.Length}"));
+            return string.Join(", ", parts);
+        }
+
+        /// <summary>
+        /// The size of a load, to four significant figures and without an exponent where a load
+        /// could plausibly need one: 12.5 kN, 0.375 kN/m, 1250 kN.
+        /// </summary>
+        private static string LoadValue(double value, string unit)
+        {
+            string number = Math.Abs(value) >= 1000.0
+                ? value.ToString("0", System.Globalization.CultureInfo.InvariantCulture)
+                : value.ToString("G4", System.Globalization.CultureInfo.InvariantCulture);
+            return $"{number} {unit}";
+        }
+
         private static void VisualisePointLoad(IGH_PreviewArgs args, Point3d position, Vector3d magnitude)
         {
             if (magnitude.Length <= 0) return;
             var line = new Line(position, magnitude);
             var offset = new Vector3d(position.X - line.To.X, position.Y - line.To.Y, position.Z - line.To.Z);
             line.Transform(Transform.Translation(offset));
-            args.Display.DrawArrow(line, AlpacaSettings.Colour(DisplayItem.PointLoads), 24, 0);
+            DrawLoadArrow(args, line, AlpacaSettings.Colour(DisplayItem.PointLoads));
         }
 
         private static void VisualiseLineLoad(IGH_PreviewArgs args, Curve lineGeometry, Vector3d forceVector, double scale)
@@ -732,7 +802,7 @@ namespace Alpaca4d.Gh
                 var line      = new Line(point, magnitude);
                 var offset    = new Vector3d(point.X - line.To.X, point.Y - line.To.Y, point.Z - line.To.Z);
                 line.Transform(Transform.Translation(offset));
-                args.Display.DrawArrow(line, color, 24, 0);
+                DrawLoadArrow(args, line, color);
             }
         }
 

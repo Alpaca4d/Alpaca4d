@@ -16,6 +16,14 @@ namespace Alpaca4d.Loads
         public List<int> Range { get; set; }
         public List<IBeam> AllElements { get; set; }
         public IBeam Element { get; set; }
+
+        /// <summary>
+        /// Text naming the beams the load goes on, read as the result filters read it: an ElementId,
+        /// a wildcard over them, an element tag, or "regex:...". Looked at only when there is no
+        /// <see cref="Element"/>; with neither, the load goes on every beam.
+        /// </summary>
+        public string Filter { get; set; }
+
         public Vector3d GlobalForce { get; set; }
         public Vector3d LocalForce { get; set; }
         private double? Wx => LocalForce.X;
@@ -55,6 +63,18 @@ namespace Alpaca4d.Loads
             var localY = this.Element.GeomTransf.LocalY; // Rhino Place LocalX
             var plane = new Rhino.Geometry.Plane(Rhino.Geometry.Point3d.Origin, localX, localY);
             return Utils.PlaceCoordinates(new Rhino.Geometry.Point3d(force), plane);
+        }
+
+        /// <summary>
+        /// The beams out of <paramref name="beams"/> the load goes on: its own <see cref="Element"/>,
+        /// the ones its <see cref="Filter"/> names, or with neither all of them.
+        /// </summary>
+        public List<IBeam> AppliedTo(IEnumerable<IBeam> beams)
+        {
+            if (this.Element != null)
+                return new List<IBeam> { this.Element };
+
+            return Alpaca4d.Result.ElementFilter.Named(this.Filter, beams);
         }
 
         public void SetTag(Model model)
