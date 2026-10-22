@@ -530,8 +530,7 @@ namespace Alpaca4d.Gh
                 {
                     var forceValue = meshLoad.GlobalForce.Length;
                     var unitVector = meshLoad.GlobalForce / forceValue;
-                    var shells = meshLoad.Element == null ? _model.Shells : new List<Alpaca4d.Generic.IShell> { meshLoad.Element };
-                    foreach (var shell in shells)
+                    foreach (var shell in meshLoad.AppliedTo(_model.Shells))
                     {
                         if (showLoads)
                             VisualiseMeshLoad(args, shell.Mesh, forceValue, unitVector, loadScale);
@@ -543,9 +542,8 @@ namespace Alpaca4d.Gh
 
                 foreach (var lineLoad in patternLoads.OfType<Alpaca4d.Loads.LineLoad>())
                 {
-                    var beams = lineLoad.Element == null ? _model.Beams : new List<Alpaca4d.Generic.IBeam> { lineLoad.Element };
                     var arrow = lineLoad.GlobalForce * loadScale;
-                    foreach (var beam in beams)
+                    foreach (var beam in lineLoad.AppliedTo(_model.Beams))
                     {
                         if (showLoads)
                             VisualiseLineLoad(args, beam.Curve, lineLoad.GlobalForce, loadScale);

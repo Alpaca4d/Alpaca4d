@@ -380,11 +380,11 @@ namespace Alpaca4d.FemDesign
                         break;
 
                     case LineLoad lineLoad:
-                        // Assemble Model gives a load without an element to every beam.
+                        // Assemble Model gives a load without an element to every beam its filter names, or to every beam.
                         if (lineLoad.Element == null)
                         {
-                            foreach (var index in beams.Values)
-                                loadCase.BeamLoads.Add(new ExportBeamLoad { Beam = index, Force = lineLoad.GlobalForce });
+                            foreach (var beam in lineLoad.AppliedTo(beams.Keys))
+                                loadCase.BeamLoads.Add(new ExportBeamLoad { Beam = beams[beam], Force = lineLoad.GlobalForce });
                         }
                         else if (beams.TryGetValue(lineLoad.Element, out int beamIndex))
                         {
@@ -398,8 +398,8 @@ namespace Alpaca4d.FemDesign
                     case MeshLoad meshLoad:
                         if (meshLoad.Element == null)
                         {
-                            foreach (var index in shells.Values)
-                                loadCase.ShellLoads.Add(new ExportShellLoad { Shell = index, Pressure = meshLoad.GlobalForce });
+                            foreach (var shell in meshLoad.AppliedTo(shells.Keys))
+                                loadCase.ShellLoads.Add(new ExportShellLoad { Shell = shells[shell], Pressure = meshLoad.GlobalForce });
                         }
                         else if (shells.TryGetValue(meshLoad.Element, out int shellIndex))
                             loadCase.ShellLoads.Add(new ExportShellLoad { Shell = shellIndex, Pressure = meshLoad.GlobalForce });
