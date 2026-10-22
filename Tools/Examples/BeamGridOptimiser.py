@@ -58,7 +58,7 @@ O_MODEL, O_MAX_UTILISATION, O_ITERATIONS = 0, 3, 4
 O_MODEL_OUT, O_MASS, O_CONVERGED, O_HISTORY = 0, 4, 5, 8
 # View Results' outputs and Legend's inputs, by place.
 R_VALUES, R_COLORS = 1, 2
-L_TITLE, L_DATA, L_COLORS, L_POSITION = 0, 1, 2, 3
+L_TITLE, L_VALUES, L_COLORS, L_POSITION = 0, 1, 2, 3
 
 # Faint group colours from Alpaca4d's palette, one per stage of the definition.
 RED = Color.FromArgb(50, 254, 0, 0)
@@ -472,7 +472,7 @@ def build(doc):
     wire(inp(results, 0), out(optimiser, O_MODEL_OUT))
     legend = component(grid, LEGEND, "Legend", None, KEY, ALONG_Y)
     words(inp(legend, L_TITLE), "Displacement [mm]")
-    wire(inp(legend, L_DATA), out(results, R_VALUES))
+    wire(inp(legend, L_VALUES), out(results, R_VALUES))
     wire(inp(legend, L_COLORS), out(results, R_COLORS))
     integer(inp(legend, L_POSITION), 1)
 

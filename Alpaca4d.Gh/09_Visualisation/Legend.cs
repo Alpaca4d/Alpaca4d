@@ -26,13 +26,16 @@ namespace Alpaca4d.Gh
             _conduit = new LegendConduit(ShouldDraw);
         }
 
+        private const string ValuesDescription =
+            "Numbers the labels run from the smallest to the largest of - the Values output of View Results, " +
+            "which follows the Range given to it. To label a range of your own, give its two ends.\n" +
+            "One value more than there are colours, as View Results gives with Iso-surfaces on, labels the edges between the colours rather than the colours.";
+
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("Title", "Title", "Legend title", GH_ParamAccess.item, "");
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddNumberParameter("Data", "Data", "Numeric data the labels run from the smallest to the largest of - the Values output of View Results, " +
-                "which follows the Range given to it. To label a range of your own, give its two ends.\n" +
-                "One value more than there are colours, as View Results gives with Iso-surfaces on, labels the edges between the colours rather than the colours.", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Values", "Values", ValuesDescription, GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddColourParameter("Colors", "Colors", "Legend colors, from the low end to the high - the Colors output of View Results, so the legend and the model agree. " +
                 "Fewer than two fall back to the default gradient, as in View Results.", GH_ParamAccess.list);
@@ -45,6 +48,27 @@ namespace Alpaca4d.Gh
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
+        }
+
+        /// <summary>
+        /// Values was called Data, and renamed after the View Results output wired into it. A file
+        /// puts back the name, nickname and description each input was saved with, so one saved
+        /// before would go on showing Data: renamed here, the nickname too unless it was given one
+        /// of its own.
+        /// </summary>
+        public override bool Read(GH_IO.Serialization.GH_IReader reader)
+        {
+            if (!base.Read(reader)) return false;
+
+            var values = Params.Input.Count > 1 ? Params.Input[1] : null;
+            if (values != null && values.Name == "Data")
+            {
+                values.Name = "Values";
+                values.Description = ValuesDescription;
+                if (values.NickName == "Data") values.NickName = "Values";
+            }
+
+            return true;
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

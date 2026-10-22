@@ -131,7 +131,7 @@ namespace Alpaca4d.Gh
         {
             pManager.Register_StringParam("Info", "Info", "What is drawn, the unit it is in, and the range it spans.");
             pManager.Register_DoubleParam("Values", "Values", "The value each colour stands for, one per colour of Colors, from the low end to the high - over Range when it is set - in the unit picked under Unit. " +
-                "With Iso-surfaces on, the edges of the bands instead, one more than there are colours. Feed it to the Data input of Legend, so the legend and the model agree.");
+                "With Iso-surfaces on, the edges of the bands instead, one more than there are colours. Feed it to the Values input of Legend, so the legend and the model agree.");
             pManager.Register_ColourParam("Colors", "Colors", "The gradient used. Feed it to the Colors input of Legend, so the legend and the model agree.");
         }
 

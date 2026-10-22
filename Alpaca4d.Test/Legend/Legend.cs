@@ -98,7 +98,7 @@ class LegendTest
 
         Section("The values View Results hands Legend end on its range exactly");
         {
-            // Legend labels from the smallest of its Data to the largest, so the ends have to be
+            // Legend labels from the smallest of its Values to the largest, so the ends have to be
             // the range View Results painted over, not min + span rounded a hair past it.
             foreach (var range in new[] { Tuple.Create(-0.0034, 0.0012), Tuple.Create(-0.3, 0.1), Tuple.Create(0.07, 0.31) })
             {

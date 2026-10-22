@@ -13,7 +13,7 @@ the colours through `ColourScale`, so what is checked here is that the labels si
   nothing looking wrong. The labels are pinned against `ColourScale.Stops`, which View Results
   paints by, for several palette sizes and ranges.
 * **The values View Results hands Legend end on its range exactly.** Legend reads its range from
-  the smallest and largest of its Data, and `min + span` rounded a hair past the maximum.
+  the smallest and largest of its Values, and `min + span` rounded a hair past the maximum.
 * **A flat range is one swatch**, at the value the model shows in its first colour.
 * **Every label of a legend reads to the same step**, four significant figures of the larger end
   of the range. Two fixed decimals printed every displacement in metres as `0.00`; four figures of
