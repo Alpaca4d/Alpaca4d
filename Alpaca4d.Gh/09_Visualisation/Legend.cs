@@ -31,7 +31,8 @@ namespace Alpaca4d.Gh
             pManager.AddTextParameter("Title", "Title", "Legend title", GH_ParamAccess.item, "");
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddNumberParameter("Data", "Data", "Numeric data the labels run from the smallest to the largest of - the Values output of View Results, " +
-                "which follows the Range given to it. To label a range of your own, give its two ends.", GH_ParamAccess.list);
+                "which follows the Range given to it. To label a range of your own, give its two ends.\n" +
+                "One value more than there are colours, as View Results gives with Iso-surfaces on, labels the edges between the colours rather than the colours.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddColourParameter("Colors", "Colors", "Legend colors, from the low end to the high - the Colors output of View Results, so the legend and the model agree. " +
                 "Fewer than two fall back to the default gradient, as in View Results.", GH_ParamAccess.list);
@@ -85,8 +86,14 @@ namespace Alpaca4d.Gh
                 max = finite.Max();
             }
 
-            var values = ColourScale.LabelValues(min, max, colors.Count);
-            _conduit.Update(title, colors.Take(values.Count).ToList(), values.Select(value => ColourScale.Format(value, min, max)).ToList(), position, scale);
+            // One more value than colours is View Results with iso-surfaces on, handing over the
+            // edges of its bands: a label at each edge, between the swatches. A flat range is one
+            // value either way, and one swatch.
+            bool edges = data.Count == colors.Count + 1;
+            var values = ColourScale.LabelValues(min, max, colors.Count + (edges ? 1 : 0));
+            int swatches = values.Count > 1 && edges ? values.Count - 1 : values.Count;
+
+            _conduit.Update(title, colors.Take(swatches).ToList(), values.Select(value => ColourScale.Format(value, min, max)).ToList(), position, scale);
             Rhino.RhinoDoc.ActiveDoc?.Views?.Redraw();
         }
 
@@ -173,7 +180,10 @@ namespace Alpaca4d.Gh
                 _shouldDraw = shouldDraw;
             }
 
-            /// <summary>One label per colour, each read at the middle of its swatch.</summary>
+            /// <summary>
+            /// One label per colour, each read at the middle of its swatch - or one more than
+            /// that, the edges of bands, each read at the line between two swatches.
+            /// </summary>
             public void Update(string title, List<Color> colors, List<string> labels, int position, double scale)
             {
                 _title = title ?? string.Empty;
@@ -198,6 +208,9 @@ namespace Alpaca4d.Gh
                     DrawVertical(e.Display, width, height);
             }
 
+            /// <summary>Labels on the edges between swatches, not on the swatches: see <see cref="Update"/>.</summary>
+            private bool Edges => _labels.Count == _colors.Count + 1;
+
             /// <summary>A column of swatches with their labels to the right, at the left or right edge.</summary>
             private void DrawVertical(DisplayPipeline display, int width, int height)
             {
@@ -211,7 +224,11 @@ namespace Alpaca4d.Gh
                 var titleBox = hasTitle ? Measure(display, _title, titlePx) : Size.Empty;
                 double titleBlock = hasTitle ? titleBox.Height + gap : 0.0;
 
-                double available = height * (1.0 - MarginTop - MarginBottomVertical) - titleBlock;
+                // A label on the top edge stands half its height above the column, and one on the
+                // bottom edge half below, so the column is a label shorter and starts half lower.
+                double overhang = Edges ? textPx : 0.0;
+
+                double available = height * (1.0 - MarginTop - MarginBottomVertical) - titleBlock - overhang;
                 double length = Math.Min(3.5 * unit, available / count);
                 if (length < 1.0) return;
 
@@ -231,14 +248,19 @@ namespace Alpaca4d.Gh
                     y += titleBlock;
                 }
 
+                y += 0.5 * overhang;
+
                 for (int k = 0; k < count; k++)
                 {
                     int swatchTop = Px(y + k * length);
                     int swatchBottom = Px(y + (k + 1) * length);
                     display.Draw2dRectangle(new Rectangle(Px(x), swatchTop, Px(unit), swatchBottom - swatchTop), Ink, Stroke, _colors[k]);
+                }
 
-                    double middle = y + (k + 0.5) * length;
-                    DrawText(display, _labels[k], boxes[k], textPx, x + unit + gap, middle - 0.5 * boxes[k].Height);
+                for (int k = 0; k < _labels.Count; k++)
+                {
+                    double at = y + (Edges ? k : k + 0.5) * length;
+                    DrawText(display, _labels[k], boxes[k], textPx, x + unit + gap, at - 0.5 * boxes[k].Height);
                 }
             }
 
@@ -251,7 +273,8 @@ namespace Alpaca4d.Gh
                 int textPx = Px(1.2 * unit);
                 int titlePx = Px(1.8 * unit);
 
-                double length = Math.Min(3.5 * unit, width * (1.0 - 2.0 * MarginSide) / count);
+                // Labels on the edges stand half a swatch past either end of the row.
+                double length = Math.Min(3.5 * unit, width * (1.0 - 2.0 * MarginSide) / (Edges ? count + 1 : count));
                 if (length < 1.0) return;
 
                 // Labels sit side by side over their swatches, so the text shrinks until the
@@ -277,9 +300,12 @@ namespace Alpaca4d.Gh
                     int swatchLeft = Px(x + k * length);
                     int swatchRight = Px(x + (k + 1) * length);
                     display.Draw2dRectangle(new Rectangle(swatchLeft, Px(barTop), swatchRight - swatchLeft, Px(unit)), Ink, Stroke, _colors[k]);
+                }
 
-                    double middle = x + (k + 0.5) * length;
-                    DrawText(display, _labels[k], boxes[k], textPx, middle - 0.5 * boxes[k].Width, barTop - gap - boxes[k].Height);
+                for (int k = 0; k < _labels.Count; k++)
+                {
+                    double at = x + (Edges ? k : k + 0.5) * length;
+                    DrawText(display, _labels[k], boxes[k], textPx, at - 0.5 * boxes[k].Width, barTop - gap - boxes[k].Height);
                 }
 
                 if (hasTitle)
