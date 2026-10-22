@@ -37,13 +37,21 @@ namespace Alpaca4d.Gh
         private Alpaca4d.Model _model;
         private ResultField _field;
         private SortedDictionary<double, Color> _gradient;
+        private List<Color> _palette;
         private double _min, _max;
+
+        /// <summary>Iso-surfaces: each colour a band of values, not a point on a gradient. See <see cref="IsoBands"/>.</summary>
+        private bool _banded;
 
         /// <summary>The length one unit of beam force is drawn at; see <see cref="DiagramUnit"/>.</summary>
         private double _diagramUnit;
 
         // What gets drawn, worked out in SolveInstance and held for the viewport.
         private readonly List<Mesh> _shaded = new List<Mesh>();
+
+        // The elements' own faces, for their edges: with iso-surfaces on, what is shaded is cut
+        // into bands, and its wires would draw every cut.
+        private readonly List<Mesh> _faceEdges = new List<Mesh>();
         private readonly List<Mesh> _ghostMeshes = new List<Mesh>();
         private readonly List<Curve> _ghostCurves = new List<Curve>();
         private readonly List<Tuple<Curve, Color>> _curves = new List<Tuple<Curve, Color>>();
@@ -78,6 +86,7 @@ namespace Alpaca4d.Gh
         private MenuCheckBox _ckAnimate;
         private MenuCheckBox _ckExtruded;
         private MenuSlider _slDiagramScale;
+        private MenuCheckBox _ckBands;
         private MenuCheckBox _ckWires;
         private MenuCheckBox _ckValues;
         private MenuSlider _slTextSize;
@@ -112,7 +121,7 @@ namespace Alpaca4d.Gh
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddTextParameter("ElementId", "ElementId", ElementIdentity.Filter + "\nWhatever is left out is greyed rather than hidden.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
-            pManager.AddColourParameter("Colors", "Colors", "Gradient to colour with, from the low end to the high. Connect the Colors component for a ready-made one.\nBeam force diagrams ignore it and use the colour that belongs to the force.", GH_ParamAccess.list);
+            pManager.AddColourParameter("Colors", "Colors", "Gradient to colour with, from the low end to the high. Connect the Colors component for a ready-made one.\nWith Iso-surfaces on, each colour is one band of values.\nBeam force diagrams ignore it and use the colour that belongs to the force.", GH_ParamAccess.list);
             pManager[pManager.ParamCount - 1].Optional = true;
             pManager.AddIntervalParameter("Range", "Range", "Range the gradient is stretched over, in the unit picked under Unit. Left empty it fits what is drawn, which is what makes two steps impossible to compare - set it to compare them.", GH_ParamAccess.item);
             pManager[pManager.ParamCount - 1].Optional = true;
@@ -121,7 +130,8 @@ namespace Alpaca4d.Gh
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.Register_StringParam("Info", "Info", "What is drawn, the unit it is in, and the range it spans.");
-            pManager.Register_DoubleParam("Values", "Values", "The value each colour stands for, one per colour of Colors, from the low end to the high - over Range when it is set - in the unit picked under Unit. Feed it to the Data input of Legend, so the legend and the model agree.");
+            pManager.Register_DoubleParam("Values", "Values", "The value each colour stands for, one per colour of Colors, from the low end to the high - over Range when it is set - in the unit picked under Unit. " +
+                "With Iso-surfaces on, the edges of the bands instead, one more than there are colours. Feed it to the Data input of Legend, so the legend and the model agree.");
             pManager.Register_ColourParam("Colors", "Colors", "The gradient used. Feed it to the Colors input of Legend, so the legend and the model agree.");
         }
 
@@ -219,6 +229,9 @@ namespace Alpaca4d.Gh
             _slDiagramScale = new MenuSlider(1, "DiagramScale", 0.0, 20.0, 1.0, 2);
             _slDiagramScale.ValueChanged += OnWidgetChanged;
 
+            _ckBands = new MenuCheckBox(5, "IsoSurfaces", "Iso-surfaces");
+            _ckBands.ValueChanged += OnWidgetChanged;
+
             _ckWires = new MenuCheckBox(2, "Wires", "Element edges") { Active = true };
             _ckWires.ValueChanged += OnWidgetChanged;
 
@@ -239,6 +252,7 @@ namespace Alpaca4d.Gh
             displayPanel.AddControl(_ckExtruded);
             displayPanel.AddControl(_txDiagramScale);
             displayPanel.AddControl(_slDiagramScale);
+            displayPanel.AddControl(_ckBands);
             displayPanel.AddControl(_ckWires);
             displayPanel.AddControl(_ckValues);
             displayPanel.AddControl(_txTextSize);
@@ -269,6 +283,7 @@ namespace Alpaca4d.Gh
             _ckAnimate.ValueChanged += OnAnimateChanged;
             _ckExtruded.ValueChanged += OnWidgetChanged;
             _slDiagramScale.ValueChanged += OnWidgetChanged;
+            _ckBands.ValueChanged += OnWidgetChanged;
             _ckWires.ValueChanged += OnWidgetChanged;
             _ckValues.ValueChanged += OnWidgetChanged;
             _slTextSize.ValueChanged += OnWidgetChanged;
@@ -341,6 +356,9 @@ namespace Alpaca4d.Gh
             Show(ResultField.HasAxes(family), _txAxes, _ddAxes);
             Show(ResultField.HasReactionStyle(family), _txReaction, _ddReaction);
             Show(ResultField.HasScale(family), _txDiagramScale, _slDiagramScale);
+
+            // Beam force diagrams are coloured by the force, not by the gradient.
+            Show(family != ResultFamily.BeamForce, _ckBands);
 
             var quantity = ResultField.QuantityOf(family, _ddComponent?.Value ?? 0);
             for (int i = 0; i < _ddUnits.Length; i++)
@@ -544,6 +562,7 @@ namespace Alpaca4d.Gh
         private void Clear()
         {
             _shaded.Clear();
+            _faceEdges.Clear();
             _ghostMeshes.Clear();
             _ghostCurves.Clear();
             _curves.Clear();
@@ -641,6 +660,8 @@ namespace Alpaca4d.Gh
             }
 
             _gradient = ColourScale.Stops(palette, _min, _max);
+            _palette = palette;
+            _banded = (_ckBands?.Active ?? false) && family != ResultFamily.BeamForce;
 
             Dictionary<int, Vector3d> displacement = null;
             if (_ckDeformed?.Active ?? false)
@@ -656,8 +677,11 @@ namespace Alpaca4d.Gh
             // The scale, not the values drawn: Legend reads its range from the ends of what it is
             // given, and the values drawn knew nothing of a Range, so it took a second wire to put
             // Range into Legend as well. Nothing drawn and no Range gives no scale.
+            //
+            // With iso-surfaces, the edges of the bands, one more than there are colours, which
+            // Legend takes as its cue to write them between its swatches rather than on them.
             if (ranged || shown.Count > 0)
-                DA.SetDataList(1, ColourScale.LabelValues(_min, _max, palette.Count));
+                DA.SetDataList(1, ColourScale.LabelValues(_min, _max, palette.Count + (_banded ? 1 : 0)));
             DA.SetDataList(2, palette);
 
             Rhino.RhinoDoc.ActiveDoc?.Views?.Redraw();
@@ -872,14 +896,31 @@ namespace Alpaca4d.Gh
         /// A value painted along a beam, given at points from 0 at its start to 1 at its end. Drawn
         /// as short lines each in the colour of its middle, or with Extruded beams on, as the beam's
         /// section carried along it with a ring at every point in the colour there.
+        ///
+        /// With iso-surfaces, as one stretch per band instead, cut where the value crosses into the
+        /// next - extruded, two rings at each cut, one in either colour.
         /// </summary>
         private void Paint(IBeam beam, Point3d start, Point3d end, List<Tuple<double, double>> samples)
         {
+            var axis = end - start;
+
+            if (_banded)
+            {
+                var stretches = IsoBands.Along(samples, _min, _max, _palette.Count);
+                if (Extrude(beam, start, end, stretches.SelectMany(x => new[] { x.Item1, x.Item2 }).ToList(),
+                            stretches.SelectMany(x => new[] { _palette[x.Item3], _palette[x.Item3] }).ToList()))
+                    return;
+
+                foreach (var stretch in stretches.Where(x => x.Item2 > x.Item1))
+                    _curves.Add(Tuple.Create((Curve)new LineCurve(start + axis * stretch.Item1, start + axis * stretch.Item2),
+                                             _palette[stretch.Item3]));
+                return;
+            }
+
             if (Extrude(beam, start, end, samples.Select(x => x.Item1).ToList(),
                         samples.Select(x => Colour(x.Item2)).ToList()))
                 return;
 
-            var axis = end - start;
             for (int i = 0; i < samples.Count - 1; i++)
             {
                 var segment = new LineCurve(start + axis * samples[i].Item1, start + axis * samples[i + 1].Item1);
@@ -1109,19 +1150,19 @@ namespace Alpaca4d.Gh
             }
 
             mesh.VertexColors.Clear();
+            _faceEdges.Add(mesh);
+
             double label = 0.0;
-            bool hasLabel = false;
+            double[] corners = null;
 
             if (family == ResultFamily.Displacement && _field.ByNode != null && nodes != null)
             {
+                corners = new double[mesh.Vertices.Count];
                 for (int i = 0; i < mesh.Vertices.Count; i++)
                 {
-                    double value = ValueAtNode(i < nodes.Count ? nodes[i] : null);
-                    mesh.VertexColors.Add(Colour(value));
-                    if (Math.Abs(value) > Math.Abs(label)) label = value;
+                    corners[i] = ValueAtNode(i < nodes.Count ? nodes[i] : null);
+                    if (Math.Abs(corners[i]) > Math.Abs(label)) label = corners[i];
                 }
-
-                hasLabel = true;
             }
             else if (coloured && tag.HasValue && _field.ByElement != null && _field.ByElement.ContainsKey(tag.Value))
             {
@@ -1135,29 +1176,38 @@ namespace Alpaca4d.Gh
                 // far side of the triangle from where it was read.
                 var values = _field.ByElement[tag.Value];
                 bool edges = midEdge && values.Count == 3 && mesh.Vertices.Count == 3;
+                corners = new double[mesh.Vertices.Count];
                 for (int i = 0; i < mesh.Vertices.Count; i++)
                 {
-                    double value = edges
+                    corners[i] = edges
                         ? (values[0] + values[1] + values[2] - values[i]) * 0.5
                         : values[Math.Min(i, values.Count - 1)];
-                    mesh.VertexColors.Add(Colour(value));
                 }
 
                 foreach (var value in values)
                     if (Math.Abs(value) > Math.Abs(label)) label = value;
-
-                hasLabel = true;
             }
-            else
+
+            if (corners == null)
             {
                 // Passed the filter, but this result has nothing to say about it.
                 mesh.VertexColors.CreateMonotoneMesh(Color.FromArgb(210, 210, 210));
+                _shaded.Add(mesh);
+                return;
             }
 
-            _shaded.Add(mesh);
+            if (_banded)
+            {
+                _shaded.Add(IsoBands.Paint(mesh, corners, _palette, _min, _max));
+            }
+            else
+            {
+                foreach (var value in corners)
+                    mesh.VertexColors.Add(Colour(value));
+                _shaded.Add(mesh);
+            }
 
-            if (hasLabel)
-                Label(mesh.GetBoundingBox(false).Center, label);
+            Label(mesh.GetBoundingBox(false).Center, label);
         }
 
         /// <summary>
@@ -1293,6 +1343,9 @@ namespace Alpaca4d.Gh
 
         private Color Colour(double value)
         {
+            if (_banded && _palette != null && _palette.Count > 0)
+                return _palette[ColourScale.Band(value, _min, _max, _palette.Count)];
+
             return _gradient != null && _gradient.Count > 0
                 ? Alpaca4d.Colors.GetColor(value, _gradient)
                 : Color.Gray;
@@ -1406,7 +1459,7 @@ namespace Alpaca4d.Gh
                 foreach (var mesh in _ghostMeshes)
                     args.Display.DrawMeshWires(mesh, ghostLine, 1);
 
-                foreach (var mesh in _shaded)
+                foreach (var mesh in _faceEdges)
                     args.Display.DrawMeshWires(mesh, Color.Black, 1);
 
                 foreach (var mesh in _beamEdges)
