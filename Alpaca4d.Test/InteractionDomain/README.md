@@ -12,7 +12,7 @@ under mono; a patch's mesh vertices are stood in for by check points on the outl
 
 | case | against |
 | --- | --- |
-| 300 x 500 rectangle, C30/37 and B500 design values, 3 φ20 + 2 φ16 | pure compression fcd Ac + Es εc2 As and pure tension fyd As; 24 random ultimate planes imposed on a `zeroLengthSection` of the same fibres, N My Mz to 0.05; Moment Curvature's own deck at N = -1000 and 0, read up to the first fibre at its limit, against the Mz = 0 cut |
+| 300 x 500 rectangle, C30/37 and B500 design values, 3 φ20 + 2 φ16 | pure compression fcd Ac + Es εc2 As and pure tension fyd As; 24 random ultimate planes imposed on a `zeroLengthSection` of the same fibres, N My Mz to 0.05; every point of the surface with a fibre at its limit, the bars at εud at N = 0 among them; Moment Curvature's own deck at N = -1000 and 0, read up to the first fibre at its limit, against the Mz = 0 cut |
 | an L of two 250 x 800 legs | the same, the Moment Curvature deck's neutral axis turning as Mz stays zero |
 | HEA 300 in S355 with its root fillets, εud = 5% | A, Wpl,y, Wpl,z against the tables; A fy, Wpl,y fy and Wpl,z fy (from below: the web sits in the elastic core about z); Mpl,y - N²/(4 tw fy) while the web carries N, where EN 1993-1-1 6.2.9.1 makes no reduction; the N-My cut |
 | the same, εud = fy/E | Wel,y fy and Wel,z fy exactly, and N/Npl + My/Mel,y + Mz/Mel,z = 1 round a level; checked at its fibres rather than its outline, first yield comes out high |

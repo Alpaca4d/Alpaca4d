@@ -291,7 +291,7 @@ class InteractionDomainCheck
             for (int i = 0; i < Math.Min(force.Count, deformation.Count); i++)
             {
                 // Deformations come as e0, kz, ky; forces as P, Mz, My.
-                double ratio = 1.0 / domain.LimitFactor(deformation[i][0], deformation[i][2], deformation[i][1]);
+                double ratio = domain.UltimateRatio(deformation[i][0], deformation[i][2], deformation[i][1]);
                 double my = force[i][2];
                 if (ratio >= 1.0)
                     return lastMy + (my - lastMy) * (1.0 - lastRatio) / (ratio - lastRatio);
@@ -304,6 +304,20 @@ class InteractionDomainCheck
         {
             Directory.SetCurrentDirectory(previous);
         }
+    }
+
+    /// <summary>
+    /// Every point of the surface is on an ultimate plane: a fibre at its limit, none past it. A
+    /// plane stopped short of its limits lies inside the domain, on the safe side, and so passes
+    /// every comparison with a reading taken off the same planes.
+    /// </summary>
+    static void AtLimits(string name, InteractionDomain domain)
+    {
+        var ratios = domain.Grid.SelectMany(row => row)
+            .Select(p => domain.UltimateRatio(p.Axial, p.CurvatureY, p.CurvatureZ)).ToList();
+        int off = ratios.Count(r => Math.Abs(r - 1.0) > 1e-9);
+        Check($"{name}: every point of the surface has a fibre at its limit", off == 0,
+              $"{ratios.Count - off} of {ratios.Count}, ratios {F(ratios.Min())} to {F(ratios.Max())}");
     }
 
     static double FarMy(InteractionDomain domain, double n)
@@ -329,6 +343,14 @@ class InteractionDomainCheck
 
         AgainstOpenSees("rectangle", s, domain, new IMaterial[] { concrete, steel });
 
+        // The bars are 50 mm inside the edge, so where they reach eud the concrete's edge is strained
+        // further still - past the curves' end, which used to stop the plane short.
+        AtLimits("rectangle", domain);
+        domain.LineHits(0.0, 0.0, out _, out var bending);
+        Check("N = 0, positive My: the bars in tension govern, at eud",
+              domain.Governs(bending.Axial, bending.CurvatureY, bending.CurvatureZ).Contains("+0.01 in tension"),
+              domain.Governs(bending.Axial, bending.CurvatureY, bending.CurvatureZ));
+
         foreach (var n in new[] { -1000.0, 0.0 })
             Near($"N = {n}: Moment Curvature's deck at its first limit against the Mz = 0 cut",
                  MomentCurvatureAtLimit(s, domain, n, 0.08, 4000), FarMy(domain, n), 0.2);
@@ -350,6 +372,7 @@ class InteractionDomainCheck
         Relative("pure compression", domain.Nc, -(fcd * s.FilledArea + Math.Min(fyd, Es * 0.002) * s.SteelArea), 1e-6);
         Relative("pure tension", domain.Nt, fyd * s.SteelArea, 1e-9);
         AgainstOpenSees("L", s, domain, materials);
+        AtLimits("L", domain);
 
         // With Mz left free the neutral axis turns as the section bends; the deck ends on the
         // Mz = 0 cut, which is not where a plane curving about y alone ends.
